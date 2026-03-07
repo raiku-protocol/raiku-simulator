@@ -18,9 +18,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"></script>
 <style>
 :root {
-    --lime: #C0FF38; --lime-dim: #C0FF3830; --dark: #1B1D1E; --bg: #0C0C0E; --blue: #4D63B6;
-    --sky: #67D1FF; --green2: #BDD970; --card: #1B1D1E; --card-border: #2a2c2d;
-    --text: #e0e0e0; --text2: #888; --gap: 14px; --radius: 10px;
+    --lime: #C0FF38; --lime-dim: #C0FF3830; --dark: #0a0b0c; --bg: #050506;
+    --card: #111213; --card-border: #1e1f20;
+    --text: #e0e0e0; --text2: #555; --gap: 14px; --radius: 10px;
     --font-display: 'Space Grotesk', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 }
@@ -51,21 +51,27 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 .kpi-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
 .kpi-value { font-size:22px; font-weight:700; color:var(--lime); font-variant-numeric:tabular-nums; font-family:var(--font-mono); }
 .kpi-sub { font-size:10px; color:var(--text2); margin-top:2px; }
-.kpi-value.blue { color:var(--sky); }
+.kpi-value.blue { color:#fff; }
 .kpi-value.white { color:#fff; }
 
 /* Controls */
-.controls-section { background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); padding:20px; margin-bottom:var(--gap); }
-.controls-section h2 { font-size:13px; font-weight:600; color:var(--lime); margin-bottom:14px; text-transform:uppercase; letter-spacing:2px; font-family:var(--font-mono); }
-.controls-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:14px; }
-.control { display:flex; flex-direction:column; gap:3px; }
-.control label { font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; }
-.control .slider-row { display:flex; align-items:center; gap:10px; }
-.control input[type=range] { flex:1; accent-color:var(--lime); height:6px; cursor:pointer; }
-.control .val { font-size:18px; font-weight:700; color:var(--lime); min-width:80px; text-align:right; font-variant-numeric:tabular-nums; font-family:var(--font-mono); }
-.control .val.blue { color:var(--sky); }
-.note { font-size:9.5px; color:var(--text2); font-style:italic; line-height:1.3; }
-.section-label { font-size:12px; font-weight:600; color:var(--sky); padding-bottom:4px; border-bottom:1px solid #333; grid-column:1/-1; margin-top:6px; }
+.controls-section { background:var(--card); border:2px solid var(--lime); border-radius:var(--radius); padding:24px; margin-bottom:var(--gap); box-shadow:0 0 30px #C0FF3812, inset 0 1px 0 #C0FF3810; }
+.controls-section h2 { font-size:15px; font-weight:700; color:var(--lime); margin-bottom:18px; text-transform:uppercase; letter-spacing:2px; font-family:var(--font-mono); display:flex; align-items:center; gap:10px; }
+.controls-section h2::before { content:'⚡'; font-size:16px; }
+.controls-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:18px; }
+.control { display:flex; flex-direction:column; gap:5px; }
+.control label { font-size:12px; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; font-weight:500; }
+.control .slider-row { display:flex; align-items:center; gap:12px; }
+.control input[type=range] { flex:1; -webkit-appearance:none; appearance:none; height:10px; background:#222; border-radius:5px; cursor:pointer; outline:none; transition:background 0.2s; }
+.control input[type=range]:hover { background:#2a2a2a; }
+.control input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:22px; height:22px; border-radius:50%; background:var(--lime); cursor:pointer; border:3px solid var(--bg); box-shadow:0 0 10px #C0FF3860, 0 2px 6px rgba(0,0,0,0.4); transition:transform 0.15s, box-shadow 0.15s; }
+.control input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.15); box-shadow:0 0 16px #C0FF3890, 0 2px 8px rgba(0,0,0,0.5); }
+.control input[type=range]::-moz-range-thumb { width:22px; height:22px; border-radius:50%; background:var(--lime); cursor:pointer; border:3px solid var(--bg); box-shadow:0 0 10px #C0FF3860; }
+.control input[type=range]::-moz-range-track { height:10px; background:#222; border-radius:5px; }
+.control .val { font-size:22px; font-weight:700; color:var(--lime); min-width:90px; text-align:right; font-variant-numeric:tabular-nums; font-family:var(--font-mono); }
+.control .val.blue { color:#fff; }
+.note { font-size:10px; color:var(--text2); font-style:italic; line-height:1.4; }
+.section-label { font-size:13px; font-weight:600; color:var(--lime); padding-bottom:6px; border-bottom:1px solid #2a2a2a; grid-column:1/-1; margin-top:8px; }
 
 .section { background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); padding:20px; margin-bottom:var(--gap); }
 .section h2 { font-size:13px; font-weight:600; color:var(--lime); margin-bottom:14px; text-transform:uppercase; letter-spacing:2px; font-family:var(--font-mono); }
@@ -80,7 +86,7 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 /* Revenue cards */
 .rev-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:var(--gap); margin-bottom:var(--gap); }
 .rev-card { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:18px; }
-.rev-card h3 { color:var(--sky); font-size:13px; margin-bottom:10px; }
+.rev-card h3 { color:var(--lime); font-size:13px; margin-bottom:10px; }
 .rev-line { display:flex; justify-content:space-between; padding:3px 0; font-size:12px; border-bottom:1px solid #222; }
 .rev-line:last-child { border-bottom:none; }
 .rev-line .label { color:var(--text2); }
@@ -89,7 +95,7 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 .rev-total .value { color:var(--lime); }
 
 .chart-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(380px, 1fr)); gap:var(--gap); margin-bottom:var(--gap); }
-.chart-box { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:18px; }
+.chart-box { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:18px; min-height:280px; position:relative; }
 .chart-box h3 { color:var(--text); font-size:12px; margin-bottom:10px; }
 .chart-box canvas { max-height:260px; }
 
@@ -108,9 +114,9 @@ th:hover { color:var(--lime); }
 td { padding:5px 8px; border-bottom:1px solid #1a1a1a; font-variant-numeric:tabular-nums; }
 tr:hover td { background:#141516; }
 .tag { display:inline-block; padding:1px 6px; border-radius:3px; font-size:9px; font-weight:600; text-transform:uppercase; }
-.tag.aot { background:#4D63B622; color:var(--blue); border:1px solid var(--blue); }
+.tag.aot { background:#ffffff15; color:#ccc; border:1px solid #888; }
 .tag.jit { background:#C0FF3822; color:var(--lime); border:1px solid var(--lime); }
-.tag.both { background:#67D1FF22; color:var(--sky); border:1px solid var(--sky); }
+.tag.both { background:#C0FF3815; color:var(--lime); border:1px solid var(--lime); }
 .tag.potential { background:#BDD97022; color:var(--green2); border:1px solid var(--green2); }
 .tag.neither { background:#88888822; color:#888; border:1px solid #555; }
 .filter-row { display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
@@ -125,8 +131,16 @@ tr:hover td { background:#141516; }
 
 .footer { text-align:center; padding:24px 16px; color:var(--text2); font-size:10px; font-family:var(--font-mono); letter-spacing:0.5px; border-top:1px solid var(--card-border); margin-top:8px; }
 
+/* Tabs */
+.tab-bar { display:flex; gap:2px; margin-bottom:var(--gap); background:#0d0e0f; border-radius:var(--radius); padding:3px; border:1px solid var(--card-border); }
+.tab-btn { flex:1; padding:10px 16px; background:transparent; border:none; color:var(--text2); font-size:12px; font-weight:600; font-family:var(--font-mono); letter-spacing:1px; text-transform:uppercase; cursor:pointer; border-radius:8px; transition:all 0.2s; white-space:nowrap; }
+.tab-btn:hover { color:var(--text); background:#1a1b1c; }
+.tab-btn.active { background:var(--lime); color:var(--bg); box-shadow:0 0 16px #C0FF3840; }
+.tab-content { display:none; }
+.tab-content.active { display:block; animation:fadeIn 0.35s ease-out; }
+
 /* Background atmosphere */
-body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100%; background:radial-gradient(ellipse at 20% 0%, #C0FF3808 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, #4D63B608 0%, transparent 50%); pointer-events:none; z-index:-1; }
+body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100%; background:radial-gradient(ellipse at 20% 0%, #C0FF3806 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, #C0FF3804 0%, transparent 50%); pointer-events:none; z-index:-1; }
 
 /* Card hover effects */
 .section { transition:border-color 0.3s, box-shadow 0.3s; }
@@ -146,6 +160,7 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
     .chart-row { grid-template-columns:1fr; }
     .rev-row { grid-template-columns:1fr; }
     .wf-row { grid-template-columns:repeat(2,1fr); }
+    .tab-btn { font-size:10px; padding:8px 10px; letter-spacing:0.5px; }
 }
 </style>
 </head>
@@ -167,27 +182,48 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
     </button>
 </div>
 
+<!-- TAB BAR -->
+<div class="tab-bar" style="animation:fadeIn 0.5s ease-out;">
+    <button class="tab-btn active" onclick="switchTab('macro')">⚡ Revenue Model</button>
+    <button class="tab-btn" onclick="switchTab('micro')">📊 Programs</button>
+    <button class="tab-btn" onclick="switchTab('data')">🔗 Solana Data</button>
+</div>
+
+<!-- ═══ TAB 1: REVENUE MODEL (Macro) ═══ -->
+<div class="tab-content active" id="tab-macro">
+
+<!-- QUICK ACTIONS BAR -->
+<div style="display:flex;justify-content:flex-end;margin-bottom:8px;gap:10px;">
+    <a href="#model-params" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#C0FF3812;border:1px solid var(--lime);border-radius:6px;color:var(--lime);font-size:11px;font-family:var(--font-mono);text-decoration:none;letter-spacing:0.5px;transition:all 0.2s;" onmouseover="this.style.background='var(--lime)';this.style.color='var(--bg)'" onmouseout="this.style.background='#C0FF3812';this.style.color='var(--lime)'">⚡ Adjust Parameters ↓</a>
+</div>
+
 <!-- TOP REVENUE OVERVIEW -->
 <div class="section fade-in fade-in-1">
     <h2>Revenue Overview</h2>
+    <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-family:var(--font-mono);">Revenue Sources</div>
     <div class="wf-row">
         <div class="wf-item" style="border-color:var(--text2)"><div class="wf-label">Gross Revenue</div><div class="wf-val" style="color:var(--text)" id="wf-gross">&mdash;</div><div class="wf-sub" id="wf-gross-sol"></div></div>
         <div class="wf-item" style="border-color:var(--lime)"><div class="wf-label">JIT (tips market)</div><div class="wf-val" style="color:var(--lime)" id="wf-jit">&mdash;</div><div class="wf-sub" id="wf-jit-pct"></div></div>
-        <div class="wf-item" style="border-color:var(--blue)"><div class="wf-label">AOT (auctions)</div><div class="wf-val" style="color:var(--sky)" id="wf-aot">&mdash;</div><div class="wf-sub" id="wf-aot-pct"></div></div>
-        <div class="wf-item" style="border-color:#555"><div class="wf-label">Validators</div><div class="wf-val" style="color:var(--text2)" id="wf-val">&mdash;</div><div class="wf-sub" id="wf-val-sub"></div></div>
-        <div class="wf-item" style="border-color:var(--lime)"><div class="wf-label">Protocol Treasury</div><div class="wf-val" style="color:var(--lime)" id="wf-treasury">&mdash;</div><div class="wf-sub" id="wf-treasury-mo"></div></div>
+        <div class="wf-item" style="border-color:#888"><div class="wf-label">AOT (auctions)</div><div class="wf-val" style="color:#fff" id="wf-aot">&mdash;</div><div class="wf-sub" id="wf-aot-pct"></div></div>
+    </div>
+    <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-family:var(--font-mono);">Fee Distribution</div>
+    <div class="wf-row">
+        <div class="wf-item" style="border-color:#444"><div class="wf-label">Validators</div><div class="wf-val" style="color:var(--text2)" id="wf-val">&mdash;</div><div class="wf-sub" id="wf-val-sub"></div></div>
+        <div class="wf-item" style="border-color:#666"><div class="wf-label">Customer Rebates</div><div class="wf-val" style="color:#aaa" id="wf-rebates">&mdash;</div><div class="wf-sub" id="wf-rebates-sub"></div></div>
+        <div class="wf-item" style="border-color:#C0FF3860"><div class="wf-label">Validator Bonus</div><div class="wf-val" style="color:#C0FF38aa" id="wf-vbonus">&mdash;</div><div class="wf-sub" id="wf-vbonus-sub"></div></div>
+        <div class="wf-item" style="border-color:var(--lime)"><div class="wf-label">Protocol Revenue</div><div class="wf-val" style="color:var(--lime)" id="wf-treasury">&mdash;</div><div class="wf-sub" id="wf-treasury-mo"></div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);">
-        <div class="chart-box"><h3>Revenue Split (Protocol Treasury)</h3><canvas id="chart-split"></canvas></div>
-        <div class="chart-box"><h3>Gross Revenue Distribution</h3><canvas id="chart-waterfall"></canvas></div>
+        <div class="chart-box"><h3>Gross Revenue Split (JIT vs AOT)</h3><canvas id="chart-split"></canvas></div>
+        <div class="chart-box"><h3>Fee Distribution Breakdown</h3><canvas id="chart-waterfall"></canvas></div>
     </div>
 </div>
 
 <!-- KPIs -->
 <div class="kpi-row fade-in fade-in-2">
-    <div class="kpi"><div class="kpi-label">Protocol Treasury</div><div class="kpi-value" id="kpi-total">&mdash;</div><div class="kpi-sub" id="kpi-total-sub"></div></div>
-    <div class="kpi"><div class="kpi-label">JIT Treasury</div><div class="kpi-value blue" id="kpi-jit">&mdash;</div><div class="kpi-sub" id="kpi-jit-sub"></div></div>
-    <div class="kpi"><div class="kpi-label">AOT Treasury</div><div class="kpi-value blue" id="kpi-aot">&mdash;</div><div class="kpi-sub" id="kpi-aot-sub"></div></div>
+    <div class="kpi"><div class="kpi-label">Protocol Revenue</div><div class="kpi-value" id="kpi-total">&mdash;</div><div class="kpi-sub" id="kpi-total-sub"></div></div>
+    <div class="kpi"><div class="kpi-label">JIT Gross</div><div class="kpi-value white" id="kpi-jit">&mdash;</div><div class="kpi-sub" id="kpi-jit-sub"></div></div>
+    <div class="kpi"><div class="kpi-label">AOT Gross</div><div class="kpi-value white" id="kpi-aot">&mdash;</div><div class="kpi-sub" id="kpi-aot-sub"></div></div>
     <div class="kpi"><div class="kpi-label">Monthly</div><div class="kpi-value" id="kpi-mo">&mdash;</div><div class="kpi-sub">protocol / month</div></div>
     <div class="kpi"><div class="kpi-label">SOL Price</div><div class="kpi-value white" id="kpi-price">&mdash;</div><div class="kpi-sub">slider value</div></div>
     <div class="kpi"><div class="kpi-label">Jito Tips (ann.)</div><div class="kpi-value white" id="kpi-jito">&mdash;</div><div class="kpi-sub">SOL / year</div></div>
@@ -207,7 +243,7 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 </div>
 
 <!-- CONTROLS -->
-<div class="controls-section">
+<div class="controls-section" id="model-params">
     <h2>Model Parameters</h2>
     <div class="controls-grid">
         <div class="section-label">Protocol</div>
@@ -215,6 +251,16 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
             <label>Protocol Commission</label>
             <div class="slider-row"><input type="range" id="sl-comm" min="0" max="10" step="0.5" value="5"><span class="val" id="v-comm">5.0%</span></div>
             <div class="note">Governance range 1-5%. 0% = all revenue to validators. Up to 10% for sensitivity.</div>
+        </div>
+        <div class="control">
+            <label>Customer Rebate Rate</label>
+            <div class="slider-row"><input type="range" id="sl-rebate" min="0" max="2" step="0.1" value="0.5"><span class="val" id="v-rebate">0.5%</span></div>
+            <div class="note">% of gross revenue returned to users as loyalty rebates (JIT + AOT). Reduces protocol revenue. Example: 0.5% on 100 SOL = 0.5 SOL back to customers.</div>
+        </div>
+        <div class="control">
+            <label>Validator Bonus Rate</label>
+            <div class="slider-row"><input type="range" id="sl-vbonus" min="0" max="3" step="0.1" value="1.5"><span class="val" id="v-vbonus">1.5%</span></div>
+            <div class="note">% of gross revenue distributed as performance bonuses to well-behaved validators. Incentivizes good behavior. Example: 1.5% on 100 SOL = 1.5 SOL bonus.</div>
         </div>
         <div class="control">
             <label>SOL Price (USD)</label>
@@ -265,8 +311,8 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
             <div style="font-size:9px;color:var(--text2);margin-top:4px;" id="sc-base-m"></div>
         </div>
         <div class="rev-card" style="text-align:center;cursor:pointer;" onclick="applyScenario('opt')">
-            <h3 style="color:var(--sky)">Optimistic</h3>
-            <div style="font-size:22px;font-weight:700;color:var(--sky);" id="sc-opt-v">&mdash;</div>
+            <h3 style="color:#fff">Optimistic</h3>
+            <div style="font-size:22px;font-weight:700;color:#fff;" id="sc-opt-v">&mdash;</div>
             <div style="font-size:10px;color:var(--text2);margin-top:4px;" id="sc-opt-d"></div>
             <div style="font-size:9px;color:var(--text2);margin-top:4px;" id="sc-opt-m"></div>
         </div>
@@ -303,10 +349,13 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
             <div class="rev-total"><span class="label">AOT Treasury</span><span class="value" id="rb-an">&mdash;</span></div>
         </div>
         <div class="rev-card">
-            <h3>Revenue Distribution</h3>
+            <h3>Fee Distribution (Commission Breakdown)</h3>
             <div class="rev-line"><span class="label">Total Gross</span><span class="value" id="rd-g">&mdash;</span></div>
-            <div class="rev-line"><span class="label">Validators</span><span class="value" id="rd-v">&mdash;</span></div>
-            <div class="rev-line"><span class="label">Protocol Treasury</span><span class="value" id="rd-t">&mdash;</span></div>
+            <div class="rev-line"><span class="label">→ Validators</span><span class="value" id="rd-v">&mdash;</span></div>
+            <div class="rev-line"><span class="label">→ Commission</span><span class="value" id="rd-comm">&mdash;</span></div>
+            <div class="rev-line"><span class="label" style="padding-left:14px">Customer Rebates</span><span class="value" id="rd-reb">&mdash;</span></div>
+            <div class="rev-line"><span class="label" style="padding-left:14px">Validator Bonus</span><span class="value" id="rd-vb">&mdash;</span></div>
+            <div class="rev-total"><span class="label">Protocol Revenue</span><span class="value" id="rd-t">&mdash;</span></div>
             <div class="rev-line"><span class="label" style="padding-left:10px">Per month</span><span class="value" id="rd-m">&mdash;</span></div>
             <div class="rev-line"><span class="label" style="padding-left:10px">In SOL/yr</span><span class="value" id="rd-s">&mdash;</span></div>
         </div>
@@ -320,6 +369,37 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
     <div class="table-wrap" id="aot-matrix"></div>
 </div>
 
+
+</div><!-- end tab-macro -->
+
+<!-- ═══ TAB 2: PROGRAMS (Micro) ═══ -->
+<div class="tab-content" id="tab-micro">
+
+<div class="section fade-in">
+    <h2>Program Explorer</h2>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:12px;">Solana on-chain program data from Dune Analytics (30-day window: Feb 4 – Mar 5, 2026). Filter by product type, subcategory, or search by name/address. Sortable columns.</div>
+    <div class="filter-row">
+        <select id="f-prod" onchange="renderTable()"><option value="all">All Products</option><option value="aot">AOT</option><option value="jit">JIT</option><option value="both">Both</option><option value="potential">Potential</option></select>
+        <select id="f-sub" onchange="renderTable()"><option value="all">All Subcategories</option></select>
+        <input type="text" id="f-search" placeholder="Search..." oninput="renderTable()">
+        <label><input type="checkbox" id="f-hide-sys" checked onchange="renderTable()"> Hide system programs</label>
+    </div>
+    <div class="table-wrap" id="prog-table"></div>
+</div>
+
+</div><!-- end tab-micro -->
+
+<!-- ═══ TAB 3: SOLANA DATA ═══ -->
+<div class="tab-content" id="tab-data">
+
+<div class="kpi-row fade-in" id="data-kpis">
+    <div class="kpi"><div class="kpi-label">Jito Tips (annualized)</div><div class="kpi-value white" id="dk-mev">&mdash;</div><div class="kpi-sub">SOL / year (36 epochs)</div></div>
+    <div class="kpi"><div class="kpi-label">Priority Fees (annualized)</div><div class="kpi-value white" id="dk-pf">&mdash;</div><div class="kpi-sub">SOL / year (36 epochs)</div></div>
+    <div class="kpi"><div class="kpi-label">Avg SOL Price</div><div class="kpi-value white" id="dk-price">&mdash;</div><div class="kpi-sub">over 36 epochs</div></div>
+    <div class="kpi"><div class="kpi-label">Epochs Tracked</div><div class="kpi-value white" id="dk-epochs">&mdash;</div><div class="kpi-sub">epochs 836–935</div></div>
+    <div class="kpi"><div class="kpi-label">Programs Tracked</div><div class="kpi-value white" id="dk-progs">&mdash;</div><div class="kpi-sub">from Dune 30d data</div></div>
+</div>
+
 <!-- CHARTS -->
 <div class="chart-row">
     <div class="chart-box"><h3>Priority Fees & Jito Tips per Epoch (SOL)</h3><canvas id="chart-epoch"></canvas></div>
@@ -330,17 +410,7 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
     <div class="chart-box"><h3>Fee/CU by Program Subcategory (on-chain)</h3><canvas id="chart-fcu"></canvas></div>
 </div>
 
-<!-- PROGRAM TABLE -->
-<div class="section fade-in fade-in-6">
-    <h2>Program Explorer</h2>
-    <div class="filter-row">
-        <select id="f-prod" onchange="renderTable()"><option value="all">All Products</option><option value="aot">AOT</option><option value="jit">JIT</option><option value="both">Both</option><option value="potential">Potential</option></select>
-        <select id="f-sub" onchange="renderTable()"><option value="all">All Subcategories</option></select>
-        <input type="text" id="f-search" placeholder="Search..." oninput="renderTable()">
-        <label><input type="checkbox" id="f-hide-sys" checked onchange="renderTable()"> Hide system programs</label>
-    </div>
-    <div class="table-wrap" id="prog-table"></div>
-</div>
+</div><!-- end tab-data -->
 
 <div class="footer">
     RAIKU Revenue Simulator v3 &mdash; Trillium API (epochs 836-935), Dune Analytics (per-program 30d), CoinGecko<br>
@@ -355,10 +425,10 @@ const D =
 const SY = 78_408_000, CB = 60_000_000, LS = 1_000_000_000;
 
 const SC = {
-    con:  {c:2,j:2,s:1,b:5,f:0.05,p:80, desc:"Conservative: 1% stake (~5 small validators), 5% block share, 0.05 L/CU (PropAMM-level), 2% JIT share, 2% commission, $80 SOL."},
-    base: {c:5,j:5,s:5,b:10,f:0.10,p:Math.round(D.a.price), desc:"Base Case: 5% stake (~25 mid-size validators at 150K SOL each), 10% block share (6M CU), 0.10 L/CU (weighted avg), 5% JIT share, 5% commission, SOL at current avg."},
-    opt:  {c:5,j:10,s:15,b:15,f:0.30,p:150, desc:"Optimistic: 15% stake (~75 validators), 15% block share, 0.30 L/CU (competitive auctions), 10% JIT share, 5% commission, $150 SOL."},
-    bull: {c:5,j:20,s:30,b:20,f:0.50,p:250, desc:"Bull: 30% stake (major adoption), 20% block share, 0.50 L/CU (strong demand), 20% JIT share, 5% commission, $250 SOL."},
+    con:  {c:2,j:2,s:1,b:5,f:0.05,p:80,r:0.2,vb:0.5, desc:"Conservative: 1% stake, 5% block, 0.05 L/CU, 2% JIT, 2% commission (0.2% rebates, 0.5% bonus → 1.3% protocol)."},
+    base: {c:5,j:5,s:5,b:10,f:0.10,p:Math.round(D.a.price),r:0.5,vb:1.5, desc:"Base Case: 5% stake, 10% block, 0.10 L/CU, 5% JIT, 5% commission (0.5% rebates, 1.5% val bonus → 3% protocol revenue)."},
+    opt:  {c:5,j:10,s:15,b:15,f:0.30,p:150,r:0.5,vb:1.5, desc:"Optimistic: 15% stake, 15% block, 0.30 L/CU, 10% JIT, 5% commission (0.5% rebates, 1.5% val bonus → 3% protocol revenue)."},
+    bull: {c:5,j:20,s:30,b:20,f:0.50,p:250,r:1.0,vb:1.5, desc:"Bull: 30% stake, 20% block, 0.50 L/CU, 20% JIT, 5% commission (1% rebates, 1.5% val bonus → 2.5% protocol revenue)."},
 };
 
 function fmt(v,t){
@@ -374,6 +444,8 @@ function fmt(v,t){
 function applyScenario(n){
     const s=SC[n];
     document.getElementById('sl-comm').value=s.c;
+    document.getElementById('sl-rebate').value=s.r;
+    document.getElementById('sl-vbonus').value=s.vb;
     document.getElementById('sl-jit').value=s.j;
     document.getElementById('sl-stake').value=s.s;
     document.getElementById('sl-blk').value=s.b;
@@ -385,7 +457,7 @@ function applyScenario(n){
     update();
 }
 
-['comm','jit','stake','blk','fcu','price'].forEach(s=>{
+['comm','rebate','vbonus','jit','stake','blk','fcu','price'].forEach(s=>{
     document.getElementById('sl-'+s).addEventListener('input',()=>{
         document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.remove('active'));
         update();
@@ -394,6 +466,8 @@ function applyScenario(n){
 
 function gp(){return{
     c:+document.getElementById('sl-comm').value/100,
+    r:+document.getElementById('sl-rebate').value/100,
+    vb:+document.getElementById('sl-vbonus').value/100,
     j:+document.getElementById('sl-jit').value/100,
     s:+document.getElementById('sl-stake').value/100,
     b:+document.getElementById('sl-blk').value/100,
@@ -406,26 +480,32 @@ function calc(p){
     const ls=p.s*SY, cu=p.b*CB;
     const aG=(ls*cu*p.f)/LS, aN=aG*p.c;
     const tG=jG+aG, vS=tG*(1-p.c);
-    return{jG,jN,jU:jN*p.p, ls,cu, aG,aN,aU:aN*p.p, tG,vS, tN:jN+aN, tU:(jN+aN)*p.p};
+    // Fee distribution breakdown (from commission)
+    const commission=tG*p.c;
+    const rebates=tG*Math.min(p.r,p.c);
+    const valBonus=tG*Math.min(p.vb,Math.max(0,p.c-p.r));
+    const protRev=Math.max(0,commission-rebates-valBonus);
+    return{jG,jN,jU:jN*p.p, ls,cu, aG,aN,aU:aN*p.p, tG,vS,
+        tN:protRev, tU:protRev*p.p, commission, rebates, valBonus, protRev};
 }
 
 let cE,cS,cW,cA,cP,cF;
 function initCharts(){
     const o={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:10}}}},scales:{x:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'}}}};
     const ep=D.e.map(e=>e.e);
-    cE=new Chart(document.getElementById('chart-epoch'),{type:'line',data:{labels:ep,datasets:[{label:'Priority Fees',data:D.e.map(e=>e.pf),borderColor:'#67D1FF',borderWidth:1.5,pointRadius:0,fill:false},{label:'Jito Tips',data:D.e.map(e=>e.mev),borderColor:'#C0FF38',borderWidth:1.5,pointRadius:0,fill:false}]},options:o});
-    cS=new Chart(document.getElementById('chart-split'),{type:'doughnut',data:{labels:['JIT','AOT'],datasets:[{data:[50,50],backgroundColor:['#C0FF38','#4D63B6']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#ccc'}}}}});
-    cW=new Chart(document.getElementById('chart-waterfall'),{type:'bar',data:{labels:['JIT Gross','AOT Gross','Validators','Treasury'],datasets:[{data:[0,0,0,0],backgroundColor:['#C0FF38','#4D63B6','#555','#C0FF38']}]},options:{...o,plugins:{...o.plugins,legend:{display:false}},indexAxis:'y'}});
-    cA=new Chart(document.getElementById('chart-aot'),{type:'bar',data:{labels:['1%','2%','5%','10%','15%','20%','30%','50%'],datasets:[{label:'AOT Treasury',data:Array(8).fill(0),backgroundColor:'#4D63B6'}]},options:o});
+    cE=new Chart(document.getElementById('chart-epoch'),{type:'line',data:{labels:ep,datasets:[{label:'Priority Fees',data:D.e.map(e=>e.pf),borderColor:'#999',borderWidth:1.5,pointRadius:0,fill:false},{label:'Jito Tips',data:D.e.map(e=>e.mev),borderColor:'#C0FF38',borderWidth:1.5,pointRadius:0,fill:false}]},options:o});
+    cS=new Chart(document.getElementById('chart-split'),{type:'doughnut',data:{labels:['JIT','AOT'],datasets:[{data:[50,50],backgroundColor:['#C0FF38','#666']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#ccc'}}}}});
+    cW=new Chart(document.getElementById('chart-waterfall'),{type:'bar',data:{labels:['Validators (pass-through)','Rebates','Val. Bonus','Protocol Revenue'],datasets:[{data:[1,1,1,1],backgroundColor:['#444','#888','#C0FF3870','#C0FF38'],borderRadius:4,barThickness:28}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const v=ctx.raw;const pct=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);const p=pct>0?((v/pct)*100).toFixed(1):'0';return (v>=1e6?'$'+(v/1e6).toFixed(2)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':'$'+Math.round(v))+' ('+p+'%)';}}}},scales:{x:{beginAtZero:true,ticks:{color:'#888',font:{size:9,family:'JetBrains Mono'},callback:v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+Math.round(v/1e3)+'K':'$'+Math.round(v)},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#ccc',font:{size:10,weight:'500',family:'Space Grotesk'}},grid:{display:false}}}}});
+    cA=new Chart(document.getElementById('chart-aot'),{type:'bar',data:{labels:['1%','2%','5%','10%','15%','20%','30%','50%'],datasets:[{label:'AOT Treasury',data:Array(8).fill(0),backgroundColor:'#C0FF3880'}]},options:o});
     cP=new Chart(document.getElementById('chart-price'),{type:'line',data:{labels:ep,datasets:[{label:'SOL',data:D.e.map(e=>e.p),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:false}]},options:o});
     const st={};D.p.forEach(p=>{if(p.fpc>0&&p.prod!=='neither'){const k=p.sub||p.cat;if(!st[k])st[k]=[];st[k].push(p.fpc);}});
     const ss=Object.entries(st).map(([k,v])=>({k,a:v.reduce((a,b)=>a+b,0)/v.length})).sort((a,b)=>b.a-a.a).slice(0,15);
-    cF=new Chart(document.getElementById('chart-fcu'),{type:'bar',data:{labels:ss.map(s=>s.k),datasets:[{label:'Avg Fee/CU (L)',data:ss.map(s=>s.a),backgroundColor:'#67D1FF'}]},options:{...o,plugins:{...o.plugins,legend:{display:false}}}});
+    cF=new Chart(document.getElementById('chart-fcu'),{type:'bar',data:{labels:ss.map(s=>s.k),datasets:[{label:'Avg Fee/CU (L)',data:ss.map(s=>s.a),backgroundColor:'#C0FF38'}]},options:{...o,plugins:{...o.plugins,legend:{display:false}}}});
 }
 
 function updCharts(p,r){
-    cS.data.datasets[0].data=[r.jU,r.aU]; cS.update();
-    cW.data.datasets[0].data=[r.jG*p.p,r.aG*p.p,r.vS*p.p,r.tU]; cW.update();
+    cS.data.datasets[0].data=[r.jG*p.p,r.aG*p.p]; cS.update();
+    cW.data.datasets[0].data=[r.vS*p.p,r.rebates*p.p,r.valBonus*p.p,r.protRev*p.p]; cW.update();
     [0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50].forEach((s,i)=>{
         cA.data.datasets[0].data[i]=(s*SY*p.b*CB*p.f)/LS*p.c*p.p;
     }); cA.update();
@@ -483,30 +563,37 @@ function initFilters(){
 function update(){
     const p=gp(),r=calc(p);
     document.getElementById('v-comm').textContent=(p.c*100).toFixed(1)+'%';
+    document.getElementById('v-rebate').textContent=(p.r*100).toFixed(1)+'%';
+    document.getElementById('v-vbonus').textContent=(p.vb*100).toFixed(1)+'%';
     document.getElementById('v-jit').textContent=Math.round(p.j*100)+'%';
     document.getElementById('v-stake').textContent=(p.s*100).toFixed(1)+'%';
     document.getElementById('v-blk').textContent=Math.round(p.b*100)+'%';
     document.getElementById('v-fcu').textContent=p.f<0.1?p.f.toFixed(3):p.f.toFixed(2);
     document.getElementById('v-price').textContent='$'+p.p;
 
-    // Waterfall
+    // Waterfall - Revenue Sources
     document.getElementById('wf-gross').textContent=fmt(r.tG*p.p,'$');
     document.getElementById('wf-gross-sol').textContent=fmt(r.tG,'S')+'/yr';
     document.getElementById('wf-jit').textContent=fmt(r.jG*p.p,'$');
     document.getElementById('wf-jit-pct').textContent=r.tG>0?Math.round(r.jG/r.tG*100)+'% of gross':'';
     document.getElementById('wf-aot').textContent=fmt(r.aG*p.p,'$');
     document.getElementById('wf-aot-pct').textContent=r.tG>0?Math.round(r.aG/r.tG*100)+'% of gross':'';
+    // Waterfall - Fee Distribution
     document.getElementById('wf-val').textContent=fmt(r.vS*p.p,'$');
     document.getElementById('wf-val-sub').textContent=Math.round((1-p.c)*100)+'% of gross';
+    document.getElementById('wf-rebates').textContent=fmt(r.rebates*p.p,'$');
+    document.getElementById('wf-rebates-sub').textContent=(p.r*100).toFixed(1)+'% of gross';
+    document.getElementById('wf-vbonus').textContent=fmt(r.valBonus*p.p,'$');
+    document.getElementById('wf-vbonus-sub').textContent=(p.vb*100).toFixed(1)+'% of gross';
     document.getElementById('wf-treasury').textContent=fmt(r.tU,'$');
     document.getElementById('wf-treasury-mo').textContent=fmt(r.tU/12,'$')+'/mo';
 
     // KPIs
     document.getElementById('kpi-total').textContent=fmt(r.tU,'$')+'/yr';
     document.getElementById('kpi-total-sub').textContent=fmt(r.tN,'S')+'/yr | '+fmt(r.tU/12,'$')+'/mo';
-    document.getElementById('kpi-jit').textContent=fmt(r.jU,'$')+'/yr';
-    document.getElementById('kpi-jit-sub').textContent=fmt(r.jN,'S')+'/yr';
-    document.getElementById('kpi-aot').textContent=fmt(r.aU,'$')+'/yr';
+    document.getElementById('kpi-jit').textContent=fmt(r.jG*p.p,'$')+'/yr';
+    document.getElementById('kpi-jit-sub').textContent=fmt(r.jG,'S')+'/yr';
+    document.getElementById('kpi-aot').textContent=fmt(r.aG*p.p,'$')+'/yr';
     document.getElementById('kpi-aot-sub').textContent=fmt(r.aN,'S')+'/yr';
     document.getElementById('kpi-mo').textContent=fmt(r.tU/12,'$');
     document.getElementById('kpi-price').textContent='$'+p.p;
@@ -530,16 +617,19 @@ function update(){
     document.getElementById('rb-acc').textContent=(p.c*100).toFixed(1)+'%';
     document.getElementById('rb-an').textContent=fmt(r.aU,'$')+'/yr ('+fmt(r.aN,'S')+')';
 
-    // Distribution
+    // Distribution (commission breakdown)
     document.getElementById('rd-g').textContent=fmt(r.tG*p.p,'$')+' ('+fmt(r.tG,'S')+')';
     document.getElementById('rd-v').textContent=fmt(r.vS*p.p,'$')+' ('+Math.round((1-p.c)*100)+'%)';
-    document.getElementById('rd-t').textContent=fmt(r.tU,'$')+' ('+Math.round(p.c*100)+'%)';
+    document.getElementById('rd-comm').textContent=fmt(r.commission*p.p,'$')+' ('+Math.round(p.c*100)+'%)';
+    document.getElementById('rd-reb').textContent=fmt(r.rebates*p.p,'$')+' ('+(p.r*100).toFixed(1)+'%)';
+    document.getElementById('rd-vb').textContent=fmt(r.valBonus*p.p,'$')+' ('+(p.vb*100).toFixed(1)+'%)';
+    document.getElementById('rd-t').textContent=fmt(r.tU,'$')+'/yr';
     document.getElementById('rd-m').textContent=fmt(r.tU/12,'$')+'/mo';
     document.getElementById('rd-s').textContent=fmt(r.tN,'S');
 
     // Scenarios
     ['con','base','opt','bull'].forEach(n=>{
-        const s=SC[n],sp={c:s.c/100,j:s.j/100,s:s.s/100,b:s.b/100,f:s.f,p:s.p};
+        const s=SC[n],sp={c:s.c/100,r:s.r/100,vb:s.vb/100,j:s.j/100,s:s.s/100,b:s.b/100,f:s.f,p:s.p};
         const sr=calc(sp);
         document.getElementById('sc-'+n+'-v').textContent=fmt(sr.tU,'$')+'/yr';
         const jP=sr.tU>0?Math.round(sr.jU/sr.tU*100):0, aP=sr.tU>0?Math.round(sr.aU/sr.tU*100):0;
@@ -552,6 +642,27 @@ function update(){
 }
 
 initCharts(); initFilters(); renderTable(); applyScenario('base');
+
+// Populate Solana Data KPIs
+document.getElementById('dk-mev').textContent=fmt(D.a.mev,'S');
+document.getElementById('dk-pf').textContent=fmt(D.a.pf,'S');
+document.getElementById('dk-price').textContent='$'+Math.round(D.a.price);
+document.getElementById('dk-epochs').textContent=D.a.n;
+document.getElementById('dk-progs').textContent=D.p.filter(p=>p.prod!=='neither').length;
+
+// Tab switching
+function switchTab(id){
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('tab-'+id).classList.add('active');
+    event.currentTarget.classList.add('active');
+    // Chart.js needs resize when container becomes visible
+    requestAnimationFrame(()=>{
+        if(id==='data'){[cE,cA,cP,cF].forEach(c=>{if(c)c.resize();});}
+        if(id==='macro'){[cS,cW].forEach(c=>{if(c)c.resize();});}
+    });
+}
+window.switchTab=switchTab;
 
 function shareSimulator(){
     const url = window.location.href;
