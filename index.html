@@ -186,19 +186,78 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 <div class="tab-bar" style="animation:fadeIn 0.5s ease-out;">
     <button class="tab-btn active" onclick="switchTab('macro')">⚡ Revenue Model</button>
     <button class="tab-btn" onclick="switchTab('micro')">📊 Programs</button>
-    <button class="tab-btn" onclick="switchTab('data')">🔗 Solana Data</button>
+    <button class="tab-btn" onclick="switchTab('data')">📈 Solana Market</button>
 </div>
 
 <!-- ═══ TAB 1: REVENUE MODEL (Macro) ═══ -->
 <div class="tab-content active" id="tab-macro">
 
-<!-- QUICK ACTIONS BAR -->
-<div style="display:flex;justify-content:flex-end;margin-bottom:8px;gap:10px;">
-    <a href="#model-params" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#C0FF3812;border:1px solid var(--lime);border-radius:6px;color:var(--lime);font-size:11px;font-family:var(--font-mono);text-decoration:none;letter-spacing:0.5px;transition:all 0.2s;" onmouseover="this.style.background='var(--lime)';this.style.color='var(--bg)'" onmouseout="this.style.background='#C0FF3812';this.style.color='var(--lime)'">⚡ Adjust Parameters ↓</a>
+<!-- SCENARIO PRESETS (top, for immediate interaction) -->
+<div class="controls-section fade-in fade-in-1">
+    <h2>Scenario Presets</h2>
+    <div class="scenario-btns">
+        <button class="scenario-btn" id="btn-con" onclick="applyScenario('con')">Conservative</button>
+        <button class="scenario-btn active" id="btn-base" onclick="applyScenario('base')">Base Case</button>
+        <button class="scenario-btn" id="btn-opt" onclick="applyScenario('opt')">Optimistic</button>
+        <button class="scenario-btn" id="btn-bull" onclick="applyScenario('bull')">Bull Case</button>
+    </div>
+    <div class="scenario-desc" id="scenario-desc"></div>
+</div>
+
+<!-- MODEL PARAMETERS (sliders — user tunes before seeing results) -->
+<div class="controls-section fade-in fade-in-2" id="model-params">
+    <h2>Model Parameters</h2>
+    <div class="controls-grid">
+        <div class="section-label">Protocol</div>
+        <div class="control">
+            <label>Protocol Commission</label>
+            <div class="slider-row"><input type="range" id="sl-comm" min="0" max="10" step="0.5" value="5"><span class="val" id="v-comm">5.0%</span></div>
+            <div class="note">Governance range 1-5%. 0% = all revenue to validators. Up to 10% for sensitivity.</div>
+        </div>
+        <div class="control">
+            <label>Customer Rebate Rate</label>
+            <div class="slider-row"><input type="range" id="sl-rebate" min="0" max="2" step="0.1" value="0.5"><span class="val" id="v-rebate">0.5%</span></div>
+            <div class="note">% of gross revenue returned to users as loyalty rebates (JIT + AOT). Reduces protocol revenue.</div>
+        </div>
+        <div class="control">
+            <label>Validator Bonus Rate</label>
+            <div class="slider-row"><input type="range" id="sl-vbonus" min="0" max="3" step="0.1" value="1.5"><span class="val" id="v-vbonus">1.5%</span></div>
+            <div class="note">% of gross revenue as performance bonuses to well-behaved validators.</div>
+        </div>
+        <div class="control">
+            <label>SOL Price (USD)</label>
+            <div class="slider-row"><input type="range" id="sl-price" min="10" max="400" step="5" value="109"><span class="val" id="v-price">$109</span></div>
+            <div class="note">Default: real average from last 36 epochs ($109).</div>
+        </div>
+
+        <div class="section-label">JIT (Just-in-Time) &mdash; Real-time tip-based ordering</div>
+        <div class="control">
+            <label>JIT Market Share</label>
+            <div class="slider-row"><input type="range" id="sl-jit" min="0" max="30" step="1" value="5"><span class="val blue" id="v-jit">5%</span></div>
+            <div class="note"><strong>RAIKU's share of the global JIT auction market.</strong> Current data based on Jito MEV tips only (~811K SOL/yr). Addressable market includes all JIT providers (Jito + Harmonik + future).</div>
+        </div>
+
+        <div class="section-label">AOT (Ahead-of-Time) &mdash; Sealed-bid blockspace auctions</div>
+        <div class="control">
+            <label>RAIKU Stake %</label>
+            <div class="slider-row"><input type="range" id="sl-stake" min="0" max="50" step="0.1" value="5"><span class="val blue" id="v-stake">5.0%</span></div>
+            <div class="note">RAIKU validators' share of total Solana stake (424M SOL). 5% = ~3.9M slots/yr.</div>
+        </div>
+        <div class="control">
+            <label>Block Share (CU reserved %)</label>
+            <div class="slider-row"><input type="range" id="sl-blk" min="0" max="100" step="1" value="10"><span class="val blue" id="v-blk">10%</span></div>
+            <div class="note">% of block CU sold via AOT auction. Block = 60M CU. 10% = 6M CU/slot.</div>
+        </div>
+        <div class="control">
+            <label>Avg Auction Fee/CU (lamports)</label>
+            <div class="slider-row"><input type="range" id="sl-fcu" min="0.001" max="2" step="0.001" value="0.10"><span class="val blue" id="v-fcu">0.100</span></div>
+            <div class="note">Auction clearing price per CU. Phoenix 0.005, Arb bots 0.087, Raydium ~2.0. Base 0.10 = weighted avg.</div>
+        </div>
+    </div>
 </div>
 
 <!-- TOP REVENUE OVERVIEW -->
-<div class="section fade-in fade-in-1">
+<div class="section fade-in fade-in-3">
     <h2>Revenue Overview</h2>
     <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-family:var(--font-mono);">Revenue Sources</div>
     <div class="wf-row">
@@ -230,69 +289,6 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
     <div class="kpi"><div class="kpi-label">Priority Fees (ann.)</div><div class="kpi-value white" id="kpi-pf">&mdash;</div><div class="kpi-sub">SOL / year</div></div>
 </div>
 
-<!-- SCENARIO PRESETS -->
-<div class="controls-section">
-    <h2>Scenario Presets</h2>
-    <div class="scenario-btns">
-        <button class="scenario-btn" id="btn-con" onclick="applyScenario('con')">Conservative</button>
-        <button class="scenario-btn active" id="btn-base" onclick="applyScenario('base')">Base Case</button>
-        <button class="scenario-btn" id="btn-opt" onclick="applyScenario('opt')">Optimistic</button>
-        <button class="scenario-btn" id="btn-bull" onclick="applyScenario('bull')">Bull Case</button>
-    </div>
-    <div class="scenario-desc" id="scenario-desc"></div>
-</div>
-
-<!-- CONTROLS -->
-<div class="controls-section" id="model-params">
-    <h2>Model Parameters</h2>
-    <div class="controls-grid">
-        <div class="section-label">Protocol</div>
-        <div class="control">
-            <label>Protocol Commission</label>
-            <div class="slider-row"><input type="range" id="sl-comm" min="0" max="10" step="0.5" value="5"><span class="val" id="v-comm">5.0%</span></div>
-            <div class="note">Governance range 1-5%. 0% = all revenue to validators. Up to 10% for sensitivity.</div>
-        </div>
-        <div class="control">
-            <label>Customer Rebate Rate</label>
-            <div class="slider-row"><input type="range" id="sl-rebate" min="0" max="2" step="0.1" value="0.5"><span class="val" id="v-rebate">0.5%</span></div>
-            <div class="note">% of gross revenue returned to users as loyalty rebates (JIT + AOT). Reduces protocol revenue. Example: 0.5% on 100 SOL = 0.5 SOL back to customers.</div>
-        </div>
-        <div class="control">
-            <label>Validator Bonus Rate</label>
-            <div class="slider-row"><input type="range" id="sl-vbonus" min="0" max="3" step="0.1" value="1.5"><span class="val" id="v-vbonus">1.5%</span></div>
-            <div class="note">% of gross revenue distributed as performance bonuses to well-behaved validators. Incentivizes good behavior. Example: 1.5% on 100 SOL = 1.5 SOL bonus.</div>
-        </div>
-        <div class="control">
-            <label>SOL Price (USD)</label>
-            <div class="slider-row"><input type="range" id="sl-price" min="10" max="400" step="5" value="109"><span class="val" id="v-price">$109</span></div>
-            <div class="note">Default: real average from last 36 epochs ($109).</div>
-        </div>
-
-        <div class="section-label">JIT (Just-in-Time) &mdash; Real-time tip-based ordering</div>
-        <div class="control">
-            <label>JIT Market Share</label>
-            <div class="slider-row"><input type="range" id="sl-jit" min="0" max="30" step="1" value="5"><span class="val blue" id="v-jit">5%</span></div>
-            <div class="note"><strong>RAIKU's share of the global JIT auction market.</strong> Today, Jito dominates JIT on Solana, but Harmonik (HRMN) is a direct competitor offering an alternative MEV pipeline. Current data is based on Jito MEV tips only (~811K SOL/yr). The real addressable market includes all JIT providers (Jito + Harmonik + future entrants) and is likely larger. This slider assumes RAIKU captures X% of the combined JIT market.</div>
-        </div>
-
-        <div class="section-label">AOT (Ahead-of-Time) &mdash; RAIKU is the sole provider of sealed-bid blockspace auctions</div>
-        <div class="control">
-            <label>RAIKU Stake %</label>
-            <div class="slider-row"><input type="range" id="sl-stake" min="0" max="50" step="0.1" value="5"><span class="val blue" id="v-stake">5.0%</span></div>
-            <div class="note">RAIKU validators' share of total Solana stake (424M SOL). Determines leader slots. 5% = ~3.9M slots/yr, 20% = ~15.7M. Solana has 788 active validators.</div>
-        </div>
-        <div class="control">
-            <label>Block Share (CU reserved %)</label>
-            <div class="slider-row"><input type="range" id="sl-blk" min="0" max="100" step="1" value="10"><span class="val blue" id="v-blk">10%</span></div>
-            <div class="note">% of block CU sold via AOT auction. Block = 60M CU. 10% = 6M CU/slot. Initially capped ~10%, can grow.</div>
-        </div>
-        <div class="control">
-            <label>Avg Auction Fee/CU (lamports)</label>
-            <div class="slider-row"><input type="range" id="sl-fcu" min="0.001" max="2" step="0.001" value="0.10"><span class="val blue" id="v-fcu">0.100</span></div>
-            <div class="note">Auction clearing price (lamports per CU). On-chain observed: Phoenix 0.005, PropAMMs 0.016&ndash;0.027, Arb bots 0.087, Raydium ~2.0. Base case 0.10 = weighted avg.</div>
-        </div>
-    </div>
-</div>
 
 <!-- SCENARIOS COMPARISON -->
 <div class="section fade-in fade-in-3">
@@ -362,8 +358,15 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
     </div>
 </div>
 
-<!-- AOT SENSITIVITY MATRIX -->
+<!-- AOT REVENUE SENSITIVITY CHART (model output) -->
 <div class="section fade-in fade-in-5">
+    <h2>AOT Revenue by Stake %</h2>
+    <div class="note" style="margin-bottom:10px">Protocol treasury (USD/yr) at different RAIKU stake levels. Block share, Fee/CU & SOL price from sliders above.</div>
+    <div class="chart-box" style="min-height:220px;"><canvas id="chart-aot"></canvas></div>
+</div>
+
+<!-- AOT SENSITIVITY MATRIX -->
+<div class="section fade-in fade-in-6">
     <h2>AOT Sensitivity &mdash; Protocol Treasury (USD/yr)</h2>
     <div class="note" style="margin-bottom:10px">Rows = Stake %, Cols = Fee/CU. Block share & SOL price from sliders. Highlighted = current.</div>
     <div class="table-wrap" id="aot-matrix"></div>
@@ -387,6 +390,13 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
     <div class="table-wrap" id="prog-table"></div>
 </div>
 
+<!-- FEE/CU BY SUBCATEGORY (program-level data) -->
+<div class="section fade-in" style="margin-top:var(--gap);">
+    <h2>Fee/CU by Program Subcategory</h2>
+    <div class="note" style="margin-bottom:10px">Average auction clearing price (lamports per CU) across on-chain program subcategories. Higher = more valuable blockspace demand.</div>
+    <div class="chart-box" style="min-height:260px;"><canvas id="chart-fcu"></canvas></div>
+</div>
+
 </div><!-- end tab-micro -->
 
 <!-- ═══ TAB 3: SOLANA DATA ═══ -->
@@ -400,14 +410,10 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
     <div class="kpi"><div class="kpi-label">Programs Tracked</div><div class="kpi-value white" id="dk-progs">&mdash;</div><div class="kpi-sub">from Dune 30d data</div></div>
 </div>
 
-<!-- CHARTS -->
+<!-- CHARTS — raw Solana market data only -->
 <div class="chart-row">
     <div class="chart-box"><h3>Priority Fees & Jito Tips per Epoch (SOL)</h3><canvas id="chart-epoch"></canvas></div>
-    <div class="chart-box"><h3>AOT Revenue by Stake %</h3><canvas id="chart-aot"></canvas></div>
-</div>
-<div class="chart-row">
     <div class="chart-box"><h3>SOL Price History</h3><canvas id="chart-price"></canvas></div>
-    <div class="chart-box"><h3>Fee/CU by Program Subcategory (on-chain)</h3><canvas id="chart-fcu"></canvas></div>
 </div>
 
 </div><!-- end tab-data -->
@@ -494,8 +500,8 @@ function initCharts(){
     const o={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:10}}}},scales:{x:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'}}}};
     const ep=D.e.map(e=>e.e);
     cE=new Chart(document.getElementById('chart-epoch'),{type:'line',data:{labels:ep,datasets:[{label:'Priority Fees',data:D.e.map(e=>e.pf),borderColor:'#999',borderWidth:1.5,pointRadius:0,fill:false},{label:'Jito Tips',data:D.e.map(e=>e.mev),borderColor:'#C0FF38',borderWidth:1.5,pointRadius:0,fill:false}]},options:o});
-    cS=new Chart(document.getElementById('chart-split'),{type:'doughnut',data:{labels:['JIT','AOT'],datasets:[{data:[50,50],backgroundColor:['#C0FF38','#666']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#ccc'}}}}});
-    cW=new Chart(document.getElementById('chart-waterfall'),{type:'bar',data:{labels:['Validators (pass-through)','Rebates','Val. Bonus','Protocol Revenue'],datasets:[{data:[1,1,1,1],backgroundColor:['#444','#888','#C0FF3870','#C0FF38'],borderRadius:4,barThickness:28}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const v=ctx.raw;const pct=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);const p=pct>0?((v/pct)*100).toFixed(1):'0';return (v>=1e6?'$'+(v/1e6).toFixed(2)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':'$'+Math.round(v))+' ('+p+'%)';}}}},scales:{x:{beginAtZero:true,ticks:{color:'#888',font:{size:9,family:'JetBrains Mono'},callback:v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+Math.round(v/1e3)+'K':'$'+Math.round(v)},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#ccc',font:{size:10,weight:'500',family:'Space Grotesk'}},grid:{display:false}}}}});
+    cS=new Chart(document.getElementById('chart-split'),{type:'doughnut',data:{labels:['JIT','AOT'],datasets:[{data:[50,50],backgroundColor:['#e0e0e0','#555'],borderColor:'#0a0b0c',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{labels:{color:'#aaa',font:{size:11}}},tooltip:{callbacks:{label:ctx=>{const v=ctx.raw;const t=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);return ctx.label+': '+(v>=1e6?'$'+(v/1e6).toFixed(2)+'M':v>=1e3?'$'+Math.round(v/1e3)+'K':'$'+Math.round(v))+' ('+Math.round(v/t*100)+'%)';}}}}}});
+    cW=new Chart(document.getElementById('chart-waterfall'),{type:'bar',data:{labels:['Gross Revenue'],datasets:[{label:'Validators',data:[95],backgroundColor:'#333',borderRadius:0,barPercentage:1,categoryPercentage:0.85},{label:'Rebates',data:[0.5],backgroundColor:'#777',borderRadius:0,barPercentage:1,categoryPercentage:0.85},{label:'Val. Bonus',data:[1.5],backgroundColor:'#aaa',borderRadius:0,barPercentage:1,categoryPercentage:0.85},{label:'Protocol',data:[3],backgroundColor:'#e0e0e0',borderRadius:0,barPercentage:1,categoryPercentage:0.85}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'bottom',labels:{color:'#aaa',font:{size:10,family:'JetBrains Mono'},padding:14,usePointStyle:true,pointStyle:'rectRounded'}},tooltip:{callbacks:{label:ctx=>{const v=ctx.raw;return ctx.dataset.label+': '+(v>=1e6?'$'+(v/1e6).toFixed(2)+'M':v>=1e3?'$'+Math.round(v/1e3)+'K':'$'+Math.round(v));}}}},scales:{x:{stacked:true,beginAtZero:true,ticks:{color:'#888',font:{size:9,family:'JetBrains Mono'},callback:v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+Math.round(v/1e3)+'K':'$'+Math.round(v)},grid:{color:'#1a1a1a'}},y:{stacked:true,display:false}}}});
     cA=new Chart(document.getElementById('chart-aot'),{type:'bar',data:{labels:['1%','2%','5%','10%','15%','20%','30%','50%'],datasets:[{label:'AOT Treasury',data:Array(8).fill(0),backgroundColor:'#C0FF3880'}]},options:o});
     cP=new Chart(document.getElementById('chart-price'),{type:'line',data:{labels:ep,datasets:[{label:'SOL',data:D.e.map(e=>e.p),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:false}]},options:o});
     const st={};D.p.forEach(p=>{if(p.fpc>0&&p.prod!=='neither'){const k=p.sub||p.cat;if(!st[k])st[k]=[];st[k].push(p.fpc);}});
@@ -505,7 +511,7 @@ function initCharts(){
 
 function updCharts(p,r){
     cS.data.datasets[0].data=[r.jG*p.p,r.aG*p.p]; cS.update();
-    cW.data.datasets[0].data=[r.vS*p.p,r.rebates*p.p,r.valBonus*p.p,r.protRev*p.p]; cW.update();
+    cW.data.datasets[0].data=[r.vS*p.p]; cW.data.datasets[1].data=[r.rebates*p.p]; cW.data.datasets[2].data=[r.valBonus*p.p]; cW.data.datasets[3].data=[r.protRev*p.p]; cW.update();
     [0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50].forEach((s,i)=>{
         cA.data.datasets[0].data[i]=(s*SY*p.b*CB*p.f)/LS*p.c*p.p;
     }); cA.update();
@@ -658,8 +664,9 @@ function switchTab(id){
     event.currentTarget.classList.add('active');
     // Chart.js needs resize when container becomes visible
     requestAnimationFrame(()=>{
-        if(id==='data'){[cE,cA,cP,cF].forEach(c=>{if(c)c.resize();});}
-        if(id==='macro'){[cS,cW].forEach(c=>{if(c)c.resize();});}
+        if(id==='macro'){[cS,cW,cA].forEach(c=>{if(c)c.resize();});}
+        if(id==='micro'){[cF].forEach(c=>{if(c)c.resize();});}
+        if(id==='data'){[cE,cP].forEach(c=>{if(c)c.resize();});}
     });
 }
 window.switchTab=switchTab;
