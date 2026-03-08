@@ -32,7 +32,7 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 /* Animations */
 @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
 @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-@keyframes glowPulse { 0%,100% { box-shadow:0 0 20px #C0FF3815; } 50% { box-shadow:0 0 40px #C0FF3830; } }
+@keyframes glowPulse { 0%,100% { box-shadow:0 0 15px #C0FF3808; } 50% { box-shadow:0 0 25px #C0FF3812; } }
 @keyframes shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
 .fade-in { animation: fadeInUp 0.6s ease-out both; }
 .fade-in-1 { animation-delay:0.05s; } .fade-in-2 { animation-delay:0.1s; } .fade-in-3 { animation-delay:0.15s; }
@@ -49,7 +49,7 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 /* KPI */
 .kpi-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:10px; margin-bottom:var(--gap); }
 .kpi { background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); padding:14px 16px; }
-.kpi-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+.kpi-label { font-size:9px; color:var(--text-mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
 .kpi-value { font-size:22px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; font-family:var(--font-mono); }
 .kpi-sub { font-size:10px; color:var(--text2); margin-top:2px; }
 .kpi-value.blue { color:#fff; }
@@ -80,13 +80,14 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 /* Scenario buttons */
 .scenario-btns { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
 .scenario-btn { background:#141516; border:2px solid #333; border-radius:8px; padding:8px 18px; cursor:pointer; color:var(--text); font-size:12px; font-weight:600; transition:all 0.15s; }
-.scenario-btn:hover { border-color:var(--lime-soft); color:var(--lime-soft); }
+.scenario-btn:hover { border-color:#555; color:var(--text); }
 .scenario-btn.active { border-color:var(--text); background:#ffffff08; color:var(--text); }
 .scenario-desc { font-size:11px; color:var(--text-mid); padding:8px 12px; background:#141516; border-radius:6px; line-height:1.4; }
 
 /* Revenue cards */
 .rev-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:var(--gap); margin-bottom:var(--gap); }
-.rev-card { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:18px; }
+.rev-card { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:18px; transition:border-color 0.3s, box-shadow 0.3s; }
+.rev-card:hover { border-color:#3a3c3d; box-shadow:0 4px 20px rgba(0,0,0,0.25); }
 .rev-card h3 { color:var(--lime-soft); font-size:13px; margin-bottom:10px; }
 .rev-line { display:flex; justify-content:space-between; padding:3px 0; font-size:12px; border-bottom:1px solid #222; }
 .rev-line:last-child { border-bottom:none; }
@@ -148,12 +149,12 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 .section:hover { border-color:#3a3c3d; box-shadow:0 4px 24px rgba(0,0,0,0.3); }
 .kpi { transition:border-color 0.3s, transform 0.2s; }
 .kpi:hover { border-color:#3a3c3d; transform:translateY(-2px); }
-.wf-item { transition:border-color 0.3s, transform 0.2s; }
-.wf-item:hover { transform:translateY(-2px); }
+.wf-item { transition:border-color 0.3s, transform 0.2s, box-shadow 0.3s; }
+.wf-item:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,0.3); }
 
 /* Share button */
 .share-btn { background:transparent; border:1px solid var(--card-border); color:var(--text-mid); padding:6px 16px; border-radius:6px; cursor:pointer; font-size:11px; font-family:var(--font-mono); letter-spacing:1px; text-transform:uppercase; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px; }
-.share-btn:hover { background:var(--lime); color:var(--bg); }
+.share-btn:hover { background:#ffffff12; color:var(--text); border-color:#555; }
 .share-btn svg { width:14px; height:14px; }
 
 /* ═══ Sidebar Layout — inputs & outputs side-by-side ═══ */
@@ -320,33 +321,33 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
         <div class="wf-item" style="border-color:#666"><div class="wf-label">Validator Bonus</div><div class="wf-val" style="color:var(--text-mid)" id="wf-vbonus">&mdash;</div><div class="wf-sub" id="wf-vbonus-sub"></div></div>
         <div class="wf-item" style="border-color:var(--lime)"><div class="wf-label">Protocol Revenue</div><div class="wf-val" style="color:var(--lime)" id="wf-treasury">&mdash;</div><div class="wf-sub" id="wf-treasury-pct"></div></div>
     </div>
-    <div class="chart-box" style="min-height:200px;">
+    <div class="chart-box" style="min-height:230px;">
         <h3>Revenue Flow</h3>
-        <svg id="flow-sankey" viewBox="0 0 800 180" style="width:100%;height:160px;font-family:var(--font-mono);">
+        <svg id="flow-sankey" viewBox="0 0 800 200" style="width:100%;height:190px;font-family:var(--font-mono);">
             <!-- Left: Sources -->
             <rect id="fk-jit" x="0" y="10" width="18" height="70" rx="3" fill="#d4e8a0"/>
             <text x="24" y="35" fill="#d4e8a0" font-size="10" font-weight="600">JIT</text>
             <text id="fk-jit-v" x="24" y="50" fill="#A0A3A9" font-size="9">—</text>
-            <rect id="fk-aot" x="0" y="100" width="18" height="70" rx="3" fill="#71787F"/>
-            <text x="24" y="125" fill="#A0A3A9" font-size="10" font-weight="600">AOT</text>
-            <text id="fk-aot-v" x="24" y="140" fill="#71787F" font-size="9">—</text>
+            <rect id="fk-aot" x="0" y="110" width="18" height="80" rx="3" fill="#71787F"/>
+            <text x="24" y="140" fill="#A0A3A9" font-size="10" font-weight="600">AOT</text>
+            <text id="fk-aot-v" x="24" y="155" fill="#71787F" font-size="9">—</text>
             <!-- Center: Commission -->
-            <rect id="fk-comm" x="290" y="30" width="18" height="120" rx="3" fill="#F6F8FA"/>
-            <text x="314" y="75" fill="#F6F8FA" font-size="10" font-weight="600">Commission</text>
-            <text id="fk-comm-v" x="314" y="92" fill="#A0A3A9" font-size="9">—</text>
+            <rect id="fk-comm" x="290" y="20" width="18" height="160" rx="3" fill="#F6F8FA"/>
+            <text x="314" y="85" fill="#F6F8FA" font-size="10" font-weight="600">Commission</text>
+            <text id="fk-comm-v" x="314" y="102" fill="#A0A3A9" font-size="9">—</text>
             <!-- Right: Distribution -->
-            <rect id="fk-val" x="590" y="5" width="18" height="40" rx="3" fill="#333"/>
-            <text x="614" y="22" fill="#71787F" font-size="9" font-weight="600">Validators</text>
-            <text id="fk-val-v" x="614" y="35" fill="#555" font-size="8">—</text>
-            <rect id="fk-reb" x="590" y="55" width="18" height="30" rx="3" fill="#555"/>
-            <text x="614" y="68" fill="#A0A3A9" font-size="9" font-weight="600">Rebates</text>
-            <text id="fk-reb-v" x="614" y="80" fill="#71787F" font-size="8">—</text>
-            <rect id="fk-vb" x="590" y="95" width="18" height="30" rx="3" fill="#888"/>
-            <text x="614" y="108" fill="#A0A3A9" font-size="9" font-weight="600">Val. Bonus</text>
-            <text id="fk-vb-v" x="614" y="120" fill="#71787F" font-size="8">—</text>
-            <rect id="fk-proto" x="590" y="135" width="18" height="40" rx="3" fill="var(--lime)"/>
-            <text x="614" y="152" fill="var(--lime)" font-size="9" font-weight="700">Protocol</text>
-            <text id="fk-proto-v" x="614" y="165" fill="#d4e8a0" font-size="8">—</text>
+            <rect id="fk-val" x="590" y="5" width="18" height="45" rx="3" fill="#333"/>
+            <text x="614" y="24" fill="#71787F" font-size="9" font-weight="600">Validators</text>
+            <text id="fk-val-v" x="614" y="38" fill="#555" font-size="8">—</text>
+            <rect id="fk-reb" x="590" y="60" width="18" height="35" rx="3" fill="#555"/>
+            <text x="614" y="75" fill="#A0A3A9" font-size="9" font-weight="600">Rebates</text>
+            <text id="fk-reb-v" x="614" y="88" fill="#71787F" font-size="8">—</text>
+            <rect id="fk-vb" x="590" y="105" width="18" height="35" rx="3" fill="#888"/>
+            <text x="614" y="120" fill="#A0A3A9" font-size="9" font-weight="600">Val. Bonus</text>
+            <text id="fk-vb-v" x="614" y="133" fill="#71787F" font-size="8">—</text>
+            <rect id="fk-proto" x="590" y="150" width="18" height="45" rx="3" fill="var(--lime)"/>
+            <text x="614" y="169" fill="var(--lime)" font-size="9" font-weight="700">Protocol</text>
+            <text id="fk-proto-v" x="614" y="182" fill="#d4e8a0" font-size="8">—</text>
             <!-- Flow paths (drawn dynamically) -->
             <g id="fk-paths" opacity="0.25"></g>
         </svg>
@@ -602,23 +603,23 @@ function updFlow(p,r){
     const maxH=140, minH=8;
     const jH=Math.max(minH,jU/total*maxH), aH=Math.max(minH,aU/total*maxH);
     document.getElementById('fk-jit').setAttribute('height',jH);
-    document.getElementById('fk-aot').setAttribute('y',10+jH+10);
+    document.getElementById('fk-aot').setAttribute('y',10+jH+20);
     document.getElementById('fk-aot').setAttribute('height',aH);
     // Reposition AOT text
-    document.querySelector('#fk-aot + text').setAttribute('y',10+jH+10+Math.min(25,aH/2));
-    document.querySelector('#fk-aot + text + text').setAttribute('y',10+jH+10+Math.min(40,aH/2+15));
+    document.querySelector('#fk-aot + text').setAttribute('y',10+jH+20+Math.min(25,aH/2));
+    document.querySelector('#fk-aot + text + text').setAttribute('y',10+jH+20+Math.min(40,aH/2+15));
     // Update flow paths
     const paths=document.getElementById('fk-paths');
     const commTotal=cU||1;
-    const dists=[{v:vU,y1:5,h:40,c:'#333'},{v:reU,y1:55,h:30,c:'#555'},{v:vbU,y1:95,h:30,c:'#888'},{v:prU,y1:135,h:40,c:'#C0FF38'}];
+    const dists=[{v:vU,y1:5,h:45,c:'#333'},{v:reU,y1:60,h:35,c:'#555'},{v:vbU,y1:105,h:35,c:'#888'},{v:prU,y1:150,h:45,c:'#C0FF38'}];
     let svg='';
     // Source → Commission flows
-    svg+=`<path d="M18,${10+jH/2} C150,${10+jH/2} 200,90 290,90" stroke="#d4e8a0" stroke-width="${Math.max(1,jH/4)}" fill="none"/>`;
-    svg+=`<path d="M18,${10+jH+10+aH/2} C150,${10+jH+10+aH/2} 200,90 290,90" stroke="#71787F" stroke-width="${Math.max(1,aH/4)}" fill="none"/>`;
+    svg+=`<path d="M18,${10+jH/2} C150,${10+jH/2} 200,100 290,100" stroke="#d4e8a0" stroke-width="${Math.max(1,jH/4)}" fill="none"/>`;
+    svg+=`<path d="M18,${10+jH+20+aH/2} C150,${10+jH+20+aH/2} 200,100 290,100" stroke="#71787F" stroke-width="${Math.max(1,aH/4)}" fill="none"/>`;
     // Commission → Distribution flows
     dists.forEach(d=>{
         const w=Math.max(0.5,d.v/commTotal*8);
-        svg+=`<path d="M308,90 C450,90 500,${d.y1+d.h/2} 590,${d.y1+d.h/2}" stroke="${d.c}" stroke-width="${w}" fill="none"/>`;
+        svg+=`<path d="M308,100 C450,100 500,${d.y1+d.h/2} 590,${d.y1+d.h/2}" stroke="${d.c}" stroke-width="${w}" fill="none"/>`;
     });
     paths.innerHTML=svg;
 }
@@ -777,7 +778,7 @@ function switchTab(id){
     event.currentTarget.classList.add('active');
     // Chart.js needs resize when container becomes visible
     requestAnimationFrame(()=>{
-        if(id==='macro'){[cS,cW,cA].forEach(c=>{if(c)c.resize();});}
+        if(id==='macro'){[cA].forEach(c=>{if(c)c.resize();});}
         if(id==='micro'){[cF].forEach(c=>{if(c)c.resize();});}
         if(id==='data'){[cE,cP].forEach(c=>{if(c)c.resize();});}
     });
@@ -793,7 +794,7 @@ function shareSimulator(){
             const btn = document.querySelector('.share-btn');
             const orig = btn.innerHTML;
             btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
-            btn.style.background = 'var(--lime)'; btn.style.color = 'var(--bg)';
+            btn.style.background = '#1B1D1E'; btn.style.color = 'var(--text)';
             setTimeout(()=>{ btn.innerHTML = orig; btn.style.background = ''; btn.style.color = ''; }, 2000);
         });
     }
