@@ -18,9 +18,10 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"></script>
 <style>
 :root {
-    --lime: #C0FF38; --lime-dim: #C0FF3830; --dark: #0a0b0c; --bg: #050506;
-    --card: #111213; --card-border: #1e1f20;
-    --text: #e0e0e0; --text2: #555; --gap: 14px; --radius: 10px;
+    --lime: #C0FF38; --lime-dim: #C0FF3830; --lime-soft: #d4e8a0;
+    --dark: #0a0b0c; --bg: #000204; --card: #1B1D1E; --card-border: #26282C;
+    --text: #F6F8FA; --text2: #71787F; --text-mid: #A0A3A9;
+    --gap: 14px; --radius: 10px;
     --font-display: 'Space Grotesk', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 }
@@ -49,14 +50,14 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 .kpi-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:10px; margin-bottom:var(--gap); }
 .kpi { background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); padding:14px 16px; }
 .kpi-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
-.kpi-value { font-size:22px; font-weight:700; color:var(--lime); font-variant-numeric:tabular-nums; font-family:var(--font-mono); }
+.kpi-value { font-size:22px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; font-family:var(--font-mono); }
 .kpi-sub { font-size:10px; color:var(--text2); margin-top:2px; }
 .kpi-value.blue { color:#fff; }
 .kpi-value.white { color:#fff; }
 
 /* Controls */
-.controls-section { background:var(--card); border:2px solid var(--lime); border-radius:var(--radius); padding:24px; margin-bottom:var(--gap); box-shadow:0 0 30px #C0FF3812, inset 0 1px 0 #C0FF3810; }
-.controls-section h2 { font-size:15px; font-weight:700; color:var(--lime); margin-bottom:18px; text-transform:uppercase; letter-spacing:2px; font-family:var(--font-mono); display:flex; align-items:center; gap:10px; }
+.controls-section { background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); padding:24px; margin-bottom:var(--gap); }
+.controls-section h2 { font-size:15px; font-weight:700; color:var(--lime-soft); margin-bottom:18px; text-transform:uppercase; letter-spacing:2px; font-family:var(--font-mono); display:flex; align-items:center; gap:10px; }
 .controls-section h2::before { content:'⚡'; font-size:16px; }
 .controls-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:18px; }
 .control { display:flex; flex-direction:column; gap:5px; }
@@ -68,31 +69,31 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 .control input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.15); box-shadow:0 0 16px #C0FF3890, 0 2px 8px rgba(0,0,0,0.5); }
 .control input[type=range]::-moz-range-thumb { width:22px; height:22px; border-radius:50%; background:var(--lime); cursor:pointer; border:3px solid var(--bg); box-shadow:0 0 10px #C0FF3860; }
 .control input[type=range]::-moz-range-track { height:10px; background:#222; border-radius:5px; }
-.control .val { font-size:22px; font-weight:700; color:var(--lime); min-width:90px; text-align:right; font-variant-numeric:tabular-nums; font-family:var(--font-mono); }
+.control .val { font-size:22px; font-weight:700; color:var(--text); min-width:90px; text-align:right; font-variant-numeric:tabular-nums; font-family:var(--font-mono); }
 .control .val.blue { color:#fff; }
 .note { font-size:10px; color:var(--text2); font-style:italic; line-height:1.4; }
-.section-label { font-size:13px; font-weight:600; color:var(--lime); padding-bottom:6px; border-bottom:1px solid #2a2a2a; grid-column:1/-1; margin-top:8px; }
+.section-label { font-size:13px; font-weight:600; color:var(--lime-soft); padding-bottom:6px; border-bottom:1px solid var(--card-border); grid-column:1/-1; margin-top:8px; }
 
 .section { background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); padding:20px; margin-bottom:var(--gap); }
-.section h2 { font-size:13px; font-weight:600; color:var(--lime); margin-bottom:14px; text-transform:uppercase; letter-spacing:2px; font-family:var(--font-mono); }
+.section h2 { font-size:13px; font-weight:600; color:var(--lime-soft); margin-bottom:14px; text-transform:uppercase; letter-spacing:2px; font-family:var(--font-mono); }
 
 /* Scenario buttons */
 .scenario-btns { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
 .scenario-btn { background:#141516; border:2px solid #333; border-radius:8px; padding:8px 18px; cursor:pointer; color:var(--text); font-size:12px; font-weight:600; transition:all 0.15s; }
-.scenario-btn:hover { border-color:var(--lime); color:var(--lime); }
-.scenario-btn.active { border-color:var(--lime); background:#C0FF3815; color:var(--lime); }
-.scenario-desc { font-size:10px; color:var(--text2); padding:8px 12px; background:#141516; border-radius:6px; line-height:1.4; }
+.scenario-btn:hover { border-color:var(--lime-soft); color:var(--lime-soft); }
+.scenario-btn.active { border-color:var(--lime); background:#C0FF3810; color:var(--lime); }
+.scenario-desc { font-size:11px; color:var(--text-mid); padding:8px 12px; background:#141516; border-radius:6px; line-height:1.4; }
 
 /* Revenue cards */
 .rev-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:var(--gap); margin-bottom:var(--gap); }
 .rev-card { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:18px; }
-.rev-card h3 { color:var(--lime); font-size:13px; margin-bottom:10px; }
+.rev-card h3 { color:var(--lime-soft); font-size:13px; margin-bottom:10px; }
 .rev-line { display:flex; justify-content:space-between; padding:3px 0; font-size:12px; border-bottom:1px solid #222; }
 .rev-line:last-child { border-bottom:none; }
 .rev-line .label { color:var(--text2); }
 .rev-line .value { font-weight:600; font-variant-numeric:tabular-nums; }
-.rev-total { display:flex; justify-content:space-between; padding:6px 0; margin-top:6px; border-top:2px solid var(--lime); font-size:14px; font-weight:700; }
-.rev-total .value { color:var(--lime); }
+.rev-total { display:flex; justify-content:space-between; padding:6px 0; margin-top:6px; border-top:1px solid var(--card-border); font-size:14px; font-weight:700; }
+.rev-total .value { color:var(--text); }
 
 .chart-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(380px, 1fr)); gap:var(--gap); margin-bottom:var(--gap); }
 .chart-box { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:18px; min-height:280px; position:relative; }
@@ -110,13 +111,13 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 .table-wrap { overflow-x:auto; max-height:600px; overflow-y:auto; }
 table { width:100%; border-collapse:collapse; font-size:11px; }
 th { text-align:left; padding:6px 8px; border-bottom:2px solid #333; color:var(--text2); font-weight:600; text-transform:uppercase; letter-spacing:0.3px; cursor:pointer; white-space:nowrap; user-select:none; position:sticky; top:0; background:var(--card); z-index:1; font-size:10px; }
-th:hover { color:var(--lime); }
+th:hover { color:var(--text); }
 td { padding:5px 8px; border-bottom:1px solid #1a1a1a; font-variant-numeric:tabular-nums; }
 tr:hover td { background:#141516; }
 .tag { display:inline-block; padding:1px 6px; border-radius:3px; font-size:9px; font-weight:600; text-transform:uppercase; }
 .tag.aot { background:#ffffff15; color:#ccc; border:1px solid #888; }
-.tag.jit { background:#C0FF3822; color:var(--lime); border:1px solid var(--lime); }
-.tag.both { background:#C0FF3815; color:var(--lime); border:1px solid var(--lime); }
+.tag.jit { background:#C0FF3815; color:var(--lime-soft); border:1px solid #C0FF3840; }
+.tag.both { background:#C0FF3810; color:var(--lime-soft); border:1px solid #C0FF3830; }
 .tag.potential { background:#BDD97022; color:var(--green2); border:1px solid var(--green2); }
 .tag.neither { background:#88888822; color:#888; border:1px solid #555; }
 .filter-row { display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
@@ -127,7 +128,7 @@ tr:hover td { background:#141516; }
 .matrix-table { font-size:11px; border-collapse:collapse; margin-top:8px; }
 .matrix-table th, .matrix-table td { padding:5px 8px; border:1px solid #333; text-align:right; }
 .matrix-table th { background:#1B1D1E; color:var(--text2); font-weight:600; }
-.matrix-table td.hl { background:#C0FF3815; color:var(--lime); font-weight:700; }
+.matrix-table td.hl { background:#C0FF3810; color:var(--lime-soft); font-weight:700; }
 
 .footer { text-align:center; padding:24px 16px; color:var(--text2); font-size:10px; font-family:var(--font-mono); letter-spacing:0.5px; border-top:1px solid var(--card-border); margin-top:8px; }
 
@@ -140,25 +141,25 @@ tr:hover td { background:#141516; }
 .tab-content.active { display:block; animation:fadeIn 0.35s ease-out; }
 
 /* Background atmosphere */
-body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100%; background:radial-gradient(ellipse at 20% 0%, #C0FF3806 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, #C0FF3804 0%, transparent 50%); pointer-events:none; z-index:-1; }
+body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100%; background:radial-gradient(ellipse at 20% 0%, #C0FF3803 0%, transparent 50%); pointer-events:none; z-index:-1; }
 
 /* Card hover effects */
 .section { transition:border-color 0.3s, box-shadow 0.3s; }
 .section:hover { border-color:#3a3c3d; box-shadow:0 4px 24px rgba(0,0,0,0.3); }
 .kpi { transition:border-color 0.3s, transform 0.2s; }
-.kpi:hover { border-color:var(--lime); transform:translateY(-2px); }
+.kpi:hover { border-color:#3a3c3d; transform:translateY(-2px); }
 .wf-item { transition:border-color 0.3s, transform 0.2s; }
 .wf-item:hover { transform:translateY(-2px); }
 
 /* Share button */
-.share-btn { background:transparent; border:1px solid var(--lime); color:var(--lime); padding:6px 16px; border-radius:6px; cursor:pointer; font-size:11px; font-family:var(--font-mono); letter-spacing:1px; text-transform:uppercase; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px; }
+.share-btn { background:transparent; border:1px solid var(--card-border); color:var(--text-mid); padding:6px 16px; border-radius:6px; cursor:pointer; font-size:11px; font-family:var(--font-mono); letter-spacing:1px; text-transform:uppercase; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px; }
 .share-btn:hover { background:var(--lime); color:var(--bg); }
 .share-btn svg { width:14px; height:14px; }
 
 /* ═══ Sidebar Layout — inputs & outputs side-by-side ═══ */
 .tab-layout { display:flex; gap:var(--gap); align-items:flex-start; }
 .sidebar {
-    width:270px; min-width:270px; position:sticky; top:10px;
+    width:310px; min-width:310px; position:sticky; top:10px;
     max-height:calc(100vh - 100px); overflow-y:auto;
     scrollbar-width:thin; scrollbar-color:#333 transparent;
 }
@@ -170,12 +171,12 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 /* Compact sidebar controls */
 .sidebar .controls-section { padding:10px 12px; margin-bottom:0; border-radius:0; border-bottom:none; }
 .sidebar .controls-section:first-child { border-radius:var(--radius) var(--radius) 0 0; }
-.sidebar .controls-section:last-child { border-bottom:2px solid var(--lime); border-radius:0 0 var(--radius) var(--radius); }
+.sidebar .controls-section:last-child { border-bottom:1px solid var(--card-border); border-radius:0 0 var(--radius) var(--radius); }
 .sidebar .controls-section h2 { font-size:9px; margin-bottom:6px; letter-spacing:1.5px; }
 .sidebar .controls-section h2::before { font-size:11px; }
 .sidebar .scenario-btns { gap:3px; margin-bottom:4px; }
 .sidebar .scenario-btn { padding:3px 8px; font-size:9px; border-radius:4px; border-width:1px; }
-.sidebar .scenario-desc { font-size:8px; padding:3px 6px; line-height:1.3; }
+.sidebar .scenario-desc { font-size:10px; padding:4px 8px; line-height:1.4; color:var(--text-mid); }
 .sidebar .controls-grid { grid-template-columns:1fr; gap:4px; }
 .sidebar .control { gap:2px; }
 .sidebar .control label { font-size:9px; letter-spacing:0.3px; }
@@ -192,7 +193,7 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
     .tab-layout { flex-direction:column; }
     .sidebar { width:100%; min-width:100%; position:static; max-height:none; overflow-y:visible; }
     .sidebar .controls-section { padding:16px; }
-    .sidebar .controls-section:first-child, .sidebar .controls-section:last-child { border-radius:var(--radius); border:2px solid var(--lime); margin-bottom:var(--gap); }
+    .sidebar .controls-section:first-child, .sidebar .controls-section:last-child { border-radius:var(--radius); border:1px solid var(--card-border); margin-bottom:var(--gap); }
     .sidebar .controls-grid { grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); }
     .sidebar .note { display:block; }
     .sidebar .control label { font-size:11px; }
@@ -279,7 +280,7 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
         <div class="control">
             <label>JIT Market Share</label>
             <div class="slider-row"><input type="range" id="sl-jit" min="0" max="30" step="1" value="5"><span class="val blue" id="v-jit">5%</span></div>
-            <div class="note"><strong>RAIKU's share of the global JIT auction market.</strong> Current data based on Jito MEV tips only (~811K SOL/yr). Addressable market includes all JIT providers (Jito + Harmonik + future).</div>
+            <div class="note"><strong>RAIKU's share of the global JIT auction market.</strong> Current data based on Jito MEV tips only (~811K SOL/yr). Addressable market includes all JIT providers (Jito + Harmonic + future).</div>
         </div>
 
         <div class="section-label">AOT (Ahead-of-Time) &mdash; Sealed-bid blockspace auctions</div>
@@ -309,19 +310,46 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
     <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-family:var(--font-mono);">Revenue Sources</div>
     <div class="wf-row">
         <div class="wf-item" style="border-color:var(--text2)"><div class="wf-label">Gross Revenue</div><div class="wf-val" style="color:var(--text)" id="wf-gross">&mdash;</div><div class="wf-sub" id="wf-gross-sol"></div></div>
-        <div class="wf-item" style="border-color:var(--lime)"><div class="wf-label">JIT (tips market)</div><div class="wf-val" style="color:var(--lime)" id="wf-jit">&mdash;</div><div class="wf-sub" id="wf-jit-pct"></div></div>
+        <div class="wf-item" style="border-color:var(--lime-soft)"><div class="wf-label">JIT (tips market)</div><div class="wf-val" style="color:var(--lime-soft)" id="wf-jit">&mdash;</div><div class="wf-sub" id="wf-jit-pct"></div></div>
         <div class="wf-item" style="border-color:#888"><div class="wf-label">AOT (auctions)</div><div class="wf-val" style="color:#fff" id="wf-aot">&mdash;</div><div class="wf-sub" id="wf-aot-pct"></div></div>
     </div>
     <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-family:var(--font-mono);">Fee Distribution</div>
     <div class="wf-row">
         <div class="wf-item" style="border-color:#444"><div class="wf-label">Validators</div><div class="wf-val" style="color:var(--text2)" id="wf-val">&mdash;</div><div class="wf-sub" id="wf-val-sub"></div></div>
         <div class="wf-item" style="border-color:#666"><div class="wf-label">Customer Rebates</div><div class="wf-val" style="color:#aaa" id="wf-rebates">&mdash;</div><div class="wf-sub" id="wf-rebates-sub"></div></div>
-        <div class="wf-item" style="border-color:#C0FF3860"><div class="wf-label">Validator Bonus</div><div class="wf-val" style="color:#C0FF38aa" id="wf-vbonus">&mdash;</div><div class="wf-sub" id="wf-vbonus-sub"></div></div>
-        <div class="wf-item" style="border-color:var(--lime)"><div class="wf-label">Protocol Revenue</div><div class="wf-val" style="color:var(--lime)" id="wf-treasury">&mdash;</div><div class="wf-sub" id="wf-treasury-mo"></div></div>
+        <div class="wf-item" style="border-color:#666"><div class="wf-label">Validator Bonus</div><div class="wf-val" style="color:var(--text-mid)" id="wf-vbonus">&mdash;</div><div class="wf-sub" id="wf-vbonus-sub"></div></div>
+        <div class="wf-item" style="border-color:var(--lime)"><div class="wf-label">Protocol Revenue</div><div class="wf-val" style="color:var(--lime)" id="wf-treasury">&mdash;</div><div class="wf-sub" id="wf-treasury-pct"></div></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);">
-        <div class="chart-box"><h3>Gross Revenue Split (JIT vs AOT)</h3><canvas id="chart-split"></canvas></div>
-        <div class="chart-box"><h3>Fee Distribution Breakdown</h3><canvas id="chart-waterfall"></canvas></div>
+    <div class="chart-box" style="min-height:200px;">
+        <h3>Revenue Flow</h3>
+        <svg id="flow-sankey" viewBox="0 0 800 180" style="width:100%;height:160px;font-family:var(--font-mono);">
+            <!-- Left: Sources -->
+            <rect id="fk-jit" x="0" y="10" width="18" height="70" rx="3" fill="#d4e8a0"/>
+            <text x="24" y="35" fill="#d4e8a0" font-size="10" font-weight="600">JIT</text>
+            <text id="fk-jit-v" x="24" y="50" fill="#A0A3A9" font-size="9">—</text>
+            <rect id="fk-aot" x="0" y="100" width="18" height="70" rx="3" fill="#71787F"/>
+            <text x="24" y="125" fill="#A0A3A9" font-size="10" font-weight="600">AOT</text>
+            <text id="fk-aot-v" x="24" y="140" fill="#71787F" font-size="9">—</text>
+            <!-- Center: Commission -->
+            <rect id="fk-comm" x="290" y="30" width="18" height="120" rx="3" fill="#F6F8FA"/>
+            <text x="314" y="75" fill="#F6F8FA" font-size="10" font-weight="600">Commission</text>
+            <text id="fk-comm-v" x="314" y="92" fill="#A0A3A9" font-size="9">—</text>
+            <!-- Right: Distribution -->
+            <rect id="fk-val" x="590" y="5" width="18" height="40" rx="3" fill="#333"/>
+            <text x="614" y="22" fill="#71787F" font-size="9" font-weight="600">Validators</text>
+            <text id="fk-val-v" x="614" y="35" fill="#555" font-size="8">—</text>
+            <rect id="fk-reb" x="590" y="55" width="18" height="30" rx="3" fill="#555"/>
+            <text x="614" y="68" fill="#A0A3A9" font-size="9" font-weight="600">Rebates</text>
+            <text id="fk-reb-v" x="614" y="80" fill="#71787F" font-size="8">—</text>
+            <rect id="fk-vb" x="590" y="95" width="18" height="30" rx="3" fill="#888"/>
+            <text x="614" y="108" fill="#A0A3A9" font-size="9" font-weight="600">Val. Bonus</text>
+            <text id="fk-vb-v" x="614" y="120" fill="#71787F" font-size="8">—</text>
+            <rect id="fk-proto" x="590" y="135" width="18" height="40" rx="3" fill="var(--lime)"/>
+            <text x="614" y="152" fill="var(--lime)" font-size="9" font-weight="700">Protocol</text>
+            <text id="fk-proto-v" x="614" y="165" fill="#d4e8a0" font-size="8">—</text>
+            <!-- Flow paths (drawn dynamically) -->
+            <g id="fk-paths" opacity="0.25"></g>
+        </svg>
     </div>
 </div>
 
@@ -337,29 +365,29 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 </div>
 
 
-<!-- SCENARIOS COMPARISON -->
+<!-- SCENARIOS COMPARISON (static, no interactive buttons) -->
 <div class="section fade-in fade-in-3">
     <h2>Scenario Comparison</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
-        <div class="rev-card" style="text-align:center;cursor:pointer;" onclick="applyScenario('con')">
-            <h3 style="color:var(--text2)">Conservative</h3>
+        <div class="rev-card" style="text-align:center;">
+            <h3 style="color:var(--text-mid)">Conservative</h3>
             <div style="font-size:22px;font-weight:700;" id="sc-con-v">&mdash;</div>
             <div style="font-size:10px;color:var(--text2);margin-top:4px;" id="sc-con-d"></div>
             <div style="font-size:9px;color:var(--text2);margin-top:4px;" id="sc-con-m"></div>
         </div>
-        <div class="rev-card" style="text-align:center;cursor:pointer;border-color:var(--lime);" onclick="applyScenario('base')">
-            <h3 style="color:var(--lime)">Base Case</h3>
-            <div style="font-size:22px;font-weight:700;color:var(--lime);" id="sc-base-v">&mdash;</div>
+        <div class="rev-card" style="text-align:center;border-color:var(--lime-soft);">
+            <h3 style="color:var(--lime-soft)">Base Case</h3>
+            <div style="font-size:22px;font-weight:700;color:var(--text);" id="sc-base-v">&mdash;</div>
             <div style="font-size:10px;color:var(--text2);margin-top:4px;" id="sc-base-d"></div>
             <div style="font-size:9px;color:var(--text2);margin-top:4px;" id="sc-base-m"></div>
         </div>
-        <div class="rev-card" style="text-align:center;cursor:pointer;" onclick="applyScenario('opt')">
+        <div class="rev-card" style="text-align:center;">
             <h3 style="color:#fff">Optimistic</h3>
             <div style="font-size:22px;font-weight:700;color:#fff;" id="sc-opt-v">&mdash;</div>
             <div style="font-size:10px;color:var(--text2);margin-top:4px;" id="sc-opt-d"></div>
             <div style="font-size:9px;color:var(--text2);margin-top:4px;" id="sc-opt-m"></div>
         </div>
-        <div class="rev-card" style="text-align:center;cursor:pointer;" onclick="applyScenario('bull')">
+        <div class="rev-card" style="text-align:center;">
             <h3 style="color:#FFD700">Bull Case</h3>
             <div style="font-size:22px;font-weight:700;color:#FFD700;" id="sc-bull-v">&mdash;</div>
             <div style="font-size:10px;color:var(--text2);margin-top:4px;" id="sc-bull-d"></div>
@@ -469,7 +497,7 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 
 <div class="footer">
     RAIKU Revenue Simulator v3 &mdash; Trillium API (epochs 836-935), Dune Analytics (per-program 30d), CoinGecko<br>
-    Annualization: 36 epochs (~71 days). Programs: 2026-02-04 &rarr; 03-05. AOT: 3D model (Stake &times; Block &times; Fee/CU). Block = 60M CU. JIT market data = Jito tips only (excl. Harmonik).
+    Annualization: 36 epochs (~71 days). Programs: 2026-02-04 &rarr; 03-05. AOT: 3D model (Stake &times; Block &times; Fee/CU). Block = 60M CU. JIT market data = Jito tips only (excl. Harmonic).
 </div>
 </div>
 
@@ -480,9 +508,9 @@ const D =
 const SY = 78_408_000, CB = 60_000_000, LS = 1_000_000_000;
 
 const SC = {
-    con:  {c:2,j:2,s:1,b:5,f:0.05,p:80,r:0.2,vb:0.5, desc:"Conservative: 1% stake, 5% block, 0.05 L/CU, 2% JIT, 2% commission (0.2% rebates, 0.5% bonus → 1.3% protocol)."},
-    base: {c:5,j:5,s:5,b:10,f:0.10,p:Math.round(D.a.price),r:0.5,vb:1.5, desc:"Base Case: 5% stake, 10% block, 0.10 L/CU, 5% JIT, 5% commission (0.5% rebates, 1.5% val bonus → 3% protocol revenue)."},
-    opt:  {c:5,j:10,s:15,b:15,f:0.30,p:150,r:0.5,vb:1.5, desc:"Optimistic: 15% stake, 15% block, 0.30 L/CU, 10% JIT, 5% commission (0.5% rebates, 1.5% val bonus → 3% protocol revenue)."},
+    con:  {c:5,j:2,s:1,b:5,f:0.10,p:80,r:1,vb:1.5, desc:"Conservative: 1% stake, 5% block, 0.10 L/CU, 2% JIT, 5% commission (1% rebates, 1.5% val bonus → 2.5% protocol)."},
+    base: {c:5,j:5,s:5,b:10,f:0.10,p:100,r:0.5,vb:1, desc:"Base Case: 5% stake, 10% block, 0.10 L/CU, 5% JIT, 5% commission (0.5% rebates, 1% val bonus → 3.5% protocol revenue)."},
+    opt:  {c:5,j:10,s:15,b:10,f:0.20,p:150,r:0.5,vb:0.5, desc:"Optimistic: 15% stake, 10% block, 0.20 L/CU, 10% JIT, 5% commission (0.5% rebates, 0.5% val bonus → 4% protocol revenue)."},
     bull: {c:5,j:20,s:30,b:20,f:0.50,p:250,r:1.0,vb:1.5, desc:"Bull: 30% stake, 20% block, 0.50 L/CU, 20% JIT, 5% commission (1% rebates, 1.5% val bonus → 2.5% protocol revenue)."},
 };
 
@@ -544,23 +572,59 @@ function calc(p){
         tN:protRev, tU:protRev*p.p, commission, rebates, valBonus, protRev};
 }
 
-let cE,cS,cW,cA,cP,cF;
+let cE,cA,cP,cF;
 function initCharts(){
     const o={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:10}}}},scales:{x:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'}}}};
     const ep=D.e.map(e=>e.e);
-    cE=new Chart(document.getElementById('chart-epoch'),{type:'line',data:{labels:ep,datasets:[{label:'Priority Fees',data:D.e.map(e=>e.pf),borderColor:'#999',borderWidth:1.5,pointRadius:0,fill:false},{label:'Jito Tips',data:D.e.map(e=>e.mev),borderColor:'#C0FF38',borderWidth:1.5,pointRadius:0,fill:false}]},options:o});
-    cS=new Chart(document.getElementById('chart-split'),{type:'doughnut',data:{labels:['JIT','AOT'],datasets:[{data:[50,50],backgroundColor:['#e0e0e0','#555'],borderColor:'#0a0b0c',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{labels:{color:'#aaa',font:{size:11}}},tooltip:{callbacks:{label:ctx=>{const v=ctx.raw;const t=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);return ctx.label+': '+(v>=1e6?'$'+(v/1e6).toFixed(2)+'M':v>=1e3?'$'+Math.round(v/1e3)+'K':'$'+Math.round(v))+' ('+Math.round(v/t*100)+'%)';}}}}}});
-    cW=new Chart(document.getElementById('chart-waterfall'),{type:'bar',data:{labels:['Gross Revenue'],datasets:[{label:'Validators',data:[95],backgroundColor:'#333',borderRadius:0,barPercentage:1,categoryPercentage:0.85},{label:'Rebates',data:[0.5],backgroundColor:'#777',borderRadius:0,barPercentage:1,categoryPercentage:0.85},{label:'Val. Bonus',data:[1.5],backgroundColor:'#aaa',borderRadius:0,barPercentage:1,categoryPercentage:0.85},{label:'Protocol',data:[3],backgroundColor:'#e0e0e0',borderRadius:0,barPercentage:1,categoryPercentage:0.85}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'bottom',labels:{color:'#aaa',font:{size:10,family:'JetBrains Mono'},padding:14,usePointStyle:true,pointStyle:'rectRounded'}},tooltip:{callbacks:{label:ctx=>{const v=ctx.raw;return ctx.dataset.label+': '+(v>=1e6?'$'+(v/1e6).toFixed(2)+'M':v>=1e3?'$'+Math.round(v/1e3)+'K':'$'+Math.round(v));}}}},scales:{x:{stacked:true,beginAtZero:true,ticks:{color:'#888',font:{size:9,family:'JetBrains Mono'},callback:v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+Math.round(v/1e3)+'K':'$'+Math.round(v)},grid:{color:'#1a1a1a'}},y:{stacked:true,display:false}}}});
-    cA=new Chart(document.getElementById('chart-aot'),{type:'bar',data:{labels:['1%','2%','5%','10%','15%','20%','30%','50%'],datasets:[{label:'AOT Treasury',data:Array(8).fill(0),backgroundColor:'#C0FF3880'}]},options:o});
+    cE=new Chart(document.getElementById('chart-epoch'),{type:'line',data:{labels:ep,datasets:[{label:'Priority Fees',data:D.e.map(e=>e.pf),borderColor:'#999',borderWidth:1.5,pointRadius:0,fill:false},{label:'Jito Tips',data:D.e.map(e=>e.mev),borderColor:'#d4e8a0',borderWidth:1.5,pointRadius:0,fill:false}]},options:o});
+    cA=new Chart(document.getElementById('chart-aot'),{type:'bar',data:{labels:['1%','2%','5%','10%','15%','20%','30%','50%'],datasets:[{label:'AOT Treasury',data:Array(8).fill(0),backgroundColor:'#d4e8a060'}]},options:o});
     cP=new Chart(document.getElementById('chart-price'),{type:'line',data:{labels:ep,datasets:[{label:'SOL',data:D.e.map(e=>e.p),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:false}]},options:o});
     const st={};D.p.forEach(p=>{if(p.fpc>0&&p.prod!=='neither'){const k=p.sub||p.cat;if(!st[k])st[k]=[];st[k].push(p.fpc);}});
     const ss=Object.entries(st).map(([k,v])=>({k,a:v.reduce((a,b)=>a+b,0)/v.length})).sort((a,b)=>b.a-a.a).slice(0,15);
-    cF=new Chart(document.getElementById('chart-fcu'),{type:'bar',data:{labels:ss.map(s=>s.k),datasets:[{label:'Avg Fee/CU (L)',data:ss.map(s=>s.a),backgroundColor:'#C0FF38'}]},options:{...o,plugins:{...o.plugins,legend:{display:false}}}});
+    cF=new Chart(document.getElementById('chart-fcu'),{type:'bar',data:{labels:ss.map(s=>s.k),datasets:[{label:'Avg Fee/CU (L)',data:ss.map(s=>s.a),backgroundColor:'#d4e8a0'}]},options:{...o,plugins:{...o.plugins,legend:{display:false}}}});
+}
+
+function fmtShort(v){return v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+Math.round(v/1e3)+'K':'$'+Math.round(v);}
+
+function updFlow(p,r){
+    const jU=r.jG*p.p, aU=r.aG*p.p, cU=r.commission*p.p;
+    const vU=r.vS*p.p, reU=r.rebates*p.p, vbU=r.valBonus*p.p, prU=r.protRev*p.p;
+    const total=jU+aU||1;
+    // Update labels
+    document.getElementById('fk-jit-v').textContent=fmtShort(jU);
+    document.getElementById('fk-aot-v').textContent=fmtShort(aU);
+    document.getElementById('fk-comm-v').textContent=fmtShort(cU)+' ('+Math.round(p.c*100)+'%)';
+    document.getElementById('fk-val-v').textContent=fmtShort(vU);
+    document.getElementById('fk-reb-v').textContent=fmtShort(reU);
+    document.getElementById('fk-vb-v').textContent=fmtShort(vbU);
+    document.getElementById('fk-proto-v').textContent=fmtShort(prU);
+    // Scale bar heights proportionally
+    const maxH=140, minH=8;
+    const jH=Math.max(minH,jU/total*maxH), aH=Math.max(minH,aU/total*maxH);
+    document.getElementById('fk-jit').setAttribute('height',jH);
+    document.getElementById('fk-aot').setAttribute('y',10+jH+10);
+    document.getElementById('fk-aot').setAttribute('height',aH);
+    // Reposition AOT text
+    document.querySelector('#fk-aot + text').setAttribute('y',10+jH+10+Math.min(25,aH/2));
+    document.querySelector('#fk-aot + text + text').setAttribute('y',10+jH+10+Math.min(40,aH/2+15));
+    // Update flow paths
+    const paths=document.getElementById('fk-paths');
+    const commTotal=cU||1;
+    const dists=[{v:vU,y1:5,h:40,c:'#333'},{v:reU,y1:55,h:30,c:'#555'},{v:vbU,y1:95,h:30,c:'#888'},{v:prU,y1:135,h:40,c:'#C0FF38'}];
+    let svg='';
+    // Source → Commission flows
+    svg+=`<path d="M18,${10+jH/2} C150,${10+jH/2} 200,90 290,90" stroke="#d4e8a0" stroke-width="${Math.max(1,jH/4)}" fill="none"/>`;
+    svg+=`<path d="M18,${10+jH+10+aH/2} C150,${10+jH+10+aH/2} 200,90 290,90" stroke="#71787F" stroke-width="${Math.max(1,aH/4)}" fill="none"/>`;
+    // Commission → Distribution flows
+    dists.forEach(d=>{
+        const w=Math.max(0.5,d.v/commTotal*8);
+        svg+=`<path d="M308,90 C450,90 500,${d.y1+d.h/2} 590,${d.y1+d.h/2}" stroke="${d.c}" stroke-width="${w}" fill="none"/>`;
+    });
+    paths.innerHTML=svg;
 }
 
 function updCharts(p,r){
-    cS.data.datasets[0].data=[r.jG*p.p,r.aG*p.p]; cS.update();
-    cW.data.datasets[0].data=[r.vS*p.p]; cW.data.datasets[1].data=[r.rebates*p.p]; cW.data.datasets[2].data=[r.valBonus*p.p]; cW.data.datasets[3].data=[r.protRev*p.p]; cW.update();
+    updFlow(p,r);
     [0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50].forEach((s,i)=>{
         cA.data.datasets[0].data[i]=(s*SY*p.b*CB*p.f)/LS*p.c*p.p;
     }); cA.update();
@@ -641,7 +705,7 @@ function update(){
     document.getElementById('wf-vbonus').textContent=fmt(r.valBonus*p.p,'$');
     document.getElementById('wf-vbonus-sub').textContent=(p.vb*100).toFixed(1)+'% of gross';
     document.getElementById('wf-treasury').textContent=fmt(r.tU,'$');
-    document.getElementById('wf-treasury-mo').textContent=fmt(r.tU/12,'$')+'/mo';
+    document.getElementById('wf-treasury-pct').textContent=fmt(r.tU/12,'$')+'/mo';
 
     // KPIs
     document.getElementById('kpi-total').textContent=fmt(r.tU,'$')+'/yr';
