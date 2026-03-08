@@ -155,7 +155,50 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 .share-btn:hover { background:var(--lime); color:var(--bg); }
 .share-btn svg { width:14px; height:14px; }
 
-@media(max-width:768px) {
+/* ═══ Sidebar Layout — inputs & outputs side-by-side ═══ */
+.tab-layout { display:flex; gap:var(--gap); align-items:flex-start; }
+.sidebar {
+    width:270px; min-width:270px; position:sticky; top:10px;
+    max-height:calc(100vh - 100px); overflow-y:auto;
+    scrollbar-width:thin; scrollbar-color:#333 transparent;
+}
+.sidebar::-webkit-scrollbar { width:4px; }
+.sidebar::-webkit-scrollbar-track { background:transparent; }
+.sidebar::-webkit-scrollbar-thumb { background:#333; border-radius:2px; }
+.main-content { flex:1; min-width:0; }
+
+/* Compact sidebar controls */
+.sidebar .controls-section { padding:10px 12px; margin-bottom:0; border-radius:0; border-bottom:none; }
+.sidebar .controls-section:first-child { border-radius:var(--radius) var(--radius) 0 0; }
+.sidebar .controls-section:last-child { border-bottom:2px solid var(--lime); border-radius:0 0 var(--radius) var(--radius); }
+.sidebar .controls-section h2 { font-size:9px; margin-bottom:6px; letter-spacing:1.5px; }
+.sidebar .controls-section h2::before { font-size:11px; }
+.sidebar .scenario-btns { gap:3px; margin-bottom:4px; }
+.sidebar .scenario-btn { padding:3px 8px; font-size:9px; border-radius:4px; border-width:1px; }
+.sidebar .scenario-desc { font-size:8px; padding:3px 6px; line-height:1.3; }
+.sidebar .controls-grid { grid-template-columns:1fr; gap:4px; }
+.sidebar .control { gap:2px; }
+.sidebar .control label { font-size:9px; letter-spacing:0.3px; }
+.sidebar .control .slider-row { gap:6px; }
+.sidebar .control input[type=range] { height:4px; border-radius:2px; }
+.sidebar .control input[type=range]::-webkit-slider-thumb { width:14px; height:14px; border-width:2px; box-shadow:0 0 6px #C0FF3840; }
+.sidebar .control input[type=range]::-moz-range-thumb { width:14px; height:14px; border-width:2px; }
+.sidebar .control input[type=range]::-moz-range-track { height:4px; }
+.sidebar .control .val { font-size:13px; min-width:48px; }
+.sidebar .note { display:none; }
+.sidebar .section-label { font-size:9px; margin-top:2px; padding-bottom:2px; }
+
+@media(max-width:900px) {
+    .tab-layout { flex-direction:column; }
+    .sidebar { width:100%; min-width:100%; position:static; max-height:none; overflow-y:visible; }
+    .sidebar .controls-section { padding:16px; }
+    .sidebar .controls-section:first-child, .sidebar .controls-section:last-child { border-radius:var(--radius); border:2px solid var(--lime); margin-bottom:var(--gap); }
+    .sidebar .controls-grid { grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); }
+    .sidebar .note { display:block; }
+    .sidebar .control label { font-size:11px; }
+    .sidebar .control .val { font-size:18px; min-width:70px; }
+    .sidebar .control input[type=range] { height:8px; }
+    .sidebar .control input[type=range]::-webkit-slider-thumb { width:20px; height:20px; }
     .kpi-row { grid-template-columns:repeat(2,1fr); }
     .chart-row { grid-template-columns:1fr; }
     .rev-row { grid-template-columns:1fr; }
@@ -191,6 +234,8 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 
 <!-- ═══ TAB 1: REVENUE MODEL (Macro) ═══ -->
 <div class="tab-content active" id="tab-macro">
+<div class="tab-layout">
+<div class="sidebar">
 
 <!-- SCENARIO PRESETS (top, for immediate interaction) -->
 <div class="controls-section fade-in fade-in-1">
@@ -255,6 +300,8 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
         </div>
     </div>
 </div>
+</div><!-- end sidebar -->
+<div class="main-content">
 
 <!-- TOP REVENUE OVERVIEW -->
 <div class="section fade-in fade-in-3">
@@ -373,6 +420,8 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 </div>
 
 
+</div><!-- end main-content -->
+</div><!-- end tab-layout -->
 </div><!-- end tab-macro -->
 
 <!-- ═══ TAB 2: PROGRAMS (Micro) ═══ -->
