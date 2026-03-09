@@ -24,6 +24,15 @@
     --gap: 14px; --radius: 10px;
     --font-display: 'Space Grotesk', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
+    /* Economic category colors — restrained palette */
+    --clr-gross: #d4e8a0;        /* Raiku pale lime — total gross */
+    --clr-jit: #FFFFFF;         /* White — JIT revenue */
+    --clr-aot: #FFFFFF;         /* White — AOT revenue */
+    --clr-validator: #5B8DEF;   /* Blue — Validator family */
+    --clr-val-bonus: #4178DE;   /* Slightly darker blue — AOT validator bonus */
+    --clr-rebate: #8BAF8B;      /* Soft desaturated green — AOT rebate */
+    --clr-rebate-jit: #9BBF9B;  /* Lighter soft green — JIT rebate */
+    --clr-protocol: #C0FF38;    /* Lime — Protocol Treasury */
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family: var(--font-display); background:var(--bg); color:var(--text); line-height:1.5; }
@@ -75,7 +84,7 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 .section-label { font-size:13px; font-weight:600; color:var(--lime-soft); padding-bottom:6px; border-bottom:1px solid var(--card-border); grid-column:1/-1; margin-top:8px; }
 
 .section { background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); padding:20px; margin-bottom:var(--gap); }
-.section h2 { font-size:13px; font-weight:600; color:var(--lime-soft); margin-bottom:14px; text-transform:uppercase; letter-spacing:2px; font-family:var(--font-mono); }
+.section h2 { font-size:12px; font-weight:600; color:var(--lime-soft); margin-bottom:10px; text-transform:uppercase; letter-spacing:2px; font-family:var(--font-mono); }
 
 /* Scenario buttons */
 .scenario-btns { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
@@ -84,29 +93,12 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 .scenario-btn.active { border-color:var(--text); background:#ffffff08; color:var(--text); }
 .scenario-desc { font-size:11px; color:var(--text-mid); padding:8px 12px; background:#141516; border-radius:6px; line-height:1.4; }
 
-/* Revenue cards */
-.rev-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:var(--gap); margin-bottom:var(--gap); }
-.rev-card { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:18px; transition:border-color 0.3s, box-shadow 0.3s; }
-.rev-card:hover { border-color:#3a3c3d; box-shadow:0 4px 20px rgba(0,0,0,0.25); }
-.rev-card h3 { color:var(--lime-soft); font-size:13px; margin-bottom:10px; }
-.rev-line { display:flex; justify-content:space-between; padding:3px 0; font-size:12px; border-bottom:1px solid #222; }
-.rev-line:last-child { border-bottom:none; }
-.rev-line .label { color:var(--text2); }
-.rev-line .value { font-weight:600; font-variant-numeric:tabular-nums; }
-.rev-total { display:flex; justify-content:space-between; padding:6px 0; margin-top:6px; border-top:1px solid var(--card-border); font-size:14px; font-weight:700; }
-.rev-total .value { color:var(--text); }
 
 .chart-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(380px, 1fr)); gap:var(--gap); margin-bottom:var(--gap); }
 .chart-box { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:18px; min-height:280px; position:relative; }
 .chart-box h3 { color:var(--text); font-size:12px; margin-bottom:10px; }
 .chart-box canvas { max-height:260px; }
 
-/* Waterfall */
-.wf-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:8px; margin-bottom:var(--gap); }
-.wf-item { background:#141516; border:1px solid var(--card-border); border-radius:8px; padding:12px; text-align:center; }
-.wf-item .wf-label { font-size:9px; color:var(--text2); text-transform:uppercase; margin-bottom:3px; }
-.wf-item .wf-val { font-size:18px; font-weight:700; font-variant-numeric:tabular-nums; font-family:var(--font-mono); }
-.wf-item .wf-sub { font-size:9px; color:var(--text2); margin-top:2px; }
 
 /* Table */
 .table-wrap { overflow-x:auto; max-height:600px; overflow-y:auto; }
@@ -147,11 +139,14 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 /* Card hover effects */
 .section { transition:border-color 0.3s, box-shadow 0.3s; }
 .section:hover { border-color:#3a3c3d; box-shadow:0 4px 24px rgba(0,0,0,0.3); }
+
+/* Collapsible data sources */
+details summary { list-style:none; }
+details summary::-webkit-details-marker { display:none; }
+details summary::before { content:'▶ '; font-size:9px; transition:transform 0.2s; display:inline-block; }
+details[open] summary::before { transform:rotate(90deg); }
 .kpi { transition:border-color 0.3s, transform 0.2s; }
 .kpi:hover { border-color:#3a3c3d; transform:translateY(-2px); }
-.wf-item { transition:border-color 0.3s, transform 0.2s, box-shadow 0.3s; }
-.wf-item:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,0,0,0.3); }
-
 /* Share button */
 .share-btn { background:transparent; border:1px solid var(--card-border); color:var(--text-mid); padding:6px 16px; border-radius:6px; cursor:pointer; font-size:11px; font-family:var(--font-mono); letter-spacing:1px; text-transform:uppercase; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px; }
 .share-btn:hover { background:#ffffff12; color:var(--text); border-color:#555; }
@@ -203,9 +198,37 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
     .sidebar .control input[type=range]::-webkit-slider-thumb { width:20px; height:20px; }
     .kpi-row { grid-template-columns:repeat(2,1fr); }
     .chart-row { grid-template-columns:1fr; }
-    .rev-row { grid-template-columns:1fr; }
-    .wf-row { grid-template-columns:repeat(2,1fr); }
     .tab-btn { font-size:10px; padding:8px 10px; letter-spacing:0.5px; }
+}
+/* ═══ Triple-format cards ═══ */
+.triple-card { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:12px 14px; border-left:3px solid var(--card-border); transition:border-color 0.3s, box-shadow 0.3s, transform 0.2s; }
+.triple-card:hover { box-shadow:0 4px 20px rgba(0,0,0,0.25); transform:translateY(-1px); }
+.triple-card .tc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.triple-card .tc-label { font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; font-weight:500; }
+.triple-card .tc-badge { font-size:8px; color:var(--text2); text-transform:uppercase; letter-spacing:1px; background:#ffffff08; border:1px solid #333; border-radius:3px; padding:1px 5px; }
+.triple-card .tc-usd { font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; font-family:var(--font-mono); line-height:1.2; }
+.triple-card .tc-secondary { font-size:11px; color:var(--text2); margin-top:4px; font-family:var(--font-mono); }
+.triple-card .tc-monthly { font-size:10px; color:var(--text2); margin-top:2px; opacity:0.7; }
+
+/* (Validator group card removed — split into separate triple-cards) */
+
+/* Scenario card with dynamic active state */
+.scenario-card { background:#141516; border:2px solid var(--card-border); border-radius:var(--radius); padding:16px; text-align:center; transition:all 0.25s; }
+.scenario-card h3 { font-size:12px; color:var(--text-mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.scenario-card .sc-val { font-size:24px; font-weight:700; color:var(--text); font-family:var(--font-mono); }
+.scenario-card .sc-detail { font-size:10px; color:var(--text2); margin-top:4px; }
+.scenario-card .sc-monthly { font-size:9px; color:var(--text2); margin-top:3px; }
+.scenario-card.active { border-color:var(--clr-protocol); background:rgba(192,255,56,0.03); box-shadow:0 0 12px rgba(192,255,56,0.08); }
+.scenario-card.active h3 { color:var(--clr-protocol); }
+
+
+
+/* Revenue grid layouts */
+.rev-sources-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:10px; }
+.rev-dist-grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin-bottom:10px; }
+@media(max-width:900px) {
+    .rev-sources-grid { grid-template-columns:1fr; }
+    .rev-dist-grid { grid-template-columns:1fr; }
 }
 </style>
 </head>
@@ -261,15 +284,21 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
             <div class="slider-row"><input type="range" id="sl-comm" min="0" max="10" step="0.5" value="5"><span class="val" id="v-comm">5.0%</span></div>
             <div class="note">Governance range 1-5%. 0% = all revenue to validators. Up to 10% for sensitivity.</div>
         </div>
+        <div class="section-label">Revenue Distribution</div>
         <div class="control">
-            <label>Customer Rebate Rate</label>
-            <div class="slider-row"><input type="range" id="sl-rebate" min="0" max="2" step="0.1" value="0.5"><span class="val" id="v-rebate">0.5%</span></div>
-            <div class="note">% of gross revenue returned to users as loyalty rebates (JIT + AOT). Reduces protocol revenue.</div>
+            <label>AOT Customer Rebate (%)</label>
+            <div class="slider-row"><input type="range" id="sl-rebate-aot" min="0" max="1" step="0.05" value="0.25"><span class="val" id="v-rebate-aot">0.25%</span></div>
+            <div class="note">% of AOT gross returned to users as loyalty rebates. Reduces AOT protocol revenue.</div>
         </div>
         <div class="control">
-            <label>Validator Bonus Rate</label>
-            <div class="slider-row"><input type="range" id="sl-vbonus" min="0" max="3" step="0.1" value="1.5"><span class="val" id="v-vbonus">1.5%</span></div>
-            <div class="note">% of gross revenue as performance bonuses to well-behaved validators.</div>
+            <label>JIT Customer Rebate (%)</label>
+            <div class="slider-row"><input type="range" id="sl-rebate-jit" min="0" max="0.5" step="0.05" value="0.25"><span class="val" id="v-rebate-jit">0.25%</span></div>
+            <div class="note">% of JIT gross returned to users as loyalty rebates. Reduces JIT protocol revenue.</div>
+        </div>
+        <div class="control">
+            <label>AOT Validator Bonus (%) <span style="font-size:9px;color:var(--clr-val-bonus);font-weight:400;">(AOT only)</span></label>
+            <div class="slider-row"><input type="range" id="sl-val-bonus" min="0" max="2" step="0.1" value="1"><span class="val" id="v-val-bonus">1.0%</span></div>
+            <div class="note">% of AOT gross as bonus to validators who respect AOT ordering/inclusion rules. Does not apply to JIT.</div>
         </div>
         <div class="control">
             <label>SOL Price (USD)</label>
@@ -279,9 +308,18 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 
         <div class="section-label">JIT (Just-in-Time) &mdash; Real-time tip-based ordering</div>
         <div class="control">
+            <label>JIT Total Market (SOL/yr)</label>
+            <div class="slider-row"><input type="range" id="sl-jit-market" min="100000" max="10000000" step="1000" value="813000"><span class="val blue" id="v-jit-market">813K</span></div>
+            <div style="font-size:11px;color:var(--text-mid);font-family:var(--font-mono);margin-top:-2px;" id="v-jit-market-usd">&mdash;</div>
+            <div class="note">Total annual Jito MEV rewards used as the JIT market size. Default = data-driven baseline from the last 100 epochs.</div>
+        </div>
+        <div class="control">
             <label>JIT Market Share</label>
             <div class="slider-row"><input type="range" id="sl-jit" min="0" max="30" step="1" value="5"><span class="val blue" id="v-jit">5%</span></div>
-            <div class="note"><strong>RAIKU's share of the global JIT auction market.</strong> Current data based on Jito MEV tips only (~811K SOL/yr). Addressable market includes all JIT providers (Jito + Harmonic + future).</div>
+            <div class="note">RAIKU's share of the global JIT auction market.</div>
+        </div>
+        <div style="margin-top:4px;margin-bottom:8px;padding:5px 10px;background:#111213;border-radius:5px;border-left:2px solid var(--lime-soft);">
+            <a href="#jit-data-section" style="color:var(--lime-soft);text-decoration:underline;font-weight:600;font-size:12px;letter-spacing:0.3px;" onclick="document.getElementById('jit-data-section').scrollIntoView({behavior:'smooth'});return false;">&#x2193; See JIT data source &amp; methodology</a>
         </div>
 
         <div class="section-label">AOT (Ahead-of-Time) &mdash; Sealed-bid blockspace auctions</div>
@@ -297,157 +335,456 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
         </div>
         <div class="control">
             <label>Avg Auction Fee/CU (lamports)</label>
-            <div class="slider-row"><input type="range" id="sl-fcu" min="0.001" max="2" step="0.001" value="0.10"><span class="val blue" id="v-fcu">0.100</span></div>
-            <div class="note">Auction clearing price per CU. Phoenix 0.005, Arb bots 0.087, Raydium ~2.0. Base 0.10 = weighted avg.</div>
+            <div class="slider-row"><input type="range" id="sl-fcu" min="0.01" max="25" step="0.01" value="1.00"><span class="val blue" id="v-fcu">1.00</span></div>
+            <div class="note">CU-weighted blended fee across your AOT customer mix. Low-fee DeFi ≈ 0.21 L/CU, Prop AMM / high-fee ≈ 19.28 L/CU. Scenario presets model different customer mixes.</div>
+        </div>
+        <div style="margin-top:4px;margin-bottom:8px;padding:5px 10px;background:#111213;border-radius:5px;border-left:2px solid var(--lime-soft);">
+            <a href="#aot-fcu-data-section" style="color:var(--lime-soft);text-decoration:underline;font-weight:600;font-size:12px;letter-spacing:0.3px;" onclick="document.getElementById('aot-fcu-data-section').scrollIntoView({behavior:'smooth'});return false;">&#x2193; See AOT fee/CU data source &amp; methodology</a>
         </div>
     </div>
 </div>
 </div><!-- end sidebar -->
 <div class="main-content">
 
-<!-- TOP REVENUE OVERVIEW -->
+
+
+<!-- REVENUE OVERVIEW -->
 <div class="section fade-in fade-in-3">
-    <h2>Revenue Overview</h2>
-    <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-family:var(--font-mono);">Revenue Sources</div>
-    <div class="wf-row">
-        <div class="wf-item" style="border-color:var(--text2)"><div class="wf-label">Gross Revenue</div><div class="wf-val" style="color:var(--text)" id="wf-gross">&mdash;</div><div class="wf-sub" id="wf-gross-sol"></div></div>
-        <div class="wf-item" style="border-color:var(--lime-soft)"><div class="wf-label">JIT (tips market)</div><div class="wf-val" style="color:var(--lime-soft)" id="wf-jit">&mdash;</div><div class="wf-sub" id="wf-jit-pct"></div></div>
-        <div class="wf-item" style="border-color:#888"><div class="wf-label">AOT (auctions)</div><div class="wf-val" style="color:#fff" id="wf-aot">&mdash;</div><div class="wf-sub" id="wf-aot-pct"></div></div>
+    <h2>Annual Revenue Overview</h2>
+    <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;font-family:var(--font-mono);">Revenue Sources</div>
+    <div class="rev-sources-grid">
+        <div class="triple-card" style="border-left-color:var(--clr-gross);">
+            <div class="tc-header"><span class="tc-label">Total Gross Revenue</span><span class="tc-badge">Annual</span></div>
+            <div class="tc-usd" style="color:var(--clr-gross);" id="tc-gross-usd">&mdash;</div>
+            <div class="tc-secondary" id="tc-gross-sol">&mdash;</div>
+            <div class="tc-monthly" id="tc-gross-mo">&mdash;</div>
+        </div>
+        <div class="triple-card" style="border-left-color:var(--clr-jit);">
+            <div class="tc-header"><span class="tc-label">JIT Revenue (tips)</span><span class="tc-badge">Annual</span></div>
+            <div class="tc-usd" style="color:var(--clr-jit);" id="tc-jit-usd">&mdash;</div>
+            <div class="tc-secondary" id="tc-jit-sol">&mdash;</div>
+            <div class="tc-monthly" id="tc-jit-mo">&mdash;</div>
+        </div>
+        <div class="triple-card" style="border-left-color:var(--clr-aot);">
+            <div class="tc-header"><span class="tc-label">AOT Revenue (auctions)</span><span class="tc-badge">Annual</span></div>
+            <div class="tc-usd" style="color:var(--clr-aot);" id="tc-aot-usd">&mdash;</div>
+            <div class="tc-secondary" id="tc-aot-sol">&mdash;</div>
+            <div class="tc-monthly" id="tc-aot-mo">&mdash;</div>
+        </div>
     </div>
-    <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-family:var(--font-mono);">Fee Distribution</div>
-    <div class="wf-row">
-        <div class="wf-item" style="border-color:#444"><div class="wf-label">Validators</div><div class="wf-val" style="color:var(--text2)" id="wf-val">&mdash;</div><div class="wf-sub" id="wf-val-sub"></div></div>
-        <div class="wf-item" style="border-color:#666"><div class="wf-label">Customer Rebates</div><div class="wf-val" style="color:#aaa" id="wf-rebates">&mdash;</div><div class="wf-sub" id="wf-rebates-sub"></div></div>
-        <div class="wf-item" style="border-color:#666"><div class="wf-label">Validator Bonus</div><div class="wf-val" style="color:var(--text-mid)" id="wf-vbonus">&mdash;</div><div class="wf-sub" id="wf-vbonus-sub"></div></div>
-        <div class="wf-item" style="border-color:var(--lime)"><div class="wf-label">Protocol Revenue</div><div class="wf-val" style="color:var(--lime)" id="wf-treasury">&mdash;</div><div class="wf-sub" id="wf-treasury-pct"></div></div>
+    <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;font-family:var(--font-mono);">Revenue Distribution</div>
+    <div class="rev-dist-grid">
+        <!-- Validator Base -->
+        <div class="triple-card" style="border-left-color:var(--clr-validator);">
+            <div class="tc-header"><span class="tc-label">Validator Base</span><span class="tc-badge">Annual</span></div>
+            <div class="tc-usd" style="color:var(--clr-validator);" id="vg-base-usd">&mdash;</div>
+            <div class="tc-secondary" id="vg-base-sol">&mdash;</div>
+            <div class="tc-monthly" id="vg-base-mo">&mdash;</div>
+        </div>
+        <!-- AOT Validator Bonus -->
+        <div class="triple-card" style="border-left-color:var(--clr-val-bonus);">
+            <div class="tc-header"><span class="tc-label">Validator Bonus <span style="font-size:8px;color:var(--clr-val-bonus);opacity:0.8;letter-spacing:0;text-transform:none;">(AOT only)</span></span><span class="tc-badge">Annual</span></div>
+            <div class="tc-usd" style="color:var(--clr-val-bonus);" id="vg-bonus-usd">&mdash;</div>
+            <div class="tc-secondary" id="vg-bonus-sol">&mdash;</div>
+            <div class="tc-monthly" id="vg-bonus-mo">&mdash;</div>
+        </div>
+        <!-- AOT Customer Rebate -->
+        <div class="triple-card" style="border-left-color:var(--clr-rebate);">
+            <div class="tc-header"><span class="tc-label">AOT Customer Rebate</span><span class="tc-badge">Annual</span></div>
+            <div class="tc-usd" style="color:var(--clr-rebate);" id="tc-reb-aot-usd">&mdash;</div>
+            <div class="tc-secondary" id="tc-reb-aot-sol">&mdash;</div>
+            <div class="tc-monthly" id="tc-reb-aot-mo">&mdash;</div>
+        </div>
+        <!-- JIT Customer Rebate -->
+        <div class="triple-card" style="border-left-color:var(--clr-rebate-jit);">
+            <div class="tc-header"><span class="tc-label">JIT Customer Rebate</span><span class="tc-badge">Annual</span></div>
+            <div class="tc-usd" style="color:var(--clr-rebate-jit);" id="tc-reb-jit-usd">&mdash;</div>
+            <div class="tc-secondary" id="tc-reb-jit-sol">&mdash;</div>
+            <div class="tc-monthly" id="tc-reb-jit-mo">&mdash;</div>
+        </div>
+        <!-- Protocol Treasury — the key metric -->
+        <div class="triple-card" style="border-left-color:var(--clr-protocol);border-color:var(--clr-protocol);background:#0d120a;">
+            <div class="tc-header"><span class="tc-label" style="color:var(--clr-protocol);">Protocol Treasury</span><span class="tc-badge" style="border-color:var(--clr-protocol);color:var(--clr-protocol);">Annual</span></div>
+            <div class="tc-usd" style="color:var(--clr-protocol);font-size:26px;" id="tc-proto-usd">&mdash;</div>
+            <div class="tc-secondary" id="tc-proto-sol">&mdash;</div>
+            <div class="tc-monthly" style="font-size:11px;opacity:1;color:var(--text-mid);" id="tc-proto-mo">&mdash;</div>
+        </div>
     </div>
-    <div class="chart-box" style="min-height:230px;">
-        <h3>Revenue Flow</h3>
-        <svg id="flow-sankey" viewBox="0 0 800 200" style="width:100%;height:190px;font-family:var(--font-mono);">
+
+    <!-- Sankey Flow Chart — clean, tall, readable -->
+    <div class="chart-box" style="min-height:420px;padding:16px 24px;">
+        <h3 style="font-size:13px;margin-bottom:10px;color:var(--text2);">Revenue Flow — JIT + AOT → Distribution</h3>
+        <svg id="flow-sankey" viewBox="0 0 1000 420" style="width:100%;height:400px;font-family:var(--font-mono);">
             <!-- Left: Sources -->
-            <rect id="fk-jit" x="0" y="10" width="18" height="70" rx="3" fill="#d4e8a0"/>
-            <text x="24" y="35" fill="#d4e8a0" font-size="10" font-weight="600">JIT</text>
-            <text id="fk-jit-v" x="24" y="50" fill="#A0A3A9" font-size="9">—</text>
-            <rect id="fk-aot" x="0" y="110" width="18" height="80" rx="3" fill="#71787F"/>
-            <text x="24" y="140" fill="#A0A3A9" font-size="10" font-weight="600">AOT</text>
-            <text id="fk-aot-v" x="24" y="155" fill="#71787F" font-size="9">—</text>
-            <!-- Center: Commission -->
-            <rect id="fk-comm" x="290" y="20" width="18" height="160" rx="3" fill="#F6F8FA"/>
-            <text x="314" y="85" fill="#F6F8FA" font-size="10" font-weight="600">Commission</text>
-            <text id="fk-comm-v" x="314" y="102" fill="#A0A3A9" font-size="9">—</text>
-            <!-- Right: Distribution -->
-            <rect id="fk-val" x="590" y="5" width="18" height="45" rx="3" fill="#333"/>
-            <text x="614" y="24" fill="#71787F" font-size="9" font-weight="600">Validators</text>
-            <text id="fk-val-v" x="614" y="38" fill="#555" font-size="8">—</text>
-            <rect id="fk-reb" x="590" y="60" width="18" height="35" rx="3" fill="#555"/>
-            <text x="614" y="75" fill="#A0A3A9" font-size="9" font-weight="600">Rebates</text>
-            <text id="fk-reb-v" x="614" y="88" fill="#71787F" font-size="8">—</text>
-            <rect id="fk-vb" x="590" y="105" width="18" height="35" rx="3" fill="#888"/>
-            <text x="614" y="120" fill="#A0A3A9" font-size="9" font-weight="600">Val. Bonus</text>
-            <text id="fk-vb-v" x="614" y="133" fill="#71787F" font-size="8">—</text>
-            <rect id="fk-proto" x="590" y="150" width="18" height="45" rx="3" fill="var(--lime)"/>
-            <text x="614" y="169" fill="var(--lime)" font-size="9" font-weight="700">Protocol</text>
-            <text id="fk-proto-v" x="614" y="182" fill="#d4e8a0" font-size="8">—</text>
+            <rect id="fk-jit" x="0" y="40" width="20" height="140" rx="3" fill="#FFFFFF" opacity="0.9"/>
+            <text id="fk-jit-label" x="30" y="100" fill="#FFFFFF" font-size="15" font-weight="700">JIT Revenue</text>
+            <text id="fk-jit-v" x="30" y="122" fill="#A0A3A9" font-size="13">—</text>
+            <rect id="fk-aot" x="0" y="240" width="20" height="140" rx="3" fill="#FFFFFF" opacity="0.9"/>
+            <text id="fk-aot-label" x="30" y="300" fill="#FFFFFF" font-size="15" font-weight="700">AOT Revenue</text>
+            <text id="fk-aot-v" x="30" y="322" fill="#A0A3A9" font-size="13">—</text>
+            <!-- Center: Total Revenue -->
+            <rect id="fk-total" x="370" y="20" width="20" height="440" rx="3" fill="#d4e8a0" opacity="0.85"/>
+            <text x="400" y="230" fill="#d4e8a0" font-size="15" font-weight="700">Total Revenue</text>
+            <text id="fk-total-v" x="400" y="252" fill="#A0A3A9" font-size="13">—</text>
+            <!-- Right: 5 Distribution outputs — evenly spaced, large -->
+            <rect id="fk-valbase" x="720" y="20" width="18" height="80" rx="3" fill="#5B8DEF"/>
+            <text id="fk-valbase-label" x="746" y="52" fill="#5B8DEF" font-size="15" font-weight="700">Validator Base</text>
+            <text id="fk-valbase-v" x="746" y="74" fill="#A0A3A9" font-size="13">—</text>
+            <rect id="fk-vb" x="720" y="115" width="18" height="60" rx="3" fill="#4178DE"/>
+            <text id="fk-vb-label" x="746" y="140" fill="#4178DE" font-size="14" font-weight="600">AOT Val. Bonus</text>
+            <text id="fk-vb-paren" x="882" y="140" fill="#4178DE" font-size="10" opacity="0.7">(AOT only)</text>
+            <text id="fk-vb-v" x="746" y="160" fill="#A0A3A9" font-size="13">—</text>
+            <rect id="fk-reb-aot" x="720" y="200" width="18" height="60" rx="3" fill="#8BAF8B"/>
+            <text id="fk-reb-aot-label" x="746" y="225" fill="#8BAF8B" font-size="14" font-weight="600">AOT Rebate</text>
+            <text id="fk-reb-aot-v" x="746" y="245" fill="#A0A3A9" font-size="13">—</text>
+            <rect id="fk-reb-jit" x="720" y="285" width="18" height="60" rx="3" fill="#9BBF9B"/>
+            <text id="fk-reb-jit-label" x="746" y="310" fill="#9BBF9B" font-size="14" font-weight="600">JIT Rebate</text>
+            <text id="fk-reb-jit-v" x="746" y="330" fill="#A0A3A9" font-size="13">—</text>
+            <rect id="fk-proto" x="720" y="370" width="18" height="80" rx="3" fill="#C0FF38"/>
+            <text id="fk-proto-label" x="746" y="402" fill="#C0FF38" font-size="15" font-weight="700">Protocol Treasury</text>
+            <text id="fk-proto-v" x="746" y="424" fill="#C0FF38" font-size="13">—</text>
             <!-- Flow paths (drawn dynamically) -->
-            <g id="fk-paths" opacity="0.25"></g>
+            <g id="fk-paths" opacity="0.3"></g>
         </svg>
     </div>
 </div>
 
-<!-- KPIs -->
-<div class="kpi-row fade-in fade-in-2">
-    <div class="kpi"><div class="kpi-label">Protocol Revenue</div><div class="kpi-value" id="kpi-total">&mdash;</div><div class="kpi-sub" id="kpi-total-sub"></div></div>
-    <div class="kpi"><div class="kpi-label">JIT Gross</div><div class="kpi-value white" id="kpi-jit">&mdash;</div><div class="kpi-sub" id="kpi-jit-sub"></div></div>
-    <div class="kpi"><div class="kpi-label">AOT Gross</div><div class="kpi-value white" id="kpi-aot">&mdash;</div><div class="kpi-sub" id="kpi-aot-sub"></div></div>
-    <div class="kpi"><div class="kpi-label">Monthly</div><div class="kpi-value" id="kpi-mo">&mdash;</div><div class="kpi-sub">protocol / month</div></div>
-    <div class="kpi"><div class="kpi-label">SOL Price</div><div class="kpi-value white" id="kpi-price">&mdash;</div><div class="kpi-sub">slider value</div></div>
-    <div class="kpi"><div class="kpi-label">Jito Tips (ann.)</div><div class="kpi-value white" id="kpi-jito">&mdash;</div><div class="kpi-sub">SOL / year</div></div>
-    <div class="kpi"><div class="kpi-label">Priority Fees (ann.)</div><div class="kpi-value white" id="kpi-pf">&mdash;</div><div class="kpi-sub">SOL / year</div></div>
-</div>
+<!-- KPI row removed — consolidated into Revenue Overview above -->
 
 
-<!-- SCENARIOS COMPARISON (static, no interactive buttons) -->
+<!-- SCENARIOS COMPARISON — dynamic active state, no hardcoded colors -->
 <div class="section fade-in fade-in-3">
     <h2>Scenario Comparison</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
-        <div class="rev-card" style="text-align:center;">
-            <h3 style="color:var(--text-mid)">Conservative</h3>
-            <div style="font-size:22px;font-weight:700;" id="sc-con-v">&mdash;</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:4px;" id="sc-con-d"></div>
-            <div style="font-size:9px;color:var(--text2);margin-top:4px;" id="sc-con-m"></div>
+        <div class="scenario-card" id="sc-card-con" data-scenario="con">
+            <h3>Conservative</h3>
+            <div class="sc-val" id="sc-con-v">&mdash;</div>
+            <div class="sc-detail" id="sc-con-d"></div>
+            <div class="sc-monthly" id="sc-con-m"></div>
         </div>
-        <div class="rev-card" style="text-align:center;border-color:var(--lime-soft);">
-            <h3 style="color:var(--lime-soft)">Base Case</h3>
-            <div style="font-size:22px;font-weight:700;color:var(--text);" id="sc-base-v">&mdash;</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:4px;" id="sc-base-d"></div>
-            <div style="font-size:9px;color:var(--text2);margin-top:4px;" id="sc-base-m"></div>
+        <div class="scenario-card" id="sc-card-base" data-scenario="base">
+            <h3>Base Case</h3>
+            <div class="sc-val" id="sc-base-v">&mdash;</div>
+            <div class="sc-detail" id="sc-base-d"></div>
+            <div class="sc-monthly" id="sc-base-m"></div>
         </div>
-        <div class="rev-card" style="text-align:center;">
-            <h3 style="color:#fff">Optimistic</h3>
-            <div style="font-size:22px;font-weight:700;color:#fff;" id="sc-opt-v">&mdash;</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:4px;" id="sc-opt-d"></div>
-            <div style="font-size:9px;color:var(--text2);margin-top:4px;" id="sc-opt-m"></div>
+        <div class="scenario-card" id="sc-card-opt" data-scenario="opt">
+            <h3>Optimistic</h3>
+            <div class="sc-val" id="sc-opt-v">&mdash;</div>
+            <div class="sc-detail" id="sc-opt-d"></div>
+            <div class="sc-monthly" id="sc-opt-m"></div>
         </div>
-        <div class="rev-card" style="text-align:center;">
-            <h3 style="color:#FFD700">Bull Case</h3>
-            <div style="font-size:22px;font-weight:700;color:#FFD700;" id="sc-bull-v">&mdash;</div>
-            <div style="font-size:10px;color:var(--text2);margin-top:4px;" id="sc-bull-d"></div>
-            <div style="font-size:9px;color:var(--text2);margin-top:4px;" id="sc-bull-m"></div>
-        </div>
-    </div>
-</div>
-
-<!-- REVENUE BREAKDOWN -->
-<div class="section fade-in fade-in-4">
-    <h2>Revenue Breakdown</h2>
-    <div class="rev-row">
-        <div class="rev-card">
-            <h3>JIT Revenue</h3>
-            <div class="rev-line"><span class="label">JIT Market (annual, Jito-based)</span><span class="value" id="rb-jm">&mdash;</span></div>
-            <div class="rev-line"><span class="label">&times; RAIKU Market Share</span><span class="value" id="rb-js">&mdash;</span></div>
-            <div class="rev-line"><span class="label">= Gross JIT Revenue</span><span class="value" id="rb-jg">&mdash;</span></div>
-            <div class="rev-line"><span class="label">&times; Protocol Commission</span><span class="value" id="rb-jc">&mdash;</span></div>
-            <div class="rev-total"><span class="label">JIT Treasury</span><span class="value" id="rb-jn">&mdash;</span></div>
-        </div>
-        <div class="rev-card">
-            <h3>AOT Revenue (3D Framework)</h3>
-            <div class="rev-line"><span class="label">RAIKU Stake %</span><span class="value" id="rb-as">&mdash;</span></div>
-            <div class="rev-line"><span class="label">Leader Slots / year</span><span class="value" id="rb-al">&mdash;</span></div>
-            <div class="rev-line"><span class="label">CU reserved per slot</span><span class="value" id="rb-ac">&mdash;</span></div>
-            <div class="rev-line"><span class="label">Avg Fee/CU</span><span class="value" id="rb-af">&mdash;</span></div>
-            <div class="rev-line"><span class="label">= Gross AOT (SOL/yr)</span><span class="value" id="rb-ags">&mdash;</span></div>
-            <div class="rev-line"><span class="label">= Gross AOT (USD/yr)</span><span class="value" id="rb-agu">&mdash;</span></div>
-            <div class="rev-line"><span class="label">&times; Protocol Commission</span><span class="value" id="rb-acc">&mdash;</span></div>
-            <div class="rev-total"><span class="label">AOT Treasury</span><span class="value" id="rb-an">&mdash;</span></div>
-        </div>
-        <div class="rev-card">
-            <h3>Fee Distribution (Commission Breakdown)</h3>
-            <div class="rev-line"><span class="label">Total Gross</span><span class="value" id="rd-g">&mdash;</span></div>
-            <div class="rev-line"><span class="label">→ Validators</span><span class="value" id="rd-v">&mdash;</span></div>
-            <div class="rev-line"><span class="label">→ Commission</span><span class="value" id="rd-comm">&mdash;</span></div>
-            <div class="rev-line"><span class="label" style="padding-left:14px">Customer Rebates</span><span class="value" id="rd-reb">&mdash;</span></div>
-            <div class="rev-line"><span class="label" style="padding-left:14px">Validator Bonus</span><span class="value" id="rd-vb">&mdash;</span></div>
-            <div class="rev-total"><span class="label">Protocol Revenue</span><span class="value" id="rd-t">&mdash;</span></div>
-            <div class="rev-line"><span class="label" style="padding-left:10px">Per month</span><span class="value" id="rd-m">&mdash;</span></div>
-            <div class="rev-line"><span class="label" style="padding-left:10px">In SOL/yr</span><span class="value" id="rd-s">&mdash;</span></div>
+        <div class="scenario-card" id="sc-card-bull" data-scenario="bull">
+            <h3>Bull Case</h3>
+            <div class="sc-val" id="sc-bull-v">&mdash;</div>
+            <div class="sc-detail" id="sc-bull-d"></div>
+            <div class="sc-monthly" id="sc-bull-m"></div>
         </div>
     </div>
 </div>
 
 <!-- AOT REVENUE SENSITIVITY CHART (model output) -->
 <div class="section fade-in fade-in-5">
-    <h2>AOT Revenue by Stake %</h2>
-    <div class="note" style="margin-bottom:10px">Protocol treasury (USD/yr) at different RAIKU stake levels. Block share, Fee/CU & SOL price from sliders above.</div>
+    <h2>AOT Protocol Treasury by Stake %</h2>
+    <div class="note" style="margin-bottom:10px">Protocol treasury from AOT stream (USD/yr) at different RAIKU stake levels. Held constant: Block share, Fee/CU, SOL price, AOT rebate, AOT val bonus (from sliders). X-axis = RAIKU stake %. Base case shown from current slider.</div>
     <div class="chart-box" style="min-height:220px;"><canvas id="chart-aot"></canvas></div>
 </div>
 
 <!-- AOT SENSITIVITY MATRIX -->
 <div class="section fade-in fade-in-6">
     <h2>AOT Sensitivity &mdash; Protocol Treasury (USD/yr)</h2>
-    <div class="note" style="margin-bottom:10px">Rows = Stake %, Cols = Fee/CU. Block share & SOL price from sliders. Highlighted = current.</div>
+    <div class="note" style="margin-bottom:10px">Rows = Stake %, Cols = Fee/CU. Block share & SOL price from sliders. AOT rebate and AOT validator bonus applied. Highlighted = current.</div>
     <div class="table-wrap" id="aot-matrix"></div>
 </div>
 
+<!-- DATA SOURCES & METHODOLOGY — includes full JIT data module -->
+<div class="section fade-in fade-in-7" style="margin-top:var(--gap);">
+    <h2>Data Sources & Methodology</h2>
+
+    <!-- JIT Market Data — primary data transparency module -->
+    <details open style="margin-bottom:16px;">
+    <summary style="font-size:13px;font-weight:700;color:var(--lime-soft);text-transform:uppercase;letter-spacing:1.2px;cursor:pointer;padding:10px 0;list-style:none;display:flex;align-items:center;gap:8px;">
+        JIT Market Assumption &amp; Methodology
+    </summary>
+    <div id="jit-data-section" style="background:#0d0e0f;border:1px solid var(--card-border);border-radius:8px;padding:20px 24px;">
+
+        <!-- Header badge -->
+        <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:14px;">
+            <span style="font-size:11px;color:var(--text2);font-style:italic;" id="jit-ds-badge">data-driven default</span>
+        </div>
+
+        <!-- Headline: USD primary, SOL secondary -->
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
+            <span style="font-size:26px;font-weight:700;color:var(--text);font-family:var(--font-mono);" id="jit-m-usd">&mdash;</span>
+            <span style="font-size:14px;color:var(--text2);font-family:var(--font-mono);" id="jit-m-sol"></span>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:16px;">
+            Annualized JIT market size used as model input. Controlled by the <strong>JIT Total Market</strong> slider in the left panel.
+        </div>
+
+        <!-- Methodology — plain English, larger text -->
+        <div style="font-size:13px;color:var(--text);line-height:1.7;padding:14px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid var(--lime-soft);">
+            <div style="font-weight:600;color:var(--lime-soft);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">How the default is computed</div>
+            <p style="margin:0 0 8px 0;">The default value is computed from on-chain data extracted via the <strong>Jito Foundation API</strong> (<code style="font-size:11px;">POST /api/v1/mev_rewards</code>). For each Solana epoch, the API returns <code style="font-size:11px;">total_network_mev_lamports</code>, which we convert to SOL.</p>
+            <p style="margin:0 0 8px 0;" id="jit-methodology-window">We take the <strong>most recent 100 epochs</strong> with non-zero rewards and sum their MEV totals. This covers a period of approximately <span id="jit-m-duration">&mdash;</span>, from <span id="jit-m-period">&mdash;</span>.</p>
+            <p style="margin:0 0 8px 0;" id="jit-methodology-calc">The total Jito MEV rewards in this window are <strong id="jit-ds-total-sol">&mdash;</strong> over <strong id="jit-ds-total-days">&mdash;</strong>. To annualize: <code style="font-size:11px;">(<span id="jit-m-method-num">&mdash;</span> / <span id="jit-m-method-days">&mdash;</span>) &times; 365.25 = <span id="jit-m-method-result">&mdash;</span></code>.</p>
+            <p style="margin:0;color:var(--text2);">This annualized value (<strong id="jit-m-method-result2">&mdash;</strong>) becomes the <strong>default position</strong> of the JIT Total Market slider. You can move that slider freely to test conservative or bullish assumptions.</p>
+        </div>
+
+        <!-- Source metadata grid — larger text -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px 18px;font-size:12px;margin-bottom:16px;">
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Source</span><br><span style="color:var(--text);font-weight:500;">Jito Foundation API</span></div>
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Metric</span><br><span style="color:var(--text);font-weight:500;">total_network_mev_lamports</span></div>
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Dataset</span><br><span style="color:var(--text);font-weight:500;"><span id="jit-ds-total-epochs">&mdash;</span> epochs (epoch <span id="jit-ds-first-epoch">&mdash;</span> &rarr; <span id="jit-ds-last-epoch">&mdash;</span>)</span></div>
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Computation window</span><br><span style="color:var(--text);font-weight:500;"><span id="jit-ds-window-n">&mdash;</span> most recent epochs</span></div>
+        </div>
+
+        <!-- Inclusions / Exclusions — larger text -->
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;">
+            <div style="margin-bottom:6px;"><span style="color:#8ddb6a;font-size:14px;">&#9745;</span> <strong style="color:var(--text);">What this includes:</strong> Only MEV rewards observed through the Jito block engine &mdash; tips that validators and stakers receive via Jito's auction mechanism.</div>
+            <div style="margin-bottom:6px;"><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">What this excludes:</strong> This assumption does <em>not</em> include Solana's native priority fees (a separate fee market), nor MEV captured by other JIT providers such as Harmonic, private relay channels, or off-chain/private MEV flows that are not observable on-chain.</div>
+            <div style="color:var(--text2);font-style:italic;">In other words, this is a <strong>Jito-only</strong> view of the JIT market. The true addressable market is likely larger, since it would also include non-Jito MEV sources.</div>
+        </div>
+
+        <!-- Scenario regime note -->
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid #5B8DEF;">
+            <div style="font-weight:600;color:#5B8DEF;margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Scenario assumptions &mdash; market regimes</div>
+            <p style="margin:0 0 6px 0;">The <strong>Base Case</strong> uses the data-driven default computed from recent normal-activity epochs. The <strong>Conservative</strong> scenario assumes a lower-activity market (e.g. reduced MEV during quiet periods).</p>
+            <p style="margin:0 0 6px 0;">The <strong>Optimistic</strong> and <strong>Bull Case</strong> assumptions are informed by historically stronger congestion and peak MEV periods &mdash; such as memecoin surges and high on-chain trading volume &mdash; that we identified in our research on Solana network activity.</p>
+            <p style="margin:0;color:var(--text2);font-style:italic;">Note: Richer integration of peak-period data is still a work in progress. The optimistic and bullish values are already conceptually anchored to those higher-activity regimes, but may be refined as more granular data becomes available.</p>
+        </div>
+
+        <!-- Historical chart — directly in this section -->
+        <div style="margin-bottom:16px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;">Jito MEV Rewards — Historical Trend</div>
+            <div style="height:220px;background:#0a0b0c;border-radius:6px;padding:8px;"><canvas id="chart-jit-history"></canvas></div>
+            <div style="font-size:11px;color:var(--text2);margin-top:6px;">Full history from epoch <span id="jit-chart-range">&mdash;</span>. The <span style="color:#BDD970;font-weight:600;">highlighted section</span> shows the 100-epoch window used to compute the default. Peaks reflect periods of high MEV activity (e.g., memecoin surges).</div>
+        </div>
+
+        <!-- View source dataset button -->
+        <div style="margin-bottom:8px;">
+            <button id="jit-dataset-toggle" style="background:var(--lime);color:#000;border:none;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:0.3px;">View JIT Source Dataset</button>
+            <span style="font-size:11px;color:var(--text2);margin-left:10px;">Inspect the raw epoch-by-epoch data behind this assumption</span>
+        </div>
+        <div id="jit-dataset-table-container" style="display:none;max-height:350px;overflow-y:auto;border:1px solid var(--card-border);border-radius:6px;margin-top:8px;background:#0a0b0c;">
+            <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
+                <thead style="position:sticky;top:0;background:#111213;">
+                    <tr style="border-bottom:1px solid var(--card-border);">
+                        <th style="padding:8px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Epoch</th>
+                        <th style="padding:8px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Date</th>
+                        <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">MEV (SOL)</th>
+                        <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Duration (days)</th>
+                        <th style="padding:8px 10px;text-align:center;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">In Window</th>
+                    </tr>
+                </thead>
+                <tbody id="jit-dataset-tbody"></tbody>
+            </table>
+        </div>
+
+        <!-- Cross-validation note -->
+        <details style="margin-top:12px;">
+            <summary style="font-size:12px;color:var(--lime-soft);cursor:pointer;font-weight:600;padding:4px 0;">Cross-validation &amp; additional details</summary>
+            <div style="font-size:12px;color:var(--text2);padding:10px 0 4px 14px;line-height:1.7;">
+                <strong>Cross-source check:</strong> The Jito Foundation API values match Trillium API's <code>total_mev_earned</code> field at a 0.9997&times; ratio across 135+ epochs. Dune Analytics' <code>mev_reward</code> column is 3-5% higher (same order of magnitude, likely due to different aggregation scope).<br>
+                <strong>Avg SOL/epoch in window:</strong> <span id="jit-ds-avg-epoch">&mdash;</span><br>
+                <strong>Raw file:</strong> <code>jito_mev_rewards.csv</code> (extracted via <code>01_extract/extract_jito_mev.py</code>)
+            </div>
+        </details>
+
+    </div>
+    </details>
+
+    <!-- AOT Fee/CU Data — second core assumption transparency module -->
+    <details open style="margin-bottom:16px;">
+    <summary style="font-size:13px;font-weight:700;color:var(--lime-soft);text-transform:uppercase;letter-spacing:1.2px;cursor:pointer;padding:10px 0;list-style:none;display:flex;align-items:center;gap:8px;">
+        AOT Fee/CU Assumption &amp; Methodology
+    </summary>
+    <div id="aot-fcu-data-section" style="background:#0d0e0f;border:1px solid var(--card-border);border-radius:8px;padding:20px 24px;">
+
+        <!-- Header badge -->
+        <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:10px;">
+            <span style="font-size:11px;color:var(--text2);font-style:italic;" id="aot-fcu-badge">data-driven framework</span>
+        </div>
+
+        <!-- Headline: current slider value -->
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
+            <span style="font-size:26px;font-weight:700;color:var(--text);font-family:var(--font-mono);" id="aot-fcu-headline">&mdash;</span>
+            <span style="font-size:14px;color:var(--text2);font-family:var(--font-mono);">lamports per CU</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:16px;">
+            Blended average fee per compute unit across all AOT auction customers. Controlled by the <strong>Avg Auction Fee/CU</strong> slider in the left panel. This is the second of two core model assumptions (alongside JIT market size).
+        </div>
+
+        <!-- Customer tier breakdown — BOTH metrics shown -->
+        <div style="font-size:13px;color:var(--text);line-height:1.7;padding:14px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid var(--lime-soft);">
+            <div style="font-weight:600;color:var(--lime-soft);margin-bottom:8px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Two-tier customer structure (observed on-chain)</div>
+            <p style="margin:0 0 10px 0;">On-chain data reveals a <strong>bimodal fee structure</strong> among AOT-relevant Solana programs. We identify two distinct customer tiers, each with two measurable fee metrics:</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                <!-- Low-fee tier -->
+                <div style="padding:12px;background:#0a0b0c;border-radius:6px;border-left:3px solid #5B8DEF;">
+                    <div style="font-size:11px;color:#5B8DEF;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px;">Low-fee AOT customers</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+                        <div>
+                            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.3px;">Priority fee/CU</div>
+                            <div style="font-size:17px;font-weight:700;font-family:var(--font-mono);color:var(--text);" id="aot-tier-low-pri">&mdash;</div>
+                        </div>
+                        <div>
+                            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.3px;">Total fee/CU</div>
+                            <div style="font-size:17px;font-weight:700;font-family:var(--font-mono);color:var(--text);" id="aot-tier-low-tot">&mdash;</div>
+                        </div>
+                    </div>
+                    <div style="font-size:10px;color:var(--text2);" id="aot-tier-low-stats">&mdash;</div>
+                    <div style="font-size:10px;color:var(--text-mid);margin-top:2px;">AMMs, lending, aggregators, perps, oracles, vaults</div>
+                </div>
+                <!-- Prop AMM / high-fee tier -->
+                <div style="padding:12px;background:#0a0b0c;border-radius:6px;border-left:3px solid #F5A623;">
+                    <div style="font-size:11px;color:#F5A623;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px;">Prop AMM / high-fee customers</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+                        <div>
+                            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.3px;">Priority fee/CU</div>
+                            <div style="font-size:17px;font-weight:700;font-family:var(--font-mono);color:#F5A623;" id="aot-tier-high-pri">&mdash;</div>
+                        </div>
+                        <div>
+                            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.3px;">Total fee/CU</div>
+                            <div style="font-size:17px;font-weight:700;font-family:var(--font-mono);color:#F5A623;" id="aot-tier-high-tot">&mdash;</div>
+                        </div>
+                    </div>
+                    <div style="font-size:10px;color:var(--text2);" id="aot-tier-high-stats">&mdash;</div>
+                    <div style="font-size:10px;color:var(--text-mid);margin-top:2px;">HumidiFi, BisonFi (Prop AMMs) + Phoenix, Manifest (orderbooks)</div>
+                </div>
+            </div>
+
+            <div style="font-size:11px;color:var(--text2);padding:6px 8px;background:#0a0b0c;border-radius:4px;">
+                <strong style="color:var(--text);">Priority fee/CU</strong> = incremental bid above the mandatory base fee (5000 lam/signature). Reflects marginal willingness to pay for transaction priority.<br>
+                <strong style="color:var(--text);">Total fee/CU</strong> = base + priority fees combined. Reflects the <em>full revealed willingness to pay</em> for blockspace — the reservation price.
+            </div>
+
+            <p style="margin:10px 0 0 0;color:var(--text2);font-size:12px;" id="aot-tier-key-fact">Key fact: Prop AMM / high-fee customers represent a small share of CU volume but generate the majority of AOT-relevant fee revenue on the current Solana network.</p>
+        </div>
+
+        <!-- Methodology — metric-regime progression -->
+        <div style="font-size:13px;color:var(--text);line-height:1.7;padding:14px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid var(--lime-soft);">
+            <div style="font-weight:600;color:var(--lime-soft);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">How the scenario fee/CU values are determined</div>
+
+            <p style="margin:0 0 10px 0;">Each scenario represents a different <strong>customer acquisition outcome</strong> and a different <strong>market pressure regime</strong>. The key insight is that the <em>relevant fee metric itself shifts</em> as demand for AOT blockspace increases:</p>
+
+            <div style="padding:10px 14px;background:#0a0b0c;border-radius:6px;margin-bottom:10px;font-size:12px;line-height:1.8;">
+                <div style="margin-bottom:6px;"><strong style="color:#5B8DEF;">Low demand (Conservative / Base):</strong> Auction bids are anchored to <strong>priority fee/CU</strong> — the incremental cost above the mandatory base fee. In this regime, blockspace is abundant and bids reflect marginal willingness to pay. Observed: low-fee DeFi ~<span id="meth-pri-low">&mdash;</span> lam/CU, Prop AMMs ~<span id="meth-pri-high">&mdash;</span> lam/CU.</div>
+                <div style="margin-bottom:6px;"><strong style="color:#E8D44D;">Transition (Optimistic):</strong> As Prop AMM share grows and blockspace becomes scarcer, auction bids <strong>move above marginal priority fees</strong> toward the full reservation price. Bids reflect increasing competition, not just priority-fee logic.</div>
+                <div><strong style="color:#F5A623;">High demand (Bull):</strong> Fully competitive market — bids converge on <strong>total fee/CU</strong>, the full revealed willingness to pay. Observed: Prop AMMs ~<span id="meth-tot-high">&mdash;</span> lam/CU. This is the theoretical ceiling where fee = reservation price.</div>
+            </div>
+
+            <p style="margin:0;color:var(--text2);font-size:12px;">In summary: the scenario ladder spans from conservative priority-fee-based estimates to aggressive total-fee-based valuations of AOT blockspace. Both metrics are real, observed on-chain — the question is which regime applies given the competitive pressure in each scenario.</p>
+        </div>
+
+        <!-- Scenario customer mix table — with metric regime column -->
+        <div style="margin-bottom:16px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;">Scenario Customer Mix &amp; Fee/CU Derivation</div>
+            <div style="overflow-x:auto;border:1px solid var(--card-border);border-radius:6px;background:#0a0b0c;">
+                <table style="width:100%;border-collapse:collapse;font-size:12px;font-family:var(--font-mono);">
+                    <thead style="background:#111213;">
+                        <tr style="border-bottom:1px solid var(--card-border);">
+                            <th style="padding:10px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Scenario</th>
+                            <th style="padding:10px 10px;text-align:center;color:#F5A623;font-size:10px;text-transform:uppercase;">Prop AMM share</th>
+                            <th style="padding:10px 10px;text-align:right;color:var(--text);font-size:10px;text-transform:uppercase;">Fee/CU</th>
+                            <th style="padding:10px 10px;text-align:left;color:var(--text2);font-size:10px;text-transform:uppercase;">Metric anchor</th>
+                            <th style="padding:10px 10px;text-align:left;color:var(--text2);font-size:10px;text-transform:uppercase;">Economic logic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid #1a1a1a;">
+                            <td style="padding:8px 10px;color:var(--text);font-weight:600;">Conservative</td>
+                            <td style="padding:8px 10px;text-align:center;color:#F5A623;">0%</td>
+                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;">0.40 L</td>
+                            <td style="padding:8px 10px;color:#5B8DEF;font-size:11px;font-family:var(--font-display);">Priority fee/CU</td>
+                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">Low demand — bids = incremental priority fees. Standard DeFi only.</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #1a1a1a;">
+                            <td style="padding:8px 10px;color:var(--text);font-weight:600;">Base Case</td>
+                            <td style="padding:8px 10px;text-align:center;color:#F5A623;">5%</td>
+                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;">0.60 L</td>
+                            <td style="padding:8px 10px;color:#5B8DEF;font-size:11px;font-family:var(--font-display);">Blended priority fee/CU</td>
+                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">Still priority-fee logic, but ~5% Prop AMM lifts the blended avg (~4.5 lam/CU Prop AMM priority vs ~0.4 low-fee).</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #1a1a1a;">
+                            <td style="padding:8px 10px;color:var(--text);font-weight:600;">Optimistic</td>
+                            <td style="padding:8px 10px;text-align:center;color:#F5A623;">25%</td>
+                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;">3.50 L</td>
+                            <td style="padding:8px 10px;color:#E8D44D;font-size:11px;font-family:var(--font-display);">Transition regime</td>
+                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">Scarcity emerges — bids move above priority fees toward total willingness-to-pay.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 10px;color:var(--text);font-weight:600;">Bull</td>
+                            <td style="padding:8px 10px;text-align:center;color:#F5A623;">100%</td>
+                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;">20.00 L</td>
+                            <td style="padding:8px 10px;color:#F5A623;font-size:11px;font-family:var(--font-display);">Total fee/CU</td>
+                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">Full competition — bids = reservation price (total fee/CU ~20 lam for Prop AMMs).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top programs by fee/CU (from D.p) — BOTH metrics shown -->
+        <div style="margin-bottom:16px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;">Top AOT-Relevant Programs — Both Fee Metrics (observed data)</div>
+            <div style="overflow-x:auto;border:1px solid var(--card-border);border-radius:6px;background:#0a0b0c;max-height:320px;overflow-y:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
+                    <thead style="position:sticky;top:0;background:#111213;">
+                        <tr style="border-bottom:1px solid var(--card-border);">
+                            <th style="padding:8px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Program</th>
+                            <th style="padding:8px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Tier</th>
+                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Priority fee/CU</th>
+                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Total fee/CU</th>
+                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">CU (Billions)</th>
+                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Priority Fees (SOL)</th>
+                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Total Fees (SOL)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aot-fcu-programs-tbody"></tbody>
+                </table>
+            </div>
+            <div style="font-size:11px;color:var(--text2);margin-top:6px;">Source: D.p inline data (from <code style="font-size:10px;">dune_program_fees_v2.csv</code>) — 30-day window (Feb 4 – Mar 5, 2026). Only programs tagged as AOT or Both. Sorted by total fee volume. <strong>Priority fee/CU</strong> = fee above mandatory base. <strong>Total fee/CU</strong> = base + priority combined.</div>
+        </div>
+
+        <!-- Chart: fee/CU by subcategory — TOTAL fee/CU, explicit title -->
+        <div style="margin-bottom:16px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;">Total Fee/CU by Subcategory (CU-weighted average)</div>
+            <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Shows <strong>total fee per CU</strong> (base + priority) — the full revealed willingness-to-pay. This is the metric used in the Bull scenario.</div>
+            <div style="height:300px;background:#0a0b0c;border-radius:6px;padding:8px;"><canvas id="chart-aot-fcu-tiers"></canvas></div>
+            <div style="font-size:11px;color:var(--text2);margin-top:6px;"><span style="color:#F5A623;font-weight:600;">Orange bars</span> = Prop AMM / high-fee tier. <span style="color:#5B8DEF;font-weight:600;">Blue bars</span> = Low-fee DeFi tier. Log scale. The ~50× gap between tiers drives the scenario ladder.</div>
+        </div>
+
+        <!-- Source metadata -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px 18px;font-size:12px;margin-bottom:16px;">
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Source</span><br><span style="color:var(--text);font-weight:500;">Dune Analytics (on-chain)</span></div>
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Metrics</span><br><span style="color:var(--text);font-weight:500;">priority_fee/CU + total_fee/CU</span></div>
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Dataset</span><br><span style="color:var(--text);font-weight:500;">D.p inline (dune_program_fees_v2.csv)</span></div>
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Weighting</span><br><span style="color:var(--text);font-weight:500;">CU-weighted avg per tier</span></div>
+        </div>
+
+        <!-- Inclusions / Exclusions -->
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;">
+            <div style="margin-bottom:6px;"><span style="color:#8ddb6a;font-size:14px;">&#9745;</span> <strong style="color:var(--text);">What this includes:</strong> Only Solana programs classified as <em>AOT</em> or <em>Both</em> in our product taxonomy. Both priority fees and total fees (base + priority) observed over a 30-day period, weighted by CU consumption.</div>
+            <div style="margin-bottom:6px;"><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">What this excludes:</strong> JIT-only programs (trading bots, searchers), system programs (ComputeBudget, Token Program), and programs with no meaningful fee activity.</div>
+            <div style="color:var(--text2);font-style:italic;">The Prop AMM / high-fee tier is currently dominated by <strong>HumidiFi</strong> and <strong>BisonFi</strong> (proprietary AMMs with matching engines). As more Prop AMM-style protocols emerge on Solana, the high-fee tier could grow substantially.</div>
+        </div>
+    </div>
+    </details>
+
+    <details style="margin-bottom:10px;">
+        <summary style="font-size:12px;color:var(--lime-soft);cursor:pointer;font-weight:600;padding:6px 0;">Model Constants & Setup</summary>
+        <div style="font-size:11px;color:var(--text2);padding:8px 0 4px 12px;line-height:1.6;">
+            <strong>Slots/year (SY):</strong> 78,408,000 (~2.5 slots/sec × 86400 × 365.25)<br>
+            <strong>CU/block (CB):</strong> 60,000,000 (Solana max compute units per block)<br>
+            <strong>Lamports/SOL (LS):</strong> 1,000,000,000<br>
+            <strong>SOL price default:</strong> Real average from last 36 epochs (~$109)<br>
+            <strong>Commission:</strong> Dynamic from slider (default 5%). Validator base = 1 – commission.<br>
+            <strong>Two-waterfall model:</strong> AOT and JIT streams are calculated independently, then aggregated. Validator bonus applies only to AOT.
+        </div>
+    </details>
+</div>
 
 </div><!-- end main-content -->
 </div><!-- end tab-layout -->
@@ -490,29 +827,63 @@ body::before { content:''; position:fixed; top:0; left:0; width:100%; height:100
 
 <!-- CHARTS — raw Solana market data only -->
 <div class="chart-row">
-    <div class="chart-box"><h3>Priority Fees & Jito Tips per Epoch (SOL)</h3><canvas id="chart-epoch"></canvas></div>
+    <div class="chart-box"><h3>Jito MEV Rewards per Epoch (SOL)</h3><canvas id="chart-epoch"></canvas></div>
     <div class="chart-box"><h3>SOL Price History</h3><canvas id="chart-price"></canvas></div>
 </div>
 
 </div><!-- end tab-data -->
 
 <div class="footer">
-    RAIKU Revenue Simulator v3 &mdash; Trillium API (epochs 836-935), Dune Analytics (per-program 30d), CoinGecko<br>
-    Annualization: 36 epochs (~71 days). Programs: 2026-02-04 &rarr; 03-05. AOT: 3D model (Stake &times; Block &times; Fee/CU). Block = 60M CU. JIT market data = Jito tips only (excl. Harmonic).
+    RAIKU Revenue Simulator v3 &mdash; Jito Foundation API (MEV rewards), Trillium API (epochs 836-935), Dune Analytics (per-program 30d), CoinGecko<br>
+    Annualization: 100 epochs (JIT) / 36 epochs (AOT). Programs: 2026-02-04 &rarr; 03-05. AOT: 3D model (Stake &times; Block &times; Fee/CU). Block = 60M CU. JIT market = Jito MEV rewards only (excl. priority fees, Harmonic, private MEV).
 </div>
 </div>
 
 <script>
 const D = 
 {"a":{"pf":2221078.0,"mev":810778.0,"price":108.7,"days":71.0,"n":36},"e":[{"e":836,"d":"2025-08-19","dd":1.97,"pf":11934.7,"mev":11508.9,"p":184.56},{"e":837,"d":"2025-08-21","dd":1.97,"pf":10066.0,"mev":8744.9,"p":202.51},{"e":838,"d":"2025-08-23","dd":1.97,"pf":8862.3,"mev":7459.1,"p":199.24},{"e":839,"d":"2025-08-25","dd":1.97,"pf":11396.8,"mev":10197.6,"p":203.92},{"e":840,"d":"2025-08-27","dd":1.97,"pf":12263.8,"mev":10483.1,"p":209.06},{"e":841,"d":"2025-08-29","dd":1.98,"pf":8135.3,"mev":5853.1,"p":204.32},{"e":842,"d":"2025-08-31","dd":1.98,"pf":8590.6,"mev":5913.9,"p":202.91},{"e":843,"d":"2025-09-02","dd":1.98,"pf":11053.3,"mev":7716.8,"p":206.52},{"e":844,"d":"2025-09-04","dd":1.99,"pf":8505.4,"mev":5798.7,"p":202.26},{"e":845,"d":"2025-09-06","dd":2.01,"pf":6766.3,"mev":4345.9,"p":211.62},{"e":846,"d":"2025-09-08","dd":2.01,"pf":8423.9,"mev":5864.0,"p":220.87},{"e":847,"d":"2025-09-10","dd":2.0,"pf":11799.4,"mev":9335.7,"p":237.92},{"e":848,"d":"2025-09-12","dd":1.97,"pf":8383.4,"mev":6648.8,"p":245.42},{"e":849,"d":"2025-09-14","dd":1.97,"pf":14699.5,"mev":13817.1,"p":235.95},{"e":850,"d":"2025-09-16","dd":1.98,"pf":9717.6,"mev":6420.1,"p":247.0},{"e":851,"d":"2025-09-18","dd":1.98,"pf":8005.8,"mev":4915.3,"p":238.88},{"e":852,"d":"2025-09-20","dd":1.98,"pf":5148.8,"mev":3394.8,"p":224.41},{"e":853,"d":"2025-09-22","dd":1.98,"pf":6530.7,"mev":4026.5,"p":212.33},{"e":854,"d":"2025-09-24","dd":1.98,"pf":6339.4,"mev":3725.2,"p":196.96},{"e":855,"d":"2025-09-26","dd":1.98,"pf":4514.1,"mev":2660.9,"p":202.94},{"e":856,"d":"2025-09-28","dd":1.98,"pf":5798.1,"mev":3378.1,"p":208.74},{"e":857,"d":"2025-09-30","dd":1.97,"pf":7703.6,"mev":4253.5,"p":226.37},{"e":858,"d":"2025-10-02","dd":1.98,"pf":7583.1,"mev":4553.4,"p":228.61},{"e":859,"d":"2025-10-04","dd":1.98,"pf":5140.8,"mev":2972.7,"p":233.3},{"e":860,"d":"2025-10-06","dd":1.98,"pf":6188.8,"mev":3882.6,"p":222.87},{"e":861,"d":"2025-10-08","dd":1.98,"pf":4097.3,"mev":2670.8,"p":193.29},{"e":862,"d":"2025-10-10","dd":1.99,"pf":8249.2,"mev":13395.2,"p":178.01},{"e":863,"d":"2025-10-12","dd":1.99,"pf":4314.5,"mev":3249.2,"p":208.43},{"e":864,"d":"2025-10-14","dd":1.99,"pf":5392.0,"mev":3368.8,"p":193.99},{"e":865,"d":"2025-10-16","dd":1.99,"pf":5296.8,"mev":3075.0,"p":182.02},{"e":866,"d":"2025-10-18","dd":1.99,"pf":4611.9,"mev":2445.9,"p":187.82},{"e":867,"d":"2025-10-20","dd":1.99,"pf":6384.3,"mev":3535.1,"p":185.66},{"e":868,"d":"2025-10-22","dd":1.99,"pf":5422.7,"mev":2946.3,"p":191.42},{"e":869,"d":"2025-10-24","dd":1.98,"pf":4693.7,"mev":2052.2,"p":194.02},{"e":870,"d":"2025-10-26","dd":1.98,"pf":5311.9,"mev":1915.8,"p":198.74},{"e":871,"d":"2025-10-28","dd":1.99,"pf":7461.5,"mev":3334.7,"p":194.33},{"e":872,"d":"2025-10-30","dd":2.01,"pf":7226.6,"mev":3894.7,"p":187.21},{"e":873,"d":"2025-11-01","dd":2.0,"pf":5568.3,"mev":2595.0,"p":187.81},{"e":874,"d":"2025-11-03","dd":2.0,"pf":7869.5,"mev":4683.5,"p":155.38},{"e":875,"d":"2025-11-05","dd":2.0,"pf":7623.2,"mev":3017.7,"p":155.08},{"e":876,"d":"2025-11-07","dd":2.0,"pf":6356.0,"mev":2435.5,"p":158.09},{"e":877,"d":"2025-11-09","dd":2.0,"pf":6757.1,"mev":3041.6,"p":167.35},{"e":878,"d":"2025-11-11","dd":2.0,"pf":7870.3,"mev":3935.0,"p":153.27},{"e":879,"d":"2025-11-13","dd":2.0,"pf":6111.7,"mev":2959.1,"p":138.74},{"e":880,"d":"2025-11-15","dd":1.99,"pf":4989.3,"mev":2099.3,"p":137.24},{"e":881,"d":"2025-11-17","dd":1.99,"pf":5817.9,"mev":2690.9,"p":140.68},{"e":882,"d":"2025-11-19","dd":1.98,"pf":5681.2,"mev":2661.3,"p":133.52},{"e":883,"d":"2025-11-21","dd":1.98,"pf":5298.2,"mev":2383.0,"p":127.56},{"e":884,"d":"2025-11-23","dd":1.98,"pf":4456.7,"mev":1970.6,"p":138.37},{"e":885,"d":"2025-11-25","dd":1.95,"pf":5912.0,"mev":2389.6,"p":143.01},{"e":886,"d":"2025-11-27","dd":1.94,"pf":5555.1,"mev":2187.5,"p":140.84},{"e":887,"d":"2025-11-28","dd":1.94,"pf":5461.0,"mev":2343.2,"p":136.07},{"e":888,"d":"2025-11-30","dd":1.94,"pf":6570.4,"mev":2595.7,"p":126.7},{"e":889,"d":"2025-12-02","dd":1.94,"pf":8294.2,"mev":3350.8,"p":144.9},{"e":890,"d":"2025-12-04","dd":1.95,"pf":5794.7,"mev":2142.0,"p":133.31},{"e":891,"d":"2025-12-06","dd":1.95,"pf":6467.6,"mev":2141.7,"p":132.12},{"e":892,"d":"2025-12-08","dd":1.95,"pf":7299.1,"mev":2439.9,"p":137.91},{"e":893,"d":"2025-12-10","dd":1.95,"pf":7806.7,"mev":3304.5,"p":136.38},{"e":894,"d":"2025-12-12","dd":1.95,"pf":5343.8,"mev":2409.4,"p":133.23},{"e":895,"d":"2025-12-14","dd":1.95,"pf":5663.1,"mev":2410.3,"p":127.77},{"e":896,"d":"2025-12-16","dd":1.95,"pf":5940.5,"mev":2442.3,"p":123.13},{"e":897,"d":"2025-12-18","dd":1.96,"pf":5680.2,"mev":2439.5,"p":126.2},{"e":898,"d":"2025-12-20","dd":1.96,"pf":5062.5,"mev":2005.5,"p":126.0},{"e":899,"d":"2025-12-22","dd":1.96,"pf":6266.8,"mev":2793.4,"p":123.87},{"e":900,"d":"2025-12-24","dd":1.96,"pf":4964.3,"mev":2207.9,"p":119.95},{"e":901,"d":"2025-12-26","dd":1.96,"pf":5308.6,"mev":2176.8,"p":124.64},{"e":902,"d":"2025-12-28","dd":1.97,"pf":6768.3,"mev":2898.4,"p":123.12},{"e":903,"d":"2025-12-30","dd":1.97,"pf":6385.5,"mev":2874.3,"p":124.48},{"e":904,"d":"2026-01-01","dd":1.96,"pf":7119.7,"mev":2692.1,"p":132.18},{"e":905,"d":"2026-01-03","dd":1.98,"pf":7845.8,"mev":3476.9,"p":133.93},{"e":906,"d":"2026-01-05","dd":1.99,"pf":10501.4,"mev":4789.3,"p":141.09},{"e":907,"d":"2026-01-07","dd":1.99,"pf":9452.0,"mev":3755.1,"p":138.29},{"e":908,"d":"2026-01-09","dd":1.98,"pf":8769.5,"mev":2989.8,"p":88.31},{"e":909,"d":"2026-01-11","dd":1.97,"pf":9915.5,"mev":3397.4,"p":139.13},{"e":910,"d":"2026-01-13","dd":1.97,"pf":11302.9,"mev":4213.8,"p":146.76},{"e":911,"d":"2026-01-15","dd":1.98,"pf":13502.3,"mev":5335.7,"p":142.33},{"e":912,"d":"2026-01-16","dd":1.98,"pf":9521.6,"mev":3711.8,"p":143.73},{"e":913,"d":"2026-01-18","dd":1.99,"pf":10991.5,"mev":4737.3,"p":133.35},{"e":914,"d":"2026-01-20","dd":1.99,"pf":11213.5,"mev":3971.8,"p":129.38},{"e":915,"d":"2026-01-22","dd":2.0,"pf":11442.2,"mev":4307.2,"p":127.34},{"e":916,"d":"2026-01-24","dd":2.01,"pf":18338.8,"mev":8546.2,"p":118.77},{"e":917,"d":"2026-01-26","dd":2.01,"pf":17448.1,"mev":7199.9,"p":127.05},{"e":918,"d":"2026-01-28","dd":2.0,"pf":17955.4,"mev":7366.1,"p":117.09},{"e":919,"d":"2026-01-30","dd":1.98,"pf":14154.7,"mev":6276.2,"p":101.47},{"e":920,"d":"2026-02-01","dd":1.98,"pf":13997.8,"mev":5813.9,"p":98.03},{"e":921,"d":"2026-02-03","dd":1.97,"pf":15458.2,"mev":7533.8,"p":79.61},{"e":922,"d":"2026-02-05","dd":1.96,"pf":16313.8,"mev":9486.4,"p":88.34},{"e":923,"d":"2026-02-07","dd":1.96,"pf":12144.1,"mev":3892.1,"p":86.77},{"e":924,"d":"2026-02-09","dd":1.97,"pf":13626.5,"mev":4211.8,"p":79.66},{"e":925,"d":"2026-02-11","dd":1.95,"pf":12810.7,"mev":3485.2,"p":85.13},{"e":926,"d":"2026-02-13","dd":1.95,"pf":10368.6,"mev":2708.3,"p":86.7},{"e":927,"d":"2026-02-15","dd":1.96,"pf":12874.3,"mev":3442.4,"p":83.45},{"e":928,"d":"2026-02-17","dd":1.96,"pf":16091.6,"mev":4316.1,"p":80.65},{"e":929,"d":"2026-02-19","dd":1.97,"pf":13817.3,"mev":3822.3,"p":86.59},{"e":930,"d":"2026-02-21","dd":1.96,"pf":12870.0,"mev":3492.7,"p":80.16},{"e":931,"d":"2026-02-23","dd":1.98,"pf":15308.1,"mev":4190.8,"p":84.29},{"e":932,"d":"2026-02-25","dd":1.97,"pf":14737.2,"mev":4012.3,"p":81.4},{"e":933,"d":"2026-02-27","dd":1.97,"pf":13538.4,"mev":3768.7,"p":83.45},{"e":934,"d":"2026-03-01","dd":1.98,"pf":12775.6,"mev":3418.3,"p":84.94},{"e":935,"d":"2026-03-03","dd":1.97,"pf":13020.1,"mev":3416.0,"p":91.76}],"p":[{"id":"ComputeBudget111","n":"ComputeBudget","cat":"system","sub":"core","prod":"neither","pf":138135.59,"cu":188951.7,"tx":2610102771,"fpc":0.0241,"ok":1,"bf":13050.5139,"tf":151186.1039,"jt":0},{"id":"1111111111111111","n":"System Program","cat":"system","sub":"core","prod":"neither","pf":74196.27,"cu":25241.6,"tx":466211173,"fpc":0.0058,"ok":1,"bf":2331.0559,"tf":76527.3259,"jt":0},{"id":"jesterKqzZ7hWfNL","n":"Trading Bot (jester)","cat":"trading_bot","sub":"mev","prod":"jit","pf":717.85,"cu":103.3,"tx":599534,"fpc":0.1966,"ok":1,"bf":2.9977,"tf":720.8477,"jt":0},{"id":"ATokenGPvbdGVxr1","n":"Associated Token","cat":"system","sub":"token","prod":"neither","pf":609.44,"cu":14707.1,"tx":126587049,"fpc":0.0005,"ok":1,"bf":632.9352,"tf":1242.3752,"jt":0},{"id":"StenDH7EmnXdcniw","n":"MEV Bot (StenDH7)","cat":"trading_bot","sub":"mev","prod":"jit","pf":492.11,"cu":132.3,"tx":920648,"fpc":0.1765,"ok":1,"bf":4.6032,"tf":496.7132,"jt":0},{"id":"BiSoNHVpsVZW2F7r","n":"BisonFi","cat":"dex","sub":"prop_amm","prod":"aot","pf":436.57,"cu":34.1,"tx":111053956,"fpc":4.6413,"ok":1,"bf":555.2698,"tf":991.8398,"jt":0},{"id":"King7ki4SKMBPb3i","n":"Arbitrage Bot (King7)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":393.61,"cu":82.2,"tx":2882996,"fpc":0.009,"ok":1,"bf":14.415,"tf":408.025,"jt":0},{"id":"TokenkegQfeZyiNw","n":"Token Program","cat":"system","sub":"token","prod":"neither","pf":211.33,"cu":342.5,"tx":31284610,"fpc":0.0,"ok":1,"bf":156.423,"tf":367.753,"jt":0},{"id":"KLend2g3cP87fffo","n":"Kamino Lending v2","cat":"lending","sub":"pool","prod":"aot","pf":143.25,"cu":30.6,"tx":170493,"fpc":0.0639,"ok":1,"bf":0.8525,"tf":144.1025,"jt":0},{"id":"9H6tua7jkLhdm3w8","n":"HumidiFi","cat":"dex","sub":"prop_amm","prod":"aot","pf":125.4,"cu":90.7,"tx":297407124,"fpc":0.6978,"ok":1,"bf":1487.0356,"tf":1612.4356,"jt":0},{"id":"9i7QdbBHx7fjLAAa","n":"MEV Bot (9i7Qd)","cat":"trading_bot","sub":"mev","prod":"jit","pf":120.45,"cu":0.9,"tx":5985,"fpc":0.0,"ok":1,"bf":0.0299,"tf":120.4799,"jt":0},{"id":"6EF8rrecthR5Dkzo","n":"Pump.fun","cat":"dex","sub":"bonding_curve","prod":"potential","pf":98.48,"cu":308.2,"tx":4775884,"fpc":0.0691,"ok":1,"bf":23.8794,"tf":122.3594,"jt":0},{"id":"Bgo4vNe3vxRv37j8","n":"Trading Bot (Bgo4v)","cat":"trading_bot","sub":"mev","prod":"jit","pf":87.5,"cu":11.6,"tx":146758,"fpc":6.6485,"ok":1,"bf":0.7338,"tf":88.2338,"jt":0},{"id":"G2E4eoenFMirpFKR","n":"Trading Bot (G2E4e)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":83.04,"cu":18.7,"tx":123864,"fpc":2.8675,"ok":1,"bf":0.6193,"tf":83.6593,"jt":0},{"id":"pAMMBay6oceH9fJK","n":"Pump.fun AMM","cat":"dex","sub":"amm","prod":"potential","pf":53.89,"cu":226.9,"tx":2220731,"fpc":0.0,"ok":1,"bf":11.1037,"tf":64.9937,"jt":0},{"id":"MemoSq4gqABAXKb9","n":"Memo Program","cat":"system","sub":"metadata","prod":"neither","pf":46.22,"cu":250.0,"tx":2395760,"fpc":0.0029,"ok":1,"bf":11.9788,"tf":58.1988,"jt":0},{"id":"CroWg74XNDF8UMnA","n":"Arbitrage Bot (CroWg)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":44.87,"cu":91.7,"tx":610734,"fpc":0.1932,"ok":1,"bf":3.0537,"tf":47.9237,"jt":0},{"id":"TokenzQdBNbLqP5V","n":"Token-2022","cat":"system","sub":"token_extension","prod":"neither","pf":43.28,"cu":100.2,"tx":7791562,"fpc":0.1367,"ok":1,"bf":38.9578,"tf":82.2378,"jt":0},{"id":"pudgeNoz4YrkpwZr","n":"Trading Bot (pudge)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":38.54,"cu":116.2,"tx":755069,"fpc":0.0213,"ok":1,"bf":3.7753,"tf":42.3153,"jt":0},{"id":"routeUGWgWzqBWFc","n":"Jupiter Route","cat":"dex","sub":"aggregator","prod":"both","pf":38.43,"cu":155.9,"tx":1330786,"fpc":0.1124,"ok":1,"bf":6.6539,"tf":45.0839,"jt":0},{"id":"LiMoM9rMhrdYrfzU","n":"Trading Bot (LiMoM)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":36.84,"cu":12.0,"tx":46090,"fpc":3.6579,"ok":1,"bf":0.2304,"tf":37.0704,"jt":0},{"id":"Ed25519SigVerify","n":"Ed25519 Sig Verify","cat":"system","sub":"signature_verify","prod":"neither","pf":36.52,"cu":97.4,"tx":6058232,"fpc":0.4596,"ok":1,"bf":30.2912,"tf":66.8112,"jt":0},{"id":"9GCBb4NsSDRuEkkG","n":"Trading Bot (9GCBb)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":35.7,"cu":5.4,"tx":46542,"fpc":0.0,"ok":1,"bf":0.2327,"tf":35.9327,"jt":0},{"id":"4pjbtQCpaXFrmT7w","n":"Luck.io Program","cat":"gambling","sub":"casino","prod":"potential","pf":28.2,"cu":293.4,"tx":1879899,"fpc":0.1189,"ok":1,"bf":9.3995,"tf":37.5995,"jt":0},{"id":"8Ue7UGaqgk9GR3Yp","n":"Arbitrage Bot (8Ue7U)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":27.64,"cu":2823.8,"tx":7661674,"fpc":0.0024,"ok":1,"bf":38.3084,"tf":65.9484,"jt":0},{"id":"KeccakSecp256k11","n":"Keccak Secp256k1","cat":"system","sub":"signature_verify","prod":"neither","pf":22.82,"cu":40.0,"tx":1194086,"fpc":0.5678,"ok":1,"bf":5.9704,"tf":28.7904,"jt":0},{"id":"JUP6LkbZbjS1jKKw","n":"Jupiter V6","cat":"dex","sub":"aggregator","prod":"both","pf":22.37,"cu":261.3,"tx":2079987,"fpc":0.0,"ok":1,"bf":10.3999,"tf":32.7699,"jt":0},{"id":"675kPX9MHTjS2zt1","n":"Raydium V4","cat":"dex","sub":"amm","prod":"both","pf":16.99,"cu":8.7,"tx":304732,"fpc":0.0,"ok":1,"bf":1.5237,"tf":18.5137,"jt":0},{"id":"DT3X9y2w3S13M4Gi","n":"Automated Bot (DT3X)","cat":"trading_bot","sub":"keeper","prod":"aot","pf":16.35,"cu":9.0,"tx":1098267,"fpc":1.807,"ok":1,"bf":5.4913,"tf":21.8413,"jt":0},{"id":"45fCmmKfFjZ1bYu7","n":"Trading Bot (45fC)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":16.06,"cu":25.4,"tx":739165,"fpc":0.264,"ok":1,"bf":3.6958,"tf":19.7558,"jt":0},{"id":"FtyzXdj1NRexpX3W","n":"Trading Bot (Ftyz)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":14.89,"cu":15.2,"tx":634970,"fpc":0.2766,"ok":1,"bf":3.1749,"tf":18.0649,"jt":0},{"id":"jupgfSgfuAXv4B6R","n":"Jupiter Governance","cat":"dex","sub":"governance","prod":"neither","pf":13.76,"cu":1.9,"tx":6650,"fpc":0.1573,"ok":1,"bf":0.0333,"tf":13.7933,"jt":0},{"id":"MEXkeo4BPUCZuEJ4","n":"Swissborg","cat":"system","sub":"exchange","prod":"potential","pf":13.45,"cu":26.1,"tx":243372,"fpc":0.2296,"ok":1,"bf":1.2169,"tf":14.6669,"jt":0},{"id":"HFn8GnPADiny6XqU","n":"Kamino Scope Price","cat":"oracle","sub":"price_feed","prod":"aot","pf":12.44,"cu":21.3,"tx":91524,"fpc":0.1143,"ok":1,"bf":0.4576,"tf":12.8976,"jt":0},{"id":"MFv2hWf31Z9kbCa1","n":"Marginfi","cat":"lending","sub":"pool","prod":"aot","pf":11.07,"cu":28.4,"tx":83570,"fpc":0.1048,"ok":1,"bf":0.4178,"tf":11.4878,"jt":0},{"id":"brzp8fNvHCBRi8Uc","n":"Breeze Program","cat":"defi","sub":"unknown","prod":"potential","pf":10.72,"cu":4.3,"tx":19896,"fpc":1.0181,"ok":1,"bf":0.0995,"tf":10.8195,"jt":0},{"id":"BGUMAp9Gq7iTEuiz","n":"Bubblegum","cat":"nft","sub":"compressed_nft","prod":"potential","pf":8.21,"cu":363.8,"tx":4780611,"fpc":0.0,"ok":1,"bf":23.9031,"tf":32.1131,"jt":0},{"id":"Stake11111111111","n":"Stake Program","cat":"system","sub":"staking","prod":"neither","pf":6.88,"cu":0.8,"tx":46857,"fpc":0.0,"ok":1,"bf":0.2343,"tf":7.1143,"jt":0},{"id":"HDwcJBJXjL9FpJ7U","n":"Wormhole Program","cat":"bridge","sub":"cross_chain","prod":"potential","pf":6.28,"cu":247.7,"tx":633435,"fpc":0.0,"ok":1,"bf":3.1672,"tf":9.4472,"jt":0},{"id":"EtrnLzgbS7nMMy5f","n":"Phoenix Eternal","cat":"dex","sub":"orderbook","prod":"both","pf":6.19,"cu":1.8,"tx":640077,"fpc":10.4167,"ok":1,"bf":3.2004,"tf":9.3904,"jt":0},{"id":"CoqTVH4YViufSd8i","n":"Trading Bot (CoqT)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":5.74,"cu":157.5,"tx":968553,"fpc":0.0377,"ok":1,"bf":4.8428,"tf":10.5828,"jt":0},{"id":"6m9TTqMk9RoJxNjG","n":"Trading Bot (6m9TT)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":5.69,"cu":84.3,"tx":545630,"fpc":0.0464,"ok":1,"bf":2.7281,"tf":8.4181,"jt":0},{"id":"1avaAUcjccXCjSZz","n":"Lavarage USDC Leverage","cat":"lending","sub":"leverage","prod":"potential","pf":5.28,"cu":1.3,"tx":74050,"fpc":2.8846,"ok":1,"bf":0.3703,"tf":5.6503,"jt":0},{"id":"D4aBeFn9DBhU41kF","n":"Automated Bot (D4aB)","cat":"trading_bot","sub":"keeper","prod":"aot","pf":5.18,"cu":3.5,"tx":1025998,"fpc":1.5649,"ok":1,"bf":5.13,"tf":10.31,"jt":0},{"id":"CRSeeBqjDnm3UPef","n":"Unknown Bot (CRSee)","cat":"trading_bot","sub":"trading","prod":"jit","pf":5.06,"cu":1.5,"tx":78945,"fpc":2.462,"ok":1,"bf":0.3947,"tf":5.4547,"jt":0},{"id":"hi5iKPdHrk15joDZ","n":"Trading Bot (hi5iK)","cat":"trading_bot","sub":"mev","prod":"jit","pf":4.54,"cu":2.8,"tx":15078,"fpc":0.7578,"ok":1,"bf":0.0754,"tf":4.6154,"jt":0},{"id":"So1endDq2YkqhipR","n":"Solend v2","cat":"lending","sub":"pool","prod":"aot","pf":4.13,"cu":1.3,"tx":5556,"fpc":1.2008,"ok":1,"bf":0.0278,"tf":4.1578,"jt":0},{"id":"2M86GVGn3AHgAX9a","n":"Trading Bot (2M86G)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":3.82,"cu":24.0,"tx":157529,"fpc":0.0659,"ok":1,"bf":0.7876,"tf":4.6076,"jt":0},{"id":"FDF8AxHB8UK7RS6x","n":"Trading Bot (FDF8A)","cat":"trading_bot","sub":"mev","prod":"jit","pf":3.55,"cu":0.5,"tx":16469,"fpc":9.0,"ok":1,"bf":0.0823,"tf":3.6323,"jt":0},{"id":"GH8Ya8jNnovpKH6r","n":"Unknown DeFi (GH8Ya)","cat":"defi","sub":"unknown","prod":"potential","pf":3.51,"cu":23.9,"tx":117873,"fpc":0.1447,"ok":1,"bf":0.5894,"tf":4.0994,"jt":0},{"id":"G3z6yQqLP1q2JqFq","n":"SolPump Crash Program","cat":"gambling","sub":"crash","prod":"potential","pf":3.21,"cu":0.8,"tx":69718,"fpc":0.0,"ok":1,"bf":0.3486,"tf":3.5586,"jt":0},{"id":"LBUZKhRxPF3XUpBC","n":"Meteora DLMM","cat":"dex","sub":"dlmm","prod":"both","pf":3.17,"cu":26.5,"tx":405586,"fpc":0.2304,"ok":1,"bf":2.0279,"tf":5.1979,"jt":0},{"id":"cpamdpZCGKUy5JxQ","n":"Meteora DAMM v2","cat":"dex","sub":"amm","prod":"both","pf":3.11,"cu":9.0,"tx":156999,"fpc":0.1072,"ok":1,"bf":0.785,"tf":3.895,"jt":0},{"id":"AEyodoBDx5vgvEpW","n":"Unknown DeFi (AEyod)","cat":"defi","sub":"unknown","prod":"potential","pf":3.02,"cu":9.9,"tx":212095,"fpc":0.0,"ok":1,"bf":1.0605,"tf":4.0805,"jt":0},{"id":"7TAvuPyU7cDMhhfX","n":"Trading Bot (7TAvuP)","cat":"trading_bot","sub":"mev","prod":"jit","pf":2.79,"cu":1.8,"tx":12252,"fpc":0.9328,"ok":1,"bf":0.0613,"tf":2.8513,"jt":0},{"id":"FdDd6eCKiRTUDnQ9","n":"Unknown Bot (FdDd6)","cat":"trading_bot","sub":"trading","prod":"jit","pf":2.49,"cu":4.4,"tx":343344,"fpc":0.6105,"ok":1,"bf":1.7167,"tf":4.2067,"jt":0},{"id":"7SyiQ664tWYCyWyK","n":"Keeper Bot (7SyiQ)","cat":"trading_bot","sub":"keeper","prod":"aot","pf":2.41,"cu":1.2,"tx":467511,"fpc":2.0568,"ok":1,"bf":2.3376,"tf":4.7476,"jt":0},{"id":"vanshF62ku4jVVdf","n":"Trading Bot (vansh)","cat":"trading_bot","sub":"mev","prod":"jit","pf":2.2,"cu":0.3,"tx":3858,"fpc":0.3461,"ok":1,"bf":0.0193,"tf":2.2193,"jt":0},{"id":"SKRskrmtL83pcL4Y","n":"Solana Seeker","cat":"gaming","sub":"mobile","prod":"potential","pf":2.12,"cu":31.5,"tx":874609,"fpc":0.0686,"ok":1,"bf":4.373,"tf":6.493,"jt":0},{"id":"ENicYBBNZQ91toN7","n":"Helio Program","cat":"payments","sub":"processing","prod":"aot","pf":2.03,"cu":1.9,"tx":24889,"fpc":1.2994,"ok":1,"bf":0.1244,"tf":2.1544,"jt":0},{"id":"F6KwbonKLyLNbD1S","n":"Whale Bot (F6Kwb)","cat":"trading_bot","sub":"mev","prod":"jit","pf":1.95,"cu":0.2,"tx":1437,"fpc":0.0005,"ok":1,"bf":0.0072,"tf":1.9572,"jt":0},{"id":"RangohQxaWip6i1t","n":"Range Protocol","cat":"defi","sub":"vault","prod":"aot","pf":1.88,"cu":2.1,"tx":11668,"fpc":0.165,"ok":1,"bf":0.0583,"tf":1.9383,"jt":0},{"id":"nosJhNRqr2bc9g1n","n":"Nosana Jobs","cat":"compute","sub":"gpu_marketplace","prod":"potential","pf":1.76,"cu":10.7,"tx":177670,"fpc":0.1636,"ok":1,"bf":0.8883,"tf":2.6483,"jt":0},{"id":"5bsFrMYiXMEEkVny","n":"Trading Bot (5bsFr)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":1.69,"cu":9.8,"tx":64913,"fpc":0.0384,"ok":1,"bf":0.3246,"tf":2.0146,"jt":0},{"id":"SMRTzfY6DfH5ik3T","n":"Unknown Bot (SMRT)","cat":"trading_bot","sub":"trading","prod":"jit","pf":1.67,"cu":0.5,"tx":15127,"fpc":5.2565,"ok":1,"bf":0.0756,"tf":1.7456,"jt":0},{"id":"CPMMoo8L3F4NbTeg","n":"Raydium CPMM","cat":"dex","sub":"amm","prod":"both","pf":1.59,"cu":4.5,"tx":138609,"fpc":0.0,"ok":1,"bf":0.693,"tf":2.283,"jt":0},{"id":"9m7YMBgQaxYpUwrj","n":"Unknown DeFi (9m7YM)","cat":"defi","sub":"unknown","prod":"potential","pf":1.42,"cu":6.1,"tx":43396,"fpc":0.1551,"ok":1,"bf":0.217,"tf":1.637,"jt":0},{"id":"dbcij3LWUppWqq96","n":"Meteora Dynamic Bonding Curve","cat":"dex","sub":"bonding_curve","prod":"both","pf":1.37,"cu":35.9,"tx":422660,"fpc":0.0,"ok":1,"bf":2.1133,"tf":3.4833,"jt":0},{"id":"FLASH6Lo6h3iasJK","n":"Flash Loan Protocol","cat":"lending","sub":"flash_loan","prod":"both","pf":1.35,"cu":8.7,"tx":77753,"fpc":0.0125,"ok":1,"bf":0.3888,"tf":1.7388,"jt":0},{"id":"BwRZQcpiqQrQkpfW","n":"Trading Bot (BwRZQ)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":1.33,"cu":25.4,"tx":139344,"fpc":0.0006,"ok":1,"bf":0.6967,"tf":2.0267,"jt":0},{"id":"sa12qbQyuQqEaDcE","n":"OKX Smart Account","cat":"infrastructure","sub":"exchange","prod":"neither","pf":1.29,"cu":17.8,"tx":574417,"fpc":0.0025,"ok":1,"bf":2.8721,"tf":4.1621,"jt":0},{"id":"metaqbxxUerdq28c","n":"Metaplex Token Metadata","cat":"nft","sub":"metadata","prod":"neither","pf":1.29,"cu":20.2,"tx":203888,"fpc":0.0573,"ok":1,"bf":1.0194,"tf":2.3094,"jt":0},{"id":"Ceu4aCcSV624aRGU","n":"Arbitrage Bot (Ceu4a)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":1.23,"cu":242.9,"tx":2618539,"fpc":0.0057,"ok":1,"bf":13.0927,"tf":14.3227,"jt":0},{"id":"BzKgd9G8JXPPC91y","n":"Trading Bot (BzKgd)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":1.2,"cu":10.2,"tx":71100,"fpc":0.0387,"ok":1,"bf":0.3555,"tf":1.5555,"jt":0},{"id":"9VX8EKBg6vM6tA68","n":"MEV Bot (9VX8)","cat":"trading_bot","sub":"mev","prod":"jit","pf":1.16,"cu":0.9,"tx":1632257,"fpc":1.0,"ok":1,"bf":8.1613,"tf":9.3213,"jt":0},{"id":"HLCorec4bsTSiyzs","n":"Helium Core","cat":"iot","sub":"network","prod":"potential","pf":1.15,"cu":1.6,"tx":24499,"fpc":0.7137,"ok":1,"bf":0.1225,"tf":1.2725,"jt":0},{"id":"SHARKobtfF1bHhxD","n":"Sharky.fi","cat":"lending","sub":"nft_lending","prod":"potential","pf":1.14,"cu":2.3,"tx":41654,"fpc":0.4948,"ok":1,"bf":0.2083,"tf":1.3483,"jt":0},{"id":"BPFLoaderUpgrade","n":"BPF Loader","cat":"system","sub":"program_deployment","prod":"neither","pf":1.0,"cu":16.4,"tx":6598880,"fpc":0.0,"ok":1,"bf":32.9944,"tf":33.9944,"jt":0},{"id":"FarmsPZpWu9i7Kky","n":"Farms Protocol","cat":"defi","sub":"yield","prod":"aot","pf":0.95,"cu":2.9,"tx":32257,"fpc":0.1046,"ok":1,"bf":0.1613,"tf":1.1113,"jt":0},{"id":"AddressLookupTab","n":"Address Lookup Table","cat":"system","sub":"address_lookup","prod":"neither","pf":0.92,"cu":7.3,"tx":787545,"fpc":0.0,"ok":1,"bf":3.9377,"tf":4.8577,"jt":0},{"id":"FTV1kbDLaeVM4LG4","n":"Unknown DeFi (FTV1k)","cat":"defi","sub":"unknown","prod":"potential","pf":0.87,"cu":64.9,"tx":599479,"fpc":0.0,"ok":1,"bf":2.9974,"tf":3.8674,"jt":0},{"id":"AZipysY3PXDM61RJ","n":"Unknown Bot (AZipy)","cat":"trading_bot","sub":"trading","prod":"jit","pf":0.86,"cu":0.6,"tx":30796,"fpc":3.3192,"ok":1,"bf":0.154,"tf":1.014,"jt":0},{"id":"PdMDrKEMaX8q7CCJ","n":"pumpup.ai","cat":"trading_bot","sub":"sniper","prod":"jit","pf":0.84,"cu":54.0,"tx":839808,"fpc":0.0158,"ok":1,"bf":4.199,"tf":5.039,"jt":0},{"id":"CCTPmbSD7gX1bxKP","n":"Circle CCTP","cat":"bridge","sub":"cross_chain","prod":"potential","pf":0.84,"cu":1.2,"tx":6864,"fpc":0.0,"ok":1,"bf":0.0343,"tf":0.8743,"jt":0},{"id":"Yt3A8KLfo7JEz8RG","n":"Trading Bot (Yt3A8)","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.78,"cu":0.2,"tx":38285,"fpc":4.823,"ok":1,"bf":0.1914,"tf":0.9714,"jt":0},{"id":"AnCCJjheynmGqPp6","n":"Whale Bot (AnCCJ)","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.78,"cu":0.1,"tx":824,"fpc":2.5461,"ok":1,"bf":0.0041,"tf":0.7841,"jt":0},{"id":"worm2ZoG2kUd4vFX","n":"Wormhole","cat":"bridge","sub":"cross_chain","prod":"potential","pf":0.77,"cu":1.2,"tx":14493,"fpc":0.0,"ok":1,"bf":0.0725,"tf":0.8425,"jt":0},{"id":"idemJL67fKhpev5v","n":"Unknown DeFi (idemJ)","cat":"defi","sub":"unknown","prod":"potential","pf":0.74,"cu":1.8,"tx":147485,"fpc":0.4135,"ok":1,"bf":0.7374,"tf":1.4774,"jt":0},{"id":"pythWSnswVUd12oZ","n":"Pyth Push Oracle","cat":"oracle","sub":"price_feed","prod":"aot","pf":0.73,"cu":80.3,"tx":1033840,"fpc":0.0,"ok":1,"bf":5.1692,"tf":5.8992,"jt":0},{"id":"G77G9wS9JzkzWNGw","n":"Keeper Bot (G77G9)","cat":"trading_bot","sub":"keeper","prod":"aot","pf":0.71,"cu":0.8,"tx":78492,"fpc":1.5508,"ok":1,"bf":0.3925,"tf":1.1025,"jt":0},{"id":"CAMMCzo5YL8w4VFF","n":"Raydium CLMM","cat":"dex","sub":"clmm","prod":"both","pf":0.69,"cu":7.9,"tx":98844,"fpc":0.0,"ok":1,"bf":0.4942,"tf":1.1842,"jt":0},{"id":"EmTX93xYtDE3h7G5","n":"Keeper Bot (EmTX9)","cat":"trading_bot","sub":"keeper","prod":"aot","pf":0.69,"cu":1.0,"tx":156864,"fpc":0.7033,"ok":1,"bf":0.7843,"tf":1.4743,"jt":0},{"id":"CCTPiPYPc6AsJuwu","n":"Circle CCTP v2","cat":"bridge","sub":"cross_chain","prod":"potential","pf":0.65,"cu":0.6,"tx":8808,"fpc":0.2004,"ok":1,"bf":0.044,"tf":0.694,"jt":0},{"id":"7wuFcHkbVckS6nMq","n":"Unknown DeFi (7wuFc)","cat":"defi","sub":"unknown","prod":"potential","pf":0.64,"cu":1.6,"tx":19594,"fpc":0.0,"ok":1,"bf":0.098,"tf":0.738,"jt":0},{"id":"FR1SDyLUj7PrMbtk","n":"Trading Bot (FR1SD)","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.63,"cu":0.1,"tx":3888,"fpc":5.1647,"ok":1,"bf":0.0194,"tf":0.6494,"jt":0},{"id":"CyahQUBnG86tAjrj","n":"Unknown DeFi (CyahQ)","cat":"unknown","sub":"defi","prod":"potential","pf":0.63,"cu":1.0,"tx":16563,"fpc":0.5739,"ok":1,"bf":0.0828,"tf":0.7128,"jt":0},{"id":"whirLbMiicVdio4q","n":"Orca Whirlpool","cat":"dex","sub":"clmm","prod":"both","pf":0.6,"cu":2.7,"tx":66273,"fpc":0.0049,"ok":1,"bf":0.3314,"tf":0.9314,"jt":0},{"id":"6sbWW8qnrXoNXVMc","n":"Unknown Bot (6sbWW)","cat":"trading_bot","sub":"keeper","prod":"aot","pf":0.58,"cu":1.1,"tx":118644,"fpc":0.5812,"ok":1,"bf":0.5932,"tf":1.1732,"jt":0},{"id":"APR1MEny25pKupwn","n":"APR Protocol","cat":"defi","sub":"yield","prod":"aot","pf":0.54,"cu":11.1,"tx":79430,"fpc":0.0352,"ok":1,"bf":0.3972,"tf":0.9372,"jt":0},{"id":"wormDTUJ6AWPNvk5","n":"Wormhole Core","cat":"bridge","sub":"cross_chain","prod":"potential","pf":0.54,"cu":0.9,"tx":8532,"fpc":0.0,"ok":1,"bf":0.0427,"tf":0.5827,"jt":0},{"id":"3Wn9MScovnLzVB4B","n":"Trading Bot (3Wn9M)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.54,"cu":1.1,"tx":24044,"fpc":0.3558,"ok":1,"bf":0.1202,"tf":0.6602,"jt":0},{"id":"vVoLTRjQmtFpiYoe","n":"Volt Protocol","cat":"defi","sub":"structured_products","prod":"potential","pf":0.52,"cu":11.3,"tx":56781,"fpc":0.0094,"ok":1,"bf":0.2839,"tf":0.8039,"jt":0},{"id":"CRSHdMVmWgRsarrR","n":"Unknown Bot (CRSHd)","cat":"trading_bot","sub":"trading","prod":"jit","pf":0.51,"cu":0.5,"tx":100155,"fpc":1.1277,"ok":1,"bf":0.5008,"tf":1.0108,"jt":0},{"id":"Eo7WjKq67rjJQSZx","n":"Meteora Pools","cat":"dex","sub":"amm","prod":"both","pf":0.49,"cu":1.4,"tx":14604,"fpc":0.1796,"ok":1,"bf":0.073,"tf":0.563,"jt":0},{"id":"3AQz4t3ShixZWw5v","n":"Trading Bot (3AQz4)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.47,"cu":130.2,"tx":855848,"fpc":0.0055,"ok":1,"bf":4.2792,"tf":4.7492,"jt":0},{"id":"DEGNpUs8DhLSdDiU","n":"DeGods/DeLabs","cat":"nft","sub":"marketplace","prod":"potential","pf":0.43,"cu":0.7,"tx":11787,"fpc":0.6917,"ok":1,"bf":0.0589,"tf":0.4889,"jt":0},{"id":"CoREENxT6tW1HoK8","n":"Metaplex Core","cat":"nft","sub":"infrastructure","prod":"neither","pf":0.38,"cu":2.9,"tx":169854,"fpc":0.0,"ok":1,"bf":0.8493,"tf":1.2293,"jt":0},{"id":"TRDwq3BN4mP3m9Ks","n":"Triad Prediction Market","cat":"defi","sub":"prediction","prod":"potential","pf":0.38,"cu":1.3,"tx":16224,"fpc":0.2558,"ok":1,"bf":0.0811,"tf":0.4611,"jt":0},{"id":"C7QLEmDz81Usvy2s","n":"Unknown DeFi (C7QLE)","cat":"defi","sub":"unknown","prod":"potential","pf":0.3,"cu":9.2,"tx":132653,"fpc":0.0024,"ok":1,"bf":0.6633,"tf":0.9633,"jt":0},{"id":"9KuRi5CasX6XWCK8","n":"Unknown DeFi (9KuRi)","cat":"defi","sub":"unknown","prod":"potential","pf":0.29,"cu":6.5,"tx":57373,"fpc":0.0444,"ok":1,"bf":0.2869,"tf":0.5769,"jt":0},{"id":"pjwLcQDbzybW1FrH","n":"Unknown DeFi (pjwLc)","cat":"defi","sub":"unknown","prod":"potential","pf":0.27,"cu":3.1,"tx":133529,"fpc":0.0,"ok":1,"bf":0.6676,"tf":0.9376,"jt":0},{"id":"99vQwtBwYtrqqD9Y","n":"Relay Bridge","cat":"bridge","sub":"cross_chain","prod":"aot","pf":0.23,"cu":1.8,"tx":88298,"fpc":0.0,"ok":1,"bf":0.4415,"tf":0.6715,"jt":0},{"id":"KvauGMspG5k6rtzr","n":"Kvault Program","cat":"defi","sub":"vault","prod":"aot","pf":0.21,"cu":7.7,"tx":37409,"fpc":0.0082,"ok":1,"bf":0.187,"tf":0.397,"jt":0},{"id":"zapvX9M3uf5pvy4w","n":"Meteora Zap","cat":"dex","sub":"aggregator","prod":"both","pf":0.2,"cu":12.9,"tx":31595,"fpc":0.0,"ok":1,"bf":0.158,"tf":0.358,"jt":0},{"id":"L2TExMFKdjpN9koz","n":"Lighthouse Program","cat":"system","sub":"validation","prod":"neither","pf":0.17,"cu":1.2,"tx":12176,"fpc":0.0772,"ok":1,"bf":0.0609,"tf":0.2309,"jt":0},{"id":"n1brh2AaBbnMPEjp","n":"Unknown DeFi (n1brh)","cat":"defi","sub":"unknown","prod":"potential","pf":0.16,"cu":6.3,"tx":113914,"fpc":0.0,"ok":1,"bf":0.5696,"tf":0.7296,"jt":0},{"id":"FW6zUqn4iKRaeopw","n":"WhaleStreet","cat":"dex","sub":"prop_amm","prod":"aot","pf":0.13,"cu":0.0,"tx":24,"fpc":69.6467,"ok":1,"bf":0.0001,"tf":0.1301,"jt":0},{"id":"SQDS4ep65T869zMM","n":"Squads Multisig v4","cat":"system","sub":"multisig","prod":"neither","pf":0.09,"cu":3.3,"tx":90162,"fpc":0.0,"ok":1,"bf":0.4508,"tf":0.5408,"jt":0},{"id":"SV2EYYJyRz2YhfXw","n":"SolFi V2","cat":"dex","sub":"prop_amm","prod":"aot","pf":0.09,"cu":0.0,"tx":203,"fpc":1.0572,"ok":1,"bf":0.001,"tf":0.091,"jt":0},{"id":"PERPHjGBqRHArX4D","n":"Jupiter Perpetuals","cat":"perps","sub":"perpetuals","prod":"both","pf":0.08,"cu":2.6,"tx":17094,"fpc":0.0,"ok":1,"bf":0.0855,"tf":0.1655,"jt":0},{"id":"Memo1UhkJRfHyvLM","n":"Memo Program Legacy","cat":"system","sub":"metadata","prod":"neither","pf":0.08,"cu":26.3,"tx":213413,"fpc":0.0,"ok":1,"bf":1.0671,"tf":1.1471,"jt":0},{"id":"Swap2Ex1jbDx4c2k","n":"Swap Program","cat":"dex","sub":"swap","prod":"potential","pf":0.08,"cu":1.3,"tx":6125,"fpc":0.0539,"ok":1,"bf":0.0306,"tf":0.1106,"jt":0},{"id":"VisTAPABATtyG5FG","n":"Trading Bot (VisTAP)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.07,"cu":1.6,"tx":137579,"fpc":0.0,"ok":1,"bf":0.6879,"tf":0.7579,"jt":0},{"id":"8kJBErpatzi1AapV","n":"Unknown DeFi (8kJBE)","cat":"defi","sub":"unknown","prod":"potential","pf":0.07,"cu":1.8,"tx":14713,"fpc":0.0421,"ok":1,"bf":0.0736,"tf":0.1436,"jt":0},{"id":"T1TANpTeScyeqVzz","n":"Titan Exchange Router","cat":"dex","sub":"aggregator","prod":"both","pf":0.07,"cu":0.1,"tx":714,"fpc":0.2798,"ok":1,"bf":0.0036,"tf":0.0736,"jt":0},{"id":"vBoNdEvzMrSai7is","n":"Marinade Bond program","cat":"staking","sub":"bond","prod":"potential","pf":0.06,"cu":75.4,"tx":1063510,"fpc":0.0,"ok":1,"bf":5.3175,"tf":5.3775,"jt":0},{"id":"DF1ow4tspfHX9JwW","n":"DFlow Aggregator v4","cat":"dex","sub":"aggregator","prod":"both","pf":0.06,"cu":2.5,"tx":12229,"fpc":0.0215,"ok":1,"bf":0.0611,"tf":0.1211,"jt":0},{"id":"79NiGoTLeZUH5YUV","n":"Unknown DeFi (79NiG)","cat":"defi","sub":"unknown","prod":"potential","pf":0.06,"cu":1.3,"tx":35835,"fpc":0.0,"ok":1,"bf":0.1792,"tf":0.2392,"jt":0},{"id":"wMNFSTkir3HgyZTs","n":"Manifest Order Book","cat":"dex","sub":"orderbook","prod":"both","pf":0.05,"cu":6.2,"tx":111683,"fpc":0.0,"ok":1,"bf":0.5584,"tf":0.6084,"jt":0},{"id":"GovaE4iu227srtG2","n":"Governance Program (Gova)","cat":"governance","sub":"dao","prod":"neither","pf":0.05,"cu":1.2,"tx":34987,"fpc":0.003,"ok":1,"bf":0.1749,"tf":0.2249,"jt":0},{"id":"HpNfyc2Saw7RKkQd","n":"PancakeSwap","cat":"dex","sub":"amm","prod":"both","pf":0.05,"cu":0.2,"tx":2080,"fpc":0.1212,"ok":1,"bf":0.0104,"tf":0.0604,"jt":0},{"id":"SBondMDrcV3K4kxZ","n":"SBond (Marinade)","cat":"staking","sub":"bond","prod":"potential","pf":0.04,"cu":7.2,"tx":272217,"fpc":0.0,"ok":1,"bf":1.3611,"tf":1.4011,"jt":0},{"id":"Sea3VpnUhM9WqWqU","n":"Trading Bot (Sea3V)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.04,"cu":2.2,"tx":11729,"fpc":0.017,"ok":1,"bf":0.0586,"tf":0.0986,"jt":0},{"id":"proVF4pMXVaYqmy4","n":"Unknown Bot (proVF)","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.03,"cu":0.1,"tx":712,"fpc":0.0321,"ok":1,"bf":0.0036,"tf":0.0336,"jt":0},{"id":"T1pyyaTNZsKv2WcR","n":"Jito Tip Payment","cat":"mev","sub":"tips","prod":"jit","pf":0.01,"cu":100.7,"tx":1718317,"fpc":0.0,"ok":1,"bf":8.5916,"tf":8.6016,"jt":0},{"id":"dRiftyHA39MWEi3m","n":"Drift Protocol","cat":"perps","sub":"perpetuals","prod":"both","pf":0.01,"cu":40.2,"tx":234738,"fpc":0.0,"ok":1,"bf":1.1737,"tf":1.1837,"jt":0},{"id":"Vote111111111111","n":"Vote Program","cat":"system","sub":"vote","prod":"neither","pf":0.01,"cu":0.0,"tx":2267,"fpc":2.381,"ok":1,"bf":0.0113,"tf":0.0213,"jt":0},{"id":"MNFSTqtC93rEfYHB","n":"Manifest","cat":"dex","sub":"orderbook","prod":"both","pf":0.01,"cu":2.6,"tx":83898,"fpc":0.0,"ok":1,"bf":0.4195,"tf":0.4295,"jt":0},{"id":"AtomCf57Gdp49TDf","n":"Arbitrage Bot (AtomC)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.01,"cu":2.2,"tx":15557,"fpc":0.0,"ok":1,"bf":0.0778,"tf":0.0878,"jt":0},{"id":"jup3YeL8QhtSx1e2","n":"Jupiter Lend Earn","cat":"lending","sub":"yield","prod":"aot","pf":0.01,"cu":3.1,"tx":37411,"fpc":0.0,"ok":1,"bf":0.1871,"tf":0.1971,"jt":0},{"id":"ajXj7hMUguMEwF2o","n":"Unknown DeFi (ajXj7)","cat":"defi","sub":"unknown","prod":"potential","pf":0.01,"cu":6.2,"tx":61997,"fpc":0.0,"ok":1,"bf":0.31,"tf":0.32,"jt":0},{"id":"fUSioN9YKKSa3CUC","n":"DefiTuna Fusion AMM","cat":"dex","sub":"amm","prod":"both","pf":0.01,"cu":0.1,"tx":1705,"fpc":0.0621,"ok":1,"bf":0.0085,"tf":0.0185,"jt":0},{"id":"PhoeNiXZ8ByJGLkx","n":"Phoenix","cat":"dex","sub":"orderbook","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"opnb2LAfJYbRMAHH","n":"OpenBook V2","cat":"dex","sub":"orderbook","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"ZETAxsqBRek56Dhi","n":"Zeta Markets","cat":"perps","sub":"perpetuals","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"So1endDq2YkqhipR","n":"Solend","cat":"lending","sub":"pool","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"KLend2g3cP87ber4","n":"Kamino Lend","cat":"lending","sub":"pool","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"mSoLzYCxHdYgdzU1","n":"Marinade","cat":"staking","sub":"liquid","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"CgntPoLka5pD5fes","n":"Sanctum Router","cat":"staking","sub":"liquid","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"jCebN34bUfdeUYJT","n":"Jupiter DCA","cat":"cranker","sub":"dca","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"FsJ3A3u2vn5cTVof","n":"Pyth Oracle","cat":"oracle","sub":"price_feed","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"7UVimffxr9ow1uXY","n":"Pyth SOL/USD Price Feed","cat":"oracle","sub":"price_feed","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"SAGE2HAwep459SNq","n":"Star Atlas SAGE","cat":"gaming","sub":"game","prod":"potential","pf":0.0,"cu":128.9,"tx":1087565,"fpc":0.0,"ok":1,"bf":5.4378,"tf":5.4378,"jt":0},{"id":"FLASHX8DrLbgeR8F","n":"Flash Trade","cat":"perps","sub":"perpetuals","prod":"both","pf":0.0,"cu":140.9,"tx":1603480,"fpc":0.0,"ok":1,"bf":8.0174,"tf":8.0174,"jt":0},{"id":"phDEVv4w6BcfkLrL","n":"Phoenix Perpetuals Program","cat":"perps","sub":"perpetuals","prod":"both","pf":0.0,"cu":779.1,"tx":3788475,"fpc":0.0,"ok":1,"bf":18.9424,"tf":18.9424,"jt":0},{"id":"8jaLKWLJAj5jVCZb","n":"Trading Bot (8jaL)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.0,"cu":113.5,"tx":1504549,"fpc":0.0,"ok":1,"bf":7.5227,"tf":7.5227,"jt":0},{"id":"riptK81hDxhe5pW5","n":"Tip Bot (riptK)","cat":"trading_bot","sub":"tips","prod":"jit","pf":0.0,"cu":0.1,"tx":426160,"fpc":0.0,"ok":1,"bf":2.1308,"tf":2.1308,"jt":0},{"id":"6WPHMhYD7JLAF1HE","n":"Keeper Bot (6WPHMh)","cat":"trading_bot","sub":"keeper","prod":"aot","pf":0.0,"cu":4.2,"tx":302046,"fpc":0.0,"ok":1,"bf":1.5102,"tf":1.5102,"jt":0},{"id":"FHKBuiohcYB5n636","n":"RevShare Vault","cat":"defi","sub":"vault","prod":"aot","pf":0.0,"cu":7.4,"tx":238876,"fpc":0.0,"ok":1,"bf":1.1944,"tf":1.1944,"jt":0},{"id":"ARBTRGgcwmy3VS2W","n":"Arbitrage Bot (ARBTR)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.0,"cu":39.2,"tx":189770,"fpc":0.0,"ok":1,"bf":0.9488,"tf":0.9488,"jt":0},{"id":"25uXrrL4p6xd9Uk6","n":"Keeper Bot (25uXr)","cat":"trading_bot","sub":"keeper","prod":"aot","pf":0.0,"cu":2.5,"tx":193342,"fpc":0.0,"ok":1,"bf":0.9667,"tf":0.9667,"jt":0},{"id":"8aquaCPqbpsWvHdp","n":"Aqua Protocol","cat":"defi","sub":"vault","prod":"potential","pf":0.0,"cu":22.3,"tx":163323,"fpc":0.0,"ok":1,"bf":0.8166,"tf":0.8166,"jt":0},{"id":"2o5Mab8XFN4BYcfr","n":"Unknown DeFi (2o5Ma)","cat":"defi","sub":"unknown","prod":"potential","pf":0.0,"cu":5.6,"tx":160633,"fpc":0.0,"ok":1,"bf":0.8032,"tf":0.8032,"jt":0},{"id":"2qGyiNeWyZxNdkvW","n":"Elixir Program","cat":"defi","sub":"liquidity","prod":"both","pf":0.0,"cu":19.7,"tx":152290,"fpc":0.0,"ok":1,"bf":0.7614,"tf":0.7614,"jt":0},{"id":"Q72w4coozA552keK","n":"Tip Bot (Q72w4)","cat":"trading_bot","sub":"tips","prod":"jit","pf":0.0,"cu":0.0,"tx":299906,"fpc":0.0,"ok":1,"bf":1.4995,"tf":1.4995,"jt":0},{"id":"FsWxHsafrajWKW5Y","n":"Arbitrage Bot (FsWxH)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.0,"cu":11.2,"tx":85735,"fpc":0.0,"ok":1,"bf":0.4287,"tf":0.4287,"jt":0},{"id":"HuTkmnrv4zPnArMq","n":"Liquid Mesh Router","cat":"dex","sub":"aggregator","prod":"both","pf":0.0,"cu":5.9,"tx":33005,"fpc":0.0,"ok":1,"bf":0.165,"tf":0.165,"jt":0},{"id":"G1gWiF8QpAYsBr55","n":"TIX Program","cat":"nft","sub":"ticketing","prod":"neither","pf":0.0,"cu":3.6,"tx":43371,"fpc":0.0,"ok":1,"bf":0.2169,"tf":0.2169,"jt":0},{"id":"SPoo1Ku8WFXoNDMH","n":"Stake Pool Program","cat":"staking","sub":"pool","prod":"aot","pf":0.0,"cu":1.2,"tx":21588,"fpc":0.0,"ok":1,"bf":0.1079,"tf":0.1079,"jt":0},{"id":"MevFXXGBgBMbr2c9","n":"MEV Bot (MevFXX)","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.0,"cu":8.5,"tx":57186,"fpc":0.0,"ok":1,"bf":0.2859,"tf":0.2859,"jt":0},{"id":"strmRqUCoQUgGUan","n":"Streamflow","cat":"defi","sub":"vesting","prod":"aot","pf":0.0,"cu":1.3,"tx":50907,"fpc":0.0,"ok":1,"bf":0.2545,"tf":0.2545,"jt":0},{"id":"DGgwXnCW9ERZoqEb","n":"Trading Bot (DGgwX)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.0,"cu":1.9,"tx":119765,"fpc":0.0,"ok":1,"bf":0.5988,"tf":0.5988,"jt":0},{"id":"L6pUpkHtq3CLtJRT","n":"Unknown DeFi (L6pUp)","cat":"defi","sub":"unknown","prod":"potential","pf":0.0,"cu":1.5,"tx":10527,"fpc":0.0,"ok":1,"bf":0.0526,"tf":0.0526,"jt":0},{"id":"4Wbqb1mAPFfR3oQP","n":"Unknown DeFi (4Wbqb)","cat":"defi","sub":"unknown","prod":"potential","pf":0.0,"cu":1.1,"tx":19462,"fpc":0.0,"ok":1,"bf":0.0973,"tf":0.0973,"jt":0},{"id":"ALPHAQmeA7bjrVuc","n":"AlphaQ","cat":"dex","sub":"prop_amm","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"AQU1FRd7papthgdr","n":"Aquifer","cat":"dex","sub":"prop_amm","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"goonuddtQRrWqqn5","n":"GoonFi V2","cat":"dex","sub":"prop_amm","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"obriQD1zbpyLz95G","n":"Obric V2","cat":"dex","sub":"prop_amm","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"SCoRcH8c2dpjvcJD","n":"Scorch","cat":"dex","sub":"prop_amm","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"TessVdML9pBGgG9y","n":"Tessera V","cat":"dex","sub":"prop_amm","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"ZERor4xhbUycZ6gb","n":"ZeroFi","cat":"dex","sub":"prop_amm","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"mv3ekLzLbnVPNxjS","n":"Mango Markets V3","cat":"perps","sub":"perpetuals","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"5fNfvyp5czQVX77y","n":"Mango Markets V2","cat":"perps","sub":"perpetuals","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"4MangoMjqJ2firMo","n":"Mango Markets V4","cat":"perps","sub":"perpetuals","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"MarBmsSgKXdrN1eg","n":"Marinade Finance","cat":"staking","sub":"liquid","prod":"aot","pf":0.0,"cu":0.3,"tx":5516,"fpc":0.0,"ok":1,"bf":0.0276,"tf":0.0276,"jt":0},{"id":"EewxydAPCCVuNEyr","n":"Lifinity","cat":"dex","sub":"proactive_mm","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"JUP4Fb2cqiRUcaTH","n":"Jupiter V4","cat":"dex","sub":"aggregator","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"JUP5pEAZeHdHrLxh","n":"Jupiter V5","cat":"dex","sub":"aggregator","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"ZETAxsqBRek56Dhi","n":"ZetaDex","cat":"dex","sub":"orderbook","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"ZDx8a8jBqGmJyxi1","n":"01 DEX","cat":"dex","sub":"orderbook","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"R2y9ip6mxmWUj4pt","n":"PsyOptions","cat":"defi","sub":"options","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"Jito4APyf642JPZP","n":"Jito Stake Pool","cat":"staking","sub":"liquid","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"bSo13r4TkiE4KumL","n":"BlazeStake","cat":"staking","sub":"liquid","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"5ocnV1qiCgaQR8Jb","n":"Sanctum Infinity","cat":"staking","sub":"liquid","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"he1iusmfkpAdwvxL","n":"Helius hSOL (token)","cat":"staking","sub":"liquid","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"Dso1bDeDjCQxTrWH","n":"Drift dSOL (token)","cat":"staking","sub":"liquid","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"13gDzEXCdocbj8iA","n":"Adrena Protocol","cat":"perps","sub":"perpetuals","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"Gmso1uvJnLbawvw7","n":"GMTrade Store","cat":"perps","sub":"perpetuals","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"GAMMA7meSFWaBXF2","n":"GooseFX GAMMA","cat":"dex","sub":"amm","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"SW1TCH7qEPTdLsDH","n":"Switchboard V2","cat":"oracle","sub":"price_feed","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"HEvSKofvBgfaexv2","n":"Chainlink Data Feed","cat":"oracle","sub":"price_feed","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"cjg3oHmg9uuPsP8D","n":"Chainlink Offchain Reader","cat":"oracle","sub":"price_feed","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"stork1JUZMKYgjNa","n":"Stork Oracle","cat":"oracle","sub":"price_feed","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"HyaB3W9q6XdA5xwp","n":"Invariant Swap","cat":"dex","sub":"clmm","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"7Zb1bGi32pfsrBkz","n":"Larix Lending","cat":"lending","sub":"lending","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"6UeJYTLU1adaoHWe","n":"Apricot Finance Program","cat":"lending","sub":"lending","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"3parcLrT7WnXAcyP","n":"Parcl V3","cat":"perps","sub":"synthetics","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"2nAAsYdXF3eTQzae","n":"Francium lyfRaydium","cat":"defi","sub":"yield","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"7bgvkyKyHvgHdNCT","n":"Arbitrage Bot (7bgvk)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"rexhfZLRRxRkPkw9","n":"Arbitrage Bot (rexhf)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"GMGNreQcJFufBiCT","n":"Arbitrage Bot (GMGNr)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"FD1amxhTsDpwzoVX","n":"Arbitrage Bot (FD1am)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"MEViZt7uNtZs47Xk","n":"Arbitrage Bot (MEViZ)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"Crf6uiMVHpuqkQzE","n":"Arbitrage Bot (Crf6u)","cat":"trading_bot","sub":"arbitrage","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"b1oomGGqPKGD6err","n":"Bloom Router","cat":"dex","sub":"aggregator","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"1oopBoJG58DgkUVK","n":"Loopscale","cat":"lending","sub":"modular","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"ExponentnaRg3CQb","n":"Exponent Finance","cat":"defi","sub":"yield_trading","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"tuna4uSQZncNeeiA","n":"DefiTuna","cat":"lending","sub":"leverage","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"KiNetiCAToLExLv5","n":"Kinetic Aggregator v4","cat":"dex","sub":"aggregator","prod":"both","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"BFYDcwRC2CqnvSpd","n":"Unknown Bot (BFYDc)","cat":"trading_bot","sub":"trading","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"NA247a7YE9S3p9Cd","n":"Unknown Bot (NA247)","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"MEViEnscUm6tsQRo","n":"MEV Bot (MEViE)","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"XxXxXwJhqsCqZ5yz","n":"Unknown Bot (XxXxX)","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"FsU1rcaEC361jBr9","n":"Unknown Bot (FsU1r)","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"2Z2EJavNVHpBgw8g","n":"Unknown Bot (2Z2EJ)","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"MEVbit1CZN1oHXJk","n":"MEV Bot (MEVbi)","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"TitanLozLMhczcwr","n":"Titan Loz","cat":"trading_bot","sub":"mev","prod":"jit","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0},{"id":"SoLFiHG9TfgtdUXU","n":"SolFi","cat":"dex","sub":"prop_amm","prod":"aot","pf":0.0,"cu":0.0,"tx":0,"fpc":0.0,"ok":0,"bf":0,"tf":0.0,"jt":0}]};
-
+const D_JITO = [[390,0.0,"2022-12-23",2.21],[391,0.0,"2022-12-25",2.25],[392,0.0,"2022-12-27",2.25],[393,0.0,"2022-12-29",2.29],[394,0.0,"2023-01-01",2.29],[395,0.0,"2023-01-03",2.42],[397,0.0,"2023-01-08",2.58],[398,0.0,"2023-01-11",2.58],[399,0.0,"2023-01-14",2.5],[400,0.1,"2023-01-16",2.5],[401,0.0,"2023-01-19",2.5],[402,0.0,"2023-01-21",2.54],[403,1.6,"2023-01-24",2.5],[404,2.3,"2023-01-26",2.5],[405,4.9,"2023-01-29",2.5],[407,3.0,"2023-02-03",2.58],[408,3.1,"2023-02-06",2.5],[409,3.5,"2023-02-08",2.42],[410,3.4,"2023-02-11",2.54],[411,5.4,"2023-02-13",2.46],[412,3.2,"",2.0],[413,3.2,"2023-02-18",5.12],[414,6.8,"2023-02-21",2.54],[415,5.1,"2023-02-23",2.54],[417,6.3,"2023-03-01",2.38],[418,6.0,"2023-03-03",2.33],[419,5.9,"2023-03-06",2.33],[420,6.6,"2023-03-08",2.33],[421,47.3,"2023-03-10",2.38],[422,9.1,"2023-03-13",2.33],[423,15.8,"2023-03-15",2.33],[424,7.8,"2023-03-17",2.33],[425,7.7,"2023-03-20",2.25],[426,12.2,"2023-03-22",2.29],[427,8.7,"2023-03-24",2.29],[428,10.5,"2023-03-27",2.25],[429,11.6,"2023-03-29",2.25],[430,18.0,"2023-03-31",2.25],[431,11.0,"2023-04-02",2.29],[432,16.9,"2023-04-05",2.29],[433,11.9,"2023-04-07",2.25],[434,13.5,"2023-04-09",2.25],[435,16.6,"2023-04-12",2.29],[436,13.0,"2023-04-14",2.29],[437,15.8,"2023-04-16",2.29],[438,22.0,"2023-04-19",2.29],[439,18.8,"2023-04-21",2.38],[440,13.4,"2023-04-23",2.33],[441,16.8,"2023-04-26",2.29],[442,13.5,"2023-04-28",2.29],[443,17.1,"2023-04-30",2.29],[444,20.9,"2023-05-03",2.29],[445,40.4,"2023-05-05",2.38],[446,52.6,"2023-05-07",2.38],[447,52.8,"2023-05-10",2.38],[448,27.8,"2023-05-12",2.42],[449,33.4,"2023-05-15",2.38],[450,25.9,"2023-05-17",2.38],[451,24.5,"2023-05-19",2.38],[452,24.2,"2023-05-22",2.33],[453,142.6,"2023-05-24",2.29],[454,43.3,"2023-05-26",2.38],[455,108.8,"2023-05-29",2.29],[456,56.4,"2023-05-31",2.33],[457,91.1,"2023-06-02",2.33],[458,68.2,"2023-06-05",2.33],[459,120.7,"2023-06-07",2.38],[460,163.6,"2023-06-09",2.38],[461,130.2,"2023-06-12",2.46],[462,70.2,"2023-06-14",2.38],[463,54.4,"2023-06-17",2.25],[464,66.3,"2023-06-19",2.21],[465,133.3,"2023-06-21",2.25],[466,73.1,"2023-06-23",2.25],[467,58.6,"2023-06-26",2.25],[468,176.6,"2023-06-28",2.21],[469,158.3,"2023-06-30",2.21],[470,34.5,"2023-07-02",2.21],[471,122.0,"2023-07-05",2.21],[472,67.2,"2023-07-07",2.21],[473,36.6,"2023-07-09",2.21],[474,169.2,"2023-07-11",2.21],[475,241.5,"2023-07-13",2.21],[476,96.8,"2023-07-16",2.25],[477,80.4,"2023-07-18",2.21],[478,65.8,"2023-07-20",2.21],[479,65.5,"2023-07-22",2.21],[480,59.3,"2023-07-25",2.21],[481,28.3,"2023-07-27",2.21],[482,28.8,"2023-07-29",2.17],[483,156.4,"2023-07-31",2.17],[484,50.4,"2023-08-02",2.17],[485,46.3,"2023-08-05",2.17],[486,101.8,"2023-08-07",2.12],[487,82.0,"2023-08-09",2.17],[488,37.1,"2023-08-11",2.17],[489,74.6,"2023-08-13",2.12],[490,145.3,"2023-08-16",2.17],[491,56.6,"2023-08-18",2.21],[492,35.4,"2023-08-20",2.17],[493,143.7,"2023-08-22",2.17],[494,60.0,"2023-08-24",2.21],[495,157.2,"2023-08-27",2.12],[496,82.0,"2023-08-29",2.17],[497,138.8,"2023-08-31",2.17],[498,23.7,"2023-09-02",2.17],[499,33.9,"2023-09-04",2.12],[500,56.0,"2023-09-06",2.17],[501,69.7,"2023-09-09",2.17],[502,80.1,"2023-09-11",2.17],[503,58.8,"2023-09-13",2.17],[504,49.4,"2023-09-15",2.17],[505,95.5,"2023-09-17",2.17],[506,121.1,"2023-09-19",2.17],[507,42.5,"2023-09-22",2.17],[508,38.1,"2023-09-24",2.12],[509,30.9,"2023-09-26",2.12],[510,107.3,"2023-09-28",2.12],[511,78.4,"2023-09-30",2.12],[512,55.3,"2023-10-02",2.12],[513,121.3,"2023-10-05",2.12],[514,62.8,"2023-10-07",2.04],[515,77.7,"2023-10-09",2.0],[516,45.9,"2023-10-11",2.04],[517,47.3,"2023-10-13",2.04],[518,55.1,"2023-10-15",2.04],[519,28.6,"2023-10-17",2.04],[520,68.6,"2023-10-19",2.04],[521,88.0,"2023-10-21",2.04],[522,271.1,"2023-10-23",2.08],[523,286.9,"2023-10-25",2.12],[524,129.7,"2023-10-27",2.12],[525,270.9,"2023-10-29",2.04],[526,1583.8,"2023-10-31",2.04],[527,209.0,"2023-11-03",2.12],[529,203.0,"2023-11-07",2.04],[530,454.7,"2023-11-09",2.08],[531,260.5,"2023-11-11",2.17],[532,177.2,"2023-11-13",2.17],[533,177.2,"2023-11-16",2.17],[534,226.3,"2023-11-18",2.17],[535,648.9,"2023-11-20",2.08],[536,243.7,"2023-11-22",2.17],[537,130.7,"2023-11-24",2.17],[538,102.8,"2023-11-26",2.12],[539,155.4,"2023-11-28",2.17],[540,108.0,"2023-12-01",2.17],[541,172.7,"2023-12-03",2.12],[542,116.3,"2023-12-05",2.17],[543,471.6,"2023-12-07",2.21],[544,931.7,"2023-12-10",2.25],[545,1775.9,"2023-12-12",2.29],[546,4194.0,"2023-12-14",2.29],[547,1979.0,"2023-12-16",2.25],[548,3803.1,"2023-12-19",2.29],[549,5876.8,"2023-12-21",2.25],[550,3595.0,"2023-12-23",2.25],[551,4824.7,"2023-12-26",2.25],[552,2708.1,"2023-12-28",2.28],[553,1544.6,"2023-12-30",2.3],[554,3268.6,"2024-01-01",2.28],[555,3169.7,"2024-01-04",2.3],[556,1946.3,"2024-01-06",2.28],[557,2115.4,"2024-01-08",2.21],[558,3948.4,"2024-01-10",2.17],[559,2178.6,"2024-01-13",2.2],[560,3018.0,"2024-01-15",2.18],[561,3494.5,"2024-01-17",2.09],[562,4688.1,"2024-01-19",2.08],[563,4600.9,"2024-01-21",2.07],[564,4150.8,"2024-01-23",2.08],[565,4906.9,"2024-01-25",2.08],[566,4995.1,"2024-01-27",2.08],[567,10757.7,"2024-01-29",2.08],[568,8081.6,"2024-02-01",2.09],[569,4610.8,"2024-02-03",2.15],[570,4417.2,"2024-02-05",2.32],[571,3465.2,"2024-02-07",2.05],[572,2958.8,"2024-02-09",2.05],[573,5572.3,"2024-02-11",2.09],[574,4719.2,"2024-02-13",2.09],[575,3438.8,"2024-02-15",2.1],[576,3064.9,"2024-02-17",2.12],[577,2807.6,"2024-02-20",2.12],[578,2793.0,"2024-02-22",2.12],[579,4223.7,"2024-02-24",2.09],[580,6059.8,"2024-02-26",2.09],[581,5709.2,"2024-02-28",2.07],[582,7825.2,"2024-03-01",2.06],[583,10733.0,"2024-03-03",2.05],[584,16586.1,"2024-03-05",2.05],[585,13900.2,"2024-03-07",2.05],[586,5804.9,"2024-03-09",2.07],[587,6504.1,"2024-03-11",2.12],[588,9398.0,"2024-03-14",2.14],[589,11378.7,"2024-03-16",2.13],[590,14708.5,"2024-03-18",2.09],[591,13369.5,"2024-03-20",2.11],[592,10467.4,"2024-03-22",2.17],[593,11850.3,"2024-03-24",2.13],[594,11755.9,"2024-03-26",2.14],[595,14641.2,"2024-03-28",2.24],[596,17749.7,"2024-03-31",2.22],[597,19935.0,"2024-04-02",2.29],[598,19048.9,"2024-04-04",2.43],[599,21270.2,"2024-04-07",2.49],[600,19630.5,"2024-04-09",2.46],[601,18343.1,"2024-04-12",2.38],[602,14604.2,"2024-04-14",2.29],[603,11281.8,"2024-04-16",2.19],[604,12192.5,"2024-04-18",2.29],[605,12083.9,"2024-04-21",2.32],[606,16396.0,"2024-04-23",2.33],[607,14549.1,"2024-04-25",2.36],[608,14472.0,"2024-04-28",2.35],[609,14523.1,"2024-04-30",2.3],[610,19572.3,"2024-05-02",2.33],[611,18800.6,"2024-05-05",2.32],[612,18026.7,"2024-05-07",2.28],[613,14551.3,"2024-05-09",2.24],[614,18829.0,"2024-05-12",2.22],[615,20744.4,"2024-05-14",2.2],[616,15869.8,"2024-05-16",2.2],[617,15868.5,"2024-05-18",2.21],[618,16536.3,"2024-05-20",2.22],[619,15746.1,"2024-05-23",2.27],[620,16211.5,"2024-05-25",2.28],[621,25635.9,"2024-05-27",2.22],[622,21365.7,"2024-05-29",2.16],[623,17690.2,"2024-06-01",2.17],[624,18374.9,"2024-06-03",2.2],[625,23399.5,"2024-06-05",2.2],[626,28971.9,"2024-06-07",2.17],[627,23343.1,"2024-06-09",2.21],[628,23293.8,"2024-06-11",2.21],[629,12258.2,"2024-06-14",2.2],[630,18569.8,"2024-06-16",2.22],[631,19167.4,"2024-06-18",2.22],[632,15419.5,"2024-06-20",2.26],[633,13434.9,"2024-06-23",2.25],[634,14970.7,"2024-06-25",2.26],[635,15703.3,"2024-06-27",2.27],[636,13842.7,"2024-06-29",2.28],[637,12880.3,"2024-07-02",2.28],[638,12011.7,"2024-07-04",2.29],[639,12469.2,"2024-07-06",2.3],[640,10370.4,"2024-07-09",2.33],[641,10661.8,"2024-07-11",2.33],[642,16413.1,"2024-07-13",2.31],[643,12981.0,"2024-07-15",2.29],[644,10962.4,"2024-07-18",2.29],[645,11216.0,"2024-07-20",2.25],[646,13506.8,"2024-07-22",2.23],[647,21764.1,"2024-07-25",2.3],[648,30346.2,"2024-07-27",2.27],[649,29160.6,"2024-07-29",2.23],[650,23031.1,"2024-07-31",2.21],[651,17885.6,"2024-08-03",2.23],[652,25571.5,"2024-08-05",2.13],[653,24557.4,"2024-08-07",2.11],[654,15871.9,"2024-08-09",2.1],[655,18683.3,"2024-08-11",2.11],[656,16376.7,"2024-08-13",2.14],[657,11603.7,"2024-08-15",2.16],[658,13269.2,"2024-08-18",2.18],[659,6625.4,"2024-08-20",2.18],[660,7477.7,"2024-08-22",2.17],[661,6190.6,"2024-08-24",2.15],[662,7776.3,"2024-08-26",2.16],[663,6656.1,"2024-08-28",2.16],[664,5029.4,"2024-08-31",2.13],[665,6761.0,"2024-09-02",2.17],[666,5721.0,"2024-09-04",2.15],[667,4045.0,"2024-09-06",2.11],[668,5352.8,"2024-09-08",2.18],[669,5702.6,"2024-09-10",2.2],[670,4745.3,"2024-09-12",2.2],[671,4534.1,"2024-09-15",2.14],[672,5902.7,"2024-09-17",2.19],[673,5629.4,"2024-09-19",2.18],[674,6344.7,"2024-09-21",2.19],[675,9830.8,"2024-09-23",2.21],[676,21869.3,"2024-09-26",2.26],[677,22456.3,"2024-09-28",2.21],[678,22124.8,"2024-09-30",2.26],[679,19695.7,"2024-10-02",2.26],[680,18942.4,"2024-10-05",2.2],[681,19832.4,"2024-10-07",2.24],[682,20561.4,"2024-10-09",2.27],[683,25867.8,"2024-10-11",2.27],[684,34397.7,"2024-10-14",2.31],[685,40467.5,"2024-10-16",2.35],[686,48918.5,"2024-10-18",2.33],[687,49788.9,"2024-10-21",2.36],[688,65294.1,"2024-10-23",2.28],[689,45789.5,"2024-10-25",2.29],[690,54799.8,"2024-10-27",2.37],[691,44057.7,"2024-10-30",2.35],[692,36953.2,"2024-11-01",2.35],[693,40910.1,"2024-11-04",2.36],[694,47429.8,"2024-11-06",2.38],[695,37793.6,"2024-11-08",2.25],[696,64464.7,"2024-11-11",2.23],[697,79517.5,"2024-11-13",2.18],[698,89822.3,"2024-11-15",2.2],[699,111012.3,"2024-11-17",2.19],[700,116070.4,"2024-11-19",2.16],[701,73820.6,"2024-11-22",2.15],[702,61118.0,"2024-11-24",2.15],[703,64331.1,"2024-11-26",2.17],[704,51147.1,"2024-11-28",2.12],[705,44294.0,"2024-11-30",2.11],[706,46772.8,"2024-12-02",2.13],[707,38964.8,"2024-12-04",2.09],[708,27781.9,"2024-12-06",2.07],[709,43919.6,"2024-12-09",2.09],[710,49826.9,"2024-12-11",2.09],[711,44346.1,"2024-12-13",2.08],[712,34996.0,"2024-12-15",2.07],[713,45821.0,"2024-12-17",2.08],[714,49435.1,"2024-12-19",2.07],[715,35695.5,"2024-12-21",2.06],[716,28750.7,"2024-12-23",2.08],[717,37276.5,"2024-12-25",2.05],[718,34359.3,"2024-12-27",2.05],[719,38270.3,"2024-12-29",2.05],[720,40840.0,"2024-12-31",2.05],[721,56456.5,"2025-01-02",2.06],[722,55134.5,"2025-01-04",2.05],[723,61757.2,"2025-01-06",2.04],[724,63847.7,"2025-01-09",2.04],[725,56750.5,"2025-01-11",2.03],[726,54574.4,"2025-01-13",2.03],[727,58038.0,"2025-01-15",2.04],[728,79447.1,"2025-01-17",2.02],[729,181354.0,"2025-01-19",2.04],[730,103082.1,"2025-01-21",2.04],[731,129553.2,"2025-01-23",2.03],[732,85856.7,"2025-01-25",2.02],[733,77790.0,"2025-01-27",2.02],[734,92746.6,"2025-01-29",2.02],[735,57065.3,"2025-01-31",2.01],[736,46557.0,"2025-02-02",2.0],[737,49698.7,"2025-02-04",1.99],[738,41430.2,"2025-02-06",1.98],[739,48660.4,"2025-02-08",1.98],[740,73181.0,"2025-02-10",1.98],[741,51958.2,"2025-02-12",1.98],[742,44405.3,"2025-02-14",1.98],[743,26514.7,"2025-02-16",1.98],[744,30063.2,"2025-02-18",1.98],[745,25336.1,"2025-02-20",1.98],[746,19457.4,"2025-02-22",1.98],[747,22136.9,"2025-02-24",1.98],[748,18152.3,"2025-02-26",1.98],[749,13601.6,"2025-02-28",1.98],[750,23480.2,"2025-03-02",1.98],[751,19428.0,"2025-03-04",1.98],[752,23258.9,"2025-03-06",1.99],[753,17087.6,"2025-03-08",1.98],[754,17051.9,"2025-03-10",1.98],[755,17979.9,"2025-03-12",1.98],[756,16657.6,"2025-03-14",1.99],[757,15311.7,"2025-03-16",1.99],[758,15625.9,"2025-03-17",2.0],[759,12352.9,"2025-03-19",2.0],[760,10180.9,"2025-03-21",2.0],[761,24699.7,"2025-03-23",2.0],[762,20414.4,"2025-03-25",1.99],[763,20477.7,"2025-03-27",2.0],[764,17662.1,"2025-03-29",2.01],[765,24657.8,"2025-03-31",2.01],[766,17873.4,"2025-04-03",2.0],[767,15379.4,"2025-04-05",2.0],[768,24331.5,"2025-04-06",1.99],[769,28722.4,"2025-04-08",1.99],[770,25045.6,"2025-04-10",1.99],[771,25884.1,"2025-04-12",1.99],[772,33728.6,"2025-04-14",1.99],[773,24522.6,"2025-04-16",1.98],[774,16088.2,"2025-04-18",1.97],[775,23468.9,"2025-04-20",1.98],[776,26701.0,"2025-04-22",1.98],[777,26736.7,"2025-04-24",1.98],[778,24727.5,"2025-04-26",1.98],[779,28206.7,"2025-04-28",1.98],[780,34510.2,"2025-04-30",1.98],[781,22889.8,"2025-05-02",1.97],[782,24822.9,"2025-05-04",1.97],[783,26844.6,"2025-05-06",1.98],[784,27073.0,"2025-05-08",1.97],[785,24255.6,"2025-05-10",1.97],[786,48005.2,"2025-05-12",1.98],[787,42824.8,"2025-05-14",1.98],[788,24721.2,"2025-05-16",1.98],[789,23149.1,"2025-05-18",1.98],[790,24857.7,"2025-05-20",1.97],[791,21150.2,"2025-05-22",1.97],[792,12872.8,"2025-05-24",1.97],[793,16465.3,"2025-05-26",1.97],[794,14406.0,"2025-05-28",1.97],[795,10734.7,"2025-05-30",1.97],[796,13329.2,"2025-06-01",1.97],[797,15407.5,"2025-06-03",1.96],[798,18611.2,"2025-06-05",1.96],[799,10143.2,"2025-06-07",1.98],[800,13745.7,"2025-06-09",1.98],[801,13854.5,"2025-06-11",2.0],[802,11299.1,"2025-06-13",2.0],[803,15020.6,"2025-06-15",2.0],[804,13334.0,"2025-06-17",2.0],[805,13088.3,"2025-06-19",2.01],[806,11848.7,"2025-06-21",2.01],[807,14264.0,"2025-06-23",2.01],[808,15423.0,"2025-06-25",2.0],[809,12305.7,"2025-06-27",1.99],[810,14395.1,"2025-06-29",1.98],[811,16704.6,"2025-07-01",1.98],[812,13960.9,"2025-07-03",1.97],[813,16867.2,"2025-07-05",1.99],[814,17509.9,"2025-07-07",1.99],[815,16788.6,"2025-07-09",1.98],[816,13054.4,"2025-07-11",1.98],[817,16351.1,"2025-07-13",1.98],[818,22314.9,"2025-07-15",1.98],[819,23533.6,"2025-07-17",1.98],[820,13016.5,"2025-07-19",1.98],[821,18350.1,"2025-07-21",1.98],[822,16865.0,"2025-07-23",1.98],[823,12507.0,"2025-07-25",1.99],[824,12913.4,"2025-07-27",2.0],[825,14644.0,"2025-07-29",2.0],[826,13051.4,"2025-07-31",1.99],[827,9048.0,"2025-08-01",1.98],[828,15843.5,"2025-08-03",1.99],[829,17957.3,"2025-08-05",1.99],[830,15963.8,"2025-08-07",1.99],[831,13645.1,"2025-08-09",1.96],[832,18244.1,"2025-08-11",1.97],[833,14849.1,"2025-08-13",1.97],[834,7824.3,"2025-08-15",1.96],[835,9305.2,"2025-08-17",1.96],[836,11509.8,"2025-08-19",1.97],[837,8751.5,"2025-08-21",1.97],[838,7460.0,"2025-08-23",1.97],[839,10199.5,"2025-08-25",1.97],[840,10484.6,"2025-08-27",1.97],[841,5853.1,"2025-08-29",1.98],[842,5913.9,"2025-08-31",1.98],[843,7718.7,"2025-09-02",1.98],[844,5798.7,"2025-09-04",1.99],[845,4345.9,"2025-09-06",2.01],[846,5864.0,"2025-09-08",2.01],[847,9335.7,"2025-09-10",2.0],[848,6648.8,"2025-09-12",1.97],[849,13906.8,"2025-09-14",1.97],[850,6555.4,"2025-09-16",1.98],[851,4915.3,"2025-09-18",1.98],[852,3395.4,"2025-09-20",1.98],[853,4026.5,"2025-09-22",1.98],[854,3720.6,"2025-09-24",1.98],[855,2660.9,"2025-09-26",1.98],[856,3378.1,"2025-09-28",1.98],[857,4260.2,"2025-09-30",1.97],[858,4560.3,"2025-10-02",1.98],[859,2973.8,"2025-10-04",1.98],[860,3882.6,"2025-10-06",1.98],[861,2670.8,"2025-10-08",1.98],[862,13395.2,"2025-10-10",1.99],[863,3249.2,"2025-10-12",1.99],[864,3368.8,"2025-10-14",1.99],[865,3075.0,"2025-10-16",1.99],[866,2445.9,"2025-10-18",1.99],[867,3535.1,"2025-10-20",1.99],[868,2946.3,"2025-10-22",1.99],[869,2052.2,"2025-10-24",1.98],[870,1915.8,"2025-10-26",1.98],[871,3335.1,"2025-10-28",1.99],[872,3895.2,"2025-10-30",2.01],[873,2592.6,"2025-11-01",2.0],[874,4679.5,"2025-11-03",2.0],[875,3017.7,"2025-11-05",2.0],[876,2435.5,"2025-11-07",2.0],[877,3041.6,"2025-11-09",2.0],[878,3936.4,"2025-11-11",2.0],[879,2959.1,"2025-11-13",2.0],[880,2096.6,"2025-11-15",1.99],[881,2690.9,"2025-11-17",1.99],[882,2661.7,"2025-11-19",1.98],[883,2383.5,"2025-11-21",1.98],[884,1971.8,"2025-11-23",1.98],[885,2389.6,"2025-11-25",1.95],[886,2187.5,"2025-11-27",1.94],[887,2342.8,"2025-11-28",1.94],[888,2595.8,"2025-11-30",1.94],[889,3350.3,"2025-12-02",1.94],[890,2142.0,"2025-12-04",1.95],[891,2141.8,"2025-12-06",1.95],[892,2440.1,"2025-12-08",1.95],[893,3304.5,"2025-12-10",1.95],[894,2409.4,"2025-12-12",1.95],[895,2410.3,"2025-12-14",1.95],[896,2442.3,"2025-12-16",1.95],[897,2439.5,"2025-12-18",1.96],[898,2005.5,"2025-12-20",1.96],[899,2793.4,"2025-12-22",1.96],[900,2209.7,"2025-12-24",1.96],[901,2176.8,"2025-12-26",1.96],[902,2898.4,"2025-12-28",1.97],[903,2874.3,"2025-12-30",1.97],[904,2692.1,"2026-01-01",1.96],[905,3476.9,"2026-01-03",1.98],[906,4789.3,"2026-01-05",1.99],[907,3753.9,"2026-01-07",1.99],[908,2991.5,"2026-01-09",1.98],[909,3397.7,"2026-01-11",1.97],[910,4213.8,"2026-01-13",1.97],[911,5335.7,"2026-01-15",1.98],[912,3711.8,"2026-01-16",1.98],[913,4737.3,"2026-01-18",1.99],[914,3971.8,"2026-01-20",1.99],[915,4307.2,"2026-01-22",2.0],[916,8546.2,"2026-01-24",2.01],[917,7208.3,"2026-01-26",2.01],[918,7368.8,"2026-01-28",2.0],[919,6276.2,"2026-01-30",1.98],[920,5813.9,"2026-02-01",1.98],[921,7533.8,"2026-02-03",1.97],[922,9486.4,"2026-02-05",1.96],[923,3892.1,"2026-02-07",1.96],[924,4211.9,"2026-02-09",1.97],[925,3485.2,"2026-02-11",1.95],[926,2708.3,"2026-02-13",1.95],[927,3442.4,"2026-02-15",1.96],[928,4316.1,"2026-02-17",1.96],[929,3822.3,"2026-02-19",1.97],[930,3492.7,"2026-02-21",1.96],[931,4193.7,"2026-02-23",1.98],[932,4014.6,"2026-02-25",1.97],[933,3768.7,"2026-02-27",1.97],[934,3418.3,"2026-03-01",1.98]];
 const SY = 78_408_000, CB = 60_000_000, LS = 1_000_000_000;
 
+const _jitBaselineRaw = computeJitStats(100).annualized;
+const _jitBaseline = Math.round(_jitBaselineRaw / 1000) * 1000; // rounded to slider step (~813K SOL/yr)
+// --- AOT fee/CU customer tier constants (dynamically computed from D.p) ---
+// D.p fields: pf=priority fees SOL, bf=base fees SOL, tf=total fees SOL, cu=CU in billions
+// Two metrics: priority fee/CU (incremental bid above base) vs total fee/CU (full willingness-to-pay)
+const _highFeeSubs = ['prop_amm','orderbook'];
+const _aotProgs = D.p.filter(p => (p.prod === 'aot' || p.prod === 'both') && p.cu > 0);
+const _tierAgg = { low: {cu:0, pf:0, tf:0, n:0}, high: {cu:0, pf:0, tf:0, n:0} };
+_aotProgs.forEach(p => {
+    const t = _highFeeSubs.includes(p.sub) ? _tierAgg.high : _tierAgg.low;
+    t.cu += p.cu; t.pf += (p.pf||0); t.tf += (p.tf||0); t.n++;
+});
+// CU-weighted averages: SOL / billions CU = lamports / CU
+const AOT_PRI_LOW  = _tierAgg.low.cu > 0 ? _tierAgg.low.pf / _tierAgg.low.cu : 0;    // priority fee/CU, low-fee tier
+const AOT_PRI_HIGH = _tierAgg.high.cu > 0 ? _tierAgg.high.pf / _tierAgg.high.cu : 0;  // priority fee/CU, high-fee tier
+const AOT_TOT_LOW  = _tierAgg.low.cu > 0 ? _tierAgg.low.tf / _tierAgg.low.cu : 0;     // total fee/CU, low-fee tier
+const AOT_TOT_HIGH = _tierAgg.high.cu > 0 ? _tierAgg.high.tf / _tierAgg.high.cu : 0;  // total fee/CU, high-fee tier
+// Tier summary stats for display
+const _tierStats = {
+    low:  { n: _tierAgg.low.n,  cu: _tierAgg.low.cu,  pf: _tierAgg.low.pf,  tf: _tierAgg.low.tf,  priPerCU: AOT_PRI_LOW,  totPerCU: AOT_TOT_LOW },
+    high: { n: _tierAgg.high.n, cu: _tierAgg.high.cu, pf: _tierAgg.high.pf, tf: _tierAgg.high.tf, priPerCU: AOT_PRI_HIGH, totPerCU: AOT_TOT_HIGH },
+};
+// CU share of high-fee tier
+const _highCUShare = (_tierAgg.high.cu / (_tierAgg.low.cu + _tierAgg.high.cu) * 100);
+const _highFeeShare = (_tierAgg.high.tf / (_tierAgg.low.tf + _tierAgg.high.tf) * 100);
+
+// --- Scenario ladder: metric-regime progression ---
+// Conservative/Base: anchored on PRIORITY fee/CU (incremental bidding above base fee)
+// Optimistic: transition regime (bids move above priority-fee toward total willingness-to-pay)
+// Bull: anchored on TOTAL fee/CU (full reservation price in scarce blockspace)
 const SC = {
-    con:  {c:5,j:2,s:1,b:5,f:0.10,p:80,r:1,vb:1.5, desc:"Conservative: 1% stake, 5% block, 0.10 L/CU, 2% JIT, 5% commission (1% rebates, 1.5% val bonus → 2.5% protocol)."},
-    base: {c:5,j:5,s:5,b:10,f:0.10,p:100,r:0.5,vb:1, desc:"Base Case: 5% stake, 10% block, 0.10 L/CU, 5% JIT, 5% commission (0.5% rebates, 1% val bonus → 3.5% protocol revenue)."},
-    opt:  {c:5,j:10,s:15,b:10,f:0.20,p:150,r:0.5,vb:0.5, desc:"Optimistic: 15% stake, 10% block, 0.20 L/CU, 10% JIT, 5% commission (0.5% rebates, 0.5% val bonus → 4% protocol revenue)."},
-    bull: {c:5,j:20,s:30,b:20,f:0.50,p:250,r:1.0,vb:1.5, desc:"Bull: 30% stake, 20% block, 0.50 L/CU, 20% JIT, 5% commission (1% rebates, 1.5% val bonus → 2.5% protocol revenue)."},
+    con:  {c:5,j:2,s:1,b:5,f:0.40,p:80,ra:0.50,rj:0.25,vb:1.5,jm:Math.round(_jitBaseline*0.6/1000)*1000,
+           desc:"Conservative — 0% Prop AMM share. Metric anchor: priority fee/CU. AOT customers are standard DeFi only (AMMs, lending, aggregators). In low-demand conditions, auction bids reflect incremental priority fees (~0.4 lam/CU for low-fee DeFi). 1% stake, 5% block, 2% JIT share."},
+    base: {c:5,j:5,s:5,b:10,f:0.60,p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
+           desc:"Base Case — 5% Prop AMM share. Metric anchor: blended priority fee/CU. Mixed customer base with early Prop AMM interest. Bids still anchored to priority-fee logic but lifted by ~5% high-fee customers. Even using the priority-fee metric, Prop AMMs bid ~4.5 lam/CU — blending with low-fee DeFi gives ~0.60 lam/CU."},
+    opt:  {c:5,j:10,s:15,b:10,f:3.50,p:150,ra:0.25,rj:0.10,vb:0.5,jm:1500000,
+           desc:"Optimistic — 25% Prop AMM share. Metric anchor: transition regime. With meaningful Prop AMM adoption, competition for blockspace intensifies — auction bids move above marginal priority fees toward total willingness-to-pay. Blended fee/CU reflects this pressure shift (~3.50 lam/CU). 15% stake, 10% block."},
+    bull: {c:5,j:20,s:30,b:20,f:20.00,p:250,ra:1.00,rj:0.50,vb:2.0,jm:5000000,
+           desc:"Bull — 100% Prop AMM dominated. Metric anchor: total fee/CU (reservation price). In a fully competitive AOT market, bids reflect full willingness-to-pay — the total fee/CU observed on-chain (~20 lam/CU for Prop AMMs). This is the theoretical ceiling: fee = reservation price. 30% stake, 20% block."},
 };
 
 function fmt(v,t){
@@ -528,8 +899,10 @@ function fmt(v,t){
 function applyScenario(n){
     const s=SC[n];
     document.getElementById('sl-comm').value=s.c;
-    document.getElementById('sl-rebate').value=s.r;
-    document.getElementById('sl-vbonus').value=s.vb;
+    document.getElementById('sl-rebate-aot').value=s.ra;
+    document.getElementById('sl-rebate-jit').value=s.rj;
+    document.getElementById('sl-val-bonus').value=s.vb;
+    document.getElementById('sl-jit-market').value=s.jm;
     document.getElementById('sl-jit').value=s.j;
     document.getElementById('sl-stake').value=s.s;
     document.getElementById('sl-blk').value=s.b;
@@ -537,21 +910,26 @@ function applyScenario(n){
     document.getElementById('sl-price').value=s.p;
     document.getElementById('scenario-desc').textContent=s.desc;
     document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.scenario-card').forEach(c=>c.classList.remove('active'));
     document.getElementById('btn-'+n).classList.add('active');
+    document.querySelectorAll('.scenario-card').forEach(c=>c.classList.remove('active'));
+    const sc=document.getElementById('sc-card-'+n); if(sc) sc.classList.add('active');
     update();
 }
 
-['comm','rebate','vbonus','jit','stake','blk','fcu','price'].forEach(s=>{
-    document.getElementById('sl-'+s).addEventListener('input',()=>{
+['sl-comm','sl-rebate-aot','sl-rebate-jit','sl-val-bonus','sl-jit-market','sl-jit','sl-stake','sl-blk','sl-fcu','sl-price'].forEach(id=>{
+    document.getElementById(id).addEventListener('input',()=>{
         document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.remove('active'));
         update();
     });
 });
 
 function gp(){return{
-    c:+document.getElementById('sl-comm').value/100,
-    r:+document.getElementById('sl-rebate').value/100,
-    vb:+document.getElementById('sl-vbonus').value/100,
+    c:+document.getElementById('sl-comm').value,       // commission % (raw, e.g. 5)
+    ra:+document.getElementById('sl-rebate-aot').value, // AOT rebate % (raw, e.g. 0.25)
+    rj:+document.getElementById('sl-rebate-jit').value, // JIT rebate % (raw, e.g. 0.25)
+    vb:+document.getElementById('sl-val-bonus').value,  // AOT validator bonus % (raw, e.g. 1.0)
+    jm:+document.getElementById('sl-jit-market').value, // JIT total market (SOL/yr)
     j:+document.getElementById('sl-jit').value/100,
     s:+document.getElementById('sl-stake').value/100,
     b:+document.getElementById('sl-blk').value/100,
@@ -559,88 +937,260 @@ function gp(){return{
     p:+document.getElementById('sl-price').value,
 };}
 
+function computeJitStats(windowEpochs) {
+    const data = D_JITO.filter(r => r[1] > 0);
+    if (data.length === 0) return { annualized: 0, avgPerEpoch: 0, totalSol: 0, epochs: 0, firstDate: '', lastDate: '', totalDays: 0 };
+    const recent = windowEpochs ? data.slice(-windowEpochs) : data;
+    const totalSol = recent.reduce((a, r) => a + r[1], 0);
+    const totalDays = recent.reduce((a, r) => a + r[3], 0);
+    const avgPerEpoch = totalSol / recent.length;
+    const annualized = totalDays > 0 ? (totalSol / totalDays) * 365.25 : 0;
+    return {
+        annualized, avgPerEpoch, totalSol,
+        epochs: recent.length,
+        firstDate: recent[0][2],
+        lastDate: recent[recent.length - 1][2],
+        totalDays,
+    };
+}
+
+let _jitStats = null;
+function getJitStats() {
+    if (!_jitStats) _jitStats = computeJitStats(100);
+    return _jitStats;
+}
+
+function fmtTriple(usd, sol, pctOfGross) {
+    return {
+        usd: fmt(usd, '$'),
+        sol: fmt(sol, 'S') + ' \u00b7 ' + (isFinite(pctOfGross) ? pctOfGross.toFixed(1) + '%' : ''),
+        mo: fmt(usd / 12, '$') + '/mo'
+    };
+}
+
 function calc(p){
-    const jG=D.a.mev*p.j, jN=jG*p.c;
-    const ls=p.s*SY, cu=p.b*CB;
-    const aG=(ls*cu*p.f)/LS, aN=aG*p.c;
-    const tG=jG+aG, vS=tG*(1-p.c);
-    // Fee distribution breakdown (from commission)
-    const commission=tG*p.c;
-    const rebates=tG*Math.min(p.r,p.c);
-    const valBonus=tG*Math.min(p.vb,Math.max(0,p.c-p.r));
-    const protRev=Math.max(0,commission-rebates-valBonus);
-    return{jG,jN,jU:jN*p.p, ls,cu, aG,aN,aU:aN*p.p, tG,vS,
-        tN:protRev, tU:protRev*p.p, commission, rebates, valBonus, protRev};
+    const cR = p.c / 100;
+    const vR = 1 - cR;
+
+    // JIT waterfall (jitMarket comes from the JIT total market slider)
+    const jitMarket     = p.jm;
+    const jitGross         = jitMarket * p.j;
+    const jitValidatorBase = jitGross * vR;
+    const jitRebate        = jitGross * (p.rj / 100);
+    const jitValBonus      = 0;
+    const jitProtocol      = Math.max(0, jitGross * cR - jitRebate);
+
+    // AOT waterfall
+    const ls       = p.s * SY, cu = p.b * CB;
+    const aotGross         = (ls * cu * p.f) / LS;
+    const aotValidatorBase = aotGross * vR;
+    const aotRebate        = aotGross * (p.ra / 100);
+    const aotValBonus      = aotGross * (p.vb / 100);
+    const aotProtocol      = Math.max(0, aotGross * cR - aotRebate - aotValBonus);
+
+    // Aggregated
+    const totalGross     = jitGross + aotGross;
+    const totalValBase   = jitValidatorBase + aotValidatorBase;
+    const totalValRev    = totalValBase + aotValBonus;
+    const totalRebates   = jitRebate + aotRebate;
+    const totalProtocol  = Math.max(0, jitProtocol + aotProtocol);
+
+    return {
+        jitGross, jitValidatorBase, jitRebate, jitValBonus, jitProtocol, jitMarket,
+        aotGross, aotValidatorBase, aotRebate, aotValBonus, aotProtocol,
+        ls, cu,
+        totalGross, totalValBase, totalValRev, totalRebates, totalProtocol,
+        totalProtocolUSD: totalProtocol * p.p,
+        jitGrossUSD: jitGross * p.p, aotGrossUSD: aotGross * p.p,
+        totalGrossUSD: totalGross * p.p,
+    };
 }
 
 let cE,cA,cP,cF;
 function initCharts(){
-    const o={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:10}}}},scales:{x:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'}}}};
-    const ep=D.e.map(e=>e.e);
-    cE=new Chart(document.getElementById('chart-epoch'),{type:'line',data:{labels:ep,datasets:[{label:'Priority Fees',data:D.e.map(e=>e.pf),borderColor:'#999',borderWidth:1.5,pointRadius:0,fill:false},{label:'Jito Tips',data:D.e.map(e=>e.mev),borderColor:'#d4e8a0',borderWidth:1.5,pointRadius:0,fill:false}]},options:o});
-    cA=new Chart(document.getElementById('chart-aot'),{type:'bar',data:{labels:['1%','2%','5%','10%','15%','20%','30%','50%'],datasets:[{label:'AOT Treasury',data:Array(8).fill(0),backgroundColor:'#d4e8a060'}]},options:o});
-    cP=new Chart(document.getElementById('chart-price'),{type:'line',data:{labels:ep,datasets:[{label:'SOL',data:D.e.map(e=>e.p),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:false}]},options:o});
+    const o={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:10}}}},scales:{x:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'},title:{display:true,color:'#A0A3A9',font:{size:10}}},y:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'},title:{display:true,color:'#A0A3A9',font:{size:10}}}}};
+    // Full D_JITO history with highlighted computation window (last 100 non-zero)
+    const jitAll = D_JITO.filter(r => r[1] > 10);
+    const jitNonZero = D_JITO.filter(r => r[1] > 0);
+    const windowStart = jitNonZero.length > 100 ? jitNonZero[jitNonZero.length - 100][0] : jitNonZero[0]?.[0] || 0;
+    const jitHistoryData = jitAll.map(r => r[1]);
+    const jitWindowData = jitAll.map(r => r[0] >= windowStart ? r[1] : null);
+    cE=new Chart(document.getElementById('chart-epoch'),{type:'line',data:{labels:jitAll.map(r=>r[0]),datasets:[
+        {label:'All epochs (history)',data:jitHistoryData,borderColor:'rgba(255,255,255,0.25)',borderWidth:1,pointRadius:0,fill:false},
+        {label:'Computation window (last 100)',data:jitWindowData,borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(189,217,112,0.08)'}
+    ]},options:{...o,plugins:{...o.plugins,legend:{labels:{color:'#888',font:{size:10}},display:true}},scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'Epoch'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'SOL / epoch'}}}}});
+    cA=new Chart(document.getElementById('chart-aot'),{type:'bar',data:{labels:['1%','2%','5%','10%','15%','20%','30%','50%'],datasets:[{label:'AOT Protocol Treasury',data:Array(8).fill(0),backgroundColor:'#C0FF3860'}]},options:{...o,scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'RAIKU Stake %'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'Protocol Treasury (USD/yr)'}}}}});
+    cP=new Chart(document.getElementById('chart-price'),{type:'line',data:{labels:D.e.map(e=>e.e),datasets:[{label:'SOL',data:D.e.map(e=>e.p),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:false}]},options:{...o,scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'Epoch'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'Price (USD)'}}}}});
     const st={};D.p.forEach(p=>{if(p.fpc>0&&p.prod!=='neither'){const k=p.sub||p.cat;if(!st[k])st[k]=[];st[k].push(p.fpc);}});
     const ss=Object.entries(st).map(([k,v])=>({k,a:v.reduce((a,b)=>a+b,0)/v.length})).sort((a,b)=>b.a-a.a).slice(0,15);
-    cF=new Chart(document.getElementById('chart-fcu'),{type:'bar',data:{labels:ss.map(s=>s.k),datasets:[{label:'Avg Fee/CU (L)',data:ss.map(s=>s.a),backgroundColor:'#d4e8a0'}]},options:{...o,plugins:{...o.plugins,legend:{display:false}}}});
+    cF=new Chart(document.getElementById('chart-fcu'),{type:'bar',data:{labels:ss.map(s=>s.k),datasets:[{label:'Avg Fee/CU (L)',data:ss.map(s=>s.a),backgroundColor:'#d4e8a0'}]},options:{...o,plugins:{...o.plugins,legend:{display:false}},scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'Subcategory'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'Fee/CU (lamports)'}}}}});
+
+}
+
+// Inline JIT history chart (inside Data Sources section)
+let cJH;
+function initJitHistoryChart(){
+    const jitAll = D_JITO.filter(r => r[1] > 10);
+    const jitNZ = D_JITO.filter(r => r[1] > 0);
+    const ws = jitNZ.length > 100 ? jitNZ[jitNZ.length - 100][0] : jitNZ[0]?.[0] || 0;
+    // Date labels (line 1), epoch stored separately for tick callback (line 2)
+    const dateLabels = jitAll.map(r => {
+        const d = new Date(r[2]);
+        const m = d.toLocaleString('en',{month:'short'});
+        const y = String(d.getFullYear()).slice(2);
+        return m + " '" + y;
+    });
+    const epochNums = jitAll.map(r => r[0]);
+    const o2={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:10}},display:true},tooltip:{callbacks:{title:function(ctx){const i=ctx[0].dataIndex;return 'Epoch '+jitAll[i][0]+' — '+jitAll[i][2];}}}},scales:{x:{ticks:{color:'#555',font:{size:9},maxTicksLimit:18,maxRotation:0,callback:function(val,idx){const lbl=this.getLabelForValue(val);const ep=epochNums[val]!=null?epochNums[val]:'';return [lbl,'ep '+ep];}},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'},title:{display:true,color:'#A0A3A9',font:{size:10},text:'SOL / epoch'}}}};
+    cJH=new Chart(document.getElementById('chart-jit-history'),{type:'line',data:{labels:dateLabels,datasets:[
+        {label:'All epochs',data:jitAll.map(r=>r[1]),borderColor:'rgba(255,255,255,0.25)',borderWidth:1,pointRadius:0,fill:false},
+        {label:'Window (last 100)',data:jitAll.map(r=>r[0]>=ws?r[1]:null),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(189,217,112,0.1)'}
+    ]},options:o2});
+}
+
+// Dataset table toggle + populate
+function initJitDatasetViewer(){
+    const btn=document.getElementById('jit-dataset-toggle');
+    const container=document.getElementById('jit-dataset-table-container');
+    let populated=false;
+    btn.addEventListener('click',function(){
+        const isOpen = container.style.display !== 'none';
+        container.style.display = isOpen ? 'none' : 'block';
+        btn.textContent = isOpen ? 'View JIT Source Dataset' : 'Hide JIT Source Dataset';
+        if(!populated){
+            const tbody=document.getElementById('jit-dataset-tbody');
+            const jitNZ = D_JITO.filter(r=>r[1]>0);
+            const ws = jitNZ.length > 100 ? jitNZ[jitNZ.length-100][0] : jitNZ[0]?.[0]||0;
+            // Show most recent first
+            const rows=[...jitNZ].reverse();
+            rows.forEach(r=>{
+                const tr=document.createElement('tr');
+                tr.style.borderBottom='1px solid #1a1a1a';
+                const inW = r[0]>=ws;
+                if(inW) tr.style.backgroundColor='rgba(189,217,112,0.04)';
+                tr.innerHTML=
+                    '<td style="padding:5px 10px;color:var(--text);">'+r[0]+'</td>'+
+                    '<td style="padding:5px 10px;color:var(--text2);">'+r[2]+'</td>'+
+                    '<td style="padding:5px 10px;text-align:right;color:var(--text);">'+r[1].toLocaleString('en',{maximumFractionDigits:0})+'</td>'+
+                    '<td style="padding:5px 10px;text-align:right;color:var(--text2);">'+r[3].toFixed(2)+'</td>'+
+                    '<td style="padding:5px 10px;text-align:center;color:'+(inW?'#BDD970':'#555')+';">'+(inW?'&#10003;':'')+'</td>';
+                tbody.appendChild(tr);
+            });
+            populated=true;
+        }
+    });
 }
 
 function fmtShort(v){return v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+Math.round(v/1e3)+'K':'$'+Math.round(v);}
+function fmtPct(v){return v.toFixed(2)+'%';}
 
 function updFlow(p,r){
-    const jU=r.jG*p.p, aU=r.aG*p.p, cU=r.commission*p.p;
-    const vU=r.vS*p.p, reU=r.rebates*p.p, vbU=r.valBonus*p.p, prU=r.protRev*p.p;
-    const total=jU+aU||1;
-    // Update labels
+    const jU=r.jitGrossUSD, aU=r.aotGrossUSD, totalU=r.totalGrossUSD||1;
+    const vbU=r.totalValBase*p.p, abU=r.aotValBonus*p.p;
+    const raU=r.aotRebate*p.p, rjU=r.jitRebate*p.p, prU=r.totalProtocolUSD;
+
+    // Update value labels
     document.getElementById('fk-jit-v').textContent=fmtShort(jU);
     document.getElementById('fk-aot-v').textContent=fmtShort(aU);
-    document.getElementById('fk-comm-v').textContent=fmtShort(cU)+' ('+Math.round(p.c*100)+'%)';
-    document.getElementById('fk-val-v').textContent=fmtShort(vU);
-    document.getElementById('fk-reb-v').textContent=fmtShort(reU);
-    document.getElementById('fk-vb-v').textContent=fmtShort(vbU);
-    document.getElementById('fk-proto-v').textContent=fmtShort(prU);
-    // Scale bar heights proportionally
-    const maxH=140, minH=8;
-    const jH=Math.max(minH,jU/total*maxH), aH=Math.max(minH,aU/total*maxH);
-    document.getElementById('fk-jit').setAttribute('height',jH);
-    document.getElementById('fk-aot').setAttribute('y',10+jH+20);
-    document.getElementById('fk-aot').setAttribute('height',aH);
-    // Reposition AOT text
-    document.querySelector('#fk-aot + text').setAttribute('y',10+jH+20+Math.min(25,aH/2));
-    document.querySelector('#fk-aot + text + text').setAttribute('y',10+jH+20+Math.min(40,aH/2+15));
-    // Update flow paths
+    document.getElementById('fk-total-v').textContent=fmtShort(totalU)+' (100%)';
+
+    // Right outputs — capped proportional sizing (prevents dominant item from crushing others)
+    const outputs=[
+        {id:'valbase', v:vbU, color:'#5B8DEF'},
+        {id:'vb',      v:abU, color:'#4178DE'},
+        {id:'reb-aot', v:raU, color:'#8BAF8B'},
+        {id:'reb-jit', v:rjU, color:'#9BBF9B'},
+        {id:'proto',   v:prU, color:'#C0FF38'},
+    ];
+    const totalOut=outputs.reduce((a,o)=>a+o.v,0)||1;
+    const svgH=400, svgTop=10, minBarH=30, barGap=8;
+    const totalGapH=barGap*(outputs.length-1);
+    const availH=svgH-svgTop*2-totalGapH;
+    const maxBarFrac=0.42;
+    // Pass 1: proportional with min/max clamps
+    outputs.forEach(o=>{
+        o.frac=o.v/totalOut;
+        o.h=Math.max(minBarH, Math.min(availH*maxBarFrac, o.frac*availH));
+    });
+    // Pass 2: scale to fill exactly availH
+    const usedH=outputs.reduce((a,o)=>a+o.h,0);
+    const scale=availH/usedH;
+    outputs.forEach(o=>{ o.h=Math.max(minBarH, o.h*scale); });
+    // Position bars
+    let yPos=svgTop;
+    outputs.forEach(o=>{
+        const el=document.getElementById('fk-'+o.id);
+        if(el){el.setAttribute('y',yPos);el.setAttribute('height',o.h);el.setAttribute('width',18);}
+        const lbl=document.getElementById('fk-'+o.id+'-label');
+        if(lbl) lbl.setAttribute('y',yPos+o.h/2-4);
+        const val=document.getElementById('fk-'+o.id+'-v');
+        if(val){val.textContent=fmtShort(o.v)+' ('+fmtPct(o.frac*100)+')';val.setAttribute('y',yPos+o.h/2+14);}
+        const paren=document.getElementById('fk-'+o.id+'-paren');
+        if(paren) paren.setAttribute('y',yPos+o.h/2-4);
+        o.yMid=yPos+o.h/2;
+        yPos+=o.h+barGap;
+    });
+
+    // Left inputs — proportional, generous min
+    const leftH=svgH-svgTop*2-40, minH=50;
+    const jH=Math.max(minH, jU/totalU*leftH), aH=Math.max(minH, aU/totalU*leftH);
+    const jY=svgTop+5, aY=jY+jH+30;
+    const jitRect=document.getElementById('fk-jit');
+    jitRect.setAttribute('height',jH); jitRect.setAttribute('y',jY);
+    const aotRect=document.getElementById('fk-aot');
+    aotRect.setAttribute('y',aY); aotRect.setAttribute('height',aH);
+    document.getElementById('fk-jit-label').setAttribute('y',jY+jH/2-6);
+    document.getElementById('fk-jit-v').setAttribute('y',jY+jH/2+14);
+    document.getElementById('fk-aot-label').setAttribute('y',aY+aH/2-6);
+    document.getElementById('fk-aot-v').setAttribute('y',aY+aH/2+14);
+
+    // Center bar
+    const totalEl=document.getElementById('fk-total');
+    totalEl.setAttribute('y',svgTop);
+    totalEl.setAttribute('height',yPos-svgTop-barGap);
+    const cMid=svgTop+(yPos-svgTop-barGap)/2;
+    // Center labels
+    const cLbl=document.querySelector('#flow-sankey text[x="400"][font-weight="700"]');
+    if(cLbl) cLbl.setAttribute('y',cMid-8);
+    const cVal=document.getElementById('fk-total-v');
+    if(cVal) cVal.setAttribute('y',cMid+12);
+
+    // Flow paths — thin, elegant curves
     const paths=document.getElementById('fk-paths');
-    const commTotal=cU||1;
-    const dists=[{v:vU,y1:5,h:45,c:'#333'},{v:reU,y1:60,h:35,c:'#555'},{v:vbU,y1:105,h:35,c:'#888'},{v:prU,y1:150,h:45,c:'#C0FF38'}];
     let svg='';
-    // Source → Commission flows
-    svg+=`<path d="M18,${10+jH/2} C150,${10+jH/2} 200,100 290,100" stroke="#d4e8a0" stroke-width="${Math.max(1,jH/4)}" fill="none"/>`;
-    svg+=`<path d="M18,${10+jH+20+aH/2} C150,${10+jH+20+aH/2} 200,100 290,100" stroke="#71787F" stroke-width="${Math.max(1,aH/4)}" fill="none"/>`;
-    // Commission → Distribution flows
-    dists.forEach(d=>{
-        const w=Math.max(0.5,d.v/commTotal*8);
-        svg+=`<path d="M308,100 C450,100 500,${d.y1+d.h/2} 590,${d.y1+d.h/2}" stroke="${d.c}" stroke-width="${w}" fill="none"/>`;
+    const sw1=Math.max(3,jH/5), sw2=Math.max(3,aH/5);
+    svg+=`<path d="M20,${jY+jH/2} C190,${jY+jH/2} 280,${cMid} 370,${cMid}" stroke="#FFFFFF" stroke-width="${sw1}" fill="none" opacity="0.5"/>`;
+    svg+=`<path d="M20,${aY+aH/2} C190,${aY+aH/2} 280,${cMid} 370,${cMid}" stroke="#FFFFFF" stroke-width="${sw2}" fill="none" opacity="0.5"/>`;
+    outputs.forEach(o=>{
+        const w=Math.max(3, o.h*0.55);
+        svg+=`<path d="M390,${cMid} C550,${cMid} 640,${o.yMid} 720,${o.yMid}" stroke="${o.color}" stroke-width="${w}" fill="none" opacity="0.45"/>`;
     });
     paths.innerHTML=svg;
 }
 
 function updCharts(p,r){
     updFlow(p,r);
+    const cR = p.c / 100;
     [0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50].forEach((s,i)=>{
-        cA.data.datasets[0].data[i]=(s*SY*p.b*CB*p.f)/LS*p.c*p.p;
+        const aG=(s*SY*p.b*CB*p.f)/LS;
+        const aP=Math.max(0, aG*cR - aG*(p.ra/100) - aG*(p.vb/100));
+        cA.data.datasets[0].data[i]=aP*p.p;
     }); cA.update();
+
 }
 
 function buildMatrix(p){
-    const sr=[0.005,0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50], fc=[0.01,0.02,0.05,0.10,0.20,0.50,1.00,2.00];
-    let h='<table class="matrix-table"><thead><tr><th>Stake \ Fee</th>';
-    fc.forEach(f=>h+=`<th>${f<0.1?f.toFixed(3):f.toFixed(2)}L</th>`);
+    const cR = p.c / 100;
+    const sr=[0.005,0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50], fc=[0.10,0.20,0.50,1.00,2.00,5.00,10.00,20.00];
+    let h='<table class="matrix-table"><thead><tr><th>Stake \\ Fee/CU</th>';
+    fc.forEach(f=>h+=`<th>${f<0.1?f.toFixed(2):f>=10?f.toFixed(0):f.toFixed(1)}L</th>`);
     h+='</tr></thead><tbody>';
     sr.forEach(s=>{
         h+=`<tr><th>${(s*100)<1?(s*100).toFixed(1):Math.round(s*100)}%</th>`;
         fc.forEach(f=>{
-            const t=(s*SY*p.b*CB*f)/LS*p.c*p.p;
-            const hl=Math.abs(s-p.s)<0.0005&&Math.abs(f-p.f)<0.0005;
+            const aG=(s*SY*p.b*CB*f)/LS;
+            const t=Math.max(0, aG*cR - aG*(p.ra/100) - aG*(p.vb/100))*p.p;
+            const hl=Math.abs(s-p.s)<0.0005&&Math.abs(f-p.f)<0.005;
             h+=`<td class="${hl?'hl':''}">${fmt(t,'$')}</td>`;
         }); h+='</tr>';
     }); h+='</tbody></table>';
@@ -680,94 +1230,257 @@ function initFilters(){
     subs.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});
 }
 
+// --- AOT Fee/CU Data Section initialization ---
+function initAotFcuSection(){
+    const highFeeSubs = ['prop_amm','orderbook'];
+    const aotProgs = D.p.filter(p => p.prod === 'aot' || p.prod === 'both');
+
+    // --- 0. Populate tier summary cards (both metrics, dynamically from _tierStats) ---
+    const fmtFpc = v => v >= 10 ? v.toFixed(1) : v >= 1 ? v.toFixed(2) : v.toFixed(2);
+    // Low-fee tier
+    const tlp = document.getElementById('aot-tier-low-pri');  if (tlp) tlp.textContent = fmtFpc(_tierStats.low.priPerCU) + ' lam/CU';
+    const tlt = document.getElementById('aot-tier-low-tot');  if (tlt) tlt.textContent = fmtFpc(_tierStats.low.totPerCU) + ' lam/CU';
+    const tls = document.getElementById('aot-tier-low-stats');
+    if (tls) tls.textContent = _tierStats.low.n + ' programs · ' + Math.round(_tierStats.low.cu).toLocaleString() + 'B CU · ' + fmt(_tierStats.low.pf,'c') + ' SOL priority · ' + fmt(_tierStats.low.tf,'c') + ' SOL total (30d)';
+    // High-fee tier
+    const thp = document.getElementById('aot-tier-high-pri'); if (thp) thp.textContent = fmtFpc(_tierStats.high.priPerCU) + ' lam/CU';
+    const tht = document.getElementById('aot-tier-high-tot'); if (tht) tht.textContent = fmtFpc(_tierStats.high.totPerCU) + ' lam/CU';
+    const ths = document.getElementById('aot-tier-high-stats');
+    if (ths) ths.textContent = _tierStats.high.n + ' programs · ' + Math.round(_tierStats.high.cu).toLocaleString() + 'B CU · ' + fmt(_tierStats.high.pf,'c') + ' SOL priority · ' + fmt(_tierStats.high.tf,'c') + ' SOL total (30d)';
+    // Key fact
+    const kf = document.getElementById('aot-tier-key-fact');
+    if (kf) kf.innerHTML = 'Key fact: Prop AMM / high-fee customers represent only <strong>' + _highCUShare.toFixed(1) + '% of CU volume</strong> but generate <strong>' + _highFeeShare.toFixed(1) + '% of AOT-relevant total fee revenue</strong>. Even a small share of high-fee customers dramatically shifts the blended average.';
+    // Methodology dynamic values
+    const mpl = document.getElementById('meth-pri-low');   if (mpl) mpl.textContent = fmtFpc(_tierStats.low.priPerCU);
+    const mph = document.getElementById('meth-pri-high');  if (mph) mph.textContent = fmtFpc(_tierStats.high.priPerCU);
+    const mth = document.getElementById('meth-tot-high');  if (mth) mth.textContent = fmtFpc(_tierStats.high.totPerCU);
+
+    // --- 1. Populate the top-programs table (BOTH metrics: priority fee/CU + total fee/CU) ---
+    // Sort by total fee volume descending (more economically relevant)
+    const sorted = aotProgs.filter(p => (p.pf > 0 || p.tf > 0)).sort((a,b) => (b.tf||0) - (a.tf||0)).slice(0, 20);
+    let tbody = '';
+    sorted.forEach(p => {
+        const isHF = highFeeSubs.includes(p.sub);
+        const tierLabel = isHF ? '<span style="color:#F5A623;font-weight:600;">Prop AMM</span>' : '<span style="color:#5B8DEF;">Low-fee</span>';
+        // Priority fee/CU = p.fpc (median from Dune, already in lamports)
+        const priFpc = p.fpc > 0 ? (p.fpc >= 10 ? p.fpc.toFixed(1) : p.fpc.toFixed(4)) : '—';
+        // Total fee/CU = total_fees_SOL / CU_billions (CU-weighted, = lamports/CU)
+        const totFpc = (p.tf > 0 && p.cu > 0) ? ((v) => v >= 10 ? v.toFixed(1) : v.toFixed(2))(p.tf / p.cu) : '—';
+        const cuDisp = p.cu > 0 ? p.cu.toFixed(1) : '—';
+        const clr = isHF ? '#F5A623' : 'var(--text)';
+        tbody += '<tr style="border-bottom:1px solid #1a1a1a;">';
+        tbody += '<td style="padding:6px 8px;color:var(--text);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+p.n+'</td>';
+        tbody += '<td style="padding:6px 8px;">'+tierLabel+'</td>';
+        tbody += '<td style="padding:6px 8px;text-align:right;color:'+clr+';font-weight:600;">'+priFpc+'</td>';
+        tbody += '<td style="padding:6px 8px;text-align:right;color:'+clr+';font-weight:600;">'+totFpc+'</td>';
+        tbody += '<td style="padding:6px 8px;text-align:right;color:var(--text2);">'+cuDisp+'</td>';
+        tbody += '<td style="padding:6px 8px;text-align:right;color:var(--text);">'+fmt(p.pf,'c')+'</td>';
+        tbody += '<td style="padding:6px 8px;text-align:right;color:var(--text);">'+fmt(p.tf||0,'c')+'</td>';
+        tbody += '</tr>';
+    });
+    const tbEl = document.getElementById('aot-fcu-programs-tbody');
+    if (tbEl) tbEl.innerHTML = tbody;
+
+    // --- 2. Build the tier bar chart: TOTAL fee/CU (CU-weighted), explicit labels ---
+    const tierData = {};
+    aotProgs.forEach(p => {
+        if (!p.sub || (p.tf||0) <= 0) return;
+        if (!tierData[p.sub]) tierData[p.sub] = { cu: 0, tf: 0, pf: 0 };
+        tierData[p.sub].cu += (p.cu || 0);
+        tierData[p.sub].tf += (p.tf || 0);
+        tierData[p.sub].pf += (p.pf || 0);
+    });
+    // Total fee/CU per subcategory: SOL / billions CU = lamports per CU
+    const barData = Object.entries(tierData)
+        .filter(([,d]) => d.cu > 0 && d.tf > 0)
+        .map(([sub, d]) => ({
+            sub,
+            totFpc: d.tf / d.cu,    // total fee/CU
+            priFpc: d.pf / d.cu,    // priority fee/CU (for tooltip)
+            tf: d.tf,
+            isHF: highFeeSubs.includes(sub)
+        }))
+        .sort((a,b) => b.totFpc - a.totFpc)
+        .slice(0, 12);
+
+    // Format subcategory labels for readability
+    const labelMap = {
+        'prop_amm': 'Prop AMM', 'orderbook': 'Orderbook', 'amm': 'AMM',
+        'lending': 'Lending', 'aggregator': 'Aggregator', 'perps': 'Perps',
+        'oracle': 'Oracle', 'vault': 'Vault', 'liquid_staking': 'Liquid Staking',
+        'launchpad': 'Launchpad', 'payments': 'Payments', 'bridge': 'Bridge',
+        'nft_marketplace': 'NFT Mktplace', 'other': 'Other'
+    };
+    const fmtLabel = s => labelMap[s] || s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    const ctx = document.getElementById('chart-aot-fcu-tiers');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: barData.map(d => fmtLabel(d.sub)),
+                datasets: [{
+                    label: 'Total fee/CU (lam)',
+                    data: barData.map(d => d.totFpc),
+                    backgroundColor: barData.map(d => d.isHF ? '#F5A623' : '#5B8DEF'),
+                    borderColor: barData.map(d => d.isHF ? '#F5A62380' : '#5B8DEF80'),
+                    borderWidth: 1,
+                    borderRadius: 3,
+                    barThickness: 22
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(c) {
+                                const d = barData[c.dataIndex];
+                                return 'Total fee/CU: ' + d.totFpc.toFixed(2) + ' lam | Priority fee/CU: ' + d.priFpc.toFixed(2) + ' lam';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'logarithmic',
+                        ticks: {
+                            color: '#666',
+                            font: { size: 10 },
+                            callback: function(v) { return v >= 1 ? v.toFixed(0) : v.toFixed(2); }
+                        },
+                        grid: { color: '#1a1a1a' },
+                        title: { display: true, text: 'Total fee/CU (lamports) — base + priority, CU-weighted — log scale', color: '#A0A3A9', font: { size: 10 } }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#999',
+                            font: { size: 11, weight: '500' },
+                            autoSkip: false,
+                            padding: 4
+                        },
+                        grid: { display: false },
+                        afterFit: function(axis) { axis.width = 110; }
+                    }
+                }
+            }
+        });
+    }
+}
+
 function update(){
     const p=gp(),r=calc(p);
-    document.getElementById('v-comm').textContent=(p.c*100).toFixed(1)+'%';
-    document.getElementById('v-rebate').textContent=(p.r*100).toFixed(1)+'%';
-    document.getElementById('v-vbonus').textContent=(p.vb*100).toFixed(1)+'%';
+    const cR = p.c / 100;
+    const tg = r.totalGross || 1;
+
+    // Slider value displays
+    document.getElementById('v-comm').textContent=p.c.toFixed(1)+'%';
+    document.getElementById('v-rebate-aot').textContent=p.ra.toFixed(2)+'%';
+    document.getElementById('v-rebate-jit').textContent=p.rj.toFixed(2)+'%';
+    document.getElementById('v-val-bonus').textContent=p.vb.toFixed(1)+'%';
+    document.getElementById('v-jit-market').textContent=fmt(p.jm,'S');
+    document.getElementById('v-jit-market-usd').textContent='\u2248 '+fmt(p.jm*p.p,'$')+'/yr';
     document.getElementById('v-jit').textContent=Math.round(p.j*100)+'%';
     document.getElementById('v-stake').textContent=(p.s*100).toFixed(1)+'%';
     document.getElementById('v-blk').textContent=Math.round(p.b*100)+'%';
-    document.getElementById('v-fcu').textContent=p.f<0.1?p.f.toFixed(3):p.f.toFixed(2);
+    document.getElementById('v-fcu').textContent=p.f<0.1?p.f.toFixed(3):p.f>=10?p.f.toFixed(1):p.f.toFixed(2);
     document.getElementById('v-price').textContent='$'+p.p;
 
-    // Waterfall - Revenue Sources
-    document.getElementById('wf-gross').textContent=fmt(r.tG*p.p,'$');
-    document.getElementById('wf-gross-sol').textContent=fmt(r.tG,'S')+'/yr';
-    document.getElementById('wf-jit').textContent=fmt(r.jG*p.p,'$');
-    document.getElementById('wf-jit-pct').textContent=r.tG>0?Math.round(r.jG/r.tG*100)+'% of gross':'';
-    document.getElementById('wf-aot').textContent=fmt(r.aG*p.p,'$');
-    document.getElementById('wf-aot-pct').textContent=r.tG>0?Math.round(r.aG/r.tG*100)+'% of gross':'';
-    // Waterfall - Fee Distribution
-    document.getElementById('wf-val').textContent=fmt(r.vS*p.p,'$');
-    document.getElementById('wf-val-sub').textContent=Math.round((1-p.c)*100)+'% of gross';
-    document.getElementById('wf-rebates').textContent=fmt(r.rebates*p.p,'$');
-    document.getElementById('wf-rebates-sub').textContent=(p.r*100).toFixed(1)+'% of gross';
-    document.getElementById('wf-vbonus').textContent=fmt(r.valBonus*p.p,'$');
-    document.getElementById('wf-vbonus-sub').textContent=(p.vb*100).toFixed(1)+'% of gross';
-    document.getElementById('wf-treasury').textContent=fmt(r.tU,'$');
-    document.getElementById('wf-treasury-pct').textContent=fmt(r.tU/12,'$')+'/mo';
+    // === Revenue Sources (triple-cards) ===
+    document.getElementById('tc-gross-usd').textContent=fmt(r.totalGrossUSD,'$');
+    document.getElementById('tc-gross-sol').textContent=fmt(r.totalGross,'S')+' \u00b7 100%';
+    document.getElementById('tc-gross-mo').textContent=fmt(r.totalGrossUSD/12,'$')+'/mo';
+    document.getElementById('tc-jit-usd').textContent=fmt(r.jitGrossUSD,'$');
+    document.getElementById('tc-jit-sol').textContent=fmt(r.jitGross,'S')+' \u00b7 '+fmtPct(r.jitGross/tg*100);
+    document.getElementById('tc-jit-mo').textContent=fmt(r.jitGrossUSD/12,'$')+'/mo';
+    document.getElementById('tc-aot-usd').textContent=fmt(r.aotGrossUSD,'$');
+    document.getElementById('tc-aot-sol').textContent=fmt(r.aotGross,'S')+' \u00b7 '+fmtPct(r.aotGross/tg*100);
+    document.getElementById('tc-aot-mo').textContent=fmt(r.aotGrossUSD/12,'$')+'/mo';
 
-    // KPIs
-    document.getElementById('kpi-total').textContent=fmt(r.tU,'$')+'/yr';
-    document.getElementById('kpi-total-sub').textContent=fmt(r.tN,'S')+'/yr | '+fmt(r.tU/12,'$')+'/mo';
-    document.getElementById('kpi-jit').textContent=fmt(r.jG*p.p,'$')+'/yr';
-    document.getElementById('kpi-jit-sub').textContent=fmt(r.jG,'S')+'/yr';
-    document.getElementById('kpi-aot').textContent=fmt(r.aG*p.p,'$')+'/yr';
-    document.getElementById('kpi-aot-sub').textContent=fmt(r.aN,'S')+'/yr';
-    document.getElementById('kpi-mo').textContent=fmt(r.tU/12,'$');
-    document.getElementById('kpi-price').textContent='$'+p.p;
-    document.getElementById('kpi-jito').textContent=fmt(D.a.mev,'S');
-    document.getElementById('kpi-pf').textContent=fmt(D.a.pf,'S');
+    // === Revenue Distribution ===
+    document.getElementById('vg-base-usd').textContent=fmt(r.totalValBase*p.p,'$');
+    document.getElementById('vg-base-sol').textContent=fmt(r.totalValBase,'S')+' \u00b7 '+fmtPct(r.totalValBase/tg*100);
+    document.getElementById('vg-base-mo').textContent=fmt(r.totalValBase*p.p/12,'$')+'/mo';
+    document.getElementById('vg-bonus-usd').textContent=fmt(r.aotValBonus*p.p,'$');
+    document.getElementById('vg-bonus-sol').textContent=fmt(r.aotValBonus,'S')+' \u00b7 '+fmtPct(r.aotValBonus/tg*100);
+    document.getElementById('vg-bonus-mo').textContent=fmt(r.aotValBonus*p.p/12,'$')+'/mo';
 
-    // Breakdown JIT
-    document.getElementById('rb-jm').textContent=fmt(D.a.mev*p.p,'$')+' ('+fmt(D.a.mev,'S')+')';
-    document.getElementById('rb-js').textContent=Math.round(p.j*100)+'%';
-    document.getElementById('rb-jg').textContent=fmt(r.jG*p.p,'$')+' ('+fmt(r.jG,'S')+')';
-    document.getElementById('rb-jc').textContent=(p.c*100).toFixed(1)+'%';
-    document.getElementById('rb-jn').textContent=fmt(r.jU,'$')+'/yr ('+fmt(r.jN,'S')+')';
+    document.getElementById('tc-reb-aot-usd').textContent=fmt(r.aotRebate*p.p,'$');
+    document.getElementById('tc-reb-aot-sol').textContent=fmt(r.aotRebate,'S')+' \u00b7 '+fmtPct(r.aotRebate/tg*100);
+    document.getElementById('tc-reb-aot-mo').textContent=fmt(r.aotRebate*p.p/12,'$')+'/mo';
+    document.getElementById('tc-reb-jit-usd').textContent=fmt(r.jitRebate*p.p,'$');
+    document.getElementById('tc-reb-jit-sol').textContent=fmt(r.jitRebate,'S')+' \u00b7 '+fmtPct(r.jitRebate/tg*100);
+    document.getElementById('tc-reb-jit-mo').textContent=fmt(r.jitRebate*p.p/12,'$')+'/mo';
 
-    // Breakdown AOT
-    document.getElementById('rb-as').textContent=(p.s*100).toFixed(1)+'%';
-    document.getElementById('rb-al').textContent=fmt(r.ls,'#')+' slots/yr';
-    document.getElementById('rb-ac').textContent=fmt(r.cu,'#')+' CU ('+Math.round(p.b*100)+'% of 60M)';
-    document.getElementById('rb-af').textContent=(p.f<0.1?p.f.toFixed(3):p.f.toFixed(2))+' L/CU';
-    document.getElementById('rb-ags').textContent=fmt(r.aG,'S');
-    document.getElementById('rb-agu').textContent=fmt(r.aG*p.p,'$');
-    document.getElementById('rb-acc').textContent=(p.c*100).toFixed(1)+'%';
-    document.getElementById('rb-an').textContent=fmt(r.aU,'$')+'/yr ('+fmt(r.aN,'S')+')';
+    document.getElementById('tc-proto-usd').textContent=fmt(r.totalProtocolUSD,'$');
+    document.getElementById('tc-proto-sol').textContent=fmt(r.totalProtocol,'S')+' \u00b7 '+fmtPct(r.totalProtocol/tg*100);
+    document.getElementById('tc-proto-mo').textContent=fmt(r.totalProtocolUSD/12,'$')+'/mo';
 
-    // Distribution (commission breakdown)
-    document.getElementById('rd-g').textContent=fmt(r.tG*p.p,'$')+' ('+fmt(r.tG,'S')+')';
-    document.getElementById('rd-v').textContent=fmt(r.vS*p.p,'$')+' ('+Math.round((1-p.c)*100)+'%)';
-    document.getElementById('rd-comm').textContent=fmt(r.commission*p.p,'$')+' ('+Math.round(p.c*100)+'%)';
-    document.getElementById('rd-reb').textContent=fmt(r.rebates*p.p,'$')+' ('+(p.r*100).toFixed(1)+'%)';
-    document.getElementById('rd-vb').textContent=fmt(r.valBonus*p.p,'$')+' ('+(p.vb*100).toFixed(1)+'%)';
-    document.getElementById('rd-t').textContent=fmt(r.tU,'$')+'/yr';
-    document.getElementById('rd-m').textContent=fmt(r.tU/12,'$')+'/mo';
-    document.getElementById('rd-s').textContent=fmt(r.tN,'S');
+    // === JIT Data (in Data Sources section) ===
+    const js=getJitStats();
+    // Headline: USD primary (from slider value), SOL secondary
+    document.getElementById('jit-m-usd').textContent=fmt(p.jm*p.p,'$')+'/yr';
+    document.getElementById('jit-m-sol').textContent=fmt(p.jm,'S')+'/yr';
+    // Methodology fields
+    document.getElementById('jit-m-duration').textContent=js.epochs+' epochs ('+Math.round(js.totalDays)+' days)';
+    document.getElementById('jit-m-period').textContent=js.firstDate+' \u2192 '+js.lastDate;
+    document.getElementById('jit-ds-total-sol').textContent=fmt(js.totalSol,'S');
+    document.getElementById('jit-ds-total-days').textContent=Math.round(js.totalDays)+' days';
+    document.getElementById('jit-m-method-num').textContent=fmt(js.totalSol,'S');
+    document.getElementById('jit-m-method-days').textContent=Math.round(js.totalDays)+'d';
+    document.getElementById('jit-m-method-result').textContent=fmt(js.annualized,'S')+'/yr';
+    document.getElementById('jit-m-method-result2').textContent=fmt(js.annualized,'S')+'/yr';
+    // Badge: show if slider matches computed default or is user-adjusted
+    const isDefault = Math.abs(p.jm - _jitBaseline) < 1000;
+    document.getElementById('jit-ds-badge').textContent = isDefault ? 'data-driven default' : 'user-adjusted';
+    document.getElementById('jit-ds-badge').style.color = isDefault ? '' : '#F5A623';
+    // Dataset metadata
+    const allJit=D_JITO.filter(r=>r[1]>0);
+    const dsTE=document.getElementById('jit-ds-total-epochs');if(dsTE) dsTE.textContent=allJit.length;
+    const dsFE=document.getElementById('jit-ds-first-epoch');if(dsFE) dsFE.textContent=allJit[0]?allJit[0][0]:'?';
+    const dsLE=document.getElementById('jit-ds-last-epoch');if(dsLE) dsLE.textContent=allJit.length?allJit[allJit.length-1][0]:'?';
+    const dsWN=document.getElementById('jit-ds-window-n');if(dsWN) dsWN.textContent=js.epochs;
+    const dsAE=document.getElementById('jit-ds-avg-epoch');if(dsAE) dsAE.textContent=fmt(js.avgPerEpoch,'S');
+    const dsChR=document.getElementById('jit-chart-range');if(dsChR) dsChR.textContent=allJit[0]?allJit[0][0]+' \u2192 '+allJit[allJit.length-1][0]:'?';
 
-    // Scenarios
+    // === AOT Fee/CU Data (in Data Sources section) ===
+    const fcuEl = document.getElementById('aot-fcu-headline');
+    if (fcuEl) fcuEl.textContent = p.f < 0.1 ? p.f.toFixed(3) : p.f >= 10 ? p.f.toFixed(1) : p.f.toFixed(2);
+    const fcuBadge = document.getElementById('aot-fcu-badge');
+    if (fcuBadge) {
+        // Check if current fee/CU matches any scenario preset
+        const matchesSC = Object.values(SC).some(s => Math.abs(s.f - p.f) < 0.005);
+        fcuBadge.textContent = matchesSC ? 'scenario preset' : 'user-adjusted';
+        fcuBadge.style.color = matchesSC ? '' : '#F5A623';
+    }
+
+    // === Scenario cards ===
     ['con','base','opt','bull'].forEach(n=>{
-        const s=SC[n],sp={c:s.c/100,r:s.r/100,vb:s.vb/100,j:s.j/100,s:s.s/100,b:s.b/100,f:s.f,p:s.p};
+        const s=SC[n];
+        const sp={c:s.c, ra:s.ra, rj:s.rj, vb:s.vb, jm:s.jm, j:s.j/100, s:s.s/100, b:s.b/100, f:s.f, p:s.p};
         const sr=calc(sp);
-        document.getElementById('sc-'+n+'-v').textContent=fmt(sr.tU,'$')+'/yr';
-        const jP=sr.tU>0?Math.round(sr.jU/sr.tU*100):0, aP=sr.tU>0?Math.round(sr.aU/sr.tU*100):0;
-        document.getElementById('sc-'+n+'-d').textContent='JIT '+fmt(sr.jU,'$')+' ('+jP+'%) + AOT '+fmt(sr.aU,'$')+' ('+aP+'%)';
-        document.getElementById('sc-'+n+'-m').textContent=fmt(sr.tU/12,'$')+'/mo | '+fmt(sr.tN,'S');
+        document.getElementById('sc-'+n+'-v').textContent=fmt(sr.totalProtocolUSD,'$')+'/yr';
+        const jP=sr.totalProtocolUSD>0?Math.round(sr.jitProtocol*s.p/sr.totalProtocolUSD*100):0;
+        const aP=sr.totalProtocolUSD>0?Math.round(sr.aotProtocol*s.p/sr.totalProtocolUSD*100):0;
+        document.getElementById('sc-'+n+'-d').textContent='JIT '+fmt(sr.jitProtocol*s.p,'$')+' ('+jP+'%) + AOT '+fmt(sr.aotProtocol*s.p,'$')+' ('+aP+'%)';
+        document.getElementById('sc-'+n+'-m').textContent=fmt(sr.totalProtocolUSD/12,'$')+'/mo | '+fmt(sr.totalProtocol,'S');
     });
 
     updCharts(p,r);
     buildMatrix(p);
 }
 
-initCharts(); initFilters(); renderTable(); applyScenario('base');
+initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); initFilters(); renderTable(); applyScenario('base');
 
-// Populate Solana Data KPIs
-document.getElementById('dk-mev').textContent=fmt(D.a.mev,'S');
+// Populate Solana Data KPIs from computed stats
+const _js = getJitStats();
+document.getElementById('dk-mev').textContent=fmt(_js.annualized,'S')+'/yr (computed)';
 document.getElementById('dk-pf').textContent=fmt(D.a.pf,'S');
 document.getElementById('dk-price').textContent='$'+Math.round(D.a.price);
-document.getElementById('dk-epochs').textContent=D.a.n;
+document.getElementById('dk-epochs').textContent=_js.epochs+' recent';
 document.getElementById('dk-progs').textContent=D.p.filter(p=>p.prod!=='neither').length;
 
 // Tab switching
