@@ -752,7 +752,7 @@ details[open] summary::before { transform:rotate(90deg); }
         <div style="margin-bottom:16px;">
             <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;">Total Fee/CU by Subcategory (CU-weighted average)</div>
             <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Shows <strong>total fee per CU</strong> (base + priority) — the full revealed willingness-to-pay. This is the metric used in the Bull scenario.</div>
-            <div style="height:300px;background:#0a0b0c;border-radius:6px;padding:8px;"><canvas id="chart-aot-fcu-tiers"></canvas></div>
+            <div style="height:380px;background:#0a0b0c;border-radius:6px;padding:8px;"><canvas id="chart-aot-fcu-tiers"></canvas></div>
             <div style="font-size:11px;color:var(--text2);margin-top:6px;"><span style="color:#F5A623;font-weight:600;">Orange bars</span> = Prop AMM / high-fee tier. <span style="color:#5B8DEF;font-weight:600;">Blue bars</span> = Low-fee DeFi tier. Log scale. The ~50× gap between tiers drives the scenario ladder.</div>
         </div>
 
@@ -1326,7 +1326,9 @@ function initAotFcuSection(){
                     borderColor: barData.map(d => d.isHF ? '#F5A62380' : '#5B8DEF80'),
                     borderWidth: 1,
                     borderRadius: 3,
-                    barThickness: 22
+                    barThickness: 18,
+                    barPercentage: 0.7,
+                    categoryPercentage: 0.8
                 }]
             },
             options: {
