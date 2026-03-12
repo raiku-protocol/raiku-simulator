@@ -856,16 +856,16 @@ details[open] summary::before { transform:rotate(90deg); }
 
         <!-- Customer tier breakdown — BOTH metrics shown -->
         <div style="font-size:13px;color:var(--text);line-height:1.7;padding:14px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid var(--lime-soft);">
-            <div style="font-weight:600;color:var(--lime-soft);margin-bottom:8px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Two-tier customer structure (observed on-chain)</div>
-            <p style="margin:0 0 10px 0;">On-chain data reveals a <strong>bimodal fee structure</strong> among AOT-relevant Solana programs. We identify two distinct customer tiers, each with two measurable fee metrics:</p>
+            <div style="font-weight:600;color:var(--lime-soft);margin-bottom:8px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Core vs benchmark structure (observed on-chain)</div>
+            <p style="margin:0 0 10px 0;">Core AOT storytelling is based on <strong>aot + both</strong> application groups. JIT arbitrage/searcher programs are tracked as a <strong>separate benchmark</strong> and are not mixed into core customer economics.</p>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
                 <!-- Low-fee tier -->
                 <div style="padding:12px;background:#0a0b0c;border-radius:6px;border-left:3px solid #5B8DEF;">
-                    <div style="font-size:11px;color:#5B8DEF;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px;">Low-fee AOT customers</div>
+                    <div style="font-size:11px;color:#5B8DEF;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px;">Core AOT application groups</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
                         <div>
-                            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.3px;">Priority fee/CU</div>
+                            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.3px;">Non-base fee/CU</div>
                             <div style="font-size:17px;font-weight:700;font-family:var(--font-mono);color:var(--text);" id="aot-tier-low-pri">&mdash;</div>
                         </div>
                         <div>
@@ -874,14 +874,14 @@ details[open] summary::before { transform:rotate(90deg); }
                         </div>
                     </div>
                     <div style="font-size:10px;color:var(--text2);" id="aot-tier-low-stats">&mdash;</div>
-                    <div style="font-size:10px;color:var(--text-mid);margin-top:2px;">AMMs, lending, aggregators, perps, oracles, vaults</div>
+                    <div style="font-size:10px;color:var(--text-mid);margin-top:2px;">prop_amm, dex, lending, oracle, bridge, perps, ops_long_tail</div>
                 </div>
                 <!-- Prop AMM / high-fee tier -->
                 <div style="padding:12px;background:#0a0b0c;border-radius:6px;border-left:3px solid #F5A623;">
-                    <div style="font-size:11px;color:#F5A623;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px;">Prop AMM / high-fee customers</div>
+                    <div style="font-size:11px;color:#F5A623;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px;">Benchmark group (separate)</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
                         <div>
-                            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.3px;">Priority fee/CU</div>
+                            <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.3px;">Non-base fee/CU</div>
                             <div style="font-size:17px;font-weight:700;font-family:var(--font-mono);color:#F5A623;" id="aot-tier-high-pri">&mdash;</div>
                         </div>
                         <div>
@@ -890,31 +890,31 @@ details[open] summary::before { transform:rotate(90deg); }
                         </div>
                     </div>
                     <div style="font-size:10px;color:var(--text2);" id="aot-tier-high-stats">&mdash;</div>
-                    <div style="font-size:10px;color:var(--text-mid);margin-top:2px;">HumidiFi, BisonFi (Prop AMMs) + Phoenix, Manifest (orderbooks)</div>
+                    <div style="font-size:10px;color:var(--text-mid);margin-top:2px;">arbitrage_bot / jit (if present in artifact)</div>
                 </div>
             </div>
 
             <div style="font-size:11px;color:var(--text2);padding:6px 8px;background:#0a0b0c;border-radius:4px;">
-                <strong style="color:var(--text);">Priority fee/CU</strong> = incremental bid above the mandatory base fee (5000 lam/signature). Reflects marginal willingness to pay for transaction priority.<br>
-                <strong style="color:var(--text);">Total fee/CU</strong> = base + priority fees combined. Reflects the <em>full revealed willingness to pay</em> for blockspace — the reservation price.
+                <strong style="color:var(--text);">Non-base fee/CU</strong> = priority + Jito. Default analytical view for incremental willingness to pay.<br>
+                <strong style="color:var(--text);">Total fee/CU</strong> = base + priority + Jito. Reflects the <em>full revealed willingness to pay</em> for blockspace — the reservation price.
             </div>
 
-            <p style="margin:10px 0 0 0;color:var(--text2);font-size:12px;" id="aot-tier-key-fact">Key fact: Prop AMM / high-fee customers represent a small share of CU volume but generate the majority of AOT-relevant fee revenue on the current Solana network.</p>
+            <p style="margin:10px 0 0 0;color:var(--text2);font-size:12px;" id="aot-tier-key-fact">Key fact: Prop AMM has high fee intensity and should be read with dispersion metrics (median, p25/p75), not weighted mean alone.</p>
         </div>
 
         <!-- Methodology — metric-regime progression -->
         <div style="font-size:13px;color:var(--text);line-height:1.7;padding:14px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid var(--lime-soft);">
             <div style="font-weight:600;color:var(--lime-soft);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">How the scenario fee/CU values are determined</div>
 
-            <p style="margin:0 0 10px 0;">Each scenario represents a different <strong>customer acquisition outcome</strong> and a different <strong>market pressure regime</strong>. The key insight is that the <em>relevant fee metric itself shifts</em> as demand for AOT blockspace increases:</p>
+            <p style="margin:0 0 10px 0;">Each scenario represents a different <strong>demand regime</strong>. Default anchor is non-base fee/CU, with total fee/CU as high-competition comparison:</p>
 
             <div style="padding:10px 14px;background:#0a0b0c;border-radius:6px;margin-bottom:10px;font-size:12px;line-height:1.8;">
-                <div style="margin-bottom:6px;"><strong style="color:#5B8DEF;">Low demand (Conservative / Base):</strong> Auction bids are anchored to <strong>priority fee/CU</strong> — the incremental cost above the mandatory base fee. In this regime, blockspace is abundant and bids reflect marginal willingness to pay. Observed: low-fee DeFi ~<span id="meth-pri-low">&mdash;</span> lam/CU, Prop AMMs ~<span id="meth-pri-high">&mdash;</span> lam/CU.</div>
-                <div style="margin-bottom:6px;"><strong style="color:#E8D44D;">Transition (Optimistic):</strong> As Prop AMM share grows and blockspace becomes scarcer, auction bids <strong>move above marginal priority fees</strong> toward the full reservation price. Bids reflect increasing competition, not just priority-fee logic.</div>
-                <div><strong style="color:#F5A623;">High demand (Bull):</strong> Fully competitive market — bids converge on <strong>total fee/CU</strong>, the full revealed willingness to pay. Observed: Prop AMMs ~<span id="meth-tot-high">&mdash;</span> lam/CU. This is the theoretical ceiling where fee = reservation price.</div>
+                <div style="margin-bottom:6px;"><strong style="color:#5B8DEF;">Low demand (Conservative / Base):</strong> anchored on <strong>non-base fee/CU</strong> (priority + Jito). Observed p25/core weighted references: <span id="meth-pri-low">&mdash;</span> / <span id="meth-pri-high">&mdash;</span> lam/CU.</div>
+                <div style="margin-bottom:6px;"><strong style="color:#E8D44D;">Transition (Optimistic):</strong> blend between non-base and total fee/CU as scarcity rises.</div>
+                <div><strong style="color:#F5A623;">High demand (Bull):</strong> anchored on <strong>total fee/CU</strong> (base + priority + Jito). Prop AMM high-intensity reference: <span id="meth-tot-high">&mdash;</span> lam/CU.</div>
             </div>
 
-            <p style="margin:0;color:var(--text2);font-size:12px;">In summary: the scenario ladder spans from conservative priority-fee-based estimates to aggressive total-fee-based valuations of AOT blockspace. Both metrics are real, observed on-chain — the question is which regime applies given the competitive pressure in each scenario.</p>
+            <p style="margin:0;color:var(--text2);font-size:12px;">In summary: the scenario ladder spans from conservative non-base-based estimates to aggressive total-fee-based valuations of AOT blockspace. Both metrics are real, observed on-chain — the question is which regime applies given the competitive pressure in each scenario.</p>
         </div>
 
         <!-- Scenario customer mix table — with metric regime column -->
@@ -925,7 +925,7 @@ details[open] summary::before { transform:rotate(90deg); }
                     <thead style="background:#111213;">
                         <tr style="border-bottom:1px solid var(--card-border);">
                             <th style="padding:10px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Scenario</th>
-                            <th style="padding:10px 10px;text-align:center;color:#F5A623;font-size:10px;text-transform:uppercase;">Prop AMM share</th>
+                            <th style="padding:10px 10px;text-align:center;color:#F5A623;font-size:10px;text-transform:uppercase;">High-intensity share (illustrative)</th>
                             <th style="padding:10px 10px;text-align:right;color:var(--text);font-size:10px;text-transform:uppercase;">Fee/CU</th>
                             <th style="padding:10px 10px;text-align:left;color:var(--text2);font-size:10px;text-transform:uppercase;">Metric anchor</th>
                             <th style="padding:10px 10px;text-align:left;color:var(--text2);font-size:10px;text-transform:uppercase;">Economic logic</th>
@@ -935,30 +935,30 @@ details[open] summary::before { transform:rotate(90deg); }
                         <tr style="border-bottom:1px solid #1a1a1a;">
                             <td style="padding:8px 10px;color:var(--text);font-weight:600;">Conservative</td>
                             <td style="padding:8px 10px;text-align:center;color:#F5A623;">0%</td>
-                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;">0.40 L</td>
-                            <td style="padding:8px 10px;color:#5B8DEF;font-size:11px;font-family:var(--font-display);">Priority fee/CU</td>
-                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">Low demand — bids = incremental priority fees. Standard DeFi only.</td>
+                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;"><span id="sc-fee-con">&mdash;</span> L</td>
+                            <td style="padding:8px 10px;color:#5B8DEF;font-size:11px;font-family:var(--font-display);">Non-base p25</td>
+                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">Low demand anchor from core p25 non-base fee/CU.</td>
                         </tr>
                         <tr style="border-bottom:1px solid #1a1a1a;">
                             <td style="padding:8px 10px;color:var(--text);font-weight:600;">Base Case</td>
                             <td style="padding:8px 10px;text-align:center;color:#F5A623;">5%</td>
-                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;">0.60 L</td>
-                            <td style="padding:8px 10px;color:#5B8DEF;font-size:11px;font-family:var(--font-display);">Blended priority fee/CU</td>
-                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">Still priority-fee logic, but ~5% Prop AMM lifts the blended avg (~4.5 lam/CU Prop AMM priority vs ~0.4 low-fee).</td>
+                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;"><span id="sc-fee-base">&mdash;</span> L</td>
+                            <td style="padding:8px 10px;color:#5B8DEF;font-size:11px;font-family:var(--font-display);">Non-base weighted</td>
+                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">Core CU-weighted non-base anchor across frozen AOT groups.</td>
                         </tr>
                         <tr style="border-bottom:1px solid #1a1a1a;">
                             <td style="padding:8px 10px;color:var(--text);font-weight:600;">Optimistic</td>
                             <td style="padding:8px 10px;text-align:center;color:#F5A623;">25%</td>
-                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;">3.50 L</td>
+                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;"><span id="sc-fee-opt">&mdash;</span> L</td>
                             <td style="padding:8px 10px;color:#E8D44D;font-size:11px;font-family:var(--font-display);">Transition regime</td>
-                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">Scarcity emerges — bids move above priority fees toward total willingness-to-pay.</td>
+                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">Scarcity emerges — blended anchor between non-base and total fee/CU.</td>
                         </tr>
                         <tr>
                             <td style="padding:8px 10px;color:var(--text);font-weight:600;">Bull</td>
                             <td style="padding:8px 10px;text-align:center;color:#F5A623;">100%</td>
-                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;">20.00 L</td>
+                            <td style="padding:8px 10px;text-align:right;color:var(--text);font-weight:700;"><span id="sc-fee-bull">&mdash;</span> L</td>
                             <td style="padding:8px 10px;color:#F5A623;font-size:11px;font-family:var(--font-display);">Total fee/CU</td>
-                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">Full competition — bids = reservation price (total fee/CU ~20 lam for Prop AMMs).</td>
+                            <td style="padding:8px 10px;color:var(--text2);font-size:11px;font-family:var(--font-display);">High-demand anchor on CU-weighted total fee/CU (reservation-price regime).</td>
                         </tr>
                     </tbody>
                 </table>
@@ -973,7 +973,7 @@ details[open] summary::before { transform:rotate(90deg); }
                     <thead style="position:sticky;top:0;background:#111213;">
                         <tr style="border-bottom:1px solid var(--card-border);">
                             <th style="padding:8px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Program</th>
-                            <th style="padding:8px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Tier</th>
+                            <th style="padding:8px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Group</th>
                             <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Non-base fee/CU</th>
                             <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Total fee/CU</th>
                             <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">CU (Billions)</th>
@@ -992,22 +992,22 @@ details[open] summary::before { transform:rotate(90deg); }
             <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;">Non-base Fee/CU by Segment (CU-weighted average)</div>
             <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Default analytical view: <strong>non-base fee per CU</strong> (priority + Jito). Tooltips include <strong>total fee/CU</strong> (base + priority + Jito) as comparison.</div>
             <div style="height:380px;background:#0a0b0c;border-radius:6px;padding:8px;"><canvas id="chart-aot-fcu-tiers"></canvas></div>
-            <div style="font-size:11px;color:var(--text2);margin-top:6px;"><span style="color:#F5A623;font-weight:600;">Orange bars</span> = Prop AMM / high-fee tier. <span style="color:#5B8DEF;font-weight:600;">Blue bars</span> = Low-fee DeFi tier. Log scale. The ~50× gap between tiers drives the scenario ladder.</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:6px;">Bars show frozen core groups in fixed order. Primary = non-base fee/CU, secondary (tooltip) = total fee/CU, with dispersion context in group notes.</div>
         </div>
 
         <!-- Source metadata -->
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px 18px;font-size:12px;margin-bottom:16px;">
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Source</span><br><span style="color:var(--text);font-weight:500;">Dune Analytics (on-chain)</span></div>
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Source</span><br><span style="color:var(--text);font-weight:500;">Upstream canonical artifact (revenue-model output)</span></div>
             <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Metrics</span><br><span style="color:var(--text);font-weight:500;">non-base fee/CU + total fee/CU</span></div>
             <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Dataset</span><br><span style="color:var(--text);font-weight:500;">data/aot_programs.v1.js</span></div>
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Weighting</span><br><span style="color:var(--text);font-weight:500;">CU-weighted avg per tier</span></div>
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Weighting</span><br><span style="color:var(--text);font-weight:500;">CU-weighted avg per group</span></div>
         </div>
 
         <!-- Inclusions / Exclusions -->
         <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;">
             <div style="margin-bottom:6px;"><span style="color:#8ddb6a;font-size:14px;">&#9745;</span> <strong style="color:var(--text);">What this includes:</strong> Only Solana programs flagged as <em>AOT-relevant</em> in the canonical upstream taxonomy. Non-base (priority + Jito) and total fees (base + priority + Jito) over a 30-day period, weighted by CU consumption.</div>
-            <div style="margin-bottom:6px;"><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">What this excludes:</strong> JIT-only programs (trading bots, searchers), system programs (ComputeBudget, Token Program), and programs with no meaningful fee activity.</div>
-            <div style="color:var(--text2);font-style:italic;">The Prop AMM / high-fee tier is currently dominated by <strong>HumidiFi</strong> and <strong>BisonFi</strong> (proprietary AMMs with matching engines). As more Prop AMM-style protocols emerge on Solana, the high-fee tier could grow substantially.</div>
+            <div style="margin-bottom:6px;"><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">What this excludes from core display:</strong> `neither` and `potential` populations. JIT arbitrage/searcher programs are benchmarked separately.</div>
+            <div style="color:var(--text2);font-style:italic;">Dispersion matters: weighted averages can diverge materially from median for some groups, so caveat notes and p25/p75 are required in category interpretation.</div>
         </div>
     </div>
     </details>
@@ -1081,7 +1081,7 @@ details[open] summary::before { transform:rotate(90deg); }
 <!-- C. CATEGORY EXPLORER (reference data for fragment selection) -->
 <div class="section fade-in fade-in-2">
     <h2 style="margin-bottom:8px;">Category Explorer</h2>
-    <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">Business categories aggregated from loaded AOT-relevant programs in <code style="font-size:10px">data/aot_programs.v1.js</code> · Window: from artifact metadata</div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">Frozen structure (from project spec): <strong>prop_amm, dex, lending, oracle, bridge, perps, ops_long_tail</strong>. Core scope uses <strong>aot + both</strong>. Benchmark is shown separately (<strong>arbitrage_bot / jit</strong>).</div>
 
     <!-- Normal / Peak toggle -->
     <div class="regime-toggle">
@@ -1102,6 +1102,11 @@ details[open] summary::before { transform:rotate(90deg); }
             <div style="height:320px;background:#0a0b0c;border-radius:6px;padding:8px;"><canvas id="chart-cat-fcu"></canvas></div>
         </div>
     </div>
+
+    <!-- Strict spec blocks -->
+    <div id="sim-dex-breakdown" style="margin-bottom:12px;"></div>
+    <div id="sim-benchmark-block" style="margin-bottom:12px;"></div>
+    <div id="sim-caveat-legend" style="margin-bottom:6px;"></div>
 
     <!-- v6: Temporal context + distribution stats -->
     <div id="sim-cat-distrib-view"></div>
@@ -1124,14 +1129,15 @@ details[open] summary::before { transform:rotate(90deg); }
                     <strong>Input artifact:</strong> <code>data/aot_programs.v1.js</code> (produced upstream from canonical revenue-model outputs)<br>
                     <strong>Schema:</strong> <code>aot_programs.v1</code><br>
                     <strong>Period:</strong> 30-day window from artifact metadata<br>
-                    <strong>Programs:</strong> AOT-relevant rows from artifact with CU &gt; 0
+                    <strong>Programs:</strong> Artifact rows with CU &gt; 0 (core: <code>aot + both</code>, benchmark: <code>jit</code> where available)
                 </div>
             </div>
             <div class="meth-card">
                 <div class="meth-card-title">Aggregation Method</div>
                 <div class="meth-card-body">
-                    Fee/CU values are <strong>CU-weighted averages</strong> across all programs in each business category. Programs consuming more compute units have proportionally more influence on the category's fee/CU.<br>
-                    <code>fee/CU = Σ(total_fees) × 10⁹ / Σ(CU)</code>
+                    Fee/CU values are <strong>CU-weighted averages</strong> across programs in each frozen group. Programs consuming more compute units have proportionally more influence on group metrics.<br>
+                    <code>non-base fee/CU = Σ(priority + jito) × 10⁹ / Σ(CU)</code><br>
+                    <code>total fee/CU = Σ(base + priority + jito) × 10⁹ / Σ(CU)</code>
                 </div>
             </div>
             <div class="meth-card">
@@ -1143,8 +1149,8 @@ details[open] summary::before { transform:rotate(90deg); }
             <div class="meth-card">
                 <div class="meth-card-title">Category Mapping</div>
                 <div class="meth-card-body">
-                    Business categories consume <code>segment_key</code> and <code>tier_key</code> directly from the artifact contract. Prop AMM remains listed first for strategic readability.<br>
-                    <span class="meth-mapping">UI labels are mapped from artifact segment keys (prop_amm, orderbook, amm_pools, perps, lending, aggregator, oracle, bridge, trading_bots, infra, other).</span>
+                    Runtime groups consume <code>segment_key</code> directly from the artifact contract and follow the frozen UI structure.<br>
+                    <span class="meth-mapping">Core groups: <code>prop_amm</code>, <code>dex</code> (aggregator + amm_family + orderbook), <code>lending</code>, <code>oracle</code>, <code>bridge</code>, <code>perps</code>, <code>ops_long_tail</code> (cranker + depin + payments). Benchmark group is separated: <code>arbitrage_bot</code> (<code>jit</code>).</span>
                 </div>
             </div>
         </div>
@@ -1160,7 +1166,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 </div>
             </div>
         </div>
-        <button class="raw-db-toggle" id="sim-raw-toggle-btn" onclick="toggleRawDB()">📋 Inspect Raw Program Data (228 programs)</button>
+        <button class="raw-db-toggle" id="sim-raw-toggle-btn" onclick="toggleRawDB()">📋 Inspect Raw Program Data</button>
     </details>
 </div>
 
@@ -1171,7 +1177,7 @@ details[open] summary::before { transform:rotate(90deg); }
         <div style="font-size:11px;color:var(--text2);margin-bottom:12px;">Program-level AOT artifact data (<code>data/aot_programs.v1.js</code>) from upstream canonical pipeline output. Filter by product type, segment, or search by name/address.</div>
         <div class="filter-row">
             <select id="f-prod" onchange="renderTable()"><option value="all">All Products</option><option value="aot">AOT</option><option value="both">Both</option></select>
-            <select id="f-sub" onchange="renderTable()"><option value="all">All Subcategories</option></select>
+            <select id="f-sub" onchange="renderTable()"><option value="all">All Segments</option></select>
             <input type="text" id="f-search" placeholder="Search..." oninput="renderTable()">
             <label><input type="checkbox" id="f-hide-sys" checked onchange="renderTable()"> Hide system programs</label>
         </div>
@@ -1180,8 +1186,8 @@ details[open] summary::before { transform:rotate(90deg); }
 
     <!-- FEE/CU BY SUBCATEGORY (program-level data) -->
     <div class="section fade-in" style="margin-top:var(--gap);">
-        <h2>Fee/CU by Program Subcategory</h2>
-        <div class="note" style="margin-bottom:10px">CU-weighted average fee/CU (lamports per compute unit) across on-chain program subcategories. Higher = more valuable blockspace demand. Source: Dune Analytics.</div>
+        <h2>Fee/CU by Program Segment</h2>
+        <div class="note" style="margin-bottom:10px">Average non-base fee/CU (lamports per compute unit) across program segments from the loaded artifact. Higher = stronger revealed blockspace willingness-to-pay.</div>
         <div class="chart-box" style="min-height:260px;"><canvas id="chart-fcu"></canvas></div>
     </div>
 </div>
@@ -1286,39 +1292,90 @@ const AOT_PROGRAMS = _aotArtifact.programs.map(r => {
         tx: 0
     };
 });
-const _aotProgs = AOT_PROGRAMS.filter(p => p.is_aot_relevant && p.cu > 0 && (p.prod === 'aot' || p.prod === 'both'));
-const _tierAgg = { low: {cu:0, nb:0, tf:0, n:0}, high: {cu:0, nb:0, tf:0, n:0} };
-_aotProgs.forEach(p => {
-    const t = p.tier_key === 'high' ? _tierAgg.high : _tierAgg.low;
-    t.cu += p.cu; t.nb += (p.pf + p.jt); t.tf += (p.tf || 0); t.n++;
-});
-const AOT_NB_LOW   = _tierAgg.low.cu > 0 ? _tierAgg.low.nb / _tierAgg.low.cu : 0;
-const AOT_NB_HIGH  = _tierAgg.high.cu > 0 ? _tierAgg.high.nb / _tierAgg.high.cu : 0;
-const AOT_TOT_LOW  = _tierAgg.low.cu > 0 ? _tierAgg.low.tf / _tierAgg.low.cu : 0;
-const AOT_TOT_HIGH = _tierAgg.high.cu > 0 ? _tierAgg.high.tf / _tierAgg.high.cu : 0;
-const _tierStats = {
-    low:  { n: _tierAgg.low.n,  cu: _tierAgg.low.cu,  nonBaseSol: _tierAgg.low.nb,  tf: _tierAgg.low.tf,  priPerCU: AOT_NB_LOW,  totPerCU: AOT_TOT_LOW },
-    high: { n: _tierAgg.high.n, cu: _tierAgg.high.cu, nonBaseSol: _tierAgg.high.nb, tf: _tierAgg.high.tf, priPerCU: AOT_NB_HIGH, totPerCU: AOT_TOT_HIGH },
+const CORE_GROUP_SPECS = [
+    { id: 'prop_amm', label: 'Prop AMM', segments: ['prop_amm'], color: '#F5A623', order: 1 },
+    { id: 'dex', label: 'DEX', segments: ['aggregator', 'amm_pools', 'amm', 'clmm', 'dlmm', 'pool', 'stableswap', 'bonding_curve', 'swap', 'liquidity', 'launchpad', 'orderbook'], color: '#5B8DEF', order: 2 },
+    { id: 'lending', label: 'Lending', segments: ['lending'], color: '#4EBF9A', order: 3 },
+    { id: 'oracle', label: 'Oracle', segments: ['oracle'], color: '#D4D86A', order: 4 },
+    { id: 'bridge', label: 'Bridge', segments: ['bridge'], color: '#E07070', order: 5 },
+    { id: 'perps', label: 'Perps', segments: ['perps'], color: '#8B6FE8', order: 6 },
+    { id: 'ops_long_tail', label: 'Ops Long Tail', segments: ['cranker', 'depin', 'payments'], color: '#7A7E85', order: 7 }
+];
+const DEX_COMPONENT_SPECS = [
+    { id: 'aggregator', label: 'Aggregator', segments: ['aggregator'], color: '#6ECFCF' },
+    { id: 'amm_family', label: 'AMM Family', segments: ['amm_pools', 'amm', 'clmm', 'dlmm', 'pool', 'stableswap', 'bonding_curve', 'swap', 'liquidity', 'launchpad'], color: '#5B8DEF' },
+    { id: 'orderbook', label: 'Orderbook', segments: ['orderbook'], color: '#E8813A' }
+];
+const CAVEAT_NOTES = {
+    prop_amm: 'Moderate dispersion; weighted mean above median.',
+    dex: 'Moderate dispersion; see DEX component breakdown.',
+    lending: 'Large concentration; weighted mean dominated by top programs.',
+    oracle: 'Large concentration; weighted mean dominated by top programs.',
+    bridge: 'Skewed volume profile; median above weighted mean.',
+    perps: 'Low non-base intensity; median near zero.',
+    ops_long_tail: 'Heterogeneous long tail; use as directional signal.',
+    benchmark_arbitrage_bot: 'Benchmark only; not part of core AOT customer pool.'
 };
-const _highCUShare = (_tierAgg.high.cu / (_tierAgg.low.cu + _tierAgg.high.cu || 1) * 100);
-const _highFeeShare = (_tierAgg.high.tf / (_tierAgg.low.tf + _tierAgg.high.tf || 1) * 100);
-const _obsHighShare = Math.max(0, Math.min(1, (_tierAgg.high.cu / (_tierAgg.low.cu + _tierAgg.high.cu || 1))));
-const _blend = (w, lo, hi) => (1 - w) * lo + w * hi;
-const _fCon = _blend(0.00, AOT_NB_LOW, AOT_NB_HIGH);
-const _fBase = _blend(_obsHighShare, AOT_NB_LOW, AOT_NB_HIGH);
-const _wOpt = Math.max(_obsHighShare, 0.25);
-const _fOptNB = _blend(_wOpt, AOT_NB_LOW, AOT_NB_HIGH);
-const _fOptTOT = _blend(_wOpt, AOT_TOT_LOW, AOT_TOT_HIGH);
-const _fOpt = (_fOptNB + _fOptTOT) / 2;
-const _fBull = AOT_TOT_HIGH;
+const BENCHMARK_SEGMENT_KEYS = new Set(['arbitrage_bot', 'arb_bot', 'trading_bots']);
+
+const _aotProgs = AOT_PROGRAMS.filter(p => p.is_aot_relevant && p.cu > 0 && (p.prod === 'aot' || p.prod === 'both'));
+const _jitBenchmarkProgs = AOT_PROGRAMS.filter(p => p.cu > 0 && p.prod === 'jit' && BENCHMARK_SEGMENT_KEYS.has(p.segment_key));
+
+function _quantile(vals, q) {
+    if (!vals.length) return 0;
+    const a = vals.slice().sort((x, y) => x - y);
+    const idx = (a.length - 1) * q;
+    const lo = Math.floor(idx), hi = Math.ceil(idx);
+    if (lo === hi) return a[lo];
+    return a[lo] + (a[hi] - a[lo]) * (idx - lo);
+}
+function _aggPrograms(progs) {
+    const cu = progs.reduce((s, p) => s + p.cu, 0);
+    const nb = progs.reduce((s, p) => s + (p.pf + p.jt), 0);
+    const tf = progs.reduce((s, p) => s + p.tf, 0);
+    const nbVals = progs.map(p => p.fpc_nb);
+    return {
+        n: progs.length,
+        cu,
+        nonBaseSol: nb,
+        totalSol: tf,
+        weightedNonBase: cu > 0 ? nb / cu : 0,
+        weightedTotal: cu > 0 ? tf / cu : 0,
+        medianNonBase: _quantile(nbVals, 0.5),
+        p25NonBase: _quantile(nbVals, 0.25),
+        p75NonBase: _quantile(nbVals, 0.75)
+    };
+}
+function _filterBySegments(progs, segments) {
+    return progs.filter(p => segments.includes(p.segment_key));
+}
+const _coreAggByGroup = {};
+CORE_GROUP_SPECS.forEach(g => {
+    _coreAggByGroup[g.id] = _aggPrograms(_filterBySegments(_aotProgs, g.segments));
+});
+const _dexAggByComponent = {};
+DEX_COMPONENT_SPECS.forEach(g => {
+    _dexAggByComponent[g.id] = _aggPrograms(_filterBySegments(_aotProgs, g.segments));
+});
+const _benchmarkAgg = _aggPrograms(_jitBenchmarkProgs);
+
+const _scenarioPool = CORE_GROUP_SPECS
+    .map(g => _filterBySegments(_aotProgs, g.segments))
+    .flat();
+const _scenarioAgg = _aggPrograms(_scenarioPool);
+
+const _fCon = +_scenarioAgg.p25NonBase.toFixed(2);
+const _fBase = +_scenarioAgg.weightedNonBase.toFixed(2);
+const _fOpt = +((_scenarioAgg.weightedNonBase + _scenarioAgg.weightedTotal) / 2).toFixed(2);
+const _fBull = +_scenarioAgg.weightedTotal.toFixed(2);
 
 const SC = {
     con:  {c:5,j:2,s:1,b:5,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:Math.round(_jitBaseline*0.6/1000)*1000,
-           desc:"Conservative — non-base anchor (priority + Jito), low-demand regime."},
+           desc:"Conservative — p25 non-base anchor (priority + Jito), low-demand regime."},
     base: {c:5,j:5,s:5,b:10,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
-           desc:"Base Case — non-base anchor using observed tier mix from artifact data."},
+           desc:"Base Case — CU-weighted non-base anchor across core AOT groups."},
     opt:  {c:5,j:10,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:1500000,
-           desc:"Optimistic — transition regime: blend of non-base and total fee views as scarcity rises."},
+           desc:"Optimistic — transition regime: blend of non-base and total fee anchors."},
     bull: {c:5,j:20,s:30,b:20,f:+_fBull.toFixed(2),p:250,ra:1.00,rj:0.50,vb:2.0,jm:5000000,
            desc:"Bull — total-fee anchor (base + priority + Jito), high-demand reservation-price regime."},
 };
@@ -1465,7 +1522,7 @@ function initCharts(){
     cP=new Chart(document.getElementById('chart-price'),{type:'line',data:{labels:D.e.map(e=>e.e),datasets:[{label:'SOL',data:D.e.map(e=>e.p),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:false}]},options:{...o,scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'Epoch'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'Price (USD)'}}}}});
     const st={};AOT_PROGRAMS.forEach(p=>{if(p.fpc_nb>0){const k=p.segment_key||p.sub||'other';if(!st[k])st[k]=[];st[k].push(p.fpc_nb);}});
     const ss=Object.entries(st).map(([k,v])=>({k,a:v.reduce((a,b)=>a+b,0)/v.length})).sort((a,b)=>b.a-a.a).slice(0,15);
-    cF=new Chart(document.getElementById('chart-fcu'),{type:'bar',data:{labels:ss.map(s=>s.k),datasets:[{label:'Avg Fee/CU (L)',data:ss.map(s=>s.a),backgroundColor:'#d4e8a0'}]},options:{...o,plugins:{...o.plugins,legend:{display:false}},scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'Subcategory'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'Fee/CU (lamports)'}}}}});
+    cF=new Chart(document.getElementById('chart-fcu'),{type:'bar',data:{labels:ss.map(s=>s.k),datasets:[{label:'Avg Non-base Fee/CU (L)',data:ss.map(s=>s.a),backgroundColor:'#d4e8a0'}]},options:{...o,plugins:{...o.plugins,legend:{display:false}},scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'Segment'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'Non-base Fee/CU (lamports)'}}}}});
 
 }
 
@@ -1673,41 +1730,57 @@ function initFilters(){
 }
 
 // --- AOT Fee/CU Data Section initialization ---
+var cAotFcuTiers = null;
 function initAotFcuSection(){
     const aotProgs = _aotProgs;
+    const fmtFpc = v => v >= 10 ? v.toFixed(1) : v >= 1 ? v.toFixed(2) : v.toFixed(3);
+    const core = _scenarioAgg;
+    const bench = _benchmarkAgg;
+    const prop = _coreAggByGroup.prop_amm || { cu: 0, totalSol: 0, weightedNonBase: 0, weightedTotal: 0 };
+    const coreCu = core.cu || 1;
+    const coreFees = core.totalSol || 1;
+    const propCuShare = prop.cu / coreCu * 100;
+    const propFeeShare = prop.totalSol / coreFees * 100;
 
-    // --- 0. Populate tier summary cards (default = non-base, secondary = total) ---
-    const fmtFpc = v => v >= 10 ? v.toFixed(1) : v >= 1 ? v.toFixed(2) : v.toFixed(2);
-    const tlp = document.getElementById('aot-tier-low-pri');  if (tlp) tlp.textContent = fmtFpc(_tierStats.low.priPerCU) + ' lam/CU';
-    const tlt = document.getElementById('aot-tier-low-tot');  if (tlt) tlt.textContent = fmtFpc(_tierStats.low.totPerCU) + ' lam/CU';
+    // Backward-compatible cards in existing macro section
+    const tlp = document.getElementById('aot-tier-low-pri');  if (tlp) tlp.textContent = fmtFpc(core.weightedNonBase) + ' lam/CU';
+    const tlt = document.getElementById('aot-tier-low-tot');  if (tlt) tlt.textContent = fmtFpc(core.weightedTotal) + ' lam/CU';
     const tls = document.getElementById('aot-tier-low-stats');
-    if (tls) tls.textContent = _tierStats.low.n + ' programs · ' + Math.round(_tierStats.low.cu).toLocaleString() + 'B CU · ' + fmt(_tierStats.low.nonBaseSol,'c') + ' SOL non-base · ' + fmt(_tierStats.low.tf,'c') + ' SOL total (30d)';
-    const thp = document.getElementById('aot-tier-high-pri'); if (thp) thp.textContent = fmtFpc(_tierStats.high.priPerCU) + ' lam/CU';
-    const tht = document.getElementById('aot-tier-high-tot'); if (tht) tht.textContent = fmtFpc(_tierStats.high.totPerCU) + ' lam/CU';
+    if (tls) tls.textContent = core.n + ' programs · ' + Math.round(core.cu).toLocaleString() + 'B CU · ' + fmt(core.nonBaseSol,'c') + ' SOL non-base · ' + fmt(core.totalSol,'c') + ' SOL total (30d)';
+    const thp = document.getElementById('aot-tier-high-pri'); if (thp) thp.textContent = bench.n > 0 ? (fmtFpc(bench.weightedNonBase) + ' lam/CU') : '—';
+    const tht = document.getElementById('aot-tier-high-tot'); if (tht) tht.textContent = bench.n > 0 ? (fmtFpc(bench.weightedTotal) + ' lam/CU') : '—';
     const ths = document.getElementById('aot-tier-high-stats');
-    if (ths) ths.textContent = _tierStats.high.n + ' programs · ' + Math.round(_tierStats.high.cu).toLocaleString() + 'B CU · ' + fmt(_tierStats.high.nonBaseSol,'c') + ' SOL non-base · ' + fmt(_tierStats.high.tf,'c') + ' SOL total (30d)';
+    if (ths) ths.textContent = bench.n > 0
+        ? (bench.n + ' programs · ' + Math.round(bench.cu).toLocaleString() + 'B CU · ' + fmt(bench.nonBaseSol,'c') + ' SOL non-base · ' + fmt(bench.totalSol,'c') + ' SOL total (30d)')
+        : 'No benchmark rows in current artifact (expected when artifact ships only AOT/Both scope).';
     const kf = document.getElementById('aot-tier-key-fact');
-    if (kf) kf.innerHTML = 'Key fact: High-tier customers represent only <strong>' + _highCUShare.toFixed(1) + '% of CU volume</strong> but generate <strong>' + _highFeeShare.toFixed(1) + '% of total AOT-relevant fee revenue</strong>.';
-    const mpl = document.getElementById('meth-pri-low');   if (mpl) mpl.textContent = fmtFpc(_tierStats.low.priPerCU);
-    const mph = document.getElementById('meth-pri-high');  if (mph) mph.textContent = fmtFpc(_tierStats.high.priPerCU);
-    const mth = document.getElementById('meth-tot-high');  if (mth) mth.textContent = fmtFpc(_tierStats.high.totPerCU);
+    if (kf) kf.innerHTML = 'Key fact: <strong>Prop AMM</strong> represents <strong>' + propCuShare.toFixed(1) + '% of core CU</strong> but contributes <strong>' + propFeeShare.toFixed(1) + '% of core total fees</strong>.';
+    const mpl = document.getElementById('meth-pri-low');   if (mpl) mpl.textContent = fmtFpc(core.p25NonBase);
+    const mph = document.getElementById('meth-pri-high');  if (mph) mph.textContent = fmtFpc(prop.weightedNonBase);
+    const mth = document.getElementById('meth-tot-high');  if (mth) mth.textContent = fmtFpc(prop.weightedTotal);
+    const sfCon = document.getElementById('sc-fee-con'); if (sfCon) sfCon.textContent = _fCon.toFixed(2);
+    const sfBase = document.getElementById('sc-fee-base'); if (sfBase) sfBase.textContent = _fBase.toFixed(2);
+    const sfOpt = document.getElementById('sc-fee-opt'); if (sfOpt) sfOpt.textContent = _fOpt.toFixed(2);
+    const sfBull = document.getElementById('sc-fee-bull'); if (sfBull) sfBull.textContent = _fBull.toFixed(2);
 
-    // --- 1. Populate top-programs table ---
+    // Top programs table (group-aware, non-base primary)
+    const groupBySegment = (seg) => {
+        const hit = CORE_GROUP_SPECS.find(g => g.segments.includes(seg));
+        return hit ? hit.label : seg;
+    };
     const sorted = aotProgs.filter(p => p.tf > 0).sort((a,b) => (b.tf||0) - (a.tf||0)).slice(0, 20);
     let tbody = '';
     sorted.forEach(p => {
-        const isHF = p.tier_key === 'high';
-        const tierLabel = isHF ? '<span style="color:#F5A623;font-weight:600;">High-tier</span>' : '<span style="color:#5B8DEF;">Standard</span>';
+        const grp = groupBySegment(p.segment_key);
         const nbFpc = p.fpc_nb > 0 ? (p.fpc_nb >= 10 ? p.fpc_nb.toFixed(1) : p.fpc_nb.toFixed(4)) : '—';
         const totFpc = p.fpc_tot > 0 ? (p.fpc_tot >= 10 ? p.fpc_tot.toFixed(1) : p.fpc_tot.toFixed(2)) : '—';
         const nonBaseSol = (p.pf || 0) + (p.jt || 0);
         const cuDisp = p.cu > 0 ? p.cu.toFixed(1) : '—';
-        const clr = isHF ? '#F5A623' : 'var(--text)';
         tbody += '<tr style="border-bottom:1px solid #1a1a1a;">';
         tbody += '<td style="padding:6px 8px;color:var(--text);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+p.n+'</td>';
-        tbody += '<td style="padding:6px 8px;">'+tierLabel+'</td>';
-        tbody += '<td style="padding:6px 8px;text-align:right;color:'+clr+';font-weight:600;">'+nbFpc+'</td>';
-        tbody += '<td style="padding:6px 8px;text-align:right;color:'+clr+';font-weight:600;">'+totFpc+'</td>';
+        tbody += '<td style="padding:6px 8px;color:var(--text2);">'+grp+'</td>';
+        tbody += '<td style="padding:6px 8px;text-align:right;color:var(--text);font-weight:600;">'+nbFpc+'</td>';
+        tbody += '<td style="padding:6px 8px;text-align:right;color:var(--text);font-weight:600;">'+totFpc+'</td>';
         tbody += '<td style="padding:6px 8px;text-align:right;color:var(--text2);">'+cuDisp+'</td>';
         tbody += '<td style="padding:6px 8px;text-align:right;color:var(--text);">'+fmt(nonBaseSol,'c')+'</td>';
         tbody += '<td style="padding:6px 8px;text-align:right;color:var(--text);">'+fmt(p.tf||0,'c')+'</td>';
@@ -1716,46 +1789,29 @@ function initAotFcuSection(){
     const tbEl = document.getElementById('aot-fcu-programs-tbody');
     if (tbEl) tbEl.innerHTML = tbody;
 
-    // --- 2. Build segment bar chart: non-base primary, total secondary (tooltip) ---
-    const segAgg = {};
-    aotProgs.forEach(p => {
-        const seg = p.segment_key || 'other';
-        if (!segAgg[seg]) segAgg[seg] = { cu: 0, nb: 0, tf: 0, tier: 'standard' };
-        segAgg[seg].cu += (p.cu || 0);
-        segAgg[seg].nb += ((p.pf || 0) + (p.jt || 0));
-        segAgg[seg].tf += (p.tf || 0);
-        if (p.tier_key === 'high') segAgg[seg].tier = 'high';
-    });
-    const barData = Object.entries(segAgg)
-        .filter(([,d]) => d.cu > 0)
-        .map(([segment, d]) => ({
-            segment,
-            nbFpc: d.nb / d.cu,
-            totFpc: d.tf / d.cu,
-            isHF: d.tier === 'high'
-        }))
-        .sort((a,b) => b.nbFpc - a.nbFpc)
-        .slice(0, 12);
-
-    const labelMap = {
-        prop_amm: 'Prop AMM', orderbook: 'Orderbook', amm_pools: 'AMM / Pools',
-        perps: 'Perps', lending: 'Lending', aggregator: 'Aggregator',
-        oracle: 'Oracle', bridge: 'Bridge', trading_bots: 'Trading Bots',
-        infra: 'Infrastructure', other: 'Other'
-    };
-    const fmtLabel = s => labelMap[s] || s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    // Group chart (frozen order, non-base primary)
+    const barData = CORE_GROUP_SPECS.map(g => ({
+        id: g.id,
+        label: g.label,
+        nbFpc: (_coreAggByGroup[g.id] || {}).weightedNonBase || 0,
+        totFpc: (_coreAggByGroup[g.id] || {}).weightedTotal || 0,
+        p25: (_coreAggByGroup[g.id] || {}).p25NonBase || 0,
+        p75: (_coreAggByGroup[g.id] || {}).p75NonBase || 0,
+        color: g.color
+    })).filter(d => d.nbFpc > 0 || d.totFpc > 0);
 
     const ctx = document.getElementById('chart-aot-fcu-tiers');
     if (ctx) {
-        new Chart(ctx, {
+        if (cAotFcuTiers) cAotFcuTiers.destroy();
+        cAotFcuTiers = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: barData.map(d => fmtLabel(d.segment)),
+                labels: barData.map(d => d.label),
                 datasets: [{
                     label: 'Non-base fee/CU (lam)',
                     data: barData.map(d => d.nbFpc),
-                    backgroundColor: barData.map(d => d.isHF ? '#F5A623' : '#5B8DEF'),
-                    borderColor: barData.map(d => d.isHF ? '#F5A62380' : '#5B8DEF80'),
+                    backgroundColor: barData.map(d => d.color),
+                    borderColor: barData.map(d => d.color + '80'),
                     borderWidth: 1,
                     borderRadius: 3,
                     barThickness: 18,
@@ -1773,7 +1829,7 @@ function initAotFcuSection(){
                         callbacks: {
                             label: function(c) {
                                 const d = barData[c.dataIndex];
-                                return 'Non-base fee/CU: ' + d.nbFpc.toFixed(2) + ' lam | Total fee/CU: ' + d.totFpc.toFixed(2) + ' lam';
+                                return 'Non-base: ' + d.nbFpc.toFixed(3) + ' lam | Total: ' + d.totFpc.toFixed(3) + ' lam | p25/p75: ' + d.p25.toFixed(3) + '/' + d.p75.toFixed(3);
                             }
                         }
                     }
@@ -1787,17 +1843,12 @@ function initAotFcuSection(){
                             callback: function(v) { return v >= 1 ? v.toFixed(0) : v.toFixed(2); }
                         },
                         grid: { color: '#1a1a1a' },
-                        title: { display: true, text: 'Non-base fee/CU (lamports) — priority + Jito, CU-weighted — log scale', color: '#A0A3A9', font: { size: 10 } }
+                        title: { display: true, text: 'Primary metric: non-base fee/CU (priority + Jito) — log scale', color: '#A0A3A9', font: { size: 10 } }
                     },
                     y: {
-                        ticks: {
-                            color: '#999',
-                            font: { size: 11, weight: '500' },
-                            autoSkip: false,
-                            padding: 4
-                        },
+                        ticks: { color: '#999', font: { size: 11, weight: '500' }, autoSkip: false, padding: 4 },
                         grid: { display: false },
-                        afterFit: function(axis) { axis.width = 110; }
+                        afterFit: function(axis) { axis.width = 120; }
                     }
                 }
             }
@@ -1975,40 +2026,10 @@ window.switchTab=switchTab;
 // BLOCK SIMULATION MODULE v2 — Business Category Layer
 // ═══════════════════════════════════════════════════════
 
-var SEGMENT_UI = {
-    prop_amm: { label: 'Prop AMM', color: '#F5A623', order: 1 },
-    orderbook: { label: 'Orderbook DEX', color: '#E8813A', order: 2 },
-    amm_pools: { label: 'AMM / Pools', color: '#5B8DEF', order: 3 },
-    perps: { label: 'Perps', color: '#8B6FE8', order: 4 },
-    lending: { label: 'Lending', color: '#4EBF9A', order: 5 },
-    aggregator: { label: 'Aggregator', color: '#6ECFCF', order: 6 },
-    oracle: { label: 'Oracle', color: '#D4D86A', order: 7 },
-    bridge: { label: 'Bridge', color: '#E07070', order: 8 },
-    trading_bots: { label: 'Trading Bots', color: '#A78BFA', order: 9 },
-    infra: { label: 'Infrastructure', color: '#7A7E85', order: 10 },
-    other: { label: 'Other', color: '#8A8E95', order: 99 }
-};
-var CAT_COLORS = Object.fromEntries(Object.entries(SEGMENT_UI).map(([k, v]) => [k, v.color]));
-var BIZ_CATEGORIES = (() => {
-    var segTier = {};
-    AOT_PROGRAMS.forEach(function(p){
-        var id = p.segment_key || 'other';
-        if(!segTier[id]) segTier[id] = 'LOW';
-        if(p.tier_key === 'high') segTier[id] = 'HIGH';
-    });
-    return Object.keys(segTier).sort(function(a, b){
-        var oa = (SEGMENT_UI[a] && SEGMENT_UI[a].order) || 999;
-        var ob = (SEGMENT_UI[b] && SEGMENT_UI[b].order) || 999;
-        return oa - ob || a.localeCompare(b);
-    }).map(function(id){
-        return {
-            id: id,
-            label: (SEGMENT_UI[id] && SEGMENT_UI[id].label) || id.replace(/_/g, ' '),
-            tier: segTier[id],
-            icon: ''
-        };
-    });
-})();
+var CAT_COLORS = Object.fromEntries(CORE_GROUP_SPECS.map(function(g){ return [g.id, g.color]; }));
+var BIZ_CATEGORIES = CORE_GROUP_SPECS.map(function(g){
+    return { id: g.id, label: g.label, icon: '', tier: 'N/A', segments: g.segments.slice() };
+});
 
 // ── Local simulation parameters (independent from sidebar) ──
 var _simParams = null;
@@ -2078,16 +2099,16 @@ function buildCategoryData(){
     var aotProgs = _aotProgs.slice();
     var S30 = SY * 30 / 365; // slots in 30-day window
     return BIZ_CATEGORIES.map(function(cat){
-        var progs = aotProgs.filter(function(p){ return (p.segment_key || 'other') === cat.id; });
+        var progs = aotProgs.filter(function(p){ return (cat.segments || []).includes(p.segment_key || 'other'); });
         var allMatch = progs;
         var cu = progs.reduce(function(s,p){ return s + p.cu; }, 0);
         var tf = progs.reduce(function(s,p){ return s + p.tf; }, 0);
-        var pf = progs.reduce(function(s,p){ return s + (p.pf + p.jt); }, 0);
+        var pf = progs.reduce(function(s,p){ return s + (p.pf + p.jt); }, 0); // non-base fees
         var bf = progs.reduce(function(s,p){ return s + p.bf; }, 0);
         var totFeePerCU = cu > 0 ? (tf * LS / (cu * 1e9)) : 0;
         var priFeePerCU = cu > 0 ? (pf * LS / (cu * 1e9)) : 0;
-        // Per-program fee/CU distribution
-        var progFpcs = progs.map(function(p){ return p.cu > 0 ? (p.tf * LS / (p.cu * 1e9)) : 0; }).filter(function(v){ return v > 0; });
+        // Dispersion follows frozen spec: non-base fee/CU distribution
+        var progFpcs = progs.map(function(p){ return p.cu > 0 ? (p.fpc_nb || 0) : 0; });
         var avgCuPerBlock = cu > 0 ? (cu * 1e9 / S30) : 0; // CU per block on average
         return {
             id: cat.id, label: cat.label, tier: cat.tier, icon: cat.icon,
@@ -2127,8 +2148,11 @@ function initCategoryExplorer(){
         _selectedCat = data[0].id;
     }
     bar.innerHTML = data.map(function(c){
-        return '<button class="cat-btn' + (c.tier==='HIGH'?' high-tier':'') + (c.id===_selectedCat?' active':'') + '" onclick="selectCategory(\'' + c.id + '\')">' + c.label + '</button>';
+        return '<button class="cat-btn' + (c.id===_selectedCat?' active':'') + '" onclick="selectCategory(\'' + c.id + '\')">' + c.label + '</button>';
     }).join('');
+    renderDexBreakdown();
+    renderBenchmarkBlock();
+    renderCaveatLegend();
     selectCategory(_selectedCat);
 }
 
@@ -2142,6 +2166,75 @@ function selectCategory(id){
     updateCatFcuChart();
 }
 
+function renderDexBreakdown(){
+    var el = document.getElementById('sim-dex-breakdown');
+    if(!el) return;
+    var rows = DEX_COMPONENT_SPECS.map(function(s){
+        var a = _dexAggByComponent[s.id] || {n:0,cu:0,weightedNonBase:0,weightedTotal:0,medianNonBase:0,p25NonBase:0,p75NonBase:0};
+        return '<tr style="border-bottom:1px solid #1a1a1a;">' +
+            '<td style="padding:6px 8px;color:var(--text);">' + s.label + '</td>' +
+            '<td style="padding:6px 8px;text-align:right;color:var(--text2);">' + a.n + '</td>' +
+            '<td style="padding:6px 8px;text-align:right;color:var(--text2);">' + (a.cu || 0).toFixed(1) + 'B</td>' +
+            '<td style="padding:6px 8px;text-align:right;color:var(--text);font-weight:600;">' + (a.weightedNonBase || 0).toFixed(3) + '</td>' +
+            '<td style="padding:6px 8px;text-align:right;color:var(--text);">' + (a.weightedTotal || 0).toFixed(3) + '</td>' +
+            '<td style="padding:6px 8px;text-align:right;color:var(--text2);">' + (a.medianNonBase || 0).toFixed(3) + '</td>' +
+            '<td style="padding:6px 8px;text-align:right;color:var(--text2);">' + (a.p25NonBase || 0).toFixed(3) + ' / ' + (a.p75NonBase || 0).toFixed(3) + '</td>' +
+        '</tr>';
+    }).join('');
+    el.innerHTML =
+        '<div style="padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;">' +
+            '<div style="font-size:11px;color:var(--lime-soft);font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">DEX Sub-Breakdown (Frozen Spec)</div>' +
+            '<div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Primary metric: non-base fee/CU. Secondary: total fee/CU. Dispersion: median and p25/p75 (non-base).</div>' +
+            '<div style="overflow-x:auto;">' +
+                '<table style="width:100%;border-collapse:collapse;font-size:10px;font-family:var(--font-mono);">' +
+                    '<thead><tr style="border-bottom:1px solid var(--card-border);">' +
+                        '<th style="padding:6px 8px;text-align:left;color:var(--text2);">Component</th>' +
+                        '<th style="padding:6px 8px;text-align:right;color:var(--text2);">Programs</th>' +
+                        '<th style="padding:6px 8px;text-align:right;color:var(--text2);">CU (30d)</th>' +
+                        '<th style="padding:6px 8px;text-align:right;color:var(--lime-soft);">NB fee/CU</th>' +
+                        '<th style="padding:6px 8px;text-align:right;color:var(--text2);">Total fee/CU</th>' +
+                        '<th style="padding:6px 8px;text-align:right;color:var(--text2);">Median NB</th>' +
+                        '<th style="padding:6px 8px;text-align:right;color:var(--text2);">p25 / p75</th>' +
+                    '</tr></thead><tbody>' + rows + '</tbody>' +
+                '</table>' +
+            '</div>' +
+        '</div>';
+}
+
+function renderBenchmarkBlock(){
+    var el = document.getElementById('sim-benchmark-block');
+    if(!el) return;
+    var b = _benchmarkAgg || {n:0,weightedNonBase:0,weightedTotal:0,medianNonBase:0,p25NonBase:0,p75NonBase:0,cu:0};
+    if(!b.n){
+        el.innerHTML = '<div style="padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;font-size:11px;color:var(--text2);">' +
+            '<strong style="color:var(--text);">Benchmark — arbitrage_bot (jit):</strong> no rows in current artifact. Runtime separation is active and will populate when benchmark rows are included upstream.' +
+        '</div>';
+        return;
+    }
+    el.innerHTML =
+        '<div style="padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;">' +
+            '<div style="font-size:11px;color:#A78BFA;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Benchmark — Arbitrage Bot (JIT)</div>' +
+            '<div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Shown separately and excluded from core AOT customer story.</div>' +
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-family:var(--font-mono);font-size:11px;">' +
+                '<div><span style="color:var(--text2);">Programs</span><br><span style="color:var(--text);font-weight:600;">' + b.n + '</span></div>' +
+                '<div><span style="color:var(--text2);">NB fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + b.weightedNonBase.toFixed(3) + ' lam</span></div>' +
+                '<div><span style="color:var(--text2);">Total fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + b.weightedTotal.toFixed(3) + ' lam</span></div>' +
+                '<div><span style="color:var(--text2);">Median NB</span><br><span style="color:var(--text);font-weight:600;">' + b.medianNonBase.toFixed(3) + ' lam</span></div>' +
+                '<div><span style="color:var(--text2);">p25 / p75</span><br><span style="color:var(--text);font-weight:600;">' + b.p25NonBase.toFixed(3) + ' / ' + b.p75NonBase.toFixed(3) + '</span></div>' +
+            '</div>' +
+        '</div>';
+}
+
+function renderCaveatLegend(){
+    var el = document.getElementById('sim-caveat-legend');
+    if(!el) return;
+    var items = CORE_GROUP_SPECS.map(function(g){
+        return '<div style="font-size:10px;color:var(--text2);"><strong style="color:' + g.color + ';">' + g.label + ':</strong> ' + (CAVEAT_NOTES[g.id] || '') + '</div>';
+    }).join('');
+    items += '<div style="font-size:10px;color:var(--text2);"><strong style="color:#A78BFA;">Benchmark:</strong> ' + CAVEAT_NOTES.benchmark_arbitrage_bot + '</div>';
+    el.innerHTML = '<div style="padding:8px 10px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;display:grid;gap:4px;">' + items + '</div>';
+}
+
 function renderCategoryDetail(id){
     var data = getCatData();
     var c = data.find(function(d){ return d.id === id; });
@@ -2151,6 +2244,7 @@ function renderCategoryDetail(id){
     var fmtFpc = function(v){ return v < 0.01 ? v.toFixed(4) : v < 0.1 ? v.toFixed(3) : v >= 10 ? v.toFixed(1) : v.toFixed(2); };
     var S30 = SY * 30 / 365;
     var fromDataTag = '<span class="cs-tag from-data">\uD83D\uDCCA from data (30d observed)</span>';
+    var caveat = CAVEAT_NOTES[id] || '';
 
     // Missing data warning for categories with allMatch > progs
     var missingHtml = '';
@@ -2161,14 +2255,13 @@ function renderCategoryDetail(id){
     }
 
     el.innerHTML =
-        '<div class="cat-stat"><div class="cs-label">Programs with CU data (AOT-relevant)</div><div class="cs-val">' + c.n + (c.nAll > c.n ? ' <span style="font-size:11px;color:var(--text2)">/ ' + c.nAll + ' known in category</span>' : '') + '</div><div class="cs-sub">' + (c.tier==='HIGH'?'High-fee tier':'Standard tier') + '</div></div>' +
+        '<div class="cat-stat"><div class="cs-label">Programs with CU data (core scope)</div><div class="cs-val">' + c.n + '</div><div class="cs-sub">aot + both, grouped by frozen UI logic</div></div>' +
         '<div class="cat-stat"><div class="cs-label">30-day CU total (billions)</div><div class="cs-val">' + c.cuB.toFixed(1) + 'B</div><div class="cs-sub">Total compute units consumed over 30d window</div>' + fromDataTag + '</div>' +
-        '<div class="cat-stat"><div class="cs-label">Avg CU per block (30d avg)</div><div class="cs-val">' + fmtHuman(c.avgCuPerBlock) + '</div><div class="cs-sub">= 30d CU total \u00F7 ' + fmtHuman(S30) + ' slots in window</div>' + fromDataTag + '</div>' +
-        '<div class="cat-stat"><div class="cs-label">Weighted avg Fee/CU (total fees, CU-weighted)</div><div class="cs-val" style="color:' + (CAT_COLORS[c.id]||'var(--text)') + '">' + fmtFpc(c.totFeePerCU) + ' <span style="font-size:10px;color:var(--text2)">lamports/CU</span></div><div class="cs-sub">= \u03A3(total fees) \u00D7 10\u2079 / \u03A3(CU) across ' + c.n + ' programs</div>' + fromDataTag +
-            (c.progFpcs.length >= 3 ? '<div class="cat-distrib"><span class="cd-item">p25 <span class="cd-val">' + fmtFpc(c.p25Fpc) + '</span></span><span class="cd-item">median <span class="cd-val">' + fmtFpc(c.medianFpc) + '</span></span><span class="cd-item">p75 <span class="cd-val">' + fmtFpc(c.p75Fpc) + '</span></span></div>' : '') +
-        '</div>' +
-        '<div class="cat-stat"><div class="cs-label">Weighted avg Non-base Fee/CU (CU-weighted)</div><div class="cs-val">' + fmtFpc(c.priFeePerCU) + ' <span style="font-size:10px;color:var(--text2)">lamports/CU</span></div><div class="cs-sub">Non-base = priority + Jito</div>' + fromDataTag + '</div>' +
-        '<div class="cat-stat"><div class="cs-label">Total fees over 30-day window (SOL)</div><div class="cs-val">' + fmtK(Math.round(c.tf)) + ' SOL</div><div class="cs-sub">Non-base: ' + fmtK(Math.round(c.pf)) + ' SOL + Base: ' + fmtK(Math.round(c.bf)) + ' SOL</div>' + fromDataTag + '</div>' +
+        '<div class="cat-stat"><div class="cs-label">Primary — CU-weighted non-base fee/CU</div><div class="cs-val" style="color:' + (CAT_COLORS[c.id]||'var(--text)') + '">' + fmtFpc(c.priFeePerCU) + ' <span style="font-size:10px;color:var(--text2)">lamports/CU</span></div><div class="cs-sub">Non-base = priority + Jito</div>' + fromDataTag + '</div>' +
+        '<div class="cat-stat"><div class="cs-label">Secondary — CU-weighted total fee/CU</div><div class="cs-val">' + fmtFpc(c.totFeePerCU) + ' <span style="font-size:10px;color:var(--text2)">lamports/CU</span></div><div class="cs-sub">Total = base + priority + Jito</div>' + fromDataTag + '</div>' +
+        '<div class="cat-stat"><div class="cs-label">Dispersion (non-base)</div><div class="cs-val">Median ' + fmtFpc(c.medianFpc) + '</div><div class="cs-sub">p25/p75: ' + fmtFpc(c.p25Fpc) + ' / ' + fmtFpc(c.p75Fpc) + '</div>' + fromDataTag + '</div>' +
+        '<div class="cat-stat"><div class="cs-label">Fees over 30-day window (SOL)</div><div class="cs-val">' + fmtK(Math.round(c.tf)) + ' SOL</div><div class="cs-sub">Non-base: ' + fmtK(Math.round(c.pf)) + ' SOL + Base: ' + fmtK(Math.round(c.bf)) + ' SOL</div>' + fromDataTag + '</div>' +
+        '<div class="cat-stat"><div class="cs-label">Caveat</div><div class="cs-sub" style="color:var(--text2);font-size:11px;line-height:1.4;">' + caveat + '</div></div>' +
         missingHtml;
 
     // v3: Render per-program distribution view
@@ -2185,7 +2278,7 @@ function renderCategoryDistribution(id, c){
     var html = '';
     // Distribution stats (p25/median/p75) — valid from the aggregate data
     if(c.progFpcs.length >= 3){
-        html += '<div class="cat-distrib" style="margin-top:8px"><span class="cd-item">p25 <span class="cd-val">' + fmtFpc(c.p25Fpc) + '</span></span><span class="cd-item">median <span class="cd-val">' + fmtFpc(c.medianFpc) + '</span></span><span class="cd-item">p75 <span class="cd-val">' + fmtFpc(c.p75Fpc) + '</span></span><span class="cd-item">CU-wt avg <span class="cd-val" style="color:' + (CAT_COLORS[c.id]||'var(--text)') + '">' + fmtFpc(c.totFeePerCU) + '</span></span></div>';
+        html += '<div class="cat-distrib" style="margin-top:8px"><span class="cd-item">p25 <span class="cd-val">' + fmtFpc(c.p25Fpc) + '</span></span><span class="cd-item">median <span class="cd-val">' + fmtFpc(c.medianFpc) + '</span></span><span class="cd-item">p75 <span class="cd-val">' + fmtFpc(c.p75Fpc) + '</span></span><span class="cd-item">CU-wt avg (NB) <span class="cd-val" style="color:' + (CAT_COLORS[c.id]||'var(--text)') + '">' + fmtFpc(c.priFeePerCU) + '</span></span><span class="cd-item">CU-wt avg (Total) <span class="cd-val">' + fmtFpc(c.totFeePerCU) + '</span></span></div>';
     }
     el.innerHTML = html;
 
@@ -2441,30 +2534,28 @@ function renderCategoryTable(id){
     }
     var fmtFpc = function(v){ return v < 0.01 ? v.toFixed(4) : v < 0.1 ? v.toFixed(3) : v >= 10 ? v.toFixed(1) : v.toFixed(2); };
     var S30 = SY * 30 / 365;
-    // Sort by fee/CU descending (matches block-fill logic)
     var sorted = [].concat(c.progs).sort(function(a,b){
-        var afpc = a.cu > 0 ? (a.tf * LS / (a.cu * 1e9)) : 0;
-        var bfpc = b.cu > 0 ? (b.tf * LS / (b.cu * 1e9)) : 0;
+        var afpc = a.cu > 0 ? (a.fpc_nb || 0) : 0;
+        var bfpc = b.cu > 0 ? (b.fpc_nb || 0) : 0;
         return bfpc - afpc;
     });
-    // v6: Secondary label above per-program chart (demoted from primary)
     el.innerHTML = '<div class="secondary-chart-label">\u25BD SECONDARY — Per-Program Snapshot (30d aggregate)</div>' +
         '<div style="font-size:11px;font-weight:600;color:var(--text-mid);margin-bottom:4px;font-family:var(--font-mono);">PROGRAM EXPLORER — ' + c.label.toUpperCase() + ' (' + c.n + ' programs)</div>' +
-        '<div style="font-size:9px;color:var(--text2);margin-bottom:6px">Per-program fee/CU comparison \u00B7 Sorted by fee/CU descending (block-fill order) \u00B7 Source: Dune extraction (30d window) \u00B7 Static snapshot, not temporal</div>' +
+        '<div style="font-size:9px;color:var(--text2);margin-bottom:6px">Per-program fee/CU comparison \u00B7 Sorted by non-base fee/CU descending \u00B7 Source: artifact (30d window) \u00B7 Static snapshot, not temporal</div>' +
         '<div class="cat-prog-chart"><canvas id="chart-prog-explorer"></canvas></div>' +
         '<table class="cat-prog-table"><thead><tr>' +
-        '<th>Program</th><th style="color:#F5A623">Fee/CU (lam)</th><th style="color:#8ddb6a;font-weight:700">Avg CU/block</th><th style="color:var(--lime)">Implied fees/block</th><th>30d CU (B)</th><th>30d Fees (SOL)</th></tr></thead><tbody>' +
+        '<th>Program</th><th style="color:#F5A623">NB Fee/CU (lam)</th><th>Total Fee/CU (lam)</th><th style="color:#8ddb6a;font-weight:700">Avg CU/block</th><th style="color:var(--lime)">Implied NB fees/block</th><th>30d CU (B)</th><th>30d Fees (SOL)</th></tr></thead><tbody>' +
         sorted.map(function(p){
-            var tfc = p.cu > 0 ? (p.tf * LS / (p.cu * 1e9)) : 0;
+            var nbc = p.cu > 0 ? (p.fpc_nb || 0) : 0;
+            var tfc = p.cu > 0 ? (p.fpc_tot || 0) : 0;
             var cuPerBlock = p.cu > 0 ? (p.cu * 1e9 / S30) : 0;
-            var impliedFeesBlock = tfc * cuPerBlock / LS; // SOL per block
+            var impliedFeesBlock = nbc * cuPerBlock / LS;
             var cuPerBlockFmt = fmtHuman(cuPerBlock);
             var impliedFmt = impliedFeesBlock >= 0.01 ? impliedFeesBlock.toFixed(4) : impliedFeesBlock.toFixed(6);
-            return '<tr><td style="color:var(--text)">' + p.n + '</td><td style="color:' + (CAT_COLORS[id]||'var(--text-mid)') + ';font-weight:600">' + fmtFpc(tfc) + '</td><td style="color:var(--lime);font-weight:600">' + cuPerBlockFmt + '</td><td style="color:var(--lime);font-size:10px">' + impliedFmt + ' SOL</td><td>' + p.cu.toFixed(1) + '</td><td>' + fmtK(Math.round(p.tf)) + '</td></tr>';
+            return '<tr><td style="color:var(--text)">' + p.n + '</td><td style="color:' + (CAT_COLORS[id]||'var(--text-mid)') + ';font-weight:600">' + fmtFpc(nbc) + '</td><td style="color:var(--text2);">' + fmtFpc(tfc) + '</td><td style="color:var(--lime);font-weight:600">' + cuPerBlockFmt + '</td><td style="color:var(--lime);font-size:10px">' + impliedFmt + ' SOL</td><td>' + p.cu.toFixed(1) + '</td><td>' + fmtK(Math.round(p.tf)) + '</td></tr>';
         }).join('') +
     '</tbody></table>';
 
-    // Draw per-program bar chart above table (tied to selected category)
     requestAnimationFrame(function(){
         var canvas = document.getElementById('chart-prog-explorer');
         if(!canvas) return;
@@ -2474,18 +2565,18 @@ function renderCategoryTable(id){
             data:{
                 labels: sorted.map(function(p){ return p.n.length > 18 ? p.n.substring(0,17)+'\u2026' : p.n; }),
                 datasets:[{
-                    label:'Fee/CU (lam)',
-                    data: sorted.map(function(p){ return p.cu > 0 ? (p.tf * LS / (p.cu * 1e9)) : 0; }),
+                    label:'Non-base Fee/CU (lam)',
+                    data: sorted.map(function(p){ return p.cu > 0 ? (p.fpc_nb || 0) : 0; }),
                     backgroundColor: sorted.map(function(){ return (CAT_COLORS[id]||'#555') + 'B0'; }),
                     borderRadius: 2, barPercentage: 0.75
                 }]
             },
             options:{
                 responsive:true, maintainAspectRatio:false,
-                plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: function(ctx){ return fmtFpc(ctx.raw) + ' lam/CU'; }}}},
+                plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: function(ctx){ return 'NB ' + fmtFpc(ctx.raw) + ' lam/CU'; }}}},
                 scales:{
                     x:{ grid:{display:false}, ticks:{color:'#ccc', font:{size:8, family:'JetBrains Mono'}, maxRotation:45} },
-                    y:{ type: sorted.length > 3 ? 'logarithmic' : 'linear', grid:{color:'#1a1c22'}, ticks:{color:'#ccc', font:{size:9, family:'JetBrains Mono'}, callback: function(v){ return v < 0.1 ? v.toFixed(2) : v >= 10 ? v.toFixed(0) : v.toFixed(1); }}, title:{display:true, text:'Fee/CU (lam)', color:'#aaa', font:{size:9, family:'JetBrains Mono'}}}
+                    y:{ type: sorted.length > 3 ? 'logarithmic' : 'linear', grid:{color:'#1a1c22'}, ticks:{color:'#ccc', font:{size:9, family:'JetBrains Mono'}, callback: function(v){ return v < 0.1 ? v.toFixed(2) : v >= 10 ? v.toFixed(0) : v.toFixed(1); }}, title:{display:true, text:'NB Fee/CU (lam)', color:'#aaa', font:{size:9, family:'JetBrains Mono'}}}
                 }
             }
         });
@@ -2503,8 +2594,8 @@ function initCatFcuChart(){
         data:{
             labels: data.map(function(c){ return c.label; }),
             datasets:[{
-                label:'Fee/CU — CU-weighted avg (lam)',
-                data: data.map(function(c){ return c.totFeePerCU; }),
+                label:'Non-base Fee/CU — CU-weighted avg (lam)',
+                data: data.map(function(c){ return c.priFeePerCU; }),
                 backgroundColor: data.map(function(c){ return CAT_COLORS[c.id] || '#555'; }),
                 borderRadius: 3, barThickness: 18,
                 barPercentage: 0.7, categoryPercentage: 0.8
@@ -2521,7 +2612,7 @@ function initCatFcuChart(){
                             var c = data[ctx.dataIndex];
                             var v = ctx.raw;
                             var vf = v < 0.01 ? v.toFixed(4) : v < 0.1 ? v.toFixed(3) : v >= 10 ? v.toFixed(1) : v.toFixed(2);
-                            return vf + ' lam/CU (CU-weighted avg) \u00B7 ' + c.n + ' programs \u00B7 ' + c.cuB.toFixed(1) + 'B CU (30d)';
+                            return 'NB ' + vf + ' lam/CU | Total ' + c.totFeePerCU.toFixed(3) + ' lam/CU | median ' + c.medianFpc.toFixed(3) + ' | p25/p75 ' + c.p25Fpc.toFixed(3) + '/' + c.p75Fpc.toFixed(3);
                         }
                     }
                 }
@@ -2529,7 +2620,7 @@ function initCatFcuChart(){
             scales:{
                 x:{
                     type:'logarithmic',
-                    title:{display:true, text:'Fee/CU (lamports) — log scale', color:'#bbb', font:{size:10, family:'JetBrains Mono'}},
+                    title:{display:true, text:'Primary metric: non-base fee/CU (lamports) — log scale', color:'#bbb', font:{size:10, family:'JetBrains Mono'}},
                     grid:{color:'#1a1c22'},
                     ticks:{color:'#ddd', font:{size:10, family:'JetBrains Mono'},
                         callback: function(v){ return v < 0.1 ? v.toFixed(2) : v >= 10 ? v.toFixed(0) : v.toFixed(1); }
@@ -2567,7 +2658,7 @@ function addFragment(catId){
     _bbFragments.push({
         catId: catId,
         cu: defaultCU,
-        feePerCU: c.totFeePerCU,
+        feePerCU: c.priFeePerCU,
         userAdjustedFee: false
     });
     renderBlockBuilder();
@@ -2595,7 +2686,7 @@ function resetFragment(idx){
     var data = getCatData();
     var c = data.find(function(d){ return d.id === _bbFragments[idx].catId; });
     if(c){
-        _bbFragments[idx].feePerCU = c.totFeePerCU;
+        _bbFragments[idx].feePerCU = c.priFeePerCU;
         _bbFragments[idx].userAdjustedFee = false;
     }
     _bbFragments[idx].cu = (c && c.avgCuPerBlock > 0) ? Math.round(c.avgCuPerBlock) : 1000;
@@ -2713,7 +2804,7 @@ function renderBlockBuilder(){
         html += '<button class="bb-add-btn" onclick="document.getElementById(\'bb-add-dropdown\').style.display=document.getElementById(\'bb-add-dropdown\').style.display===\'block\'?\'none\':\'block\'">+ Add Category</button>';
         html += '<div id="bb-add-dropdown" style="display:none;position:absolute;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:6px;z-index:10;margin-top:4px;">';
         data.forEach(function(c){
-            html += '<div style="padding:4px 10px;cursor:pointer;font-size:11px;color:var(--text-mid);border-radius:4px;" onmouseover="this.style.background=\'#1a1c22\'" onmouseout="this.style.background=\'\'" onclick="addFragment(\'' + c.id + '\');document.getElementById(\'bb-add-dropdown\').style.display=\'none\';">' + c.label + ' <span style="color:var(--text2);font-size:9px">(' + fmtFpc(c.totFeePerCU) + ' lam/CU)</span></div>';
+            html += '<div style="padding:4px 10px;cursor:pointer;font-size:11px;color:var(--text-mid);border-radius:4px;" onmouseover="this.style.background=\'#1a1c22\'" onmouseout="this.style.background=\'\'" onclick="addFragment(\'' + c.id + '\');document.getElementById(\'bb-add-dropdown\').style.display=\'none\';">' + c.label + ' <span style="color:var(--text2);font-size:9px">(NB ' + fmtFpc(c.priFeePerCU) + ' lam/CU)</span></div>';
         });
         html += '</div>';
         fragEl.innerHTML = html;
@@ -2733,7 +2824,7 @@ function renderBlockBuilder(){
         priEl.innerHTML = '<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);margin-bottom:8px;font-family:var(--font-mono)">Per-Block Output</div>' +
         '<div class="bp-row">' +
             '<div class="bp-item"><div class="bp-label">Used CU (included fragments)</div><div class="bp-val">' + fmtHuman(totalUsed) + ' <span style="font-size:12px;color:var(--text2)">/ ' + fmtHuman(avail) + ' avail</span></div></div>' +
-            '<div class="bp-item"><div class="bp-label">Weighted avg fee/CU (included fragments)</div><div class="bp-val">' + fmtFpc(wtAvgFee) + ' <span style="font-size:12px;color:var(--text2)">lam/CU</span></div></div>' +
+            '<div class="bp-item"><div class="bp-label">Weighted avg non-base fee/CU (included fragments)</div><div class="bp-val">' + fmtFpc(wtAvgFee) + ' <span style="font-size:12px;color:var(--text2)">lam/CU</span></div></div>' +
             '<div class="bp-item"><div class="bp-label">Total Block Fees</div><div class="bp-val" style="color:var(--lime);font-size:20px">' + totalFeesSol.toFixed(6) + ' <span style="font-size:14px">SOL</span> <span style="font-size:15px;color:var(--text-mid)">\u00B7 $' + fmtK(totalFeesUSD.toFixed(4)) + '</span></div></div>' +
         '</div>';
     }
@@ -2786,7 +2877,7 @@ function toggleRawDB(){
     var visible = el.style.display !== 'none';
     el.style.display = visible ? 'none' : 'block';
     var btn = document.getElementById('sim-raw-toggle-btn');
-    if(btn) btn.textContent = visible ? '\uD83D\uDCCB Inspect Raw Program Data (228 programs)' : '\u2715 Hide Raw Data';
+    if(btn) btn.textContent = visible ? '\uD83D\uDCCB Inspect Raw Program Data' : '\u2715 Hide Raw Data';
     if(!visible && cF) setTimeout(function(){ cF.resize(); }, 100);
 }
 
