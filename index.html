@@ -279,6 +279,8 @@ details[open] summary::before { transform:rotate(90deg); }
 .validator-support-sub { font-size:10px; color:var(--text-mid); margin-top:3px; line-height:1.45; }
 .validator-support-sub a { color:var(--lime-soft); text-decoration:none; }
 .validator-support-sub a:hover { text-decoration:underline; }
+.validator-support-stack { display:grid; gap:8px; }
+.validator-support-stack .validator-support-sub { margin-top:0; }
 .validator-kpi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; }
 .validator-kpi { background:#111213; border:1px solid #1f232b; border-radius:8px; padding:12px 14px; }
 .validator-kpi-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px; }
@@ -292,6 +294,29 @@ details[open] summary::before { transform:rotate(90deg); }
 .validator-audit-formula { font-size:12px; line-height:1.65; font-family:var(--font-mono); color:#BEC3CA; }
 .validator-audit-formula .em { color:var(--text); font-weight:600; }
 .validator-audit-note { font-size:10px; color:#C7CBD1; line-height:1.45; margin-top:6px; }
+.validator-decomp-card { margin-top:12px; background:#111213; border:1px solid #23262f; border-radius:8px; padding:12px 14px; }
+.validator-decomp-title { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:0.7px; margin-bottom:10px; }
+.validator-decomp-bar { display:flex; width:100%; height:16px; overflow:hidden; border-radius:999px; background:#0d0f12; border:1px solid #20242c; }
+.validator-decomp-seg { height:100%; min-width:2px; }
+.validator-decomp-seg.base { background:#5f6875; }
+.validator-decomp-seg.priority { background:#9aa6b8; }
+.validator-decomp-seg.raiku { background:#C0FF38; }
+.validator-decomp-legend { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:8px 12px; margin-top:10px; }
+.validator-decomp-item { min-width:0; }
+.validator-decomp-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.55px; margin-bottom:3px; display:flex; align-items:center; gap:6px; }
+.validator-decomp-dot { width:9px; height:9px; border-radius:999px; flex:0 0 auto; }
+.validator-decomp-dot.base { background:#5f6875; }
+.validator-decomp-dot.priority { background:#9aa6b8; }
+.validator-decomp-dot.raiku { background:#C0FF38; }
+.validator-decomp-dot.total { background:#ffffff; }
+.validator-decomp-value { font-size:14px; color:var(--text); font-family:var(--font-mono); font-weight:600; line-height:1.2; }
+.validator-decomp-sub { font-size:10px; color:var(--text-mid); margin-top:2px; line-height:1.4; }
+.validator-scenario-yield-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-top:12px; }
+.validator-scenario-yield-card { background:#0f1012; border:1px solid #20242c; border-radius:8px; padding:10px 11px; }
+.validator-scenario-yield-name { font-size:10px; color:var(--text); text-transform:uppercase; letter-spacing:0.65px; margin-bottom:8px; }
+.validator-scenario-yield-bar { display:flex; width:100%; height:12px; overflow:hidden; border-radius:999px; background:#090a0c; border:1px solid #1b1f27; }
+.validator-scenario-yield-total { font-size:15px; color:var(--text); font-family:var(--font-mono); font-weight:700; margin-top:8px; line-height:1.2; }
+.validator-scenario-yield-sub { font-size:10px; color:var(--text-mid); margin-top:3px; line-height:1.4; }
 
 @media(max-width:1100px) {
     .validator-layout { flex-direction:column; }
@@ -1193,6 +1218,19 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-support-value" id="validator-base-apy">4.48%</div>
                 <div class="validator-support-sub" id="validator-base-yield-source">Source: <a href="https://explorer.rated.network/network?network=solana&timeWindow=30d&page=1&pageSize=15" target="_blank" rel="noopener noreferrer">Rated Network Overview (30d Delegator APY)</a></div>
             </div>
+            <div class="validator-support-item">
+                <div class="validator-support-label">Priority Fees Yield Uplift</div>
+                <div class="validator-support-stack">
+                    <div>
+                        <div class="validator-support-value" id="validator-priority-apr">0.40%</div>
+                        <div class="validator-support-sub">Priority Fees APR uplift (fixed assumption)</div>
+                    </div>
+                    <div>
+                        <div class="validator-support-value" id="validator-priority-apy">0.40%</div>
+                        <div class="validator-support-sub">APY equivalent under daily compounding</div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="validator-source-note">APY convention for this tab: daily compounding (`n = 365`).</div>
     </div>
@@ -1239,17 +1277,58 @@ details[open] summary::before { transform:rotate(90deg); }
             <div class="validator-kpi">
                 <div class="validator-kpi-label">Total APR After Uplift</div>
                 <div class="validator-kpi-value" id="validator-total-apr">0.00%</div>
-                <div class="validator-kpi-sub">Base APR + incremental APR uplift</div>
+                <div class="validator-kpi-sub">Base APR + priority fees APR + Raiku APR uplift</div>
             </div>
             <div class="validator-kpi">
                 <div class="validator-kpi-label">Total APY After Uplift</div>
                 <div class="validator-kpi-value" id="validator-total-apy">0.00%</div>
-                <div class="validator-kpi-sub">Base APY plus uplift under daily compounding</div>
+                <div class="validator-kpi-sub">Total APY after stacking base yield, priority fees, and Raiku</div>
             </div>
         </div>
         <div class="validator-audit-line">
             <div class="validator-audit-formula" id="validator-apr-formula-line">Incremental APR uplift = Total validator revenue (SOL/yr) / Connected stake (SOL) = 0 SOL / 0 SOL = 0.000%</div>
             <div class="validator-audit-note" id="validator-apr-formula-note">Using validator revenue pool in SOL and connected stake in SOL.</div>
+        </div>
+        <div class="validator-decomp-card">
+            <div class="validator-decomp-title">APR Decomposition</div>
+            <div class="validator-decomp-bar" id="validator-yield-decomp-bar">
+                <div class="validator-decomp-seg base" id="validator-yield-base-seg" style="width:0%"></div>
+                <div class="validator-decomp-seg priority" id="validator-yield-priority-seg" style="width:0%"></div>
+                <div class="validator-decomp-seg raiku" id="validator-yield-raiku-seg" style="width:0%"></div>
+            </div>
+            <div class="validator-decomp-legend">
+                <div class="validator-decomp-item">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot base"></span>Base Staking</div>
+                    <div class="validator-decomp-value" id="validator-decomp-base-apr">0.00%</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-base-apy">0.00% APY</div>
+                </div>
+                <div class="validator-decomp-item">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot priority"></span>Priority Fees</div>
+                    <div class="validator-decomp-value" id="validator-decomp-priority-apr">0.00%</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-priority-apy">0.00% APY equivalent</div>
+                </div>
+                <div class="validator-decomp-item">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot raiku"></span>Raiku Uplift</div>
+                    <div class="validator-decomp-value" id="validator-decomp-raiku-apr">0.00%</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-raiku-apy">0.00% APY uplift</div>
+                </div>
+                <div class="validator-decomp-item">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot total"></span>Total Yield</div>
+                    <div class="validator-decomp-value" id="validator-decomp-total-apr">0.00%</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-total-apy">0.00% APY</div>
+                </div>
+            </div>
+        </div>
+        <div class="validator-decomp-card">
+            <div class="validator-decomp-title">Scenario Total Yield Composition</div>
+            <div class="validator-scenario-yield-grid" id="validator-scenario-yield-grid">
+                <div class="validator-scenario-yield-card">
+                    <div class="validator-scenario-yield-name">Conservative</div>
+                    <div class="validator-scenario-yield-bar"><div class="validator-decomp-seg base" style="width:0%"></div><div class="validator-decomp-seg priority" style="width:0%"></div><div class="validator-decomp-seg raiku" style="width:0%"></div></div>
+                    <div class="validator-scenario-yield-total">0.00% APR</div>
+                    <div class="validator-scenario-yield-sub">0.00% APY</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -1687,6 +1766,7 @@ let _solanaStakeState = {
 };
 const BASE_STAKING_APY = 0.0448;
 const APY_COMPOUNDING_PERIODS = 365;
+const PRIORITY_FEES_APR_UPLIFT = 0.0040;
 const BASE_YIELD_SOURCE_HTML = 'Source: <a href="https://explorer.rated.network/network?network=solana&timeWindow=30d&page=1&pageSize=15" target="_blank" rel="noopener noreferrer">Rated Network Overview (30d Delegator APY)</a>';
 const SCENARIO_LABELS = { con:'Conservative', base:'Base Case', opt:'Optimistic', bull:'Bull Case' };
 
@@ -1763,6 +1843,53 @@ function getDisplayedScenarioName(){
     const activeBtn = document.querySelector('.scenario-btn.active');
     if (activeBtn) return activeBtn.textContent.trim();
     return 'Custom';
+}
+
+function getScenarioParams(key){
+    const s = SC[key];
+    if (!s) return null;
+    return {
+        ca:s.ca, cj:s.cj, ra:s.ra, rj:s.rj, vb:s.vb,
+        jm:s.jm, j:s.j/100, s:s.s/100, b:s.b/100, f:s.f, p:s.p
+    };
+}
+
+function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, priorityApy, totalStakedSol){
+    const el = document.getElementById('validator-scenario-yield-grid');
+    if (!el) return;
+    const rows = ['con','base','opt','bull'].map(function(key){
+        const p = getScenarioParams(key);
+        const r = calc(p);
+        const connectedStakeSol = totalStakedSol * p.s;
+        const raikuApr = connectedStakeSol > 0 ? r.totalValRev / connectedStakeSol : 0;
+        const totalApr = baseApr + priorityApr + raikuApr;
+        const totalApy = aprToApy(totalApr, APY_COMPOUNDING_PERIODS);
+        const baseWidth = totalApr > 0 ? (baseApr / totalApr) * 100 : 0;
+        const priorityWidth = totalApr > 0 ? (priorityApr / totalApr) * 100 : 0;
+        const raikuWidth = totalApr > 0 ? (raikuApr / totalApr) * 100 : 0;
+        return {
+            name: SCENARIO_LABELS[key] || key,
+            totalApr: totalApr,
+            totalApy: totalApy,
+            baseWidth: baseWidth,
+            priorityWidth: priorityWidth,
+            raikuWidth: raikuWidth,
+            raikuApr: raikuApr
+        };
+    });
+    el.innerHTML = rows.map(function(row){
+        return '' +
+            '<div class="validator-scenario-yield-card">' +
+                '<div class="validator-scenario-yield-name">' + row.name + '</div>' +
+                '<div class="validator-scenario-yield-bar">' +
+                    '<div class="validator-decomp-seg base" style="width:' + row.baseWidth.toFixed(2) + '%"></div>' +
+                    '<div class="validator-decomp-seg priority" style="width:' + row.priorityWidth.toFixed(2) + '%"></div>' +
+                    '<div class="validator-decomp-seg raiku" style="width:' + row.raikuWidth.toFixed(2) + '%"></div>' +
+                '</div>' +
+                '<div class="validator-scenario-yield-total">' + fmtValidatorRate(row.totalApr) + ' APR</div>' +
+                '<div class="validator-scenario-yield-sub">' + fmtValidatorRate(row.totalApy) + ' APY · Raiku ' + fmtValidatorRate(row.raikuApr) + '</div>' +
+            '</div>';
+    }).join('');
 }
 
 function updateAotSensitivitySummary(p){
@@ -2688,12 +2815,15 @@ function update(){
     const capturedJitSol = p.jm * p.j;
     const baseApy = BASE_STAKING_APY;
     const baseApr = apyToApr(baseApy, APY_COMPOUNDING_PERIODS);
+    const priorityFeesApr = PRIORITY_FEES_APR_UPLIFT;
+    const priorityFeesApy = aprToApy(priorityFeesApr, APY_COMPOUNDING_PERIODS);
     const totalValidatorRevenueSol = r.totalValRev;
     const totalValidatorRevenueUsd = totalValidatorRevenueSol * p.p;
     const incrementalAprUplift = connectedStakeSol > 0 ? totalValidatorRevenueSol / connectedStakeSol : 0;
-    const totalApr = baseApr + incrementalAprUplift;
+    const totalApr = baseApr + priorityFeesApr + incrementalAprUplift;
     const totalApy = aprToApy(totalApr, APY_COMPOUNDING_PERIODS);
-    const incrementalApyUplift = totalApy - baseApy;
+    const basePlusPriorityApy = aprToApy(baseApr + priorityFeesApr, APY_COMPOUNDING_PERIODS);
+    const incrementalApyUplift = totalApy - basePlusPriorityApy;
 
     // Slider value displays
     document.getElementById('v-comm-aot').textContent=p.ca.toFixed(1)+'%';
@@ -2773,6 +2903,8 @@ function update(){
     document.getElementById('validator-context-jit-take').textContent = p.cj.toFixed(1) + '%';
     document.getElementById('validator-base-apr').textContent = fmtValidatorRate(baseApr);
     document.getElementById('validator-base-apy').textContent = fmtValidatorRate(baseApy);
+    document.getElementById('validator-priority-apr').textContent = fmtValidatorRate(priorityFeesApr);
+    document.getElementById('validator-priority-apy').textContent = fmtValidatorRate(priorityFeesApy);
     document.getElementById('validator-base-yield-source').innerHTML = BASE_YIELD_SOURCE_HTML;
     document.getElementById('validator-jit-usd').textContent = fmtValidatorUsd(r.jitValidatorBase * p.p);
     document.getElementById('validator-jit-sol').textContent = fmtValidatorSol(r.jitValidatorBase) + '/yr';
@@ -2787,7 +2919,19 @@ function update(){
     document.getElementById('validator-total-apr').textContent = fmtValidatorRate(totalApr);
     document.getElementById('validator-total-apy').textContent = fmtValidatorRate(totalApy);
     document.getElementById('validator-apr-formula-line').innerHTML = 'Incremental APR uplift = Total validator revenue (SOL/yr) / Connected stake (SOL) = <span class="em">' + fmtValidatorSol(totalValidatorRevenueSol) + '</span> / <span class="em">' + fmtValidatorSol(connectedStakeSol) + '</span> = <span class="em">' + fmtValidatorRate(incrementalAprUplift) + '</span>';
-    document.getElementById('validator-apr-formula-note').textContent = 'Using validator revenue pool in SOL and connected stake in SOL.';
+    document.getElementById('validator-apr-formula-note').textContent = 'Total APR = base staking APR + fixed priority fees APR uplift + Raiku APR uplift. APY uses the same daily compounding convention.';
+    document.getElementById('validator-decomp-base-apr').textContent = fmtValidatorRate(baseApr);
+    document.getElementById('validator-decomp-base-apy').textContent = fmtValidatorRate(baseApy) + ' APY';
+    document.getElementById('validator-decomp-priority-apr').textContent = fmtValidatorRate(priorityFeesApr);
+    document.getElementById('validator-decomp-priority-apy').textContent = fmtValidatorRate(priorityFeesApy) + ' APY equivalent';
+    document.getElementById('validator-decomp-raiku-apr').textContent = fmtValidatorRate(incrementalAprUplift);
+    document.getElementById('validator-decomp-raiku-apy').textContent = fmtValidatorRate(incrementalApyUplift) + ' APY uplift';
+    document.getElementById('validator-decomp-total-apr').textContent = fmtValidatorRate(totalApr);
+    document.getElementById('validator-decomp-total-apy').textContent = fmtValidatorRate(totalApy) + ' APY';
+    document.getElementById('validator-yield-base-seg').style.width = (totalApr > 0 ? (baseApr / totalApr) * 100 : 0).toFixed(2) + '%';
+    document.getElementById('validator-yield-priority-seg').style.width = (totalApr > 0 ? (priorityFeesApr / totalApr) * 100 : 0).toFixed(2) + '%';
+    document.getElementById('validator-yield-raiku-seg').style.width = (totalApr > 0 ? (incrementalAprUplift / totalApr) * 100 : 0).toFixed(2) + '%';
+    renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityFeesApr, priorityFeesApy, totalStakedSol);
     document.getElementById('stake-sol-helper').innerHTML = '<strong>Implied stake:</strong> ' + fmt(raikuStakeSol, 'S') + ' of ' + fmt(totalStakedSol, 'S') + ' total staked';
     document.getElementById('blk-cu-helper').innerHTML = '<strong>Reserved CU:</strong> ' + fmt(reservedCu, 'i') + ' CU of ' + fmt(CB, 'i') + ' CU/block';
     document.getElementById('fcu-block-fee-helper').innerHTML = '<strong>Auction fees/block:</strong> ' + fmt(auctionFeesLamportsPerBlock, 'i') + ' lamports/block (~' + auctionFeesSolPerBlock.toFixed(6) + ' SOL/block)';
