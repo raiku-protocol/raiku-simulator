@@ -168,6 +168,8 @@ details[open] summary::before { transform:rotate(90deg); }
 .sidebar .controls-section { padding:8px 8px; margin-bottom:0; border-radius:0; border-bottom:none; }
 .sidebar .controls-section:first-child { border-radius:var(--radius) var(--radius) 0 0; }
 .sidebar .controls-section:last-child { border-bottom:1px solid var(--card-border); border-radius:0 0 var(--radius) var(--radius); }
+.sidebar .controls-section.sidebar-main-card-end { border-bottom:1px solid var(--card-border); border-radius:0 0 var(--radius) var(--radius); margin-bottom:var(--gap); }
+.sidebar .controls-section.sidebar-standalone-card { border:1px solid var(--card-border); border-radius:var(--radius); margin-bottom:var(--gap); }
 .sidebar .controls-section h2 { font-size:11px; margin-bottom:6px; letter-spacing:1.5px; }
 .sidebar .controls-section h2::before { font-size:12px; }
 .sidebar .scenario-btns { gap:3px; margin-bottom:4px; }
@@ -219,6 +221,8 @@ details[open] summary::before { transform:rotate(90deg); }
 .sidebar-info-trigger-btn { display:inline-flex; align-items:center; gap:6px; font-size:9px; color:var(--text-mid); text-transform:uppercase; letter-spacing:0.5px; padding:5px 8px; border:1px solid #2a2d36; border-radius:999px; background:#111213; }
 .sidebar-info-trigger-icon { width:15px; height:15px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:10px; color:var(--text); background:#1b1d22; border:1px solid #353844; }
 .sidebar-info-popover { margin-top:8px; background:#111213; border:1px solid #23262f; border-radius:6px; padding:8px 9px; }
+.section-inline-help { grid-column:1/-1; margin-top:-1px; margin-bottom:2px; }
+.section-inline-help .sidebar-info-trigger { margin-top:0; }
 .sidebar-yield-grid { display:grid; gap:6px; }
 .sidebar-yield-row { background:#111213; border:1px solid #1e2028; border-radius:5px; padding:6px 7px; }
 .sidebar-yield-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px; }
@@ -536,7 +540,7 @@ details[open] summary::before { transform:rotate(90deg); }
 </div>
 
 <!-- MODEL PARAMETERS (sliders — user tunes before seeing results) -->
-<div class="controls-section fade-in fade-in-2" id="model-params">
+<div class="controls-section fade-in fade-in-2 sidebar-main-card-end" id="model-params">
     <h2>Model Parameters</h2>
     <div class="controls-grid">
 
@@ -588,6 +592,22 @@ details[open] summary::before { transform:rotate(90deg); }
 
         <!-- ─── SECTION 3: REVENUE ESTIMATION ─── -->
         <div class="section-label">Revenue Estimation</div>
+        <div class="section-inline-help">
+            <details class="sidebar-info-trigger">
+                <summary>
+                    <span class="sidebar-info-trigger-btn">
+                        <span class="sidebar-info-trigger-icon">?</span>
+                        Why AOT uses stake share but JIT uses total market
+                    </span>
+                </summary>
+                <div class="sidebar-info-popover">
+                    <div class="sidebar-note-copy">
+                        <p>For AOT blockspace auctions, Raiku Stake % represents the share of total Solana stake delegated to Raiku-connected validators, because AOT capacity depends on validator stake share and reserved blockspace access.</p>
+                        <p>JIT is modeled differently: it starts from an observed market benchmark and annualizes revenue, similar to Jito-like benchmark extrapolations. In this model, total Solana stake share is a direct driver for AOT, but not the direct entry point for JIT.</p>
+                    </div>
+                </div>
+            </details>
+        </div>
         <div class="param-columns" style="grid-column:1/-1;">
             <div class="param-col aot">
                 <div class="param-col-label">AOT &mdash; Blockspace Auctions</div>
@@ -622,23 +642,7 @@ details[open] summary::before { transform:rotate(90deg); }
 
     </div>
 </div>
-<div class="controls-section fade-in fade-in-3">
-    <details class="sidebar-info-trigger">
-        <summary>
-            <span class="sidebar-info-trigger-btn">
-                <span class="sidebar-info-trigger-icon">?</span>
-                Why AOT uses stake share
-            </span>
-        </summary>
-        <div class="sidebar-info-popover">
-            <div class="sidebar-note-copy">
-                <p>For AOT blockspace auctions, Raiku Stake % represents the share of total Solana stake delegated to Raiku-connected validators, because AOT capacity depends on validator stake share and reserved blockspace access.</p>
-                <p>JIT is modeled differently: it starts from an observed market benchmark and annualizes revenue, similar to Jito-like benchmark extrapolations. In this model, total Solana stake share is a direct driver for AOT, but not the direct entry point for JIT.</p>
-            </div>
-        </div>
-    </details>
-</div>
-<div class="controls-section fade-in fade-in-4">
+<div class="controls-section fade-in fade-in-4 sidebar-standalone-card">
     <h2>Validator Revenue APR / APY</h2>
     <div class="sidebar-yield-grid">
         <div class="sidebar-yield-row">
