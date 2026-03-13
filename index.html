@@ -210,6 +210,12 @@ details[open] summary::before { transform:rotate(90deg); }
 .treasury-summary { font-size:10px; color:var(--lime-soft); padding:4px 6px; background:#111213; border-radius:5px; margin-top:4px; border-left:2px solid var(--lime-soft); }
 .method-link { display:inline-block; font-size:9px; color:var(--lime-soft); text-decoration:none; opacity:0.7; margin-top:3px; }
 .method-link:hover { opacity:1; text-decoration:underline; }
+.sidebar-note-copy { font-size:10px; color:var(--text-mid); line-height:1.45; }
+.sidebar-yield-grid { display:grid; gap:6px; }
+.sidebar-yield-row { background:#111213; border:1px solid #1e2028; border-radius:5px; padding:6px 7px; }
+.sidebar-yield-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px; }
+.sidebar-yield-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:600; }
+.sidebar-yield-sub { font-size:9px; color:var(--text2); margin-top:2px; }
 
 /* Custom tooltip for info icon */
 .info-tip { position:relative; display:inline-block; cursor:help; margin-left:4px; }
@@ -606,6 +612,32 @@ details[open] summary::before { transform:rotate(90deg); }
             </div>
         </div>
 
+    </div>
+</div>
+<div class="controls-section fade-in fade-in-3">
+    <h2>Stake Share Context</h2>
+    <div class="sidebar-note-copy">
+        For AOT blockspace auctions, Raiku Stake % represents the share of total Solana stake delegated to Raiku-connected validators, because AOT capacity depends on validator stake share and reserved blockspace access.
+        <br><br>
+        JIT is modeled differently: it starts from an observed market benchmark and annualizes revenue, similar to Jito-like benchmark extrapolations. In this model, total Solana stake share is a direct driver for AOT, but not the direct entry point for JIT.
+    </div>
+</div>
+<div class="controls-section fade-in fade-in-4">
+    <h2>APR / APY Context</h2>
+    <div class="sidebar-yield-grid">
+        <div class="sidebar-yield-row">
+            <div class="sidebar-yield-label">Current Total Solana Staked</div>
+            <div class="sidebar-yield-value">TBD</div>
+            <div class="sidebar-yield-sub">Not yet wired from the current simulator dataset.</div>
+        </div>
+        <div class="sidebar-yield-row">
+            <div class="sidebar-yield-label">Placeholder APR uplift</div>
+            <div class="sidebar-yield-value">Coming soon</div>
+        </div>
+        <div class="sidebar-yield-row">
+            <div class="sidebar-yield-label">Placeholder APY uplift</div>
+            <div class="sidebar-yield-value">Coming soon</div>
+        </div>
     </div>
 </div>
 </div><!-- end sidebar -->
