@@ -122,6 +122,21 @@ tr:hover td { background:#141516; }
 .matrix-table th, .matrix-table td { padding:5px 8px; border:1px solid #333; text-align:right; }
 .matrix-table th { background:#1B1D1E; color:var(--text2); font-weight:600; }
 .matrix-table td.hl { background:#C0FF3810; color:var(--lime-soft); font-weight:700; }
+.matrix-table th.axis-head { background:#17191d; color:var(--text); }
+.matrix-table td.axis-hl { background:#c0ff380d; }
+.matrix-table td.current-cell { background:#C0FF3820; color:var(--lime-soft); font-weight:700; box-shadow:inset 0 0 0 1px #C0FF3855; }
+.sensitivity-module-head { display:grid; grid-template-columns:minmax(0, 1fr) minmax(250px, 320px); gap:12px; align-items:start; margin-bottom:12px; }
+.sensitivity-note { font-size:11px; color:var(--text-mid); line-height:1.5; max-width:780px; margin-top:6px; }
+.sensitivity-summary { background:#111213; border:1px solid #23262f; border-radius:8px; padding:10px 12px; }
+.sensitivity-summary-title { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
+.sensitivity-summary-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:8px 12px; }
+.sensitivity-summary-item { min-width:0; }
+.sensitivity-summary-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.45px; margin-bottom:2px; }
+.sensitivity-summary-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sensitivity-module-grid { display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(0, 0.9fr); gap:12px; align-items:start; }
+.sensitivity-panel { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:14px 16px; }
+.sensitivity-panel-kicker { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
+.sensitivity-panel .table-wrap { margin-top:0; }
 
 .footer { text-align:center; padding:24px 16px; color:var(--text2); font-size:10px; font-family:var(--font-mono); letter-spacing:0.5px; border-top:1px solid var(--card-border); margin-top:8px; }
 
@@ -266,6 +281,9 @@ details[open] summary::before { transform:rotate(90deg); }
     .kpi-row { grid-template-columns:repeat(2,1fr); }
     .chart-row { grid-template-columns:1fr; }
     .tab-btn { font-size:10px; padding:8px 10px; letter-spacing:0.5px; }
+    .sensitivity-module-head { grid-template-columns:1fr; }
+    .sensitivity-summary-grid { grid-template-columns:1fr 1fr; }
+    .sensitivity-module-grid { grid-template-columns:1fr; }
 }
 /* ═══ Triple-format cards ═══ */
 .triple-card { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:12px 14px; border-left:3px solid var(--card-border); transition:border-color 0.3s, box-shadow 0.3s, transform 0.2s; }
@@ -831,18 +849,25 @@ details[open] summary::before { transform:rotate(90deg); }
     </div>
 </div>
 
-<!-- AOT REVENUE SENSITIVITY CHART (model output) -->
+<!-- AOT SENSITIVITY MODULE -->
 <div class="section fade-in fade-in-5">
-    <h2>AOT Protocol Treasury by Stake %</h2>
-    <div class="note" style="margin-bottom:10px">Protocol treasury from AOT stream (USD/yr) at different RAIKU stake levels. Held constant: Block share, Fee/CU, SOL price, AOT rebate, AOT val bonus (from sliders). X-axis = RAIKU stake %. Base case shown from current slider.</div>
-    <div class="chart-box" style="min-height:220px;"><canvas id="chart-aot"></canvas></div>
-</div>
-
-<!-- AOT SENSITIVITY MATRIX -->
-<div class="section fade-in fade-in-6">
-    <h2>AOT Sensitivity &mdash; Protocol Treasury (USD/yr)</h2>
-    <div class="note" style="margin-bottom:10px">Rows = Stake %, Cols = Fee/CU. Block share & SOL price from sliders. AOT rebate and AOT validator bonus applied. Highlighted = current.</div>
-    <div class="table-wrap" id="aot-matrix"></div>
+    <div class="sensitivity-module-head">
+        <div>
+            <h2>Protocol Treasury Sensitivity to Stake % and AOT Fees</h2>
+            <div class="sensitivity-note">AOT protocol treasury sensitivity under the current live assumptions. The chart highlights the nearest displayed stake bucket to the active setting, and the table highlights the nearest stake and fee/CU bucket intersection.</div>
+        </div>
+        <div class="sensitivity-summary" id="aot-sensitivity-summary"></div>
+    </div>
+    <div class="sensitivity-module-grid">
+        <div class="sensitivity-panel">
+            <div class="sensitivity-panel-kicker">Sensitivity Chart</div>
+            <div class="chart-box" style="min-height:220px;padding:0;border:none;background:transparent;"><canvas id="chart-aot"></canvas></div>
+        </div>
+        <div class="sensitivity-panel">
+            <div class="sensitivity-panel-kicker">Sensitivity Table</div>
+            <div class="table-wrap" id="aot-matrix"></div>
+        </div>
+    </div>
 </div>
 
 <!-- DATA SOURCES & METHODOLOGY — includes full JIT data module -->
@@ -1527,6 +1552,7 @@ let _solanaStakeState = {
     sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a>',
     mode: 'reference'
 };
+const SCENARIO_LABELS = { con:'Conservative', base:'Base Case', opt:'Optimistic', bull:'Bull Case' };
 
 function fmt(v,t){
     const a=Math.abs(v);
@@ -1536,6 +1562,43 @@ function fmt(v,t){
     if(t==='c'){return v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}  // comma formatted
     if(t==='i'){return v.toLocaleString('en-US');}  // integer with commas
     return v;
+}
+
+function nearestIdx(values, target){
+    let idx = 0;
+    let best = Infinity;
+    values.forEach(function(v, i){
+        const dist = Math.abs(v - target);
+        if (dist < best) {
+            best = dist;
+            idx = i;
+        }
+    });
+    return idx;
+}
+
+function fmtMatrixUsd(v){
+    const a = Math.abs(v);
+    if (a >= 999500) return '$' + (v / 1e6).toFixed(a >= 10e6 ? 0 : 1) + 'M';
+    if (a >= 1e6) return '$' + (v / 1e6).toFixed(a >= 10e6 ? 0 : 1) + 'M';
+    if (a >= 1000) return '$' + (v / 1e3).toFixed(a >= 100e3 ? 0 : 1) + 'K';
+    return '$' + Math.round(v);
+}
+
+function updateAotSensitivitySummary(p){
+    const el = document.getElementById('aot-sensitivity-summary');
+    if (!el) return;
+    const scenarioName = SCENARIO_LABELS[_selectedScenario] || 'Custom';
+    el.innerHTML =
+        '<div class="sensitivity-summary-title">Current Scenario Context</div>' +
+        '<div class="sensitivity-summary-grid">' +
+            '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">Selected Scenario</div><div class="sensitivity-summary-value">' + scenarioName + '</div></div>' +
+            '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">SOL Price</div><div class="sensitivity-summary-value">$' + p.p + '</div></div>' +
+            '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">Raiku Stake</div><div class="sensitivity-summary-value">' + (p.s * 100).toFixed(1) + '%</div></div>' +
+            '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">Block Share</div><div class="sensitivity-summary-value">' + Math.round(p.b * 100) + '%</div></div>' +
+            '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">Avg Auction Fee/CU</div><div class="sensitivity-summary-value">' + (p.f < 0.1 ? p.f.toFixed(3) : p.f >= 10 ? p.f.toFixed(1) : p.f.toFixed(2)) + ' L</div></div>' +
+            '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">AOT Take Rate</div><div class="sensitivity-summary-value">' + p.ca.toFixed(1) + '%</div></div>' +
+        '</div>';
 }
 
 function getCurrentTotalSolanaStakedSol(){
@@ -1836,28 +1899,45 @@ function updFlow(p,r){
 function updCharts(p,r){
     updFlow(p,r);
     const aotTakeRate = p.ca / 100;
-    [0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50].forEach((s,i)=>{
+    const stakeBuckets = [0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50];
+    const activeStakeIdx = nearestIdx(stakeBuckets, p.s);
+    stakeBuckets.forEach((s,i)=>{
         const aG=(s*SY*p.b*CB*p.f)/LS;
         const aP=Math.max(0, aG*aotTakeRate - aG*(p.ra/100) - aG*(p.vb/100));
         cA.data.datasets[0].data[i]=aP*p.p;
-    }); cA.update();
+    });
+    cA.data.datasets[0].backgroundColor = stakeBuckets.map(function(_, i){
+        return i === activeStakeIdx ? '#C0FF38CC' : '#C0FF3848';
+    });
+    cA.data.datasets[0].borderColor = stakeBuckets.map(function(_, i){
+        return i === activeStakeIdx ? '#E8FFC0' : '#C0FF3860';
+    });
+    cA.data.datasets[0].borderWidth = stakeBuckets.map(function(_, i){ return i === activeStakeIdx ? 1.5 : 1; });
+    cA.update();
 
 }
 
 function buildMatrix(p){
     const aotTakeRate = p.ca / 100;
     const sr=[0.005,0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50], fc=[0.10,0.20,0.50,1.00,2.00,5.00,10.00,20.00];
+    const activeStakeIdx = nearestIdx(sr, p.s);
+    const activeFeeIdx = nearestIdx(fc, p.f);
     let h='<table class="matrix-table"><thead><tr><th>Stake \\ Fee/CU</th>';
-    fc.forEach(f=>h+=`<th>${f<0.1?f.toFixed(2):f>=10?f.toFixed(0):f.toFixed(1)}L</th>`);
+    fc.forEach(function(f, idx){
+        h+=`<th class="${idx===activeFeeIdx?'axis-head':''}">${f<0.1?f.toFixed(2):f>=10?f.toFixed(0):f.toFixed(1)}L</th>`;
+    });
     h+='</tr></thead><tbody>';
-    sr.forEach(s=>{
-        h+=`<tr><th>${(s*100)<1?(s*100).toFixed(1):Math.round(s*100)}%</th>`;
-        fc.forEach(f=>{
+    sr.forEach(function(s, sIdx){
+        h+=`<tr><th class="${sIdx===activeStakeIdx?'axis-head':''}">${(s*100)<1?(s*100).toFixed(1):Math.round(s*100)}%</th>`;
+        fc.forEach(function(f, fIdx){
             const aG=(s*SY*p.b*CB*f)/LS;
             const t=Math.max(0, aG*aotTakeRate - aG*(p.ra/100) - aG*(p.vb/100))*p.p;
-            const hl=Math.abs(s-p.s)<0.0005&&Math.abs(f-p.f)<0.005;
-            h+=`<td class="${hl?'hl':''}">${fmt(t,'$')}</td>`;
-        }); h+='</tr>';
+            const cls = [];
+            if (sIdx === activeStakeIdx || fIdx === activeFeeIdx) cls.push('axis-hl');
+            if (sIdx === activeStakeIdx && fIdx === activeFeeIdx) cls.push('current-cell');
+            h+=`<td class="${cls.join(' ')}">${fmtMatrixUsd(t)}</td>`;
+        });
+        h+='</tr>';
     }); h+='</tbody></table>';
     document.getElementById('aot-matrix').innerHTML=h;
 }
@@ -2574,9 +2654,10 @@ function update(){
         const jP=sr.totalProtocolUSD>0?Math.round(sr.jitProtocol*price/sr.totalProtocolUSD*100):0;
         const aP=sr.totalProtocolUSD>0?Math.round(sr.aotProtocol*price/sr.totalProtocolUSD*100):0;
         document.getElementById('sc-'+n+'-d').textContent='JIT '+fmt(sr.jitProtocol*price,'$')+' ('+jP+'%) + AOT '+fmt(sr.aotProtocol*price,'$')+' ('+aP+'%)';
-        document.getElementById('sc-'+n+'-m').textContent=fmt(sr.totalProtocolUSD/12,'$')+'/mo | '+fmt(sr.totalProtocol,'S');
+    document.getElementById('sc-'+n+'-m').textContent=fmt(sr.totalProtocolUSD/12,'$')+'/mo | '+fmt(sr.totalProtocol,'S');
     });
 
+    updateAotSensitivitySummary(p);
     updCharts(p,r);
     buildMatrix(p);
     if(typeof updateSimAssumptions==='function') updateSimAssumptions();
