@@ -266,6 +266,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .aot-sc-modal-section { background:#131417; border:1px solid #26292d; border-radius:8px; padding:10px 12px; margin-top:10px; }
 .aot-sc-modal-section h4 { margin:0 0 5px 0; font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--lime-soft); }
 .aot-sc-modal-section p { margin:0; font-size:12px; line-height:1.6; color:var(--text); }
+.aot-sc-modal-refs { white-space:pre-line; }
 
 
 
@@ -939,6 +940,10 @@ details[open] summary::before { transform:rotate(90deg); }
                     <h4>Why This Rule Is Used</h4>
                     <p id="aot-sc-modal-why">&mdash;</p>
                 </div>
+                <div class="aot-sc-modal-section">
+                    <h4>Additional Reference Points</h4>
+                    <p id="aot-sc-modal-refs" class="aot-sc-modal-refs">&mdash;</p>
+                </div>
             </div>
         </div>
 
@@ -1392,6 +1397,7 @@ const _scenarioPool = CORE_GROUP_SPECS.map(g => _filterBySegments(_aotProgs, g.s
 const _scenarioAgg = _aggPrograms(_scenarioPool);
 const _scenarioActivePayers = _scenarioPool.filter(function(p){ return (p.fpc_nb || 0) > 0; });
 const _scenarioActiveAgg = _aggPrograms(_scenarioActivePayers);
+const _scenarioP70Active = _quantile(_scenarioActivePayers.map(function(p){ return Number(p.fpc_nb) || 0; }), 0.70);
 const _scenarioWinsor = _winsorizedWeightedNonBase(_scenarioPool, 0.05, 0.95);
 const _scenarioPopulationLabel = 'Population: core only (aot + both), is_aot_relevant=true, cu>0; benchmark excluded.';
 
@@ -2116,6 +2122,7 @@ function _openAotScenarioModal(key){
     _setScenarioModalText('aot-sc-modal-metric', d.metric);
     _setScenarioModalText('aot-sc-modal-calc', d.calculation);
     _setScenarioModalText('aot-sc-modal-why', d.why);
+    _setScenarioModalText('aot-sc-modal-refs', d.refs);
     backdrop.classList.add('show');
     backdrop.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -2159,43 +2166,59 @@ function initAotFcuSection(){
 
     const includedCategoriesText = 'Included application categories are Prop AMM, DEX (aggregator, AMM pools, and orderbook), lending, oracle, bridge, perps, cranker-style programs, depin, payments, NFT, and gaming. Only programs with positive compute usage over the 30-day window are included. Arb-bot benchmark rows are excluded, and categories such as unknown and other are not used in scenario construction.';
     const representativeText = 'Representative names in this included set include BisonFi and HumidiFi (Prop AMM), Jupiter and Pump.fun programs (DEX), and Kamino programs (lending).';
+    const activePayerDefinition = 'Active payers are included application programs with non-base fee/CU > 0 over the 30-day window.';
+    const includedCount = _scenarioPool.length;
+    const activeCount = _scenarioActivePayers.length;
+    const referencePointsText = [
+        'Included programs: n = ' + includedCount,
+        'Active payers: n = ' + activeCount,
+        'P25 active non-base fee/CU: ' + _fConRaw.toFixed(4) + ' lam/CU',
+        'Raw CU-weighted non-base fee/CU: ' + _fOptRaw.toFixed(4) + ' lam/CU',
+        'P70 active non-base fee/CU: ' + _scenarioP70Active.toFixed(4) + ' lam/CU',
+        'CU-weighted total fee/CU: ' + _fBullRaw.toFixed(4) + ' lam/CU',
+        'These are additional reference points only; they do not replace the four scenario rules.'
+    ].join('\n');
 
     _aotScenarioExplain = {
         con: {
             title: 'Conservative',
             value: _fCon.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents a low but still credible willingness-to-pay environment among currently active application programs.',
-            scope: includedCategoriesText + ' For this scenario, we additionally require active fee-paying behavior, meaning non-base fee/CU is above zero. ' + representativeText,
-            metric: 'Metric used: non-base fee/CU, where non-base means priority fees plus MEV / JIT fees. Rule applied: take the lower quartile (p25) among active fee-paying included programs, then apply a hard floor of 0.10 lam/CU.',
-            calculation: 'Observed p25 non-base fee/CU among active fee-paying included programs = ' + _fConRaw.toFixed(4) + ' lam/CU. Floor rule = 0.10 lam/CU. Final displayed value = max(' + _fConRaw.toFixed(4) + ', 0.10) = ' + _fCon.toFixed(2) + ' lam/CU.',
-            why: 'This rule keeps the downside case realistic for product planning while remaining tied to observed paying behavior.'
+            scope: includedCategoriesText + ' Included programs for scenario construction: n = ' + includedCount + '. For this scenario, we additionally use active payers only: n = ' + activeCount + '. ' + activePayerDefinition + ' ' + representativeText,
+            metric: 'Metric used: non-base fee/CU, where non-base means priority fees plus MEV / JIT fees. Rule applied: take P25 among active payers, then apply a hard floor of 0.10 lam/CU.',
+            calculation: 'Observed P25 non-base fee/CU among active payers (n = ' + activeCount + ') = ' + _fConRaw.toFixed(4) + ' lam/CU. Floor rule = 0.10 lam/CU. Final displayed value = max(' + _fConRaw.toFixed(4) + ', 0.10) = ' + _fCon.toFixed(2) + ' lam/CU.',
+            why: 'This rule keeps the downside case realistic for product planning while remaining tied to observed paying behavior.',
+            refs: referencePointsText
         },
         base: {
             title: 'Base',
             value: _fBase.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents the robust central market state for current application demand.',
-            scope: includedCategoriesText + ' ' + representativeText,
-            metric: 'Metric used: CU-weighted non-base fee/CU across the included application categories. Rule applied: clip extreme program-level values at p5/p95 before computing the weighted average, so a few dominant names do not distort the baseline.',
-            calculation: 'Observed raw CU-weighted non-base fee/CU across included programs = ' + _fBaseObserved.toFixed(4) + ' lam/CU. Outlier clipping bounds are p5 = ' + _scenarioWinsor.pLow.toFixed(4) + ' and p95 = ' + _scenarioWinsor.pHigh.toFixed(4) + ' lam/CU. Final displayed value after clipping and CU-weighting = ' + _fBase.toFixed(2) + ' lam/CU.',
-            why: 'This rule gives a stable default market baseline without letting a few extreme values dominate.'
+            scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
+            metric: 'Metric used: CU-weighted non-base fee/CU across included programs. Rule applied: clip extreme program-level values at P5 and P95 before computing the weighted average, so a few dominant names do not distort the baseline.',
+            calculation: 'Observed raw CU-weighted non-base fee/CU across included programs (n = ' + includedCount + ') = ' + _fBaseObserved.toFixed(4) + ' lam/CU. Outlier clipping bounds are P5 = ' + _scenarioWinsor.pLow.toFixed(4) + ' and P95 = ' + _scenarioWinsor.pHigh.toFixed(4) + ' lam/CU. Final displayed value after clipping and CU-weighting = ' + _fBase.toFixed(2) + ' lam/CU.',
+            why: 'This rule gives a stable default market baseline without letting a few extreme values dominate.',
+            refs: referencePointsText
         },
         opt: {
             title: 'Optimistic',
             value: _fOpt.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents a stronger but still market-observed state of willingness to pay.',
-            scope: includedCategoriesText + ' ' + representativeText,
+            scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
             metric: 'Metric used: raw CU-weighted non-base fee/CU across the included application categories. Rule applied: no outlier clipping is used in this scenario.',
-            calculation: 'Observed raw CU-weighted non-base fee/CU across included programs = ' + _fOptRaw.toFixed(4) + ' lam/CU. No clipping is applied. Final displayed value = ' + _fOpt.toFixed(2) + ' lam/CU.',
-            why: 'This rule keeps Optimistic fully anchored in observed market data and avoids an arbitrary midpoint construction.'
+            calculation: 'Observed raw CU-weighted non-base fee/CU across included programs (n = ' + includedCount + ') = ' + _fOptRaw.toFixed(4) + ' lam/CU. No clipping is applied. Final displayed value = ' + _fOpt.toFixed(2) + ' lam/CU.',
+            why: 'This rule keeps Optimistic fully anchored in observed market data and avoids an arbitrary midpoint construction.',
+            refs: referencePointsText
         },
         bull: {
             title: 'Bull',
             value: _fBull.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents sustained high-demand conditions where applications absorb the full all-in fee burden.',
-            scope: includedCategoriesText + ' ' + representativeText,
+            scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
             metric: 'Metric used: CU-weighted total fee/CU across the included application categories. Rule applied: total fee/CU includes base fees plus priority and MEV / JIT components.',
-            calculation: 'Observed CU-weighted total fee/CU across included programs = ' + _fBullRaw.toFixed(4) + ' lam/CU. This includes base fees in addition to non-base fees. Final displayed value = ' + _fBull.toFixed(2) + ' lam/CU.',
-            why: 'This rule is used as an upper-bound reference for periods when applications face sustained all-in fee costs.'
+            calculation: 'Observed CU-weighted total fee/CU across included programs (n = ' + includedCount + ') = ' + _fBullRaw.toFixed(4) + ' lam/CU. This includes base fees in addition to non-base fees. Final displayed value = ' + _fBull.toFixed(2) + ' lam/CU.',
+            why: 'This rule is used as an upper-bound reference for periods when applications face sustained all-in fee costs.',
+            refs: referencePointsText
         }
     };
     _bindAotScenarioModal();
