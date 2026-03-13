@@ -284,6 +284,10 @@ details[open] summary::before { transform:rotate(90deg); }
 .validator-kpi-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px; }
 .validator-kpi-value { font-size:22px; color:var(--text); font-family:var(--font-mono); font-weight:700; line-height:1.15; }
 .validator-kpi-sub { font-size:10px; color:var(--text-mid); margin-top:4px; line-height:1.45; }
+.validator-formula { margin-top:8px; padding-top:8px; border-top:1px solid #23262f; }
+.validator-formula-line { font-size:12px; color:var(--text); line-height:1.55; font-family:var(--font-mono); }
+.validator-formula-line + .validator-formula-line { margin-top:3px; }
+.validator-formula-note { font-size:10px; color:#C7CBD1; line-height:1.45; margin-top:6px; }
 .validator-yield-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; }
 .validator-source-note { font-size:10px; color:var(--text-mid); line-height:1.5; margin-top:10px; }
 .validator-source-note a { color:var(--lime-soft); text-decoration:none; }
@@ -1226,6 +1230,11 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-kpi-label">Incremental APR Uplift</div>
                 <div class="validator-kpi-value" id="validator-uplift-apr">0.00%</div>
                 <div class="validator-kpi-sub">Total validator revenue / connected stake</div>
+                <div class="validator-formula">
+                    <div class="validator-formula-line" id="validator-apr-formula-line1">Incremental APR uplift = Total validator revenue (SOL/yr) / Connected stake (SOL)</div>
+                    <div class="validator-formula-line" id="validator-apr-formula-line2">= 0 SOL / 0 SOL = 0.000%</div>
+                    <div class="validator-formula-note" id="validator-apr-formula-note">Using validator revenue pool in SOL and connected stake in SOL.</div>
+                </div>
             </div>
             <div class="validator-kpi">
                 <div class="validator-kpi-label">Incremental APY Uplift</div>
@@ -2779,6 +2788,9 @@ function update(){
     document.getElementById('validator-uplift-apy').textContent = fmtValidatorRate(incrementalApyUplift);
     document.getElementById('validator-total-apr').textContent = fmtValidatorRate(totalApr);
     document.getElementById('validator-total-apy').textContent = fmtValidatorRate(totalApy);
+    document.getElementById('validator-apr-formula-line1').textContent = 'Incremental APR uplift = Total validator revenue (SOL/yr) / Connected stake (SOL)';
+    document.getElementById('validator-apr-formula-line2').textContent = '= ' + fmtValidatorSol(totalValidatorRevenueSol) + ' / ' + fmtValidatorSol(connectedStakeSol) + ' = ' + fmtValidatorRate(incrementalAprUplift);
+    document.getElementById('validator-apr-formula-note').textContent = 'Using validator revenue pool in SOL and connected stake in SOL.';
     document.getElementById('validator-uplift-note').textContent = 'Default denominator: connected stake = ' + fmt(connectedStakeSol, 'S') + '. Incremental APR uplift = total validator revenue / connected stake. APY uses daily compounding.';
     document.getElementById('stake-sol-helper').innerHTML = '<strong>Implied stake:</strong> ' + fmt(raikuStakeSol, 'S') + ' of ' + fmt(totalStakedSol, 'S') + ' total staked';
     document.getElementById('blk-cu-helper').innerHTML = '<strong>Reserved CU:</strong> ' + fmt(reservedCu, 'i') + ' CU of ' + fmt(CB, 'i') + ' CU/block';
