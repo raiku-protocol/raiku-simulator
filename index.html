@@ -231,6 +231,8 @@ details[open] summary::before { transform:rotate(90deg); }
 .sidebar-yield-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px; }
 .sidebar-yield-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:600; }
 .sidebar-yield-sub { font-size:9px; color:var(--text2); margin-top:2px; }
+.sidebar-yield-sub a { color:var(--lime-soft); text-decoration:none; }
+.sidebar-yield-sub a:hover { text-decoration:underline; }
 
 /* Custom tooltip for info icon */
 .info-tip { position:relative; display:inline-block; cursor:help; margin-left:4px; }
@@ -655,7 +657,7 @@ details[open] summary::before { transform:rotate(90deg); }
         <div class="sidebar-yield-row">
             <div class="sidebar-yield-label">Current Total Solana Staked</div>
             <div class="sidebar-yield-value" id="validator-staked-value">423.96M SOL</div>
-            <div class="sidebar-yield-sub" id="validator-staked-source">Source: Solana RPC getVoteAccounts snapshot fallback (2026-03-13). Updating live on load.</div>
+            <div class="sidebar-yield-sub" id="validator-staked-source">Source: <a href="https://api.mainnet-beta.solana.com" target="_blank" rel="noopener noreferrer">Solana RPC</a></div>
         </div>
         <div class="sidebar-yield-row">
             <div class="sidebar-yield-label">Validator Revenue</div>
@@ -1505,7 +1507,7 @@ const STAKE_RPC_URL = 'https://api.mainnet-beta.solana.com';
 const STAKE_FALLBACK_SOL = 423960262.118339;
 let _solanaStakeState = {
     sol: STAKE_FALLBACK_SOL,
-    sourceNote: 'Source: Solana RPC getVoteAccounts snapshot fallback (2026-03-13). Updating live on load.',
+    sourceHtml: 'Source: <a href="' + STAKE_RPC_URL + '" target="_blank" rel="noopener noreferrer">Solana RPC</a>',
     mode: 'fallback'
 };
 
@@ -1546,13 +1548,13 @@ async function loadCurrentTotalSolanaStaked(){
         if (!(totalLamports > 0)) throw new Error('No activated stake returned');
         _solanaStakeState = {
             sol: totalLamports / LS,
-            sourceNote: 'Source: live Solana RPC getVoteAccounts from api.mainnet-beta.solana.com (sum of activatedStake across current + delinquent vote accounts).',
+            sourceHtml: 'Source: <a href="' + STAKE_RPC_URL + '" target="_blank" rel="noopener noreferrer">Solana RPC</a>',
             mode: 'live'
         };
     } catch (err) {
         _solanaStakeState = {
             sol: STAKE_FALLBACK_SOL,
-            sourceNote: 'Source: Solana RPC getVoteAccounts snapshot fallback (2026-03-13), used because live fetch was unavailable.',
+            sourceHtml: 'Source: <a href="' + STAKE_RPC_URL + '" target="_blank" rel="noopener noreferrer">Solana RPC</a>',
             mode: 'fallback'
         };
     }
@@ -2497,7 +2499,7 @@ function update(){
     document.getElementById('v-fcu').textContent=p.f<0.1?p.f.toFixed(3):p.f>=10?p.f.toFixed(1):p.f.toFixed(2);
     document.getElementById('v-price').textContent='$'+p.p;
     document.getElementById('validator-staked-value').textContent = fmt(totalStakedSol, 'S');
-    document.getElementById('validator-staked-source').textContent = _solanaStakeState.sourceNote;
+    document.getElementById('validator-staked-source').innerHTML = _solanaStakeState.sourceHtml;
     document.getElementById('stake-sol-helper').innerHTML = '<strong>Implied stake:</strong> ' + fmt(raikuStakeSol, 'S') + ' of ' + fmt(totalStakedSol, 'S') + ' total staked';
     document.getElementById('blk-cu-helper').innerHTML = '<strong>Reserved CU:</strong> ' + fmt(reservedCu, 'i') + ' CU of ' + fmt(CB, 'i') + ' CU/block';
     document.getElementById('fcu-block-fee-helper').innerHTML = '<strong>Auction fees/block:</strong> ' + fmt(auctionFeesLamportsPerBlock, 'i') + ' lamports/block (~' + auctionFeesSolPerBlock.toFixed(6) + ' SOL/block)';
