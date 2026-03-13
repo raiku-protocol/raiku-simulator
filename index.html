@@ -155,13 +155,9 @@ details[open] summary::before { transform:rotate(90deg); }
 /* ═══ Sidebar Layout — inputs & outputs side-by-side ═══ */
 .tab-layout { display:flex; gap:var(--gap); align-items:flex-start; }
 .sidebar {
-    width:430px; min-width:430px; position:sticky; top:10px;
-    max-height:calc(100vh - 100px); overflow-y:auto;
-    scrollbar-width:thin; scrollbar-color:#333 transparent;
+    width:430px; min-width:430px; position:relative;
+    max-height:none; overflow:visible;
 }
-.sidebar::-webkit-scrollbar { width:4px; }
-.sidebar::-webkit-scrollbar-track { background:transparent; }
-.sidebar::-webkit-scrollbar-thumb { background:#333; border-radius:2px; }
 .main-content { flex:1; min-width:0; }
 
 /* Compact sidebar controls */
