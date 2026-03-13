@@ -1,11 +1,11 @@
 window.RAIKU_AOT_DATA = {
   "schema_version": "aot_programs.v1",
-  "generated_at_utc": "2026-03-12T21:06:01Z",
+  "generated_at_utc": "2026-03-13T09:47:59Z",
   "source_file": "data/processed/program_database.csv + data/mapping/program_categories.csv",
-  "source_revision": "036a533",
+  "source_revision": "e664399",
   "window_start_date": "2026-02-04",
   "window_end_date": "2026-03-05",
-  "program_count": 117,
+  "program_count": 205,
   "programs": [
     {
       "program_id": "13gDzEXCdocbj8iAiqrScGo47NiSuYENGsRqi3SEAwet",
@@ -68,6 +68,54 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "268xoH5VPMgtcuaBgXimyRHebsubszqQzPUrU5duJLL8",
+      "program_name": "Arb Bot (268xo)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.005877564,
+      "fee_base_sol_30d": 0.00837,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "2KehYt3KsEQR53jYcxjbQp2d2kCp4AkuQW68atufRwSr",
+      "program_name": "MEV Bot (2KehY)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.006962053,
+      "fee_base_sol_30d": 0.000705,
+      "fee_priority_sol_30d": 0.059797,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "2M86GVGn3AHgAX9afQrYeSEETJBs9qmDtxb3f6kEa87H",
+      "program_name": "Trading Bot (2M86G)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 23.306482345,
+      "fee_base_sol_30d": 0.764685,
+      "fee_priority_sol_30d": 3.775988,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "2QKKmkEbkC1rakibHw1A6oRGWabw22W7jr143oVBti78",
+      "program_name": "Trading Bot (2QKKm)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.001205408,
+      "fee_base_sol_30d": 0.0001,
+      "fee_priority_sol_30d": 0.06,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "2qGyiNeWyZxNdkvWHc2jT5qkCnYa1j1gDLSSUmyoWMh8",
       "program_name": "Elixir Program",
       "product_scope": "both",
@@ -77,6 +125,42 @@ window.RAIKU_AOT_DATA = {
       "cu_b_30d": 19.698155172,
       "fee_base_sol_30d": 0.76145,
       "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "2snGap4Sehqid8zhufpTmGZbPxWsD1c6ab7rcMaocoou",
+      "program_name": "MEV Bot (2snGa)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.002854449,
+      "fee_base_sol_30d": 4.5e-05,
+      "fee_priority_sol_30d": 0.018,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "3AQz4t3ShixZWw5vhvkAindHhMco3s12gxgvGuMeh2Yg",
+      "program_name": "Trading Bot (3AQz4)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 126.652055818,
+      "fee_base_sol_30d": 4.123435,
+      "fee_priority_sol_30d": 0.45239,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "3Wn9MScovnLzVB4B8DxtchiPrX7jSanSgvUqSQfBM3MW",
+      "program_name": "Trading Bot (3Wn9M)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 1.084620038,
+      "fee_base_sol_30d": 0.117625,
+      "fee_priority_sol_30d": 0.492025,
       "fee_jito_sol_30d": 0.0
     },
     {
@@ -92,6 +176,42 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "42C9thies2WottySPmi2k93Nq2eP7TUtPZxHVAhicxMP",
+      "program_name": "Trading Bot (42C9t)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.034086101,
+      "fee_base_sol_30d": 0.009795,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "45DJvdkD7fiTrhsrNxaWd8jAiWJ1G5S98W7n4Wg8gJdW",
+      "program_name": "Trading Bot (45DJv)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.050839748,
+      "fee_base_sol_30d": 0.02118,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "45fCmmKfFjZ1bYu7zHyUPYsfPauQAD1RVinUmBp8DbSb",
+      "program_name": "Trading Bot (45fC)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 22.89642284,
+      "fee_base_sol_30d": 3.338445,
+      "fee_priority_sol_30d": 14.739386,
+      "fee_jito_sol_30d": 0.88537
+    },
+    {
       "program_id": "4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg",
       "program_name": "Mango Markets V4",
       "product_scope": "both",
@@ -101,6 +221,18 @@ window.RAIKU_AOT_DATA = {
       "cu_b_30d": 9.957e-05,
       "fee_base_sol_30d": 5e-06,
       "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "5bsFrMYiXMEEkVny2x37J1kK3U6h6RbtYGqxNAAFeSV7",
+      "program_name": "Trading Bot (5bsFr)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 9.753688773,
+      "fee_base_sol_30d": 0.324565,
+      "fee_priority_sol_30d": 1.690913,
       "fee_jito_sol_30d": 0.0
     },
     {
@@ -114,6 +246,18 @@ window.RAIKU_AOT_DATA = {
       "fee_base_sol_30d": 1.455285,
       "fee_priority_sol_30d": 16.732962,
       "fee_jito_sol_30d": 0.269253
+    },
+    {
+      "program_id": "6AXRaajKYrh6Q4tKkeD8hXB7D4uUr91wXjhYYHULeLZU",
+      "program_name": "Arb Bot (6AXRa)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.020158122,
+      "fee_base_sol_30d": 0.00096,
+      "fee_priority_sol_30d": 0.081705,
+      "fee_jito_sol_30d": 0.0085
     },
     {
       "program_id": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
@@ -152,6 +296,18 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "6m9TTqMk9RoJxNjGMrTeNAmjewMWfmk2gRYubPDE8x6k",
+      "program_name": "Trading Bot (6m9TT)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 84.116511017,
+      "fee_base_sol_30d": 2.720005,
+      "fee_priority_sol_30d": 5.57266,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "6sbWW8qnrXoNXVMcTGLBQJefuaNcJsuqxztXUegHi4Wq",
       "program_name": "Unknown Bot (6sbWW)",
       "product_scope": "aot",
@@ -176,6 +332,30 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.26815
     },
     {
+      "program_id": "7TAvuPyU7cDMhhfXs1yCDZPEEbPuynd7zVeUtQLjfLmZ",
+      "program_name": "Trading Bot (7TAvuP)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 1.702969686,
+      "fee_base_sol_30d": 0.05848,
+      "fee_priority_sol_30d": 2.687904,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "8Ue7UGaqgk9GR3YphyDMe9TX4rdUqsbVXfPcFbzM5LDE",
+      "program_name": "Arbitrage Bot (8Ue7U)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 2784.855273442,
+      "fee_base_sol_30d": 37.598135,
+      "fee_priority_sol_30d": 26.966134,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "8aquaCPqbpsWvHdpfhTgfBg8eJWqNZKQgyYzzFXCdRkH",
       "program_name": "Aqua Protocol",
       "product_scope": "aot",
@@ -185,6 +365,30 @@ window.RAIKU_AOT_DATA = {
       "cu_b_30d": 22.270616592,
       "fee_base_sol_30d": 0.81589,
       "fee_priority_sol_30d": 0.000142,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "8jaLKWLJAj5jVCZbxpe3zRUvLB3LD48MRtaQ2AjfCfxa",
+      "program_name": "Trading Bot (8jaL)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 104.645838162,
+      "fee_base_sol_30d": 6.957755,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "8p6MKtMGGugZMy2HGXtL3uBb11y7xuzXmbMbQgNmWVUQ",
+      "program_name": "Trading Bot (8p6MK)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.136113851,
+      "fee_base_sol_30d": 0.029315,
+      "fee_priority_sol_30d": 0.0,
       "fee_jito_sol_30d": 0.0
     },
     {
@@ -200,6 +404,18 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "9GCBb4NsSDRuEkkGfQkN37oppmMVPops5sXDWhAKAvQQ",
+      "program_name": "Trading Bot (9GCBb)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 5.329077125,
+      "fee_base_sol_30d": 0.22982,
+      "fee_priority_sol_30d": 34.962299,
+      "fee_jito_sol_30d": 0.067939
+    },
+    {
       "program_id": "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp",
       "program_name": "HumidiFi",
       "product_scope": "aot",
@@ -210,6 +426,102 @@ window.RAIKU_AOT_DATA = {
       "fee_base_sol_30d": 1403.89481,
       "fee_priority_sol_30d": 119.529749,
       "fee_jito_sol_30d": 161.925507
+    },
+    {
+      "program_id": "9SmGhxjLJfnatg8Xu1Ff2QM7vNMDbsbLWFwBeEzXtnBX",
+      "program_name": "Arb Bot (9SmGh)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.156937096,
+      "fee_base_sol_30d": 0.008395,
+      "fee_priority_sol_30d": 0.075555,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "9VX8EKBg6vM6tA68xaDsPkbrx26XConZjkQmhVApUptc",
+      "program_name": "MEV Bot (9VX8)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.823445754,
+      "fee_base_sol_30d": 7.74037,
+      "fee_priority_sol_30d": 1.075748,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "9cqmzK6tbYamubkrZFWANuuzzEGQkjQLEyKgUX8SNnt7",
+      "program_name": "Arb Bot (9cqmz)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.010777843,
+      "fee_base_sol_30d": 0.00044,
+      "fee_priority_sol_30d": 0.952817,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "9i7QdbBHx7fjLAAaFfcDRgkdS4oNfKv8duzyE27a1kJ6",
+      "program_name": "MEV Bot (9i7Qd)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.842472746,
+      "fee_base_sol_30d": 0.028075,
+      "fee_priority_sol_30d": 116.318867,
+      "fee_jito_sol_30d": 216.542731
+    },
+    {
+      "program_id": "9zWqf5jhauvxMc9RETXD9xbaMBrJpzPzGB6PR34Ksq6Z",
+      "program_name": "MEV Bot (9zWqf)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.004909524,
+      "fee_base_sol_30d": 0.0001,
+      "fee_priority_sol_30d": 0.04,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "A1oayh35gLkRG8fHcXtfdGJmbsubAeJA7URVVET3h8MZ",
+      "program_name": "Arb Bot (A1oay)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.020216554,
+      "fee_base_sol_30d": 0.000365,
+      "fee_priority_sol_30d": 0.513925,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "A22URFxrKkdWaQ3q51NbzDc4pGjh29UNU9WdHna5QDa5",
+      "program_name": "Arb Bot (A22UR)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.156716554,
+      "fee_base_sol_30d": 0.043595,
+      "fee_priority_sol_30d": 0.06048,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "A95jD3nCCc9AeXhbYEYLeJ1owLG8hErfuLri9W1BRqTf",
+      "program_name": "MEV Bot (A95jD)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.00266154,
+      "fee_base_sol_30d": 5e-05,
+      "fee_priority_sol_30d": 0.0192,
+      "fee_jito_sol_30d": 0.0
     },
     {
       "program_id": "ALPHAQmeA7bjrVuccPsYPiCvsi428SNwte66Srvs4pHA",
@@ -272,6 +584,114 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "ARBTRGgcwmy3VS2W9YaauL7FSMBmB41cJ8EkfWGo8D6c",
+      "program_name": "Arbitrage Bot (ARBTR)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 38.269688603,
+      "fee_base_sol_30d": 0.924545,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 2.913755
+    },
+    {
+      "program_id": "AURAsuSzLv3v8SX3Y7emMFzGTWiepJK3Sm4x77GB9n1G",
+      "program_name": "MEV Bot (AURAs)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.002993363,
+      "fee_base_sol_30d": 0.000475,
+      "fee_priority_sol_30d": 0.048885,
+      "fee_jito_sol_30d": 0.0182
+    },
+    {
+      "program_id": "AZipysY3PXDM61RJzdnP4UtWR3tVgM9kGdxXwLbjP41S",
+      "program_name": "Unknown Bot (AZipy)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.530174716,
+      "fee_base_sol_30d": 0.14016,
+      "fee_priority_sol_30d": 0.762442,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "AnCCJjheynmGqPp6Vgat9DTirGKD4CtQzP8cwTYV8qKH",
+      "program_name": "Whale Bot (AnCCJ)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.095601709,
+      "fee_base_sol_30d": 0.00404,
+      "fee_priority_sol_30d": 0.777649,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "Arcj82pX7HxYKLR92qvgZUAd7vGS1k4hQvAFcPATFdEQ",
+      "program_name": "Trading Bot (Arcj8)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.203210935,
+      "fee_base_sol_30d": 0.01489,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "AtomCf57Gdp49TDf2q6w7ypqEwPEaCCpxbpTdD4RmDQt",
+      "program_name": "Arbitrage Bot (AtomC)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 2.177305446,
+      "fee_base_sol_30d": 0.076085,
+      "fee_priority_sol_30d": 0.00816,
+      "fee_jito_sol_30d": 27.112135
+    },
+    {
+      "program_id": "B1osUCap5eJ2iJnbRqfCQB87orhJM5EqZqPcGMbjJvXz",
+      "program_name": "Trading Bot (B1osU)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.041816735,
+      "fee_base_sol_30d": 0.017375,
+      "fee_priority_sol_30d": 0.0027,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "B1sFgxd4X7WSw9622AoWna7YoweSm9oXARL2Dk5vtBAs",
+      "program_name": "Trading Bot (B1sFg)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.001551668,
+      "fee_base_sol_30d": 0.00016,
+      "fee_priority_sol_30d": 0.034962,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "BLzDYkUcxzBv6ne24N2YyPECoYTvDTKaukbbEemKASc4",
+      "program_name": "Arb Bot (BLzDY)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.030404666,
+      "fee_base_sol_30d": 0.00091,
+      "fee_priority_sol_30d": 0.108083,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "BSwp6bEBihVLdqJRKGgzjcGLHkcTuzmSo1TQkHepzH8p",
       "program_name": "BonkSwap",
       "product_scope": "both",
@@ -281,6 +701,18 @@ window.RAIKU_AOT_DATA = {
       "cu_b_30d": 7.2711e-05,
       "fee_base_sol_30d": 5e-06,
       "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "Bgo4vNe3vxRv37j8mmQarJo8vbjHEKgkhJDZzxiizBid",
+      "program_name": "Trading Bot (Bgo4v)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 9.496041058,
+      "fee_base_sol_30d": 0.601305,
+      "fee_priority_sol_30d": 74.682606,
       "fee_jito_sol_30d": 0.0
     },
     {
@@ -294,6 +726,30 @@ window.RAIKU_AOT_DATA = {
       "fee_base_sol_30d": 525.06284,
       "fee_priority_sol_30d": 418.48651,
       "fee_jito_sol_30d": 156.277162
+    },
+    {
+      "program_id": "BwRZQcpiqQrQkpfWJDxzcpojPRmTB21FoVQYkcZBBReo",
+      "program_name": "Trading Bot (BwRZQ)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 25.354571677,
+      "fee_base_sol_30d": 0.69672,
+      "fee_priority_sol_30d": 1.327066,
+      "fee_jito_sol_30d": 1e-06
+    },
+    {
+      "program_id": "BzKgd9G8JXPPC91yrYfSQcHfQsgiARwGETH4VQYfGB8p",
+      "program_name": "Trading Bot (BzKgd)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 7.455893633,
+      "fee_base_sol_30d": 0.25177,
+      "fee_priority_sol_30d": 0.933448,
+      "fee_jito_sol_30d": 0.0
     },
     {
       "program_id": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
@@ -368,6 +824,42 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.278205
     },
     {
+      "program_id": "CRSHdMVmWgRsarrRWnRXWKMxJhLEUheiU6SEhqCLS4Gm",
+      "program_name": "Unknown Bot (CRSHd)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.449087215,
+      "fee_base_sol_30d": 0.47177,
+      "fee_priority_sol_30d": 0.478851,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "CRSeeBqjDnm3UPefJ9gxrtngTsnQRhEJiTA345Q83X3v",
+      "program_name": "Unknown Bot (CRSee)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 1.410448024,
+      "fee_base_sol_30d": 0.38695,
+      "fee_priority_sol_30d": 4.893469,
+      "fee_jito_sol_30d": 0.0002
+    },
+    {
+      "program_id": "CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu",
+      "program_name": "Arb Bot (CZcvo)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.012633216,
+      "fee_base_sol_30d": 0.00949,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "Ccip842gzYHhvdDkSyi2YVCoAWPbYJoApMFzSxQroE9C",
       "program_name": "Chainlink CCIP",
       "product_scope": "both",
@@ -377,6 +869,42 @@ window.RAIKU_AOT_DATA = {
       "cu_b_30d": 0.037985476,
       "fee_base_sol_30d": 0.00085,
       "fee_priority_sol_30d": 0.121726,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "Ceu4aCcSV624aRGUoWt2pPd5YuLZM4gyos7kyrPrpGG1",
+      "program_name": "Arbitrage Bot (Ceu4a)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 242.92100782,
+      "fee_base_sol_30d": 13.092695,
+      "fee_priority_sol_30d": 1.226713,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "CoqTVH4YViufSd8idZ7WwndUQUDWnTT6yERGjXfjQd52",
+      "program_name": "Trading Bot (CoqT)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 123.586562562,
+      "fee_base_sol_30d": 3.768875,
+      "fee_priority_sol_30d": 4.522784,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "CroWg74XNDF8UMnAZVbXx49iVj7iJ7b4CsqTCVWF7aK",
+      "program_name": "Arbitrage Bot (CroWg)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 91.644294039,
+      "fee_base_sol_30d": 3.05294,
+      "fee_priority_sol_30d": 44.799197,
       "fee_jito_sol_30d": 0.0
     },
     {
@@ -428,6 +956,42 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "DGgwXnCW9ERZoqEbk47Z1Ny7tHmpptFLzBmq9ydua259",
+      "program_name": "Trading Bot (DGgwX)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 1.842318842,
+      "fee_base_sol_30d": 0.56948,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "DRSw8uSW9De7eCKSM9qXm7aD2QKrvcJnA7Hf4Uu3ezYM",
+      "program_name": "Arb Bot (DRSw8)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.101732224,
+      "fee_base_sol_30d": 0.004425,
+      "fee_priority_sol_30d": 0.069197,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "DSw5ibYPfvZH3VxCCwBWFNndu1pGTAkKfb6M1h9zwD8E",
+      "program_name": "Arb Bot (DSw5i)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.0382108,
+      "fee_base_sol_30d": 0.010625,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0172
+    },
+    {
       "program_id": "DT3X9y2w3S13M4GiQNbMtsrYeA9eEZpLg6frM4V28at5",
       "program_name": "Automated Bot (DT3X)",
       "product_scope": "aot",
@@ -437,6 +1001,18 @@ window.RAIKU_AOT_DATA = {
       "cu_b_30d": 8.491292755,
       "fee_base_sol_30d": 20.567275,
       "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "ECPPeiMVPo6BeoP67vkhLgDMbMtnVNzpGEQJb1kcTpbE",
+      "program_name": "Arb Bot (ECPPe)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.002370993,
+      "fee_base_sol_30d": 0.0004,
+      "fee_priority_sol_30d": 0.107082,
       "fee_jito_sol_30d": 0.0
     },
     {
@@ -488,6 +1064,18 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.004501
     },
     {
+      "program_id": "Ewkv3JahEFRKkcJmpoKB7pXbnUHwjAyXiwEo4ZY2rezQ",
+      "program_name": "Trading Bot (Ewkv3)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.29561998,
+      "fee_base_sol_30d": 0.05625,
+      "fee_priority_sol_30d": 0.012001,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "ExponentnaRg3CQbW6dqQNZKXp7gtZ9DGMp1cwC4HAS7",
       "program_name": "Exponent Finance",
       "product_scope": "aot",
@@ -498,6 +1086,54 @@ window.RAIKU_AOT_DATA = {
       "fee_base_sol_30d": 0.000155,
       "fee_priority_sol_30d": 0.0,
       "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "F6KwbonKLyLNbD1SfWDwKN3T3BUxK3Pguy3yxWtxo9w9",
+      "program_name": "Whale Bot (F6Kwb)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.155213675,
+      "fee_base_sol_30d": 0.00675,
+      "fee_priority_sol_30d": 1.889588,
+      "fee_jito_sol_30d": 3.796388
+    },
+    {
+      "program_id": "FD1amxhTsDpwzoVX41dxp2ygAESURV2zdUACzxM1Dfw9",
+      "program_name": "Arbitrage Bot (FD1am)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.024156885,
+      "fee_base_sol_30d": 0.001825,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "FDF8AxHB8UK7RS6xay6aBvwS3h7kez9gozqz14JyfKsg",
+      "program_name": "Trading Bot (FDF8A)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.431257459,
+      "fee_base_sol_30d": 0.07827,
+      "fee_priority_sol_30d": 3.377033,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "FEeSA5Er5hR9B6GFnu59MGcWazERt7jfaCkzGuQxs2XT",
+      "program_name": "Trading Bot (FEeSA)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.000990318,
+      "fee_base_sol_30d": 0.000105,
+      "fee_priority_sol_30d": 0.09,
+      "fee_jito_sol_30d": 0.022503
     },
     {
       "program_id": "FHKBuiohcYB5n636h7UmHahRGU5UCHX8CSb6DNSUqX65",
@@ -536,6 +1172,18 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.240737
     },
     {
+      "program_id": "FR1SDyLUj7PrMbtkUCkDrBymk5eWrRmr3UvWFb5Kjbmd",
+      "program_name": "Trading Bot (FR1SD)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.135251632,
+      "fee_base_sol_30d": 0.018095,
+      "fee_priority_sol_30d": 0.587401,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "FW6zUqn4iKRaeopwwhwsquTY6ABWLLgjxtrC3VPnaWBf",
       "program_name": "WhaleStreet",
       "product_scope": "aot",
@@ -560,6 +1208,66 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "FdDd6eCKiRTUDnQ9o466pDnpcks6kwPCVc1uqcMdScAf",
+      "program_name": "Unknown Bot (FdDd6)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 4.118645492,
+      "fee_base_sol_30d": 3.24152,
+      "fee_priority_sol_30d": 0.726349,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "FsWxHsafrajWKW5YZTT76D8sYCAVfbA4iNoPxNFQqUet",
+      "program_name": "Arbitrage Bot (FsWxH)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 10.967188568,
+      "fee_base_sol_30d": 0.418355,
+      "fee_priority_sol_30d": 0.003924,
+      "fee_jito_sol_30d": 31.20385
+    },
+    {
+      "program_id": "FtyzXdj1NRexpX3WJqxs4qaqo2S2LehiRPyPY9hWDarn",
+      "program_name": "Trading Bot (Ftyz)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 15.186197862,
+      "fee_base_sol_30d": 3.17485,
+      "fee_priority_sol_30d": 14.887592,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "Fy1YwPariTjcEZMrmDaYDwxPKWTsR7z3HjqyS2zrr87g",
+      "program_name": "Arb Bot (Fy1Yw)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.821102841,
+      "fee_base_sol_30d": 0.03292,
+      "fee_priority_sol_30d": 0.006584,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "G2E4eoenFMirpFKRfHNo2koDP7mrhnNWVwxyHASSpjQD",
+      "program_name": "Trading Bot (G2E4e)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 18.747362373,
+      "fee_base_sol_30d": 0.61932,
+      "fee_priority_sol_30d": 83.044483,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "G77G9wS9JzkzWNGwQjUhRswbA5N8hYKpCK4TZRj9G1Pw",
       "program_name": "Keeper Bot (G77G9)",
       "product_scope": "aot",
@@ -570,6 +1278,18 @@ window.RAIKU_AOT_DATA = {
       "fee_base_sol_30d": 1.0181,
       "fee_priority_sol_30d": 0.0,
       "fee_jito_sol_30d": 1.359144
+    },
+    {
+      "program_id": "GFzXiEhiRauw6k59L15zz4UJ9ZANaF5gpPtxEaYCo8jv",
+      "program_name": "Trading Bot (GFzXi)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.286885056,
+      "fee_base_sol_30d": 0.026925,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
     },
     {
       "program_id": "Gmso1uvJnLbawvw7yezdfCDcPydwW2s2iqG3w6MDucLo",
@@ -632,6 +1352,18 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "HYTuofQSW1WQnBKGa7zJfccPjoveLKDxCUiZvjRB5ep7",
+      "program_name": "Arb Bot (HYTuo)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.064165548,
+      "fee_base_sol_30d": 0.03356,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.1122
+    },
+    {
       "program_id": "HpNfyc2Saw7RKkQd8nEL4khUcuPhQ7WwY1B2qjx8jxFq",
       "program_name": "PancakeSwap",
       "product_scope": "both",
@@ -692,6 +1424,18 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 1.034409
     },
     {
+      "program_id": "King7ki4SKMBPb3iupnQwTyjsq294jaXsgLmJo8cb7T",
+      "program_name": "Arbitrage Bot (King7)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 76.212665214,
+      "fee_base_sol_30d": 13.45334,
+      "fee_priority_sol_30d": 393.454408,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "KvauGMspG5k6rtzrqqn7WNn3oZdyKqLKwK2XWQ8FLjd",
       "program_name": "Kvault Program",
       "product_scope": "aot",
@@ -714,6 +1458,30 @@ window.RAIKU_AOT_DATA = {
       "fee_base_sol_30d": 3.362175,
       "fee_priority_sol_30d": 1.56903,
       "fee_jito_sol_30d": 24.368408
+    },
+    {
+      "program_id": "LanMV9sAd7wArD4vJFi2qDdfnVhFxYSUg6eADduJ3uj",
+      "program_name": "Trading Bot (LanMV)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.509750787,
+      "fee_base_sol_30d": 0.050565,
+      "fee_priority_sol_30d": 0.098633,
+      "fee_jito_sol_30d": 0.013493
+    },
+    {
+      "program_id": "LiMoM9rMhrdYrfzUCxQppvxCSG1FcrUK9G8uLq4A1GF",
+      "program_name": "Trading Bot (LiMoM)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 11.968619472,
+      "fee_base_sol_30d": 0.230165,
+      "fee_priority_sol_30d": 36.828903,
+      "fee_jito_sol_30d": 0.060708
     },
     {
       "program_id": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e",
@@ -760,6 +1528,30 @@ window.RAIKU_AOT_DATA = {
       "tier_key": "standard",
       "cu_b_30d": 0.244392725,
       "fee_base_sol_30d": 0.02687,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "MevFXXGBgBMbr2c9G6GWE9Vo8qo8GCVed4jn1npP5tG",
+      "program_name": "MEV Bot (MevFXX)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 8.189333342,
+      "fee_base_sol_30d": 0.273875,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 11.090078
+    },
+    {
+      "program_id": "NA247a7YE9S3p9CdKmMyETx8TTwbSdVbVYHHxpnHTUV",
+      "program_name": "Unknown Bot (NA247)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.000272072,
+      "fee_base_sol_30d": 6.5e-05,
       "fee_priority_sol_30d": 0.0,
       "fee_jito_sol_30d": 0.0
     },
@@ -836,6 +1628,18 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 8.836864
     },
     {
+      "program_id": "PdMDrKEMaX8q7CCJb7NvUCxerBCcsFUa4LjBEynTtEd",
+      "program_name": "pumpup.ai",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 48.234340032,
+      "fee_base_sol_30d": 3.75046,
+      "fee_priority_sol_30d": 0.750072,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY",
       "program_name": "Phoenix",
       "product_scope": "both",
@@ -845,6 +1649,18 @@ window.RAIKU_AOT_DATA = {
       "cu_b_30d": 0.013462566,
       "fee_base_sol_30d": 0.002005,
       "fee_priority_sol_30d": 0.002665,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "Q72w4coozA552keKDdeeh2EyQw32qfMFsHPu6cbatom",
+      "program_name": "Tip Bot (Q72w4)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.000630639,
+      "fee_base_sol_30d": 0.05861,
+      "fee_priority_sol_30d": 0.0,
       "fee_jito_sol_30d": 0.0
     },
     {
@@ -858,6 +1674,30 @@ window.RAIKU_AOT_DATA = {
       "fee_base_sol_30d": 0.0003,
       "fee_priority_sol_30d": 0.0,
       "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "R6yPssVmTujhhE8QPUnVpmuz8yzQaFkkqQxBuxQX53R",
+      "program_name": "MEV Bot (R6yPs)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.006729892,
+      "fee_base_sol_30d": 0.000605,
+      "fee_priority_sol_30d": 0.180053,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3",
+      "program_name": "Trading Bot (REFER)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.191356575,
+      "fee_base_sol_30d": 0.03006,
+      "fee_priority_sol_30d": 0.492647,
+      "fee_jito_sol_30d": 0.03
     },
     {
       "program_id": "RangohQxaWip6i1twAAnRVLmob9j88fid7sq2DMAATW",
@@ -884,6 +1724,18 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "SAbErai3UvzycbkooTMoQkD3Y7JVr5aEf7tEHBW1AWf",
+      "program_name": "Verified Arb Bot (SAbEr)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 1.967948805,
+      "fee_base_sol_30d": 0.05709,
+      "fee_priority_sol_30d": 1.1e-05,
+      "fee_jito_sol_30d": 6.365495
+    },
+    {
       "program_id": "SHARKobtfF1bHhxD2eqftjHBdVSCbKo9JtgK71FhELP",
       "program_name": "Sharky.fi",
       "product_scope": "aot",
@@ -905,6 +1757,30 @@ window.RAIKU_AOT_DATA = {
       "cu_b_30d": 0.504001408,
       "fee_base_sol_30d": 0.01561,
       "fee_priority_sol_30d": 0.008908,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "SMRTzfY6DfH5ik3TKiyLFfXexV8uSG3d2UksSCYdunG",
+      "program_name": "Unknown Bot (SMRT)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.479750288,
+      "fee_base_sol_30d": 0.09755,
+      "fee_priority_sol_30d": 1.500766,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY",
+      "program_name": "Trading Bot (SP12t)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.001445603,
+      "fee_base_sol_30d": 0.000435,
+      "fee_priority_sol_30d": 0.11571,
       "fee_jito_sol_30d": 0.0
     },
     {
@@ -932,6 +1808,18 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "Sea3VpnUhM9WqWqUqVGxjqqxzFvkb8abkXaPVKdmyiR",
+      "program_name": "Trading Bot (Sea3V)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 2.187525825,
+      "fee_base_sol_30d": 0.058645,
+      "fee_priority_sol_30d": 0.036301,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo",
       "program_name": "Solend v2",
       "product_scope": "aot",
@@ -956,6 +1844,18 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "StenDH7EmnXdcniwsXgTWtN1ogfQksZ1C5UGBr7dNBG",
+      "program_name": "MEV Bot (StenDH7)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 132.326980451,
+      "fee_base_sol_30d": 4.60324,
+      "fee_priority_sol_30d": 492.107924,
+      "fee_jito_sol_30d": 7.344735
+    },
+    {
       "program_id": "T1TANpTeScyeqVzzgNViGDNrkQ6qHz9KrSBS4aNXvGT",
       "program_name": "Titan Exchange Router",
       "product_scope": "both",
@@ -968,6 +1868,30 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqt",
+      "program_name": "Jito Tip Payment",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 95.597526777,
+      "fee_base_sol_30d": 8.164345,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "VisTAPABATtyG5FGQ3twF7Hk6xAi6qBPS5BLuGoSQ3i",
+      "program_name": "Trading Bot (VisTAP)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 1.465157618,
+      "fee_base_sol_30d": 0.709915,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "WattJi1TzD85VrBjrSspQUQQau1cZ8kzxZr3i6VNnhg",
       "program_name": "Watt Protocol",
       "product_scope": "aot",
@@ -977,6 +1901,18 @@ window.RAIKU_AOT_DATA = {
       "cu_b_30d": 0.263455171,
       "fee_base_sol_30d": 0.01492,
       "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "Yt3A8KLfo7JEz8RGHw2zbaQE6MVcf9duKmb24dgXbsD",
+      "program_name": "Trading Bot (Yt3A8)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.185787123,
+      "fee_base_sol_30d": 0.177155,
+      "fee_priority_sol_30d": 0.717605,
       "fee_jito_sol_30d": 0.0
     },
     {
@@ -1000,6 +1936,18 @@ window.RAIKU_AOT_DATA = {
       "tier_key": "high",
       "cu_b_30d": 5.493e-05,
       "fee_base_sol_30d": 1e-05,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "arb1pgEiYNYvJQJwQn8u4PKAnRpJGPSVdAPU5P4KtUX",
+      "program_name": "Arbitrage Bot",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.224133057,
+      "fee_base_sol_30d": 0.03252,
       "fee_priority_sol_30d": 0.0,
       "fee_jito_sol_30d": 0.0
     },
@@ -1100,6 +2048,30 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "hi5iKPdHrk15joDZcfTio8vw5SnYnvrXQMv2qESCrJj",
+      "program_name": "Trading Bot (hi5iK)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 2.625862918,
+      "fee_base_sol_30d": 0.071135,
+      "fee_priority_sol_30d": 4.194139,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "idemJL67fKhpev5vKcxHrosuVyTat6wVC9sFfoPVg3Y",
+      "program_name": "Arb Bot (idem)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 1.655994313,
+      "fee_base_sol_30d": 1.3675,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "jCebN34bUfdeUYJT13J1yG16XWQpt5PDx6Mse9GUqhR",
       "program_name": "Jupiter DCA",
       "product_scope": "aot",
@@ -1110,6 +2082,18 @@ window.RAIKU_AOT_DATA = {
       "fee_base_sol_30d": 0.00576,
       "fee_priority_sol_30d": 1e-06,
       "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "jesterKqzZ7hWfNLnUDeB8WtMrm7a44g2vSyhs7WmyT",
+      "program_name": "Trading Bot (jester)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 87.391110626,
+      "fee_base_sol_30d": 2.56996,
+      "fee_priority_sol_30d": 628.955587,
+      "fee_jito_sol_30d": 4.745939
     },
     {
       "program_id": "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9",
@@ -1268,6 +2252,30 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.098051
     },
     {
+      "program_id": "proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u",
+      "program_name": "Unknown Bot (proVF)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.125321135,
+      "fee_base_sol_30d": 0.00339,
+      "fee_priority_sol_30d": 0.026106,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "pudgeNoz4YrkpwZr8dYmhkHJz87yRHsJeyxZhQChetj",
+      "program_name": "Trading Bot (pudge)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 116.234237005,
+      "fee_base_sol_30d": 3.775345,
+      "fee_priority_sol_30d": 38.538611,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "pythWSnswVUd12oZpeFP8e9CVaEqJg25g1Vtc2biRsT",
       "program_name": "Pyth Push Oracle",
       "product_scope": "aot",
@@ -1304,6 +2312,18 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "riptK81hDxhe5pW5jSzSM9iRA8azgEgLJ4dXkPtBS7j",
+      "program_name": "Tip Bot (riptK)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.142980699,
+      "fee_base_sol_30d": 2.1308,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "routeUGWgWzqBWFcrCfv8tritsqukccJPu3q5GPP3xS",
       "program_name": "Jupiter Route",
       "product_scope": "both",
@@ -1328,6 +2348,30 @@ window.RAIKU_AOT_DATA = {
       "fee_jito_sol_30d": 0.0
     },
     {
+      "program_id": "traderDnaR5w6Tcoi3NFm53i48FTDNbGjBSZwWXDRrg",
+      "program_name": "Trader Bot",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.176755078,
+      "fee_base_sol_30d": 0.016505,
+      "fee_priority_sol_30d": 0.0,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "trsrzhs1sRgiHcKhjMmRrgK3X8Wus3LBWogF7t13wzZ",
+      "program_name": "Trading Bot (trsrz)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.001602216,
+      "fee_base_sol_30d": 9e-05,
+      "fee_priority_sol_30d": 0.032971,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
       "program_id": "tuna4uSQZncNeeiAMKbstuxA9CUkHH6HmC64wgmnogD",
       "program_name": "DefiTuna",
       "product_scope": "aot",
@@ -1349,6 +2393,18 @@ window.RAIKU_AOT_DATA = {
       "cu_b_30d": 11.025088943,
       "fee_base_sol_30d": 0.276805,
       "fee_priority_sol_30d": 0.508169,
+      "fee_jito_sol_30d": 0.0
+    },
+    {
+      "program_id": "vanshF62ku4jVVdf8DS47SXuJC1rq8qokGSANAomhey",
+      "program_name": "Trading Bot (vansh)",
+      "product_scope": "jit",
+      "is_aot_relevant": true,
+      "segment_key": "arb_bot",
+      "tier_key": "standard",
+      "cu_b_30d": 0.321862774,
+      "fee_base_sol_30d": 0.03749,
+      "fee_priority_sol_30d": 2.144299,
       "fee_jito_sol_30d": 0.0
     },
     {
