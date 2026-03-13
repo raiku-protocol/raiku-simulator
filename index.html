@@ -657,7 +657,7 @@ details[open] summary::before { transform:rotate(90deg); }
         <div class="sidebar-yield-row">
             <div class="sidebar-yield-label">Current Total Solana Staked</div>
             <div class="sidebar-yield-value" id="validator-staked-value">423.96M SOL</div>
-            <div class="sidebar-yield-sub" id="validator-staked-source">Source: <a href="https://api.mainnet-beta.solana.com" target="_blank" rel="noopener noreferrer">Solana RPC</a></div>
+            <div class="sidebar-yield-sub" id="validator-staked-source">Source: <a href="https://solanacompass.com/tokenomics" target="_blank" rel="noopener noreferrer">Solana Compass Tokenomics</a></div>
         </div>
         <div class="sidebar-yield-row">
             <div class="sidebar-yield-label">Validator Revenue</div>
@@ -1507,7 +1507,7 @@ const STAKE_RPC_URL = 'https://api.mainnet-beta.solana.com';
 const STAKE_FALLBACK_SOL = 423960262.118339;
 let _solanaStakeState = {
     sol: STAKE_FALLBACK_SOL,
-    sourceHtml: 'Source: <a href="' + STAKE_RPC_URL + '" target="_blank" rel="noopener noreferrer">Solana RPC</a>',
+    sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics" target="_blank" rel="noopener noreferrer">Solana Compass Tokenomics</a>',
     mode: 'fallback'
 };
 
@@ -1548,13 +1548,13 @@ async function loadCurrentTotalSolanaStaked(){
         if (!(totalLamports > 0)) throw new Error('No activated stake returned');
         _solanaStakeState = {
             sol: totalLamports / LS,
-            sourceHtml: 'Source: <a href="' + STAKE_RPC_URL + '" target="_blank" rel="noopener noreferrer">Solana RPC</a>',
+            sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics" target="_blank" rel="noopener noreferrer">Solana Compass Tokenomics</a>',
             mode: 'live'
         };
     } catch (err) {
         _solanaStakeState = {
             sol: STAKE_FALLBACK_SOL,
-            sourceHtml: 'Source: <a href="' + STAKE_RPC_URL + '" target="_blank" rel="noopener noreferrer">Solana RPC</a>',
+            sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics" target="_blank" rel="noopener noreferrer">Solana Compass Tokenomics</a>',
             mode: 'fallback'
         };
     }
