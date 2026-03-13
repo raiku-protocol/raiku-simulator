@@ -870,61 +870,42 @@ details[open] summary::before { transform:rotate(90deg); }
                     <h3>Conservative</h3>
                     <div class="sc-val" id="aot-sc-con-f">&mdash;</div>
                     <div class="sc-detail" id="aot-sc-con-anchor">&mdash;</div>
-                    <div class="sc-monthly" id="aot-sc-con-formula">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-con-basis">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-con-pop">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-con-total">&mdash;</div>
                 </div>
                 <div class="scenario-card" id="aot-sc-card-base">
                     <h3>Base</h3>
                     <div class="sc-val" id="aot-sc-base-f">&mdash;</div>
                     <div class="sc-detail" id="aot-sc-base-anchor">&mdash;</div>
-                    <div class="sc-monthly" id="aot-sc-base-formula">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-base-basis">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-base-pop">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-base-total">&mdash;</div>
                 </div>
                 <div class="scenario-card" id="aot-sc-card-opt">
                     <h3>Optimistic</h3>
                     <div class="sc-val" id="aot-sc-opt-f">&mdash;</div>
                     <div class="sc-detail" id="aot-sc-opt-anchor">&mdash;</div>
-                    <div class="sc-monthly" id="aot-sc-opt-formula">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-opt-basis">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-opt-pop">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-opt-total">&mdash;</div>
                 </div>
                 <div class="scenario-card" id="aot-sc-card-bull">
                     <h3>Bull</h3>
                     <div class="sc-val" id="aot-sc-bull-f">&mdash;</div>
                     <div class="sc-detail" id="aot-sc-bull-anchor">&mdash;</div>
-                    <div class="sc-monthly" id="aot-sc-bull-formula">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-bull-basis">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-bull-pop">&mdash;</div>
+                    <div class="sc-monthly" id="aot-sc-bull-total">&mdash;</div>
                 </div>
             </div>
         </div>
 
         <!-- Top programs by fee/CU (from external artifact) — BOTH metrics shown -->
         <div style="margin-bottom:16px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
-                <div style="font-size:12px;font-weight:600;color:var(--text);">Top AOT-Relevant Programs (Top 100)</div>
-                <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text2);">
-                    <label for="aot-top-sort">Sort:</label>
-                    <select id="aot-top-sort" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:4px 8px;font-size:11px;">
-                        <option value="non_base_fees_30d">Non-base fees 30d</option>
-                        <option value="total_fees_30d">Total fees 30d</option>
-                        <option value="non_base_fee_cu">Non-base fee/CU</option>
-                        <option value="total_fee_cu">Total fee/CU</option>
-                        <option value="total_cu_30d">Total CU 30d</option>
-                    </select>
-                </div>
-            </div>
-            <div style="overflow-x:auto;border:1px solid var(--card-border);border-radius:6px;background:#0a0b0c;max-height:320px;overflow-y:auto;">
-                <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
-                    <thead style="position:sticky;top:0;background:#111213;">
-                        <tr style="border-bottom:1px solid var(--card-border);">
-                            <th style="padding:8px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Program</th>
-                            <th style="padding:8px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Category</th>
-                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Non-base fee/CU</th>
-                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Total fee/CU</th>
-                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Total CU 30d (Billions)</th>
-                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Non-base Fees 30d (SOL)</th>
-                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Total Fees 30d (SOL)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="aot-fcu-programs-tbody"></tbody>
-                </table>
-            </div>
-            <div style="font-size:11px;color:var(--text2);margin-top:6px;">Source: external simulator artifact (<code style="font-size:10px;">data/aot_programs.v1.js</code>) — 30-day window from artifact metadata. Default sort is <strong>non-base fees 30d</strong> descending. <strong>Non-base fee/CU</strong> = priority + MEV / JIT. <strong>Total fee/CU</strong> = base + priority + MEV / JIT.</div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;">Top AOT-Relevant Programs (Top 100)</div>
+            <div id="aot-top-programs-table" style="overflow-x:auto;border:1px solid var(--card-border);border-radius:6px;background:#0a0b0c;max-height:360px;overflow-y:auto;"></div>
+            <div style="font-size:11px;color:var(--text2);margin-top:6px;">Source: external simulator artifact (<code style="font-size:10px;">data/aot_programs.v1.js</code>) — 30-day window from artifact metadata. Default sort is <strong>non-base fees 30d</strong> descending. Click column headers to re-sort. <strong>Non-base fee/CU</strong> = priority + MEV / JIT. <strong>Total fee/CU</strong> = base + priority + MEV / JIT.</div>
         </div>
 
         <!-- Chart: fee/CU by category -->
@@ -939,9 +920,10 @@ details[open] summary::before { transform:rotate(90deg); }
                     </select>
                 </div>
             </div>
-            <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Non-base view uses stacked components <strong>priority + MEV / JIT</strong>. Total view uses stacked components <strong>base + non-base</strong>; tooltip always shows full decomposition.</div>
+            <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Non-base view uses stacked components <strong>priority + MEV / JIT</strong>. Total view uses stacked components <strong>base + priority + MEV / JIT</strong>; tooltip always shows full decomposition. <strong>Total</strong> = base + non-base.</div>
             <div style="height:380px;background:#0a0b0c;border-radius:6px;padding:8px;"><canvas id="chart-aot-fcu-tiers"></canvas></div>
             <div style="font-size:11px;color:var(--text2);margin-top:6px;">Weighted mean is CU-weighted while p25 / median / p75 are unweighted program percentiles; large gaps imply concentration.</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="aot-near-zero-note"></div>
         </div>
 
         <!-- Source metadata -->
@@ -1311,6 +1293,7 @@ function _aggPrograms(progs) {
     const nb = pri + mev;
     const tf = base + nb;
     const nbVals = progs.map(p => p.fpc_nb);
+    const tfVals = progs.map(p => p.fpc_tot);
     return {
         n: progs.length,
         cu,
@@ -1326,7 +1309,10 @@ function _aggPrograms(progs) {
         weightedTotal: cu > 0 ? tf / cu : 0,
         medianNonBase: _quantile(nbVals, 0.5),
         p25NonBase: _quantile(nbVals, 0.25),
-        p75NonBase: _quantile(nbVals, 0.75)
+        p75NonBase: _quantile(nbVals, 0.75),
+        medianTotal: _quantile(tfVals, 0.5),
+        p25Total: _quantile(tfVals, 0.25),
+        p75Total: _quantile(tfVals, 0.75)
     };
 }
 function _filterBySegments(progs, segments) {
@@ -1344,21 +1330,29 @@ const _benchmarkAgg = _aggPrograms(_jitBenchmarkProgs);
 
 const _scenarioPool = CORE_GROUP_SPECS.map(g => _filterBySegments(_aotProgs, g.segments)).flat();
 const _scenarioAgg = _aggPrograms(_scenarioPool);
+const _scenarioActivePayers = _scenarioPool.filter(function(p){ return (p.fpc_nb || 0) > 0; });
+const _scenarioActiveAgg = _aggPrograms(_scenarioActivePayers);
+const _scenarioPopulationLabel = 'Population: AOT + Both core categories, CU > 0, 30d artifact.';
 
-const _fCon = +_scenarioAgg.p25NonBase.toFixed(2);
+const _fConRaw = Number(_scenarioActiveAgg.p25NonBase || 0);
+const _fCon = +Math.max(0.01, _fConRaw).toFixed(2);
 const _fBase = +_scenarioAgg.weightedNonBase.toFixed(2);
 const _fOpt = +((_scenarioAgg.weightedNonBase + _scenarioAgg.weightedTotal) / 2).toFixed(2);
 const _fBull = +_scenarioAgg.weightedTotal.toFixed(2);
+const _fConTotalRef = +((Number(_scenarioActiveAgg.p25Total || 0) > 0 ? _scenarioActiveAgg.p25Total : (_fCon + _scenarioAgg.weightedBase))).toFixed(2);
+const _fBaseTotalRef = +_scenarioAgg.weightedTotal.toFixed(2);
+const _fOptTotalRef = +_scenarioAgg.weightedTotal.toFixed(2);
+const _fBullTotalRef = +_scenarioAgg.weightedTotal.toFixed(2);
 
 const SC = {
     con:  {c:5,j:2,s:1,b:5,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:Math.round(_jitBaseline*0.6/1000)*1000,
-           desc:"Conservative — non-base p25 anchor (priority + MEV / JIT)."},
+           desc:"Conservative — lower-bound non-base assumption from active fee payers (guardrailed floor)."},
     base: {c:5,j:5,s:5,b:10,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
-           desc:"Base — CU-weighted non-base anchor across canonical categories."},
+           desc:"Base — CU-weighted non-base level across core AOT categories."},
     opt:  {c:5,j:10,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:1500000,
-           desc:"Optimistic — transition blend between non-base and total fee/CU."},
+           desc:"Optimistic — midpoint between current non-base and all-in total fee pressure."},
     bull: {c:5,j:20,s:30,b:20,f:+_fBull.toFixed(2),p:250,ra:1.00,rj:0.50,vb:2.0,jm:5000000,
-           desc:"Bull — total fee/CU anchor (base + priority + MEV / JIT)."},
+           desc:"Bull — upper-bound case using CU-weighted total fee/CU."},
 };
 
 function fmt(v,t){
@@ -1847,18 +1841,25 @@ function _getCoreCategoryRows(includeBenchmark){
 function _buildCategoryChartDatasets(rows){
     if (_catChartMode === 'total') {
         return {
-            title: 'Total view (stacked): Base fee/CU + Non-base fee/CU',
+            title: 'Total view (stacked): Base fee/CU + Priority fee/CU + MEV / JIT fee/CU',
             datasets: [
                 {
                     label: 'Base fee/CU',
                     data: rows.map(r => r.weightedBase || 0),
-                    backgroundColor: rows.map(r => _hexWithAlpha(r.color, '66')),
+                    backgroundColor: rows.map(r => _hexWithAlpha(r.color, '44')),
                     borderColor: rows.map(r => _hexWithAlpha(r.color, 'AA')),
                     borderWidth: 1
                 },
                 {
-                    label: 'Non-base fee/CU',
-                    data: rows.map(r => r.weightedNonBase || 0),
+                    label: 'Priority fee/CU',
+                    data: rows.map(r => r.weightedPriority || 0),
+                    backgroundColor: rows.map(r => _hexWithAlpha(r.color, '99')),
+                    borderColor: rows.map(r => _hexWithAlpha(r.color, 'FF')),
+                    borderWidth: 1
+                },
+                {
+                    label: 'MEV / JIT fee/CU',
+                    data: rows.map(r => r.weightedMevJit || 0),
                     backgroundColor: rows.map(r => _hexWithAlpha(r.color, 'CC')),
                     borderColor: rows.map(r => _hexWithAlpha(r.color, 'FF')),
                     borderWidth: 1
@@ -1937,36 +1938,101 @@ function _renderAotCategoryChart(){
         }
     });
 }
-function _renderAotTopPrograms(){
-    const sortEl = document.getElementById('aot-top-sort');
-    const sortKey = sortEl ? sortEl.value : 'non_base_fees_30d';
-    const getSortValue = function(p){
-        if (sortKey === 'total_fees_30d') return p.tf || 0;
-        if (sortKey === 'non_base_fee_cu') return p.fpc_nb || 0;
-        if (sortKey === 'total_fee_cu') return p.fpc_tot || 0;
-        if (sortKey === 'total_cu_30d') return p.cu || 0;
-        return (p.pf || 0) + (p.jt || 0);
+var _aotTopSortKey = 'non_base_fees_30d';
+var _aotTopSortDir = -1;
+function _mapAotProgramAnalytics(p){
+    var s30 = SY * 30 / 365;
+    var nonBaseFees30d = (p.pf || 0) + (p.jt || 0);
+    var fpcPriority = p.cu > 0 ? (p.pf / p.cu) : null;
+    var fpcMevJit = p.cu > 0 ? (p.jt / p.cu) : null;
+    var fpcBase = p.cu > 0 ? (p.bf / p.cu) : null;
+    var txCount = Number.isFinite(p.tx_count_30d) && p.tx_count_30d > 0 ? p.tx_count_30d : null;
+    var blocksTouched = Number.isFinite(p.blocks_touched_30d) && p.blocks_touched_30d > 0 ? p.blocks_touched_30d : null;
+    var blockDen = blocksTouched || s30;
+    var avgCuBlock = p.cu > 0 ? (p.cu * 1e9 / blockDen) : null;
+    var nonBaseFeesBlock = blockDen > 0 ? nonBaseFees30d / blockDen : null;
+    var totalFeesBlock = blockDen > 0 ? (p.tf || 0) / blockDen : null;
+    var avgCuTx = (txCount && txCount > 0 && p.cu > 0) ? (p.cu * 1e9 / txCount) : null;
+    var avgTxBlock = (txCount && blockDen > 0) ? (txCount / blockDen) : null;
+    var avgNonBaseFeesTx = (txCount && txCount > 0) ? (nonBaseFees30d / txCount) : null;
+    var avgTotalFeesTx = (txCount && txCount > 0) ? ((p.tf || 0) / txCount) : null;
+    return {
+        ...p,
+        category_label: _groupLabelForSegment(p.segment_key),
+        non_base_fees_30d: nonBaseFees30d,
+        fpc_priority: fpcPriority,
+        fpc_mev_jit: fpcMevJit,
+        fpc_base: fpcBase,
+        avg_cu_block: avgCuBlock,
+        non_base_fees_block: nonBaseFeesBlock,
+        total_fees_block: totalFeesBlock,
+        avg_cu_tx: avgCuTx,
+        avg_tx_block: avgTxBlock,
+        avg_non_base_fees_tx: avgNonBaseFeesTx,
+        avg_total_fees_tx: avgTotalFeesTx,
+        tx_count_30d: txCount,
+        blocks_touched_30d: blocksTouched
     };
-    const sorted = _aotProgs
-        .filter(p => p.tf > 0)
-        .sort((a,b) => getSortValue(b) - getSortValue(a))
-        .slice(0, 100);
-    let tbody = '';
-    sorted.forEach(function(p){
-        const grp = _groupLabelForSegment(p.segment_key);
-        const nonBaseSol = (p.pf || 0) + (p.jt || 0);
-        tbody += '<tr style="border-bottom:1px solid #1a1a1a;">' +
-            '<td style="padding:6px 8px;color:var(--text);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + p.n + '</td>' +
-            '<td style="padding:6px 8px;color:var(--text2);">' + grp + '</td>' +
-            '<td style="padding:6px 8px;text-align:right;color:var(--text);font-weight:600;">' + _fmtFpc(p.fpc_nb) + '</td>' +
-            '<td style="padding:6px 8px;text-align:right;color:var(--text);font-weight:600;">' + _fmtFpc(p.fpc_tot) + '</td>' +
-            '<td style="padding:6px 8px;text-align:right;color:var(--text2);">' + (p.cu > 0 ? p.cu.toFixed(3) : '—') + '</td>' +
-            '<td style="padding:6px 8px;text-align:right;color:var(--text);">' + _fmtSol(nonBaseSol) + '</td>' +
-            '<td style="padding:6px 8px;text-align:right;color:var(--text);">' + _fmtSol(p.tf || 0) + '</td>' +
-        '</tr>';
+}
+function _sortAotTop(c){
+    if(_aotTopSortKey === c) _aotTopSortDir *= -1;
+    else { _aotTopSortKey = c; _aotTopSortDir = -1; }
+    _renderAotTopPrograms();
+}
+window.sortAotTop = _sortAotTop;
+function _renderAotTopPrograms(){
+    var rows = _aotProgs
+        .map(_mapAotProgramAnalytics)
+        .filter(function(r){ return (r.tf || 0) > 0; });
+    rows.sort(function(a,b){
+        var av = a[_aotTopSortKey], bv = b[_aotTopSortKey];
+        if (typeof av === 'string' || typeof bv === 'string') return String(av||'').localeCompare(String(bv||'')) * _aotTopSortDir;
+        var na = Number.isFinite(av) ? av : -Infinity;
+        var nb = Number.isFinite(bv) ? bv : -Infinity;
+        return (na - nb) * _aotTopSortDir;
     });
-    const tbEl = document.getElementById('aot-fcu-programs-tbody');
-    if (tbEl) tbEl.innerHTML = tbody;
+    rows = rows.slice(0, 100);
+
+    var cols = [
+        {k:'n', l:'Program', fmt:function(r){ return '<span title="' + r.id + '">' + r.n + '</span>'; }},
+        {k:'category_label', l:'Category', fmt:function(r){ return r.category_label; }},
+        {k:'fpc_nb', l:'Non-base fee/CU (lamports)', fmt:function(r){ return _fmtLam(r.fpc_nb); }},
+        {k:'fpc_tot', l:'Total fee/CU (lamports)', fmt:function(r){ return _fmtLam(r.fpc_tot); }},
+        {k:'fpc_priority', l:'Priority fee/CU (lamports)', fmt:function(r){ return _fmtLam(r.fpc_priority); }},
+        {k:'fpc_mev_jit', l:'MEV / JIT fee/CU (lamports)', fmt:function(r){ return _fmtLam(r.fpc_mev_jit); }},
+        {k:'fpc_base', l:'Base fee/CU (lamports)', fmt:function(r){ return _fmtLam(r.fpc_base); }},
+        {k:'avg_cu_block', l:'Avg CU / block', fmt:function(r){ return _fmtInt(r.avg_cu_block); }},
+        {k:'non_base_fees_block', l:'Non-base fees / block (SOL)', fmt:function(r){ return _fmtSol(r.non_base_fees_block); }},
+        {k:'total_fees_block', l:'Total fees / block (SOL)', fmt:function(r){ return _fmtSol(r.total_fees_block); }},
+        {k:'avg_cu_tx', l:'Avg CU / tx', fmt:function(r){ return _fmtInt(r.avg_cu_tx); }},
+        {k:'avg_tx_block', l:'Avg tx / block', fmt:function(r){ return r.avg_tx_block===null ? '—' : Number(r.avg_tx_block).toFixed(4); }},
+        {k:'avg_non_base_fees_tx', l:'Avg non-base fees / tx (SOL)', fmt:function(r){ return _fmtSol(r.avg_non_base_fees_tx); }},
+        {k:'avg_total_fees_tx', l:'Avg total fees / tx (SOL)', fmt:function(r){ return _fmtSol(r.avg_total_fees_tx); }},
+        {k:'cu', l:'Total CU 30d (billions)', fmt:function(r){ return r.cu > 0 ? r.cu.toFixed(3) : '—'; }},
+        {k:'pf', l:'Priority fees 30d (SOL)', fmt:function(r){ return _fmtSol(r.pf); }},
+        {k:'jt', l:'MEV / JIT fees 30d (SOL)', fmt:function(r){ return _fmtSol(r.jt); }},
+        {k:'bf', l:'Base fees 30d (SOL)', fmt:function(r){ return _fmtSol(r.bf); }},
+        {k:'non_base_fees_30d', l:'Non-base fees 30d (SOL)', fmt:function(r){ return _fmtSol(r.non_base_fees_30d); }},
+        {k:'tf', l:'Total fees 30d (SOL)', fmt:function(r){ return _fmtSol(r.tf); }},
+        {k:'tx_count_30d', l:'Tx count 30d', fmt:function(r){ return _fmtInt(r.tx_count_30d); }},
+        {k:'blocks_touched_30d', l:'Blocks touched 30d', fmt:function(r){ return _fmtInt(r.blocks_touched_30d); }}
+    ];
+
+    var h = '<table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);"><thead style="position:sticky;top:0;background:#111213;"><tr style="border-bottom:1px solid var(--card-border);">';
+    cols.forEach(function(c){
+        h += '<th onclick="sortAotTop(\'' + c.k + '\')" style="padding:8px 10px;text-align:' + (c.k==='n'||c.k==='category_label'?'left':'right') + ';color:var(--lime-soft);font-size:10px;text-transform:uppercase;cursor:pointer;">' + c.l + (_aotTopSortKey===c.k ? (_aotTopSortDir>0?' ▲':' ▼') : '') + '</th>';
+    });
+    h += '</tr></thead><tbody>';
+    rows.forEach(function(r){
+        h += '<tr style="border-bottom:1px solid #1a1a1a;">';
+        cols.forEach(function(c){
+            h += '<td style="padding:6px 8px;text-align:' + (c.k==='n'||c.k==='category_label'?'left':'right') + ';color:' + (c.k==='n'?'var(--text)':'var(--text2)') + ';">' + c.fmt(r) + '</td>';
+        });
+        h += '</tr>';
+    });
+    h += '</tbody></table>';
+    var wrap = document.getElementById('aot-top-programs-table');
+    if (wrap) wrap.innerHTML = h;
 }
 function initAotFcuSection(){
     const con = document.getElementById('aot-sc-con-f'); if (con) con.textContent = _fCon.toFixed(2) + ' lam/CU';
@@ -1974,18 +2040,26 @@ function initAotFcuSection(){
     const opt = document.getElementById('aot-sc-opt-f'); if (opt) opt.textContent = _fOpt.toFixed(2) + ' lam/CU';
     const bull = document.getElementById('aot-sc-bull-f'); if (bull) bull.textContent = _fBull.toFixed(2) + ' lam/CU';
 
-    const conA = document.getElementById('aot-sc-con-anchor'); if (conA) conA.textContent = 'Anchor: core p25 non-base fee/CU';
-    const baseA = document.getElementById('aot-sc-base-anchor'); if (baseA) baseA.textContent = 'Anchor: core CU-weighted non-base fee/CU';
-    const optA = document.getElementById('aot-sc-opt-anchor'); if (optA) optA.textContent = 'Anchor: midpoint between non-base and total';
-    const bullA = document.getElementById('aot-sc-bull-anchor'); if (bullA) bullA.textContent = 'Anchor: core CU-weighted total fee/CU';
+    const conA = document.getElementById('aot-sc-con-anchor'); if (conA) conA.textContent = 'Anchor: lower-bound willingness-to-pay from active fee-paying programs.';
+    const baseA = document.getElementById('aot-sc-base-anchor'); if (baseA) baseA.textContent = 'Anchor: current CU-weighted non-base fee pressure across core categories.';
+    const optA = document.getElementById('aot-sc-opt-anchor'); if (optA) optA.textContent = 'Anchor: midpoint between current non-base and all-in total fee pressure.';
+    const bullA = document.getElementById('aot-sc-bull-anchor'); if (bullA) bullA.textContent = 'Anchor: upper-bound case using CU-weighted total fee pressure.';
 
-    const conF = document.getElementById('aot-sc-con-formula'); if (conF) conF.textContent = 'Formula: fee = p25(non-base core)';
-    const baseF = document.getElementById('aot-sc-base-formula'); if (baseF) baseF.textContent = 'Formula: fee = weighted(non-base core)';
-    const optF = document.getElementById('aot-sc-opt-formula'); if (optF) optF.textContent = 'Formula: fee = 0.5 × (non-base + total)';
-    const bullF = document.getElementById('aot-sc-bull-formula'); if (bullF) bullF.textContent = 'Formula: fee = weighted(total core)';
+    const conB = document.getElementById('aot-sc-con-basis'); if (conB) conB.textContent = 'Metric basis: max(p25 non-base fee/CU among active fee payers, 0.01).';
+    const baseB = document.getElementById('aot-sc-base-basis'); if (baseB) baseB.textContent = 'Metric basis: CU-weighted mean non-base fee/CU.';
+    const optB = document.getElementById('aot-sc-opt-basis'); if (optB) optB.textContent = 'Metric basis: 0.5 × (CU-weighted non-base + CU-weighted total).';
+    const bullB = document.getElementById('aot-sc-bull-basis'); if (bullB) bullB.textContent = 'Metric basis: CU-weighted total fee/CU (base + priority + MEV / JIT).';
 
-    const topSort = document.getElementById('aot-top-sort');
-    if (topSort) topSort.addEventListener('change', _renderAotTopPrograms);
+    const conP = document.getElementById('aot-sc-con-pop'); if (conP) conP.textContent = _scenarioPopulationLabel;
+    const baseP = document.getElementById('aot-sc-base-pop'); if (baseP) baseP.textContent = _scenarioPopulationLabel;
+    const optP = document.getElementById('aot-sc-opt-pop'); if (optP) optP.textContent = _scenarioPopulationLabel;
+    const bullP = document.getElementById('aot-sc-bull-pop'); if (bullP) bullP.textContent = _scenarioPopulationLabel;
+
+    const conT = document.getElementById('aot-sc-con-total'); if (conT) conT.textContent = 'Secondary total reference: ' + _fConTotalRef.toFixed(2) + ' lam/CU';
+    const baseT = document.getElementById('aot-sc-base-total'); if (baseT) baseT.textContent = 'Secondary total reference: ' + _fBaseTotalRef.toFixed(2) + ' lam/CU';
+    const optT = document.getElementById('aot-sc-opt-total'); if (optT) optT.textContent = 'Secondary total reference: ' + _fOptTotalRef.toFixed(2) + ' lam/CU';
+    const bullT = document.getElementById('aot-sc-bull-total'); if (bullT) bullT.textContent = 'Secondary total reference: ' + _fBullTotalRef.toFixed(2) + ' lam/CU';
+
     const m1 = document.getElementById('aot-cat-chart-mode');
     const m2 = document.getElementById('sim-cat-chart-mode');
     const onModeChange = function(v){
@@ -2007,6 +2081,21 @@ function initAotFcuSection(){
         noteEl.textContent = missingActors.length
             ? ('Not populated in current taxonomy/economics window: ' + missingActors.join(', ') + '.')
             : 'All tracked canonical actor groups are populated in this window.';
+    }
+    const nearZeroEl = document.getElementById('aot-near-zero-note');
+    if (nearZeroEl) {
+        const nft = _coreAggByGroup.nft || _aggPrograms([]);
+        const gaming = _coreAggByGroup.gaming || _aggPrograms([]);
+        const maxNb = Math.max(..._getCoreCategoryRows(false).map(function(r){ return r.weightedNonBase || 0; }), 0);
+        const verySmallEconomics = ((nft.nonBaseSol + gaming.nonBaseSol) < 1) && ((nft.totalSol + gaming.totalSol) < 5);
+        const visuallyCompressed = maxNb > 0 && Math.max(nft.weightedNonBase, gaming.weightedNonBase) < (maxNb * 0.03);
+        if (verySmallEconomics) {
+            nearZeroEl.textContent = 'NFT and Gaming are near-zero mainly because current 30d economics in the loaded artifact are near-zero, not because of hidden categories.';
+        } else if (visuallyCompressed) {
+            nearZeroEl.textContent = 'NFT and Gaming are non-zero but visually compressed on this linear scale because larger categories dominate absolute fee/CU values.';
+        } else {
+            nearZeroEl.textContent = '';
+        }
     }
 
     _renderAotTopPrograms();
@@ -2801,13 +2890,20 @@ function _buildExplorerDatasets(rows){
             {
                 label:'Base fee/CU',
                 data: rows.map(function(r){ return r.weightedBase; }),
-                backgroundColor: rows.map(function(r){ return _hexWithAlpha(r.color, (r.id===selected || r.id===BENCHMARK_GROUP_SPEC.id) ? '66' : '33'); }),
+                backgroundColor: rows.map(function(r){ return _hexWithAlpha(r.color, (r.id===selected || r.id===BENCHMARK_GROUP_SPEC.id) ? '44' : '22'); }),
                 borderColor: rows.map(function(r){ return _hexWithAlpha(r.color, 'AA'); }),
                 borderWidth: 1
             },
             {
-                label:'Non-base fee/CU',
-                data: rows.map(function(r){ return r.weightedNonBase; }),
+                label:'Priority fee/CU',
+                data: rows.map(function(r){ return r.weightedPriority; }),
+                backgroundColor: rows.map(function(r){ return _hexWithAlpha(r.color, (r.id===selected || r.id===BENCHMARK_GROUP_SPEC.id) ? '99' : '55'); }),
+                borderColor: rows.map(function(r){ return _hexWithAlpha(r.color, 'FF'); }),
+                borderWidth: 1
+            },
+            {
+                label:'MEV / JIT fee/CU',
+                data: rows.map(function(r){ return r.weightedMevJit; }),
                 backgroundColor: rows.map(function(r){ return _hexWithAlpha(r.color, (r.id===selected || r.id===BENCHMARK_GROUP_SPEC.id) ? activeAlpha : mutedAlpha); }),
                 borderColor: rows.map(function(r){ return _hexWithAlpha(r.color, 'FF'); }),
                 borderWidth: 1
@@ -2836,7 +2932,7 @@ function initCatFcuChart(){
     if(!ctx) return;
     var rows = _getExplorerChartRows();
     var title = _catChartMode === 'total'
-        ? 'Total view: Base fee/CU + Non-base fee/CU'
+        ? 'Total view: Base fee/CU + Priority fee/CU + MEV / JIT fee/CU'
         : 'Non-base view: Priority fee/CU + MEV / JIT fee/CU';
     if(cCatFcu) cCatFcu.destroy();
     cCatFcu = new Chart(ctx, {
