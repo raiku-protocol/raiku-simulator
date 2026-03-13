@@ -767,7 +767,7 @@ details[open] summary::before { transform:rotate(90deg); }
     <h2>Data Sources & Methodology</h2>
 
     <!-- JIT Market Data — primary data transparency module -->
-    <details open style="margin-bottom:16px;">
+    <details open id="jit-method-details" style="margin-bottom:16px;">
     <summary style="font-size:13px;font-weight:700;color:var(--lime-soft);text-transform:uppercase;letter-spacing:1.2px;cursor:pointer;padding:10px 0;list-style:none;display:flex;align-items:center;gap:8px;">
         JIT Market Assumption &amp; Methodology
     </summary>
@@ -860,7 +860,7 @@ details[open] summary::before { transform:rotate(90deg); }
     </details>
 
     <!-- AOT Fee/CU Data — second core assumption transparency module -->
-    <details open style="margin-bottom:16px;">
+    <details open id="aot-method-details" style="margin-bottom:16px;">
     <summary style="font-size:13px;font-weight:700;color:var(--lime-soft);text-transform:uppercase;letter-spacing:1.2px;cursor:pointer;padding:10px 0;list-style:none;display:flex;align-items:center;gap:8px;">
         AOT Fee/CU Assumption &amp; Methodology
     </summary>
@@ -3492,6 +3492,12 @@ function shareSimulator(){
             setTimeout(()=>{ btn.innerHTML = orig; btn.style.background = ''; btn.style.color = ''; }, 2000);
         });
     }
+}
+
+const aotMethodDetails = document.getElementById('aot-method-details');
+const jitMethodDetails = document.getElementById('jit-method-details');
+if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitMethodDetails.parentNode) {
+    jitMethodDetails.parentNode.insertBefore(aotMethodDetails, jitMethodDetails);
 }
 </script>
 </body>
