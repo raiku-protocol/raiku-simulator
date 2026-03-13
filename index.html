@@ -2191,18 +2191,19 @@ function initAotFcuSection(){
     const includedCount = _scenarioPool.length;
     const activeCount = _scenarioActivePayers.length;
     const conAdditionalContextText = [
-        'Reminder: P25 active non-base fee/CU with explicit floor: max(P25 active, 0.10) = ' + _fCon.toFixed(2) + ' lam/CU.',
-        'Included programs: n = ' + includedCount,
-        'Active payers: n = ' + activeCount,
-        'P25 active non-base fee/CU: ' + _fConRaw.toFixed(4) + ' lam/CU',
-        'P30 active non-base fee/CU: ' + _scenarioP30Active.toFixed(4) + ' lam/CU',
+        'Reminder: P25 active non-base fee/CU = ' + _fConRaw.toFixed(4) + ' lam/CU (displayed as ' + _fCon.toFixed(2) + ' after floor).',
+        'All values below are computed from the currently loaded artifact (no manual override).',
+        'Case 1 (scenario rule): max(P25 active, 0.10) = ' + _fCon.toFixed(2) + ' lam/CU.',
+        'Case 2 (single rule on active-payer set): P30 active non-base fee/CU = ' + _scenarioP30Active.toFixed(4) + ' lam/CU.',
+        'Case 3 (single filter: active payers only): n = ' + activeCount + ', raw CU-weighted non-base fee/CU = ' + _scenarioActiveAgg.weightedNonBase.toFixed(4) + ' lam/CU.',
         activePayerAsterisk
     ].join('\n');
     const baseAdditionalContextText = [
-        'Reminder: Winsorized CU-weighted non-base fee/CU (P5-P95 clipping) = ' + _fBase.toFixed(2) + ' lam/CU.',
-        'Included programs: n = ' + includedCount,
-        'Raw CU-weighted non-base fee/CU (no clipping): ' + _fOptRaw.toFixed(4) + ' lam/CU',
-        'Median non-base fee/CU (included programs): ' + _scenarioAgg.medianNonBase.toFixed(4) + ' lam/CU'
+        'Reminder: Winsorized CU-weighted non-base fee/CU (P5-P95 clipping) = ' + _fBaseRaw.toFixed(4) + ' lam/CU (displayed as ' + _fBase.toFixed(2) + ').',
+        'All values below are computed from the currently loaded artifact (no manual override).',
+        'Case 1 (single rule: no clipping, included set n = ' + includedCount + '): raw CU-weighted non-base fee/CU = ' + _fBaseObserved.toFixed(4) + ' lam/CU.',
+        'Case 2 (scenario rule: P5-P95 clipping): CU-weighted non-base fee/CU = ' + _fBaseRaw.toFixed(4) + ' lam/CU.',
+        'Case 3 (single rule on included set): median non-base fee/CU = ' + _scenarioAgg.medianNonBase.toFixed(4) + ' lam/CU.'
     ].join('\n');
     const optAdditionalContextText = [
         'Reminder: Raw CU-weighted non-base fee/CU (no clipping) = ' + _fOptRaw.toFixed(4) + ' lam/CU (displayed as ' + _fOpt.toFixed(2) + ').',
