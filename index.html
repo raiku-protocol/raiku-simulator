@@ -262,6 +262,30 @@ details[open] summary::before { transform:rotate(90deg); }
 .sidebar-yield-sub a { color:var(--lime-soft); text-decoration:none; }
 .sidebar-yield-sub a:hover { text-decoration:underline; }
 
+.validator-layout { display:flex; gap:var(--gap); align-items:flex-start; }
+.validator-side { width:340px; min-width:340px; position:sticky; top:10px; align-self:flex-start; }
+.validator-main { flex:1; min-width:0; max-width:980px; display:grid; gap:var(--gap); }
+.validator-context-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px 12px; }
+.validator-context-item { min-width:0; }
+.validator-context-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.55px; margin-bottom:3px; }
+.validator-context-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.validator-note { font-size:10px; color:var(--text-mid); line-height:1.5; margin-top:10px; }
+.validator-kpi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; }
+.validator-kpi { background:#111213; border:1px solid #1f232b; border-radius:8px; padding:12px 14px; }
+.validator-kpi-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px; }
+.validator-kpi-value { font-size:22px; color:var(--text); font-family:var(--font-mono); font-weight:700; line-height:1.15; }
+.validator-kpi-sub { font-size:10px; color:var(--text-mid); margin-top:4px; line-height:1.45; }
+.validator-yield-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; }
+.validator-source-note { font-size:10px; color:var(--text-mid); line-height:1.5; margin-top:10px; }
+.validator-source-note a { color:var(--lime-soft); text-decoration:none; }
+.validator-source-note a:hover { text-decoration:underline; }
+
+@media(max-width:1100px) {
+    .validator-layout { flex-direction:column; }
+    .validator-side { width:100%; min-width:100%; position:static; }
+    .validator-main { max-width:none; width:100%; }
+}
+
 /* Custom tooltip for info icon */
 .info-tip { position:relative; display:inline-block; cursor:help; margin-left:4px; }
 .info-tip .info-icon { font-size:11px; color:var(--text2); opacity:0.7; }
@@ -1092,37 +1116,121 @@ details[open] summary::before { transform:rotate(90deg); }
 </div><!-- end tab-macro -->
 
 <div class="tab-content" id="tab-validator">
-<div class="section fade-in fade-in-1">
-    <h2>Validator Revenue APR / APY</h2>
-    <div class="sidebar-yield-grid">
-        <div class="sidebar-yield-row">
-            <div class="sidebar-yield-meta">
-                <div class="sidebar-yield-label">Current Total Solana Staked</div>
-                <div class="sidebar-yield-sub" id="validator-staked-source">Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a></div>
+<div class="validator-layout">
+<div class="validator-side">
+    <div class="section fade-in fade-in-1">
+        <h2>Scenario Context</h2>
+        <div class="validator-context-grid">
+            <div class="validator-context-item">
+                <div class="validator-context-label">Scenario</div>
+                <div class="validator-context-value" id="validator-scenario-name">Base Case</div>
             </div>
-            <div class="sidebar-yield-metric">
-                <div class="sidebar-yield-value prominent" id="validator-staked-value">423.95M SOL</div>
+            <div class="validator-context-item">
+                <div class="validator-context-label">SOL Price</div>
+                <div class="validator-context-value" id="validator-context-price">$100</div>
+            </div>
+            <div class="validator-context-item">
+                <div class="validator-context-label">Raiku Stake</div>
+                <div class="validator-context-value" id="validator-context-stake">10.0%</div>
+            </div>
+            <div class="validator-context-item">
+                <div class="validator-context-label">Connected Stake</div>
+                <div class="validator-context-value" id="validator-context-connected">42.39M SOL</div>
+            </div>
+            <div class="validator-context-item">
+                <div class="validator-context-label">Block Share</div>
+                <div class="validator-context-value" id="validator-context-block">5%</div>
+            </div>
+            <div class="validator-context-item">
+                <div class="validator-context-label">Avg Auction Fee/CU</div>
+                <div class="validator-context-value" id="validator-context-fee">0.50 L</div>
+            </div>
+            <div class="validator-context-item">
+                <div class="validator-context-label">AOT Take Rate</div>
+                <div class="validator-context-value" id="validator-context-aot-take">5.0%</div>
+            </div>
+            <div class="validator-context-item">
+                <div class="validator-context-label">JIT Take Rate</div>
+                <div class="validator-context-value" id="validator-context-jit-take">5.0%</div>
             </div>
         </div>
-        <div class="sidebar-yield-row">
-            <div class="sidebar-yield-meta">
-                <div class="sidebar-yield-label">Validator Revenue</div>
+        <div class="validator-note">Phase 1 uses the currently selected simulator state as the source of truth for validator-side annual revenue, then translates that revenue pool into yield uplift on the connected stake.</div>
+    </div>
+</div>
+<div class="validator-main">
+    <div class="section fade-in fade-in-1">
+        <h2>Base Network Yield</h2>
+        <div class="validator-kpi-grid">
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">Current Total Solana Staked</div>
+                <div class="validator-kpi-value" id="validator-staked-value">423.95M SOL</div>
+                <div class="validator-kpi-sub" id="validator-staked-source">Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a></div>
             </div>
-            <div class="sidebar-yield-metric">
-                <div class="sidebar-yield-value">Coming soon</div>
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">Base Staking APR</div>
+                <div class="validator-kpi-value" id="validator-base-apr">4.38%</div>
+                <div class="validator-kpi-sub">Derived from the sourced APY using daily compounding inverse.</div>
+            </div>
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">Base Staking APY</div>
+                <div class="validator-kpi-value" id="validator-base-apy">4.48%</div>
+                <div class="validator-kpi-sub" id="validator-base-yield-source">Source: <a href="https://explorer.rated.network/network?network=solana&timeWindow=30d&page=1&pageSize=15" target="_blank" rel="noopener noreferrer">Rated Network Overview (30d Delegator APY)</a></div>
             </div>
         </div>
-        <div class="sidebar-yield-row compact-pair">
-            <div class="sidebar-yield-pair-item">
-                <div class="sidebar-yield-label">APR</div>
-                <div class="sidebar-yield-value">Coming soon</div>
+        <div class="validator-source-note">APY convention for this tab: daily compounding (`n = 365`).</div>
+    </div>
+    <div class="section fade-in fade-in-2">
+        <h2>Raiku Validator Revenue Pool</h2>
+        <div class="validator-kpi-grid">
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">JIT Validator Revenue</div>
+                <div class="validator-kpi-value" id="validator-jit-usd">$0</div>
+                <div class="validator-kpi-sub" id="validator-jit-sol">0 SOL/yr</div>
             </div>
-            <div class="sidebar-yield-pair-item">
-                <div class="sidebar-yield-label">APY</div>
-                <div class="sidebar-yield-value">Coming soon</div>
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">AOT Validator Revenue</div>
+                <div class="validator-kpi-value" id="validator-aot-usd">$0</div>
+                <div class="validator-kpi-sub" id="validator-aot-sol">0 SOL/yr</div>
+            </div>
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">AOT Validator Bonus</div>
+                <div class="validator-kpi-value" id="validator-bonus-usd">$0</div>
+                <div class="validator-kpi-sub" id="validator-bonus-sol">0 SOL/yr</div>
+            </div>
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">Total Validator Revenue</div>
+                <div class="validator-kpi-value" id="validator-total-usd">$0</div>
+                <div class="validator-kpi-sub" id="validator-total-sol">0 SOL/yr</div>
             </div>
         </div>
     </div>
+    <div class="section fade-in fade-in-3">
+        <h2>Yield Uplift</h2>
+        <div class="validator-yield-grid">
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">Incremental APR Uplift</div>
+                <div class="validator-kpi-value" id="validator-uplift-apr">0.00%</div>
+                <div class="validator-kpi-sub">Total validator revenue / connected stake</div>
+            </div>
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">Incremental APY Uplift</div>
+                <div class="validator-kpi-value" id="validator-uplift-apy">0.00%</div>
+                <div class="validator-kpi-sub">Derived from APR using daily compounding</div>
+            </div>
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">Total APR After Uplift</div>
+                <div class="validator-kpi-value" id="validator-total-apr">0.00%</div>
+                <div class="validator-kpi-sub">Base APR + incremental APR uplift</div>
+            </div>
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">Total APY After Uplift</div>
+                <div class="validator-kpi-value" id="validator-total-apy">0.00%</div>
+                <div class="validator-kpi-sub">Base APY plus uplift under daily compounding</div>
+            </div>
+        </div>
+        <div class="validator-source-note" id="validator-uplift-note">Default denominator: connected stake.</div>
+    </div>
+</div>
 </div>
 </div><!-- end tab-validator -->
 
@@ -1556,6 +1664,9 @@ let _solanaStakeState = {
     sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a>',
     mode: 'reference'
 };
+const BASE_STAKING_APY = 0.0448;
+const APY_COMPOUNDING_PERIODS = 365;
+const BASE_YIELD_SOURCE_HTML = 'Source: <a href="https://explorer.rated.network/network?network=solana&timeWindow=30d&page=1&pageSize=15" target="_blank" rel="noopener noreferrer">Rated Network Overview (30d Delegator APY)</a>';
 const SCENARIO_LABELS = { con:'Conservative', base:'Base Case', opt:'Optimistic', bull:'Bull Case' };
 
 function fmt(v,t){
@@ -1587,6 +1698,24 @@ function fmtMatrixUsd(v){
     if (a >= 1e6) return '$' + (v / 1e6).toFixed(a >= 10e6 ? 0 : 1) + 'M';
     if (a >= 1000) return '$' + (v / 1e3).toFixed(a >= 100e3 ? 0 : 1) + 'K';
     return '$' + Math.round(v);
+}
+
+function aprToApy(apr, periods){
+    return Math.pow(1 + apr / periods, periods) - 1;
+}
+
+function apyToApr(apy, periods){
+    return periods * (Math.pow(1 + apy, 1 / periods) - 1);
+}
+
+function fmtRate(v){
+    return (v * 100).toFixed(2) + '%';
+}
+
+function getDisplayedScenarioName(){
+    const activeBtn = document.querySelector('.scenario-btn.active');
+    if (activeBtn) return activeBtn.textContent.trim();
+    return 'Custom';
 }
 
 function updateAotSensitivitySummary(p){
@@ -2501,11 +2630,20 @@ function update(){
     const p=gp(),r=calc(p);
     const tg = r.totalGross || 1;
     const totalStakedSol = getCurrentTotalSolanaStakedSol();
+    const connectedStakeSol = totalStakedSol * p.s;
     const raikuStakeSol = totalStakedSol * p.s;
     const reservedCu = CB * p.b;
     const auctionFeesLamportsPerBlock = reservedCu * p.f;
     const auctionFeesSolPerBlock = auctionFeesLamportsPerBlock / LS;
     const capturedJitSol = p.jm * p.j;
+    const baseApy = BASE_STAKING_APY;
+    const baseApr = apyToApr(baseApy, APY_COMPOUNDING_PERIODS);
+    const totalValidatorRevenueSol = r.totalValRev;
+    const totalValidatorRevenueUsd = totalValidatorRevenueSol * p.p;
+    const incrementalAprUplift = connectedStakeSol > 0 ? totalValidatorRevenueSol / connectedStakeSol : 0;
+    const totalApr = baseApr + incrementalAprUplift;
+    const totalApy = aprToApy(totalApr, APY_COMPOUNDING_PERIODS);
+    const incrementalApyUplift = totalApy - baseApy;
 
     // Slider value displays
     document.getElementById('v-comm-aot').textContent=p.ca.toFixed(1)+'%';
@@ -2575,6 +2713,30 @@ function update(){
     document.getElementById('v-price').textContent='$'+p.p;
     document.getElementById('validator-staked-value').textContent = fmt(totalStakedSol, 'S');
     document.getElementById('validator-staked-source').innerHTML = _solanaStakeState.sourceHtml;
+    document.getElementById('validator-scenario-name').textContent = getDisplayedScenarioName();
+    document.getElementById('validator-context-price').textContent = '$' + p.p;
+    document.getElementById('validator-context-stake').textContent = (p.s * 100).toFixed(1) + '%';
+    document.getElementById('validator-context-connected').textContent = fmt(connectedStakeSol, 'S');
+    document.getElementById('validator-context-block').textContent = Math.round(p.b * 100) + '%';
+    document.getElementById('validator-context-fee').textContent = (p.f < 0.1 ? p.f.toFixed(3) : p.f >= 10 ? p.f.toFixed(1) : p.f.toFixed(2)) + ' L';
+    document.getElementById('validator-context-aot-take').textContent = p.ca.toFixed(1) + '%';
+    document.getElementById('validator-context-jit-take').textContent = p.cj.toFixed(1) + '%';
+    document.getElementById('validator-base-apr').textContent = fmtRate(baseApr);
+    document.getElementById('validator-base-apy').textContent = fmtRate(baseApy);
+    document.getElementById('validator-base-yield-source').innerHTML = BASE_YIELD_SOURCE_HTML;
+    document.getElementById('validator-jit-usd').textContent = fmt(r.jitValidatorBase * p.p, '$');
+    document.getElementById('validator-jit-sol').textContent = fmt(r.jitValidatorBase, 'S') + '/yr';
+    document.getElementById('validator-aot-usd').textContent = fmt(r.aotValidatorBase * p.p, '$');
+    document.getElementById('validator-aot-sol').textContent = fmt(r.aotValidatorBase, 'S') + '/yr';
+    document.getElementById('validator-bonus-usd').textContent = fmt(r.aotValBonus * p.p, '$');
+    document.getElementById('validator-bonus-sol').textContent = fmt(r.aotValBonus, 'S') + '/yr';
+    document.getElementById('validator-total-usd').textContent = fmt(totalValidatorRevenueUsd, '$');
+    document.getElementById('validator-total-sol').textContent = fmt(totalValidatorRevenueSol, 'S') + '/yr';
+    document.getElementById('validator-uplift-apr').textContent = fmtRate(incrementalAprUplift);
+    document.getElementById('validator-uplift-apy').textContent = fmtRate(incrementalApyUplift);
+    document.getElementById('validator-total-apr').textContent = fmtRate(totalApr);
+    document.getElementById('validator-total-apy').textContent = fmtRate(totalApy);
+    document.getElementById('validator-uplift-note').textContent = 'Default denominator: connected stake = ' + fmt(connectedStakeSol, 'S') + '. Incremental APR uplift = total validator revenue / connected stake. APY uses daily compounding.';
     document.getElementById('stake-sol-helper').innerHTML = '<strong>Implied stake:</strong> ' + fmt(raikuStakeSol, 'S') + ' of ' + fmt(totalStakedSol, 'S') + ' total staked';
     document.getElementById('blk-cu-helper').innerHTML = '<strong>Reserved CU:</strong> ' + fmt(reservedCu, 'i') + ' CU of ' + fmt(CB, 'i') + ' CU/block';
     document.getElementById('fcu-block-fee-helper').innerHTML = '<strong>Auction fees/block:</strong> ' + fmt(auctionFeesLamportsPerBlock, 'i') + ' lamports/block (~' + auctionFeesSolPerBlock.toFixed(6) + ' SOL/block)';
