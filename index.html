@@ -1748,13 +1748,13 @@ const _fOptTotalRef = +_fBullRaw.toFixed(2);
 const _fBullTotalRef = +_fBullRaw.toFixed(2);
 
 const SC = {
-    con:  {ca:5,cj:5,j:2,s:2,b:1,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:_jitBaseline,
+    con:  {ca:5,cj:5,j:5,s:2,b:1,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:1_000_000,
            desc:"Conservative — low but practical non-base assumption from active fee-paying application programs, with a hard floor at 0.10 lam/CU."},
-    base: {ca:5,cj:5,j:5,s:10,b:5,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
+    base: {ca:5,cj:5,j:10,s:10,b:5,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:2_000_000,
            desc:"Base — raw observed CU-weighted non-base fees across included application categories, without outlier clipping."},
-    opt:  {ca:5,cj:5,j:10,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:_jitBaseline,
+    opt:  {ca:5,cj:5,j:15,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:3_000_000,
            desc:"Optimistic — active-payer P70 non-base fee/CU anchor, displayed at 1.00 lam/CU."},
-    bull: {ca:5,cj:5,j:20,s:25,b:20,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:_jitBaseline,
+    bull: {ca:5,cj:5,j:20,s:25,b:20,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:5_000_000,
            desc:"Bull — upper-bound all-in case using CU-weighted total fee/CU, displayed at 1.50 lam/CU."},
 };
 let _selectedScenario = 'base';
