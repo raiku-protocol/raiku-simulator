@@ -270,6 +270,15 @@ details[open] summary::before { transform:rotate(90deg); }
 .validator-context-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.55px; margin-bottom:3px; }
 .validator-context-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .validator-note { font-size:10px; color:var(--text-mid); line-height:1.5; margin-top:10px; }
+.validator-support.section { padding:14px 16px; }
+.validator-support h2 { font-size:10px; margin-bottom:10px; color:var(--text-mid); }
+.validator-support-grid { display:grid; gap:8px; }
+.validator-support-item { background:#111213; border:1px solid #1e2028; border-radius:6px; padding:8px 10px; }
+.validator-support-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.55px; margin-bottom:3px; }
+.validator-support-value { font-size:14px; color:var(--text); font-family:var(--font-mono); font-weight:600; line-height:1.2; }
+.validator-support-sub { font-size:10px; color:var(--text-mid); margin-top:3px; line-height:1.45; }
+.validator-support-sub a { color:var(--lime-soft); text-decoration:none; }
+.validator-support-sub a:hover { text-decoration:underline; }
 .validator-kpi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; }
 .validator-kpi { background:#111213; border:1px solid #1f232b; border-radius:8px; padding:12px 14px; }
 .validator-kpi-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px; }
@@ -1162,30 +1171,30 @@ details[open] summary::before { transform:rotate(90deg); }
         </div>
         <div class="validator-note">Phase 1 uses the currently selected simulator state as the source of truth for validator-side annual revenue, then translates that revenue pool into yield uplift on the connected stake.</div>
     </div>
-</div>
-<div class="validator-main">
-    <div class="section fade-in fade-in-1">
+    <div class="section fade-in fade-in-2 validator-support">
         <h2>Base Network Yield</h2>
-        <div class="validator-kpi-grid">
-            <div class="validator-kpi">
-                <div class="validator-kpi-label">Current Total Solana Staked</div>
-                <div class="validator-kpi-value" id="validator-staked-value">423.95M SOL</div>
-                <div class="validator-kpi-sub" id="validator-staked-source">Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a></div>
+        <div class="validator-support-grid">
+            <div class="validator-support-item">
+                <div class="validator-support-label">Current Total Solana Staked</div>
+                <div class="validator-support-value" id="validator-staked-value">423.95M SOL</div>
+                <div class="validator-support-sub" id="validator-staked-source">Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a></div>
             </div>
-            <div class="validator-kpi">
-                <div class="validator-kpi-label">Base Staking APR</div>
-                <div class="validator-kpi-value" id="validator-base-apr">4.38%</div>
-                <div class="validator-kpi-sub">Derived from the sourced APY using daily compounding inverse.</div>
+            <div class="validator-support-item">
+                <div class="validator-support-label">Base Staking APR</div>
+                <div class="validator-support-value" id="validator-base-apr">4.38%</div>
+                <div class="validator-support-sub">Derived from the sourced APY using daily compounding inverse.</div>
             </div>
-            <div class="validator-kpi">
-                <div class="validator-kpi-label">Base Staking APY</div>
-                <div class="validator-kpi-value" id="validator-base-apy">4.48%</div>
-                <div class="validator-kpi-sub" id="validator-base-yield-source">Source: <a href="https://explorer.rated.network/network?network=solana&timeWindow=30d&page=1&pageSize=15" target="_blank" rel="noopener noreferrer">Rated Network Overview (30d Delegator APY)</a></div>
+            <div class="validator-support-item">
+                <div class="validator-support-label">Base Staking APY</div>
+                <div class="validator-support-value" id="validator-base-apy">4.48%</div>
+                <div class="validator-support-sub" id="validator-base-yield-source">Source: <a href="https://explorer.rated.network/network?network=solana&timeWindow=30d&page=1&pageSize=15" target="_blank" rel="noopener noreferrer">Rated Network Overview (30d Delegator APY)</a></div>
             </div>
         </div>
         <div class="validator-source-note">APY convention for this tab: daily compounding (`n = 365`).</div>
     </div>
-    <div class="section fade-in fade-in-2">
+</div>
+<div class="validator-main">
+    <div class="section fade-in fade-in-1">
         <h2>Raiku Validator Revenue Pool</h2>
         <div class="validator-kpi-grid">
             <div class="validator-kpi">
@@ -1210,7 +1219,7 @@ details[open] summary::before { transform:rotate(90deg); }
             </div>
         </div>
     </div>
-    <div class="section fade-in fade-in-3">
+    <div class="section fade-in fade-in-2">
         <h2>Yield Uplift</h2>
         <div class="validator-yield-grid">
             <div class="validator-kpi">
