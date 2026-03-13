@@ -1428,13 +1428,13 @@ const _fOptTotalRef = +_fBullRaw.toFixed(2);
 const _fBullTotalRef = +_fBullRaw.toFixed(2);
 
 const SC = {
-    con:  {ca:5,cj:5,j:2,s:1,b:5,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:Math.round(_jitBaseline*0.6/1000)*1000,
+    con:  {ca:5,cj:5,j:2,s:2,b:1,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:_jitBaseline,
            desc:"Conservative — low but practical non-base assumption from active fee-paying application programs, with a hard floor at 0.10 lam/CU."},
-    base: {ca:5,cj:5,j:5,s:5,b:10,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
+    base: {ca:5,cj:5,j:5,s:8,b:5,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
            desc:"Base — observed non-base fees across included application categories, with extreme outliers clipped (p5/p95)."},
-    opt:  {ca:5,cj:5,j:10,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:1500000,
+    opt:  {ca:5,cj:5,j:10,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:_jitBaseline,
            desc:"Optimistic — raw observed CU-weighted non-base fees across included application categories, without outlier clipping."},
-    bull: {ca:5,cj:5,j:20,s:30,b:20,f:+_fBull.toFixed(2),p:250,ra:1.00,rj:0.50,vb:2.0,jm:5000000,
+    bull: {ca:5,cj:5,j:20,s:25,b:20,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:_jitBaseline,
            desc:"Bull — upper-bound all-in case using CU-weighted total fee/CU, including base fees."},
 };
 
