@@ -1399,7 +1399,6 @@ const _scenarioActivePayers = _scenarioPool.filter(function(p){ return (p.fpc_nb
 const _scenarioActiveAgg = _aggPrograms(_scenarioActivePayers);
 const _scenarioP30Active = _quantile(_scenarioActivePayers.map(function(p){ return Number(p.fpc_nb) || 0; }), 0.30);
 const _scenarioP70Active = _quantile(_scenarioActivePayers.map(function(p){ return Number(p.fpc_nb) || 0; }), 0.70);
-const _scenarioP75Active = _quantile(_scenarioActivePayers.map(function(p){ return Number(p.fpc_nb) || 0; }), 0.75);
 const _scenarioWinsor = _winsorizedWeightedNonBase(_scenarioPool, 0.05, 0.95);
 const _scenarioPopulationLabel = 'Population: core only (aot + both), is_aot_relevant=true, cu>0; benchmark excluded.';
 
@@ -2191,13 +2190,13 @@ function initAotFcuSection(){
         'Active payers: n = ' + activeCount,
         'Raw CU-weighted non-base fee/CU: ' + _fOptRaw.toFixed(4) + ' lam/CU',
         'P70 active non-base fee/CU: ' + _scenarioP70Active.toFixed(4) + ' lam/CU',
-        'P75 active non-base fee/CU: ' + _scenarioP75Active.toFixed(4) + ' lam/CU',
         activePayerAsterisk
     ].join('\n');
     const bullReferencePointsText = [
         'Included programs: n = ' + includedCount,
-        'CU-weighted total fee/CU: ' + _fBullRaw.toFixed(4) + ' lam/CU',
-        'Raw CU-weighted non-base fee/CU (comparison): ' + _fOptRaw.toFixed(4) + ' lam/CU'
+        'Primary anchor: CU-weighted total fee/CU = ' + _fBullRaw.toFixed(4) + ' lam/CU',
+        'All-in decomposition reminder: total = base + priority + MEV / JIT.',
+        'Secondary comparison only: CU-weighted base fee/CU component inside total = ' + _scenarioAgg.weightedBase.toFixed(4) + ' lam/CU'
     ].join('\n');
 
     _aotScenarioExplain = {
