@@ -937,12 +937,16 @@ details[open] summary::before { transform:rotate(90deg); }
                     <p id="aot-sc-modal-calc">&mdash;</p>
                 </div>
                 <div class="aot-sc-modal-section">
+                    <h4>Reference Point Used</h4>
+                    <p id="aot-sc-modal-refpoint" class="aot-sc-modal-refs">&mdash;</p>
+                </div>
+                <div class="aot-sc-modal-section">
                     <h4>Why This Rule Is Used</h4>
                     <p id="aot-sc-modal-why">&mdash;</p>
                 </div>
                 <div class="aot-sc-modal-section">
-                    <h4>Additional Reference Points</h4>
-                    <p id="aot-sc-modal-refs" class="aot-sc-modal-refs">&mdash;</p>
+                    <h4>Additional Context</h4>
+                    <p id="aot-sc-modal-context" class="aot-sc-modal-refs">&mdash;</p>
                 </div>
             </div>
         </div>
@@ -2122,8 +2126,9 @@ function _openAotScenarioModal(key){
     _setScenarioModalText('aot-sc-modal-scope', d.scope);
     _setScenarioModalText('aot-sc-modal-metric', d.metric);
     _setScenarioModalText('aot-sc-modal-calc', d.calculation);
+    _setScenarioModalText('aot-sc-modal-refpoint', d.refPoint);
     _setScenarioModalText('aot-sc-modal-why', d.why);
-    _setScenarioModalText('aot-sc-modal-refs', d.refs);
+    _setScenarioModalText('aot-sc-modal-context', d.context);
     backdrop.classList.add('show');
     backdrop.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -2171,30 +2176,26 @@ function initAotFcuSection(){
     const activePayerAsterisk = '* Active payer = priority fees + MEV / JIT fees > 0 over the 30-day window.';
     const includedCount = _scenarioPool.length;
     const activeCount = _scenarioActivePayers.length;
-    const conReferencePointsText = [
+    const conAdditionalContextText = [
         'Included programs: n = ' + includedCount,
         'Active payers: n = ' + activeCount,
         'P25 active non-base fee/CU: ' + _fConRaw.toFixed(4) + ' lam/CU',
         'P30 active non-base fee/CU: ' + _scenarioP30Active.toFixed(4) + ' lam/CU',
-        'Scenario floor logic: max(P25 active, 0.10) = ' + _fCon.toFixed(2) + ' lam/CU',
         activePayerAsterisk
     ].join('\n');
-    const baseReferencePointsText = [
+    const baseAdditionalContextText = [
         'Included programs: n = ' + includedCount,
-        'Winsorized CU-weighted non-base fee/CU (P5-P95 clipping): ' + _fBase.toFixed(4) + ' lam/CU',
         'Raw CU-weighted non-base fee/CU (no clipping): ' + _fOptRaw.toFixed(4) + ' lam/CU',
         'Median non-base fee/CU (included programs): ' + _scenarioAgg.medianNonBase.toFixed(4) + ' lam/CU'
     ].join('\n');
-    const optReferencePointsText = [
+    const optAdditionalContextText = [
         'Included programs: n = ' + includedCount,
         'Active payers: n = ' + activeCount,
-        'Raw CU-weighted non-base fee/CU: ' + _fOptRaw.toFixed(4) + ' lam/CU',
         'P70 active non-base fee/CU: ' + _scenarioP70Active.toFixed(4) + ' lam/CU',
         activePayerAsterisk
     ].join('\n');
-    const bullReferencePointsText = [
+    const bullAdditionalContextText = [
         'Included programs: n = ' + includedCount,
-        'Primary anchor: CU-weighted total fee/CU = ' + _fBullRaw.toFixed(4) + ' lam/CU',
         'All-in decomposition reminder: total = base + priority + MEV / JIT.',
         'Secondary comparison only: CU-weighted base fee/CU component inside total = ' + _scenarioAgg.weightedBase.toFixed(4) + ' lam/CU'
     ].join('\n');
@@ -2207,8 +2208,9 @@ function initAotFcuSection(){
             scope: includedCategoriesText + ' Included programs for scenario construction: n = ' + includedCount + '. For this scenario, we additionally use active payers only: n = ' + activeCount + '. ' + activePayerDefinition + ' ' + representativeText,
             metric: 'Metric used: non-base fee/CU, where non-base means priority fees plus MEV / JIT fees. Rule applied: take P25 among active payers, then apply a hard floor of 0.10 lam/CU.',
             calculation: 'Observed P25 non-base fee/CU among active payers (n = ' + activeCount + ') = ' + _fConRaw.toFixed(4) + ' lam/CU. Floor rule = 0.10 lam/CU. Final displayed value = max(' + _fConRaw.toFixed(4) + ', 0.10) = ' + _fCon.toFixed(2) + ' lam/CU.',
+            refPoint: 'P25 active non-base fee/CU with explicit floor: max(P25 active, 0.10) = ' + _fCon.toFixed(2) + ' lam/CU.',
             why: 'This rule keeps the downside case realistic for product planning while remaining tied to observed paying behavior.',
-            refs: conReferencePointsText
+            context: conAdditionalContextText
         },
         base: {
             title: 'Base',
@@ -2217,8 +2219,9 @@ function initAotFcuSection(){
             scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
             metric: 'Metric used: CU-weighted non-base fee/CU across included programs. Rule applied: clip extreme program-level values at P5 and P95 before computing the weighted average, so a few dominant names do not distort the baseline.',
             calculation: 'Observed raw CU-weighted non-base fee/CU across included programs (n = ' + includedCount + ') = ' + _fBaseObserved.toFixed(4) + ' lam/CU. Outlier clipping bounds are P5 = ' + _scenarioWinsor.pLow.toFixed(4) + ' and P95 = ' + _scenarioWinsor.pHigh.toFixed(4) + ' lam/CU. Final displayed value after clipping and CU-weighting = ' + _fBase.toFixed(2) + ' lam/CU.',
+            refPoint: 'Winsorized CU-weighted non-base fee/CU (P5-P95 clipping) = ' + _fBase.toFixed(2) + ' lam/CU.',
             why: 'This rule gives a stable default market baseline without letting a few extreme values dominate.',
-            refs: baseReferencePointsText
+            context: baseAdditionalContextText
         },
         opt: {
             title: 'Optimistic',
@@ -2227,8 +2230,9 @@ function initAotFcuSection(){
             scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
             metric: 'Metric used: raw CU-weighted non-base fee/CU across the included application categories. Rule applied: no outlier clipping is used in this scenario.',
             calculation: 'Observed raw CU-weighted non-base fee/CU across included programs (n = ' + includedCount + ') = ' + _fOptRaw.toFixed(4) + ' lam/CU. No clipping is applied. Final displayed value = ' + _fOpt.toFixed(2) + ' lam/CU.',
+            refPoint: 'Raw CU-weighted non-base fee/CU (no clipping) = ' + _fOpt.toFixed(2) + ' lam/CU.',
             why: 'This rule keeps Optimistic fully anchored in observed market data and avoids an arbitrary midpoint construction.',
-            refs: optReferencePointsText
+            context: optAdditionalContextText
         },
         bull: {
             title: 'Bull',
@@ -2237,8 +2241,9 @@ function initAotFcuSection(){
             scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
             metric: 'Metric used: CU-weighted total fee/CU across the included application categories. Rule applied: total fee/CU includes base fees plus priority and MEV / JIT components.',
             calculation: 'Observed CU-weighted total fee/CU across included programs (n = ' + includedCount + ') = ' + _fBullRaw.toFixed(4) + ' lam/CU. This includes base fees in addition to non-base fees. Final displayed value = ' + _fBull.toFixed(2) + ' lam/CU.',
+            refPoint: 'CU-weighted total fee/CU (all-in) = ' + _fBull.toFixed(2) + ' lam/CU.',
             why: 'This rule is used as an upper-bound reference for periods when applications face sustained all-in fee costs.',
-            refs: bullReferencePointsText
+            context: bullAdditionalContextText
         }
     };
     _bindAotScenarioModal();
