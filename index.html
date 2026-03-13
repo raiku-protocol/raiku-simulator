@@ -255,9 +255,9 @@ details[open] summary::before { transform:rotate(90deg); }
 .aot-sc-sentence { margin:0 0 8px 0; font-size:12px; line-height:1.45; color:var(--text); }
 .aot-sc-open { border:1px solid #2b2d2f; border-radius:6px; background:#0f1011; color:var(--lime-soft); padding:7px 10px; font-size:11px; font-weight:600; cursor:pointer; transition:border-color .15s ease, background .15s ease; }
 .aot-sc-open:hover { border-color:#3a3d40; background:#151719; }
-.aot-sc-modal-backdrop { position:fixed; inset:0; z-index:2000; background:rgba(5,6,7,.76); display:none; align-items:center; justify-content:center; padding:18px; }
-.aot-sc-modal-backdrop.show { display:flex; }
-.aot-sc-modal { width:min(860px, 96vw); max-height:88vh; max-height:calc(100dvh - 36px); overflow:auto; border:1px solid #2e3135; background:#0f1012; border-radius:10px; box-shadow:0 24px 80px rgba(0,0,0,.55); padding:16px 18px; margin-top:0; }
+.aot-sc-modal-backdrop { position:fixed; inset:0; z-index:2000; background:rgba(5,6,7,.76); display:none; padding:18px; box-sizing:border-box; }
+.aot-sc-modal-backdrop.show { display:grid; place-items:center; }
+.aot-sc-modal { width:min(860px, calc(100vw - 36px)); max-height:88vh; max-height:calc(100dvh - 36px); overflow:auto; overscroll-behavior:contain; border:1px solid #2e3135; background:#0f1012; border-radius:10px; box-shadow:0 24px 80px rgba(0,0,0,.55); padding:16px 18px; margin:0; }
 .aot-sc-modal-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px; }
 .aot-sc-modal-title { margin:0; font-size:16px; color:var(--text); text-transform:uppercase; letter-spacing:.7px; }
 .aot-sc-modal-value { margin-top:4px; font-size:12px; color:var(--lime-soft); font-family:var(--font-mono); }
