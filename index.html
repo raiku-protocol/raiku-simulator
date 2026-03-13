@@ -1437,6 +1437,7 @@ const SC = {
     bull: {ca:5,cj:5,j:20,s:25,b:20,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:_jitBaseline,
            desc:"Bull — upper-bound all-in case using CU-weighted total fee/CU, including base fees."},
 };
+let _selectedScenario = 'base';
 
 function fmt(v,t){
     const a=Math.abs(v);
@@ -1449,6 +1450,7 @@ function fmt(v,t){
 }
 
 function applyScenario(n){
+    _selectedScenario = n;
     const s=SC[n];
     document.getElementById('sl-comm-aot').value=s.ca;
     document.getElementById('sl-comm-jit').value=s.cj;
@@ -2450,12 +2452,14 @@ function update(){
     // === Scenario cards ===
     ['con','base','opt','bull'].forEach(n=>{
         const s=SC[n];
+        const isLiveCard = n === _selectedScenario;
         const sp={ca:s.ca, cj:s.cj, ra:s.ra, rj:s.rj, vb:s.vb, jm:s.jm, j:s.j/100, s:s.s/100, b:s.b/100, f:s.f, p:s.p};
-        const sr=calc(sp);
+        const sr=isLiveCard ? r : calc(sp);
+        const price = isLiveCard ? p.p : s.p;
         document.getElementById('sc-'+n+'-v').textContent=fmt(sr.totalProtocolUSD,'$')+'/yr';
-        const jP=sr.totalProtocolUSD>0?Math.round(sr.jitProtocol*s.p/sr.totalProtocolUSD*100):0;
-        const aP=sr.totalProtocolUSD>0?Math.round(sr.aotProtocol*s.p/sr.totalProtocolUSD*100):0;
-        document.getElementById('sc-'+n+'-d').textContent='JIT '+fmt(sr.jitProtocol*s.p,'$')+' ('+jP+'%) + AOT '+fmt(sr.aotProtocol*s.p,'$')+' ('+aP+'%)';
+        const jP=sr.totalProtocolUSD>0?Math.round(sr.jitProtocol*price/sr.totalProtocolUSD*100):0;
+        const aP=sr.totalProtocolUSD>0?Math.round(sr.aotProtocol*price/sr.totalProtocolUSD*100):0;
+        document.getElementById('sc-'+n+'-d').textContent='JIT '+fmt(sr.jitProtocol*price,'$')+' ('+jP+'%) + AOT '+fmt(sr.aotProtocol*price,'$')+' ('+aP+'%)';
         document.getElementById('sc-'+n+'-m').textContent=fmt(sr.totalProtocolUSD/12,'$')+'/mo | '+fmt(sr.totalProtocol,'S');
     });
 
