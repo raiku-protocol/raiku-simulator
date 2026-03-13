@@ -191,7 +191,7 @@ details[open] summary::before { transform:rotate(90deg); }
 #model-params .controls-grid { gap:4px; }
 #model-params .section-label { grid-column:1/-1; }
 #model-params .controls-section { padding:6px 4px; }
-.globals-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; grid-column:1/-1; }
+.globals-row { display:grid; grid-template-columns:1fr; gap:16px; grid-column:1/-1; }
 
 /* Panel redesign: 2-column AOT/JIT layout */
 .param-columns { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:4px; }
@@ -528,10 +528,6 @@ details[open] summary::before { transform:rotate(90deg); }
                 <label>SOL Price (USD)</label>
                 <div class="slider-row"><input type="range" id="sl-price" min="10" max="400" step="5" value="109"><span class="val" id="v-price">$109</span></div>
             </div>
-            <div class="control">
-                <label>Protocol Take Rate</label>
-                <div class="slider-row"><input type="range" id="sl-comm" min="0" max="10" step="0.5" value="5"><span class="val" id="v-comm">5.0%</span></div>
-            </div>
         </div>
 
         <!-- ─── SECTION 2: PROTOCOL POOL DISTRIBUTION ─── -->
@@ -539,6 +535,10 @@ details[open] summary::before { transform:rotate(90deg); }
         <div class="param-columns" style="grid-column:1/-1;">
             <div class="param-col aot">
                 <div class="param-col-label">AOT</div>
+                <div class="control">
+                    <label>AOT Protocol Take Rate (%)</label>
+                    <div class="slider-row"><input type="range" id="sl-comm-aot" min="0" max="10" step="0.5" value="5"><span class="val" id="v-comm-aot">5.0%</span></div>
+                </div>
                 <div class="control">
                     <label>Customer Rebate (%)</label>
                     <div class="slider-row"><input type="range" id="sl-rebate-aot" min="0" max="1" step="0.05" value="0.25"><span class="val" id="v-rebate-aot">0.25%</span></div>
@@ -552,6 +552,10 @@ details[open] summary::before { transform:rotate(90deg); }
             </div>
             <div class="param-col jit">
                 <div class="param-col-label">JIT</div>
+                <div class="control">
+                    <label>JIT Protocol Take Rate (%)</label>
+                    <div class="slider-row"><input type="range" id="sl-comm-jit" min="0" max="10" step="0.5" value="5"><span class="val" id="v-comm-jit">5.0%</span></div>
+                </div>
                 <div class="control">
                     <label>Customer Rebate (%)</label>
                     <div class="slider-row"><input type="range" id="sl-rebate-jit" min="0" max="0.5" step="0.05" value="0.25"><span class="val" id="v-rebate-jit">0.25%</span></div>
@@ -996,8 +1000,8 @@ details[open] summary::before { transform:rotate(90deg); }
             <strong>CU/block (CB):</strong> 60,000,000 (Solana max compute units per block)<br>
             <strong>Lamports/SOL (LS):</strong> 1,000,000,000<br>
             <strong>SOL price default:</strong> Real average from last 36 epochs (~$109)<br>
-            <strong>Protocol Take Rate:</strong> Dynamic from slider (default 5%). Validator base = 1 – take rate. Rebates and validator bonus are funded from the protocol pool (= gross &times; take rate), never from gross revenue directly.<br>
-            <strong>Two-waterfall model:</strong> AOT and JIT streams are calculated independently, then aggregated. Validator bonus applies only to AOT. If take rate = 0%, all redistributions are forced to 0.
+            <strong>Protocol Take Rates:</strong> AOT and JIT each use their own slider (default 5%). Validator base = 1 – take rate for that stream. Rebates and validator bonus are funded from the corresponding protocol pool (= gross &times; stream take rate), never from gross revenue directly.<br>
+            <strong>Two-waterfall model:</strong> AOT and JIT streams are calculated independently, then aggregated. Validator bonus applies only to AOT. If either take rate = 0%, redistributions on that stream are forced to 0.
         </div>
     </details>
 </div>
@@ -1420,13 +1424,13 @@ const _fOptTotalRef = +_fBullRaw.toFixed(2);
 const _fBullTotalRef = +_fBullRaw.toFixed(2);
 
 const SC = {
-    con:  {c:5,j:2,s:1,b:5,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:Math.round(_jitBaseline*0.6/1000)*1000,
+    con:  {ca:5,cj:5,j:2,s:1,b:5,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:Math.round(_jitBaseline*0.6/1000)*1000,
            desc:"Conservative — low but practical non-base assumption from active fee-paying application programs, with a hard floor at 0.10 lam/CU."},
-    base: {c:5,j:5,s:5,b:10,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
+    base: {ca:5,cj:5,j:5,s:5,b:10,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
            desc:"Base — observed non-base fees across included application categories, with extreme outliers clipped (p5/p95)."},
-    opt:  {c:5,j:10,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:1500000,
+    opt:  {ca:5,cj:5,j:10,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:1500000,
            desc:"Optimistic — raw observed CU-weighted non-base fees across included application categories, without outlier clipping."},
-    bull: {c:5,j:20,s:30,b:20,f:+_fBull.toFixed(2),p:250,ra:1.00,rj:0.50,vb:2.0,jm:5000000,
+    bull: {ca:5,cj:5,j:20,s:30,b:20,f:+_fBull.toFixed(2),p:250,ra:1.00,rj:0.50,vb:2.0,jm:5000000,
            desc:"Bull — upper-bound all-in case using CU-weighted total fee/CU, including base fees."},
 };
 
@@ -1442,7 +1446,8 @@ function fmt(v,t){
 
 function applyScenario(n){
     const s=SC[n];
-    document.getElementById('sl-comm').value=s.c;
+    document.getElementById('sl-comm-aot').value=s.ca;
+    document.getElementById('sl-comm-jit').value=s.cj;
     document.getElementById('sl-rebate-aot').value=s.ra;
     document.getElementById('sl-rebate-jit').value=s.rj;
     document.getElementById('sl-val-bonus').value=s.vb;
@@ -1461,7 +1466,7 @@ function applyScenario(n){
     update();
 }
 
-['sl-comm','sl-rebate-aot','sl-rebate-jit','sl-val-bonus','sl-jit-market','sl-jit','sl-stake','sl-blk','sl-fcu','sl-price'].forEach(id=>{
+['sl-comm-aot','sl-comm-jit','sl-rebate-aot','sl-rebate-jit','sl-val-bonus','sl-jit-market','sl-jit','sl-stake','sl-blk','sl-fcu','sl-price'].forEach(id=>{
     document.getElementById(id).addEventListener('input',()=>{
         document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.remove('active'));
         update();
@@ -1469,7 +1474,8 @@ function applyScenario(n){
 });
 
 function gp(){return{
-    c:+document.getElementById('sl-comm').value,       // protocol take rate % (raw, e.g. 5)
+    ca:+document.getElementById('sl-comm-aot').value,   // AOT protocol take rate % (raw, e.g. 5)
+    cj:+document.getElementById('sl-comm-jit').value,   // JIT protocol take rate % (raw, e.g. 5)
     ra:+document.getElementById('sl-rebate-aot').value, // AOT rebate % (raw, e.g. 0.25)
     rj:+document.getElementById('sl-rebate-jit').value, // JIT rebate % (raw, e.g. 0.25)
     vb:+document.getElementById('sl-val-bonus').value,  // AOT validator bonus % (raw, e.g. 1.0)
@@ -1479,7 +1485,7 @@ function gp(){return{
     b:+document.getElementById('sl-blk').value/100,
     f:+document.getElementById('sl-fcu').value,
     p:+document.getElementById('sl-price').value,
-};}
+};}    
 
 function computeJitStats(windowEpochs) {
     const data = D_JITO.filter(r => r[1] > 0);
@@ -1513,29 +1519,31 @@ function fmtTriple(usd, sol, pctOfGross) {
 }
 
 function calc(p){
-    const cR = p.c / 100;
-    const vR = 1 - cR;
+    const aotTakeRate = p.ca / 100;
+    const jitTakeRate = p.cj / 100;
+    const aotValidatorRate = 1 - aotTakeRate;
+    const jitValidatorRate = 1 - jitTakeRate;
 
     // Guard: rebates and bonus are funded from protocol pool — clamp to take rate
-    const jitRebateRate = cR > 0 ? Math.min(p.rj / 100, cR) : 0;
-    const aotRebateRate = cR > 0 ? Math.min(p.ra / 100, cR) : 0;
-    const aotBonusRate  = cR > 0 ? Math.min(p.vb / 100, cR - aotRebateRate) : 0;
+    const jitRebateRate = jitTakeRate > 0 ? Math.min(p.rj / 100, jitTakeRate) : 0;
+    const aotRebateRate = aotTakeRate > 0 ? Math.min(p.ra / 100, aotTakeRate) : 0;
+    const aotBonusRate  = aotTakeRate > 0 ? Math.min(p.vb / 100, Math.max(0, aotTakeRate - aotRebateRate)) : 0;
 
     // JIT waterfall (jitMarket comes from the JIT total market slider)
     const jitMarket        = p.jm;
     const jitGross         = jitMarket * p.j;
-    const jitValidatorBase = jitGross * vR;
+    const jitValidatorBase = jitGross * jitValidatorRate;
     const jitRebate        = jitGross * jitRebateRate;
     const jitValBonus      = 0;
-    const jitProtocol      = jitGross * cR - jitRebate;
+    const jitProtocol      = jitGross * jitTakeRate - jitRebate;
 
     // AOT waterfall
     const ls       = p.s * SY, cu = p.b * CB;
     const aotGross         = (ls * cu * p.f) / LS;
-    const aotValidatorBase = aotGross * vR;
+    const aotValidatorBase = aotGross * aotValidatorRate;
     const aotRebate        = aotGross * aotRebateRate;
     const aotValBonus      = aotGross * aotBonusRate;
-    const aotProtocol      = aotGross * cR - aotRebate - aotValBonus;
+    const aotProtocol      = aotGross * aotTakeRate - aotRebate - aotValBonus;
 
     // Aggregated
     const totalGross     = jitGross + aotGross;
@@ -1719,17 +1727,17 @@ function updFlow(p,r){
 
 function updCharts(p,r){
     updFlow(p,r);
-    const cR = p.c / 100;
+    const aotTakeRate = p.ca / 100;
     [0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50].forEach((s,i)=>{
         const aG=(s*SY*p.b*CB*p.f)/LS;
-        const aP=Math.max(0, aG*cR - aG*(p.ra/100) - aG*(p.vb/100));
+        const aP=Math.max(0, aG*aotTakeRate - aG*(p.ra/100) - aG*(p.vb/100));
         cA.data.datasets[0].data[i]=aP*p.p;
     }); cA.update();
 
 }
 
 function buildMatrix(p){
-    const cR = p.c / 100;
+    const aotTakeRate = p.ca / 100;
     const sr=[0.005,0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50], fc=[0.10,0.20,0.50,1.00,2.00,5.00,10.00,20.00];
     let h='<table class="matrix-table"><thead><tr><th>Stake \\ Fee/CU</th>';
     fc.forEach(f=>h+=`<th>${f<0.1?f.toFixed(2):f>=10?f.toFixed(0):f.toFixed(1)}L</th>`);
@@ -1738,7 +1746,7 @@ function buildMatrix(p){
         h+=`<tr><th>${(s*100)<1?(s*100).toFixed(1):Math.round(s*100)}%</th>`;
         fc.forEach(f=>{
             const aG=(s*SY*p.b*CB*f)/LS;
-            const t=Math.max(0, aG*cR - aG*(p.ra/100) - aG*(p.vb/100))*p.p;
+            const t=Math.max(0, aG*aotTakeRate - aG*(p.ra/100) - aG*(p.vb/100))*p.p;
             const hl=Math.abs(s-p.s)<0.0005&&Math.abs(f-p.f)<0.005;
             h+=`<td class="${hl?'hl':''}">${fmt(t,'$')}</td>`;
         }); h+='</tr>';
@@ -2298,47 +2306,63 @@ function initAotFcuSection(){
 
 function update(){
     const p=gp(),r=calc(p);
-    const cR = p.c / 100;
     const tg = r.totalGross || 1;
 
     // Slider value displays
-    document.getElementById('v-comm').textContent=p.c.toFixed(1)+'%';
+    document.getElementById('v-comm-aot').textContent=p.ca.toFixed(1)+'%';
+    document.getElementById('v-comm-jit').textContent=p.cj.toFixed(1)+'%';
     document.getElementById('v-rebate-aot').textContent=p.ra.toFixed(2)+'%';
     document.getElementById('v-rebate-jit').textContent=p.rj.toFixed(2)+'%';
     document.getElementById('v-val-bonus').textContent=p.vb.toFixed(1)+'%';
 
     // Show pool usage under each redistribution slider
     var treasSummary = document.getElementById('treasury-summary');
-    if (p.c > 0) {
-        var poolPctRA = (p.ra / p.c * 100).toFixed(0);
-        var poolPctVB = (p.vb / p.c * 100).toFixed(0);
-        var poolPctRJ = (p.rj / p.c * 100).toFixed(0);
-        document.getElementById('ratio-rebate-aot').textContent = '\u21b3 uses ' + poolPctRA + '% of pool (' + p.ra.toFixed(2) + '% of ' + p.c.toFixed(1) + '% take rate)';
-        document.getElementById('ratio-val-bonus').textContent = '\u21b3 uses ' + poolPctVB + '% of pool (' + p.vb.toFixed(1) + '% of ' + p.c.toFixed(1) + '% take rate)';
-        document.getElementById('ratio-rebate-jit').textContent = '\u21b3 uses ' + poolPctRJ + '% of pool (' + p.rj.toFixed(2) + '% of ' + p.c.toFixed(1) + '% take rate)';
-        var poolRemaining = (100 - parseFloat(poolPctRA) - parseFloat(poolPctVB) - parseFloat(poolPctRJ));
-        var treasPct = (p.c * poolRemaining / 100).toFixed(2);
-        treasSummary.textContent = 'Treasury: ' + treasPct + '% of gross \u2014 ' + poolRemaining.toFixed(0) + '% of pool remaining';
-        treasSummary.style.display = 'block';
+    if (p.ca > 0) {
+        var poolPctRA = (p.ra / p.ca * 100).toFixed(0);
+        var poolPctVB = (p.vb / p.ca * 100).toFixed(0);
+        document.getElementById('ratio-rebate-aot').textContent = '\u21b3 uses ' + poolPctRA + '% of AOT pool (' + p.ra.toFixed(2) + '% of ' + p.ca.toFixed(1) + '% take rate)';
+        document.getElementById('ratio-val-bonus').textContent = '\u21b3 uses ' + poolPctVB + '% of AOT pool (' + p.vb.toFixed(1) + '% of ' + p.ca.toFixed(1) + '% take rate)';
     } else {
         document.getElementById('ratio-rebate-aot').textContent = '';
-        document.getElementById('ratio-rebate-jit').textContent = '';
         document.getElementById('ratio-val-bonus').textContent = '';
+    }
+    if (p.cj > 0) {
+        var poolPctRJ = (p.rj / p.cj * 100).toFixed(0);
+        document.getElementById('ratio-rebate-jit').textContent = '\u21b3 uses ' + poolPctRJ + '% of JIT pool (' + p.rj.toFixed(2) + '% of ' + p.cj.toFixed(1) + '% take rate)';
+    } else {
+        document.getElementById('ratio-rebate-jit').textContent = '';
+    }
+    if (p.ca > 0 || p.cj > 0) {
+        var aotPoolRemaining = p.ca > 0 ? Math.max(0, 100 - (p.ra / p.ca * 100) - (p.vb / p.ca * 100)) : 0;
+        var jitPoolRemaining = p.cj > 0 ? Math.max(0, 100 - (p.rj / p.cj * 100)) : 0;
+        var aotTreasPct = (p.ca * aotPoolRemaining / 100).toFixed(2);
+        var jitTreasPct = (p.cj * jitPoolRemaining / 100).toFixed(2);
+        treasSummary.textContent = 'AOT treasury: ' + aotTreasPct + '% of gross (' + aotPoolRemaining.toFixed(0) + '% of AOT pool left) · JIT treasury: ' + jitTreasPct + '% of gross (' + jitPoolRemaining.toFixed(0) + '% of JIT pool left)';
+        treasSummary.style.display = 'block';
+    } else {
         treasSummary.style.display = 'none';
     }
 
     // Waterfall guard info
     const guardMsg = document.getElementById('waterfall-guard-msg');
-    if (p.c === 0 && (p.ra > 0 || p.rj > 0 || p.vb > 0)) {
+    var guardNotes = [];
+    if (p.ca === 0 && (p.ra > 0 || p.vb > 0)) {
+        guardNotes.push('AOT take rate = 0%: rebate and validator bonus forced to 0.');
+    }
+    if (p.cj === 0 && p.rj > 0) {
+        guardNotes.push('JIT take rate = 0%: rebate forced to 0.');
+    }
+    if (p.ca > 0 && (p.ra + p.vb) > p.ca) {
+        guardNotes.push('AOT rebate + validator bonus (' + (p.ra + p.vb).toFixed(2) + '%) exceed the AOT take rate (' + p.ca.toFixed(1) + '%). Values clamped.');
+    }
+    if (p.cj > 0 && p.rj > p.cj) {
+        guardNotes.push('JIT rebate (' + p.rj.toFixed(2) + '%) exceeds the JIT take rate (' + p.cj.toFixed(1) + '%). Value clamped.');
+    }
+    if (guardNotes.length) {
         guardMsg.style.display = 'block';
         guardMsg.style.color = '#F5A623';
         guardMsg.style.fontWeight = '600';
-        guardMsg.textContent = '\u26a0 Take rate = 0%: rebates and bonus forced to 0 (no protocol pool).';
-    } else if (p.c > 0 && (p.ra + p.rj + p.vb) > p.c) {
-        guardMsg.style.display = 'block';
-        guardMsg.style.color = '#F5A623';
-        guardMsg.style.fontWeight = '600';
-        guardMsg.textContent = '\u26a0 Rebates + bonus (' + (p.ra + p.rj + p.vb).toFixed(2) + '%) exceed take rate (' + p.c.toFixed(1) + '%). Values clamped.';
+        guardMsg.textContent = '\u26a0 ' + guardNotes.join(' ');
     } else {
         guardMsg.style.display = 'none';
     }
@@ -2422,7 +2446,7 @@ function update(){
     // === Scenario cards ===
     ['con','base','opt','bull'].forEach(n=>{
         const s=SC[n];
-        const sp={c:s.c, ra:s.ra, rj:s.rj, vb:s.vb, jm:s.jm, j:s.j/100, s:s.s/100, b:s.b/100, f:s.f, p:s.p};
+        const sp={ca:s.ca, cj:s.cj, ra:s.ra, rj:s.rj, vb:s.vb, jm:s.jm, j:s.j/100, s:s.s/100, b:s.b/100, f:s.f, p:s.p};
         const sr=calc(sp);
         document.getElementById('sc-'+n+'-v').textContent=fmt(sr.totalProtocolUSD,'$')+'/yr';
         const jP=sr.totalProtocolUSD>0?Math.round(sr.jitProtocol*s.p/sr.totalProtocolUSD*100):0;
