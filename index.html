@@ -2206,16 +2206,16 @@ function initAotFcuSection(){
     ].join('\n');
     const optAdditionalContextText = [
         'Reminder: Raw CU-weighted non-base fee/CU (no clipping) = ' + _fOpt.toFixed(2) + ' lam/CU.',
-        'Case 1 (single filter: active payers only): n = ' + activeCount + '.',
+        'Case 1 (single filter: active payers only): n = ' + activeCount + ', raw CU-weighted non-base fee/CU = ' + _scenarioActiveAgg.weightedNonBase.toFixed(4) + ' lam/CU.',
         'Case 2 (single rule: P70 on included set, n = ' + includedCount + '): ' + _scenarioP70Included.toFixed(4) + ' lam/CU.',
         'Case 3 (single rule on active-payer set): P70 active non-base fee/CU = ' + _scenarioP70Active.toFixed(4) + ' lam/CU.',
         activePayerAsterisk + ' Shown to contextualize stronger non-base demand around the same market.'
     ].join('\n');
     const bullAdditionalContextText = [
         'Reminder: CU-weighted total fee/CU (all-in) = ' + _fBull.toFixed(2) + ' lam/CU.',
-        'Case 1 (all included programs): n = ' + includedCount + '.',
+        'Case 1 (all included programs): n = ' + includedCount + ', CU-weighted total fee/CU = ' + _fBullRaw.toFixed(4) + ' lam/CU.',
         'Case 2 (upper-tail total-fee reference): P90 total fee/CU on included set = ' + _scenarioP90TotalIncluded.toFixed(4) + ' lam/CU.',
-        'Case 3 (decomposition): total fee/CU = base fee/CU + priority fee/CU + MEV / JIT fee/CU.'
+        'Case 3 (decomposition with values): total = base ' + _scenarioAgg.weightedBase.toFixed(4) + ' + priority ' + _scenarioAgg.weightedPriority.toFixed(4) + ' + MEV / JIT ' + _scenarioAgg.weightedMevJit.toFixed(4) + ' = ' + _scenarioAgg.weightedTotal.toFixed(4) + ' lam/CU.'
     ].join('\n');
 
     _aotScenarioExplain = {
