@@ -125,13 +125,15 @@ tr:hover td { background:#141516; }
 .matrix-table th.axis-head { background:#17191d; color:var(--text); }
 .matrix-table td.axis-hl { background:#c0ff380d; }
 .matrix-table td.current-cell { background:#C0FF3820; color:var(--lime-soft); font-weight:700; box-shadow:inset 0 0 0 1px #C0FF3855; }
-.sensitivity-note { font-size:12px; color:#B7BBC2; line-height:1.6; max-width:900px; margin:6px 0 10px; }
-.sensitivity-summary { background:#111213; border:1px solid #23262f; border-radius:8px; padding:10px 12px; margin-bottom:12px; }
-.sensitivity-summary-title { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
-.sensitivity-summary-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(108px, 1fr)); gap:8px 10px; }
+.sensitivity-note { font-size:12px; color:#B7BBC2; line-height:1.6; max-width:900px; margin:6px 0 8px; }
+.sensitivity-scope { font-size:11px; color:#D7DBE1; line-height:1.5; margin:0 0 10px; }
+.sensitivity-summary-title { font-size:10px; color:#F6F8FA; text-transform:uppercase; letter-spacing:0.85px; margin-bottom:6px; }
+.sensitivity-summary { background:#111213; border:1px solid #23262f; border-radius:8px; padding:8px 10px; margin-bottom:12px; }
+.sensitivity-summary-grid { display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:6px 10px; align-items:center; }
 .sensitivity-summary-item { min-width:0; }
 .sensitivity-summary-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.45px; margin-bottom:2px; }
 .sensitivity-summary-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sensitivity-recon { margin-top:7px; padding-top:7px; border-top:1px solid #1c2028; font-size:10px; color:#C7CBD1; font-family:var(--font-mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .sensitivity-panel-kicker { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
 .sensitivity-chart-box { min-height:220px; padding:0; border:none; background:transparent; margin-bottom:12px; }
 .sensitivity-table-wrap { margin-top:0; }
@@ -289,6 +291,7 @@ details[open] summary::before { transform:rotate(90deg); }
     .chart-row { grid-template-columns:1fr; }
     .tab-btn { font-size:10px; padding:8px 10px; letter-spacing:0.5px; }
     .sensitivity-summary-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .sensitivity-recon { white-space:normal; }
 }
 /* ═══ Triple-format cards ═══ */
 .triple-card { background:#141516; border:1px solid var(--card-border); border-radius:var(--radius); padding:12px 14px; border-left:3px solid var(--card-border); transition:border-color 0.3s, box-shadow 0.3s, transform 0.2s; }
@@ -306,8 +309,8 @@ details[open] summary::before { transform:rotate(90deg); }
 .scenario-card { background:#141516; border:2px solid var(--card-border); border-radius:var(--radius); padding:16px; text-align:center; transition:all 0.25s; }
 .scenario-card h3 { font-size:12px; color:var(--text-mid); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
 .scenario-card .sc-val { font-size:24px; font-weight:700; color:var(--text); font-family:var(--font-mono); }
-.scenario-card .sc-detail { font-size:10px; color:var(--text2); margin-top:4px; }
-.scenario-card .sc-monthly { font-size:9px; color:var(--text2); margin-top:3px; }
+.scenario-card .sc-detail { font-size:10px; color:#B8BDC4; margin-top:5px; }
+.scenario-card .sc-monthly { font-size:10px; color:#D4D8DE; margin-top:4px; }
 .scenario-card.active { border-color:var(--clr-protocol); background:rgba(192,255,56,0.03); box-shadow:0 0 12px rgba(192,255,56,0.08); }
 .scenario-card.active h3 { color:var(--clr-protocol); }
 .aot-scenario-card { text-align:left; padding:14px; }
@@ -825,8 +828,10 @@ details[open] summary::before { transform:rotate(90deg); }
 
 <!-- AOT SENSITIVITY MODULE -->
 <div class="section fade-in fade-in-5">
-    <h2>Protocol Treasury Sensitivity to Stake % and AOT Fees</h2>
+    <h2>AOT Protocol Treasury Sensitivity to Stake % and AOT Fees</h2>
     <div class="sensitivity-note">AOT protocol treasury sensitivity under the current live assumptions. The chart highlights the nearest displayed stake bucket to the active setting, and the table highlights the nearest stake and fee/CU bucket intersection.</div>
+    <div class="sensitivity-scope">AOT-only view: this module isolates AOT protocol treasury, not total protocol revenue. Use the reconciliation line below to compare the current AOT component with JIT and total protocol revenue.</div>
+    <div class="sensitivity-summary-title">Current Scenario Context</div>
     <div class="sensitivity-summary" id="aot-sensitivity-summary"></div>
     <div class="sensitivity-panel-kicker">Sensitivity Chart</div>
     <div class="chart-box sensitivity-chart-box"><canvas id="chart-aot"></canvas></div>
@@ -1537,7 +1542,7 @@ const _fBullTotalRef = +_fBullRaw.toFixed(2);
 const SC = {
     con:  {ca:5,cj:5,j:2,s:2,b:1,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:_jitBaseline,
            desc:"Conservative — low but practical non-base assumption from active fee-paying application programs, with a hard floor at 0.10 lam/CU."},
-    base: {ca:5,cj:5,j:5,s:8,b:5,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
+    base: {ca:5,cj:5,j:5,s:10,b:5,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
            desc:"Base — observed non-base fees across included application categories, with extreme outliers clipped (p5/p95)."},
     opt:  {ca:5,cj:5,j:10,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:_jitBaseline,
            desc:"Optimistic — raw observed CU-weighted non-base fees across included application categories, without outlier clipping."},
@@ -1588,16 +1593,17 @@ function updateAotSensitivitySummary(p){
     const el = document.getElementById('aot-sensitivity-summary');
     if (!el) return;
     const scenarioName = SCENARIO_LABELS[_selectedScenario] || 'Custom';
+    const live = calc(p);
     el.innerHTML =
-        '<div class="sensitivity-summary-title">Current Scenario Context</div>' +
         '<div class="sensitivity-summary-grid">' +
-            '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">Selected Scenario</div><div class="sensitivity-summary-value">' + scenarioName + '</div></div>' +
+            '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">Scenario</div><div class="sensitivity-summary-value">' + scenarioName + '</div></div>' +
             '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">SOL Price</div><div class="sensitivity-summary-value">$' + p.p + '</div></div>' +
             '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">Raiku Stake</div><div class="sensitivity-summary-value">' + (p.s * 100).toFixed(1) + '%</div></div>' +
             '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">Block Share</div><div class="sensitivity-summary-value">' + Math.round(p.b * 100) + '%</div></div>' +
             '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">Avg Auction Fee/CU</div><div class="sensitivity-summary-value">' + (p.f < 0.1 ? p.f.toFixed(3) : p.f >= 10 ? p.f.toFixed(1) : p.f.toFixed(2)) + ' L</div></div>' +
             '<div class="sensitivity-summary-item"><div class="sensitivity-summary-label">AOT Take Rate</div><div class="sensitivity-summary-value">' + p.ca.toFixed(1) + '%</div></div>' +
-        '</div>';
+        '</div>' +
+        '<div class="sensitivity-recon">JIT = ' + fmt(live.jitProtocol * p.p, '$') + ' | AOT = ' + fmt(live.aotProtocol * p.p, '$') + ' | Total = ' + fmt(live.totalProtocolUSD, '$') + '</div>';
 }
 
 function getCurrentTotalSolanaStakedSol(){
@@ -1746,7 +1752,7 @@ function initCharts(){
         {label:'All epochs (history)',data:jitHistoryData,borderColor:'rgba(255,255,255,0.25)',borderWidth:1,pointRadius:0,fill:false},
         {label:'Computation window (last 100)',data:jitWindowData,borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(189,217,112,0.08)'}
     ]},options:{...o,plugins:{...o.plugins,legend:{labels:{color:'#888',font:{size:10}},display:true}},scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'Epoch'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'SOL / epoch'}}}}});
-    cA=new Chart(document.getElementById('chart-aot'),{type:'bar',data:{labels:['1%','2%','5%','10%','15%','20%','30%','50%'],datasets:[{label:'AOT Protocol Treasury',data:Array(8).fill(0),backgroundColor:'#C0FF3860'}]},options:{...o,scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'RAIKU Stake %'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'Protocol Treasury (USD/yr)'}}}}});
+    cA=new Chart(document.getElementById('chart-aot'),{type:'bar',data:{labels:['1%','2%','5%','10%','15%','20%','25%','30%','50%'],datasets:[{label:'AOT Protocol Treasury',data:Array(9).fill(0),backgroundColor:'#C0FF3860'}]},options:{...o,scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'RAIKU Stake %'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'AOT Protocol Treasury (USD/yr)'}}}}});
     cP=new Chart(document.getElementById('chart-price'),{type:'line',data:{labels:D.e.map(e=>e.e),datasets:[{label:'SOL',data:D.e.map(e=>e.p),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:false}]},options:{...o,scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'Epoch'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'Price (USD)'}}}}});
     const st={};AOT_PROGRAMS.forEach(p=>{if(p.fpc_nb>0){const k=p.segment_key||p.sub||'other';if(!st[k])st[k]=[];st[k].push(p.fpc_nb);}});
     const ss=Object.entries(st).map(([k,v])=>({k,a:v.reduce((a,b)=>a+b,0)/v.length})).sort((a,b)=>b.a-a.a).slice(0,15);
@@ -1898,7 +1904,7 @@ function updFlow(p,r){
 function updCharts(p,r){
     updFlow(p,r);
     const aotTakeRate = p.ca / 100;
-    const stakeBuckets = [0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50];
+    const stakeBuckets = [0.01,0.02,0.05,0.10,0.15,0.20,0.25,0.30,0.50];
     const activeStakeIdx = nearestIdx(stakeBuckets, p.s);
     stakeBuckets.forEach((s,i)=>{
         const aG=(s*SY*p.b*CB*p.f)/LS;
@@ -1918,7 +1924,7 @@ function updCharts(p,r){
 
 function buildMatrix(p){
     const aotTakeRate = p.ca / 100;
-    const sr=[0.005,0.01,0.02,0.05,0.10,0.15,0.20,0.30,0.50], fc=[0.10,0.20,0.50,1.00,2.00,5.00,10.00,20.00];
+    const sr=[0.01,0.02,0.05,0.10,0.15,0.20,0.25,0.30,0.50], fc=[0.10,0.20,0.50,1.00,1.50,2.00,5.00,10.00,20.00];
     const activeStakeIdx = nearestIdx(sr, p.s);
     const activeFeeIdx = nearestIdx(fc, p.f);
     let h='<table class="matrix-table"><thead><tr><th>Stake \\ Fee/CU</th>';
