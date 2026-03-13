@@ -1397,7 +1397,9 @@ const _scenarioPool = CORE_GROUP_SPECS.map(g => _filterBySegments(_aotProgs, g.s
 const _scenarioAgg = _aggPrograms(_scenarioPool);
 const _scenarioActivePayers = _scenarioPool.filter(function(p){ return (p.fpc_nb || 0) > 0; });
 const _scenarioActiveAgg = _aggPrograms(_scenarioActivePayers);
+const _scenarioP30Active = _quantile(_scenarioActivePayers.map(function(p){ return Number(p.fpc_nb) || 0; }), 0.30);
 const _scenarioP70Active = _quantile(_scenarioActivePayers.map(function(p){ return Number(p.fpc_nb) || 0; }), 0.70);
+const _scenarioP75Active = _quantile(_scenarioActivePayers.map(function(p){ return Number(p.fpc_nb) || 0; }), 0.75);
 const _scenarioWinsor = _winsorizedWeightedNonBase(_scenarioPool, 0.05, 0.95);
 const _scenarioPopulationLabel = 'Population: core only (aot + both), is_aot_relevant=true, cu>0; benchmark excluded.';
 
@@ -2167,16 +2169,35 @@ function initAotFcuSection(){
     const includedCategoriesText = 'Included application categories are Prop AMM, DEX (aggregator, AMM pools, and orderbook), lending, oracle, bridge, perps, cranker-style programs, depin, payments, NFT, and gaming. Only programs with positive compute usage over the 30-day window are included. Arb-bot benchmark rows are excluded, and categories such as unknown and other are not used in scenario construction.';
     const representativeText = 'Representative names in this included set include BisonFi and HumidiFi (Prop AMM), Jupiter and Pump.fun programs (DEX), and Kamino programs (lending).';
     const activePayerDefinition = 'Active payers are included application programs with non-base fee/CU > 0 over the 30-day window.';
+    const activePayerAsterisk = '* Active payer = priority fees + MEV / JIT fees > 0 over the 30-day window.';
     const includedCount = _scenarioPool.length;
     const activeCount = _scenarioActivePayers.length;
-    const referencePointsText = [
+    const conReferencePointsText = [
         'Included programs: n = ' + includedCount,
         'Active payers: n = ' + activeCount,
         'P25 active non-base fee/CU: ' + _fConRaw.toFixed(4) + ' lam/CU',
+        'P30 active non-base fee/CU: ' + _scenarioP30Active.toFixed(4) + ' lam/CU',
+        'Scenario floor logic: max(P25 active, 0.10) = ' + _fCon.toFixed(2) + ' lam/CU',
+        activePayerAsterisk
+    ].join('\n');
+    const baseReferencePointsText = [
+        'Included programs: n = ' + includedCount,
+        'Winsorized CU-weighted non-base fee/CU (P5-P95 clipping): ' + _fBase.toFixed(4) + ' lam/CU',
+        'Raw CU-weighted non-base fee/CU (no clipping): ' + _fOptRaw.toFixed(4) + ' lam/CU',
+        'Median non-base fee/CU (included programs): ' + _scenarioAgg.medianNonBase.toFixed(4) + ' lam/CU'
+    ].join('\n');
+    const optReferencePointsText = [
+        'Included programs: n = ' + includedCount,
+        'Active payers: n = ' + activeCount,
         'Raw CU-weighted non-base fee/CU: ' + _fOptRaw.toFixed(4) + ' lam/CU',
         'P70 active non-base fee/CU: ' + _scenarioP70Active.toFixed(4) + ' lam/CU',
+        'P75 active non-base fee/CU: ' + _scenarioP75Active.toFixed(4) + ' lam/CU',
+        activePayerAsterisk
+    ].join('\n');
+    const bullReferencePointsText = [
+        'Included programs: n = ' + includedCount,
         'CU-weighted total fee/CU: ' + _fBullRaw.toFixed(4) + ' lam/CU',
-        'These are additional reference points only; they do not replace the four scenario rules.'
+        'Raw CU-weighted non-base fee/CU (comparison): ' + _fOptRaw.toFixed(4) + ' lam/CU'
     ].join('\n');
 
     _aotScenarioExplain = {
@@ -2188,7 +2209,7 @@ function initAotFcuSection(){
             metric: 'Metric used: non-base fee/CU, where non-base means priority fees plus MEV / JIT fees. Rule applied: take P25 among active payers, then apply a hard floor of 0.10 lam/CU.',
             calculation: 'Observed P25 non-base fee/CU among active payers (n = ' + activeCount + ') = ' + _fConRaw.toFixed(4) + ' lam/CU. Floor rule = 0.10 lam/CU. Final displayed value = max(' + _fConRaw.toFixed(4) + ', 0.10) = ' + _fCon.toFixed(2) + ' lam/CU.',
             why: 'This rule keeps the downside case realistic for product planning while remaining tied to observed paying behavior.',
-            refs: referencePointsText
+            refs: conReferencePointsText
         },
         base: {
             title: 'Base',
@@ -2198,7 +2219,7 @@ function initAotFcuSection(){
             metric: 'Metric used: CU-weighted non-base fee/CU across included programs. Rule applied: clip extreme program-level values at P5 and P95 before computing the weighted average, so a few dominant names do not distort the baseline.',
             calculation: 'Observed raw CU-weighted non-base fee/CU across included programs (n = ' + includedCount + ') = ' + _fBaseObserved.toFixed(4) + ' lam/CU. Outlier clipping bounds are P5 = ' + _scenarioWinsor.pLow.toFixed(4) + ' and P95 = ' + _scenarioWinsor.pHigh.toFixed(4) + ' lam/CU. Final displayed value after clipping and CU-weighting = ' + _fBase.toFixed(2) + ' lam/CU.',
             why: 'This rule gives a stable default market baseline without letting a few extreme values dominate.',
-            refs: referencePointsText
+            refs: baseReferencePointsText
         },
         opt: {
             title: 'Optimistic',
@@ -2208,7 +2229,7 @@ function initAotFcuSection(){
             metric: 'Metric used: raw CU-weighted non-base fee/CU across the included application categories. Rule applied: no outlier clipping is used in this scenario.',
             calculation: 'Observed raw CU-weighted non-base fee/CU across included programs (n = ' + includedCount + ') = ' + _fOptRaw.toFixed(4) + ' lam/CU. No clipping is applied. Final displayed value = ' + _fOpt.toFixed(2) + ' lam/CU.',
             why: 'This rule keeps Optimistic fully anchored in observed market data and avoids an arbitrary midpoint construction.',
-            refs: referencePointsText
+            refs: optReferencePointsText
         },
         bull: {
             title: 'Bull',
@@ -2218,7 +2239,7 @@ function initAotFcuSection(){
             metric: 'Metric used: CU-weighted total fee/CU across the included application categories. Rule applied: total fee/CU includes base fees plus priority and MEV / JIT components.',
             calculation: 'Observed CU-weighted total fee/CU across included programs (n = ' + includedCount + ') = ' + _fBullRaw.toFixed(4) + ' lam/CU. This includes base fees in addition to non-base fees. Final displayed value = ' + _fBull.toFixed(2) + ' lam/CU.',
             why: 'This rule is used as an upper-bound reference for periods when applications face sustained all-in fee costs.',
-            refs: referencePointsText
+            refs: bullReferencePointsText
         }
     };
     _bindAotScenarioModal();
