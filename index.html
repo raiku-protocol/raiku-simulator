@@ -253,15 +253,19 @@ details[open] summary::before { transform:rotate(90deg); }
 .aot-scenario-card h3 { margin-bottom:6px; }
 .aot-scenario-card .sc-val { margin-bottom:8px; }
 .aot-sc-sentence { margin:0 0 8px 0; font-size:12px; line-height:1.45; color:var(--text); }
-.aot-sc-calc { border:1px solid #2b2d2f; border-radius:6px; background:#0f1011; padding:0; }
-.aot-sc-calc summary { cursor:pointer; list-style:none; padding:7px 10px; font-size:11px; color:var(--lime-soft); font-weight:600; user-select:none; }
-.aot-sc-calc summary::-webkit-details-marker { display:none; }
-.aot-sc-calc summary::before { content:'▸ '; color:var(--text2); }
-.aot-sc-calc[open] summary::before { content:'▾ '; }
-.aot-sc-calc-body { padding:8px 10px 10px 10px; border-top:1px solid #232527; display:grid; gap:6px; font-size:10px; line-height:1.45; }
-.aot-sc-calc-row { display:grid; grid-template-columns:130px 1fr; gap:8px; align-items:start; }
-.aot-sc-calc-key { color:var(--text2); font-weight:600; text-transform:uppercase; letter-spacing:0.3px; }
-.aot-sc-calc-val { color:var(--text); }
+.aot-sc-open { border:1px solid #2b2d2f; border-radius:6px; background:#0f1011; color:var(--lime-soft); padding:7px 10px; font-size:11px; font-weight:600; cursor:pointer; transition:border-color .15s ease, background .15s ease; }
+.aot-sc-open:hover { border-color:#3a3d40; background:#151719; }
+.aot-sc-modal-backdrop { position:fixed; inset:0; z-index:2000; background:rgba(5,6,7,.76); display:none; align-items:center; justify-content:center; padding:18px; }
+.aot-sc-modal-backdrop.show { display:flex; }
+.aot-sc-modal { width:min(860px, 96vw); max-height:88vh; overflow:auto; border:1px solid #2e3135; background:#0f1012; border-radius:10px; box-shadow:0 24px 80px rgba(0,0,0,.55); padding:16px 18px; }
+.aot-sc-modal-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px; }
+.aot-sc-modal-title { margin:0; font-size:16px; color:var(--text); text-transform:uppercase; letter-spacing:.7px; }
+.aot-sc-modal-value { margin-top:4px; font-size:12px; color:var(--lime-soft); font-family:var(--font-mono); }
+.aot-sc-modal-close { border:1px solid #34373b; background:#17181b; color:var(--text); border-radius:6px; padding:6px 10px; font-size:11px; cursor:pointer; }
+.aot-sc-modal-close:hover { border-color:#4a4d50; }
+.aot-sc-modal-section { background:#131417; border:1px solid #26292d; border-radius:8px; padding:10px 12px; margin-top:10px; }
+.aot-sc-modal-section h4 { margin:0 0 5px 0; font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--lime-soft); }
+.aot-sc-modal-section p { margin:0; font-size:12px; line-height:1.6; color:var(--text); }
 
 
 
@@ -883,69 +887,61 @@ details[open] summary::before { transform:rotate(90deg); }
                     <h3>Conservative</h3>
                     <div class="sc-val" id="aot-sc-con-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-con-sentence">&mdash;</p>
-                    <details class="aot-sc-calc">
-                        <summary>Show calculation</summary>
-                        <div class="aot-sc-calc-body">
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Population</div><div class="aot-sc-calc-val" id="aot-sc-con-pop">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Metric used</div><div class="aot-sc-calc-val" id="aot-sc-con-metric">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Raw observed</div><div class="aot-sc-calc-val" id="aot-sc-con-raw">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Validated choice</div><div class="aot-sc-calc-val" id="aot-sc-con-choice">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Formula</div><div class="aot-sc-calc-val" id="aot-sc-con-formula">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Final displayed</div><div class="aot-sc-calc-val" id="aot-sc-con-final">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Secondary total</div><div class="aot-sc-calc-val" id="aot-sc-con-total">&mdash;</div></div>
-                        </div>
-                    </details>
+                    <button type="button" class="aot-sc-open" data-aot-scenario="con">Show calculation</button>
                 </div>
                 <div class="scenario-card aot-scenario-card" id="aot-sc-card-base">
                     <h3>Base</h3>
                     <div class="sc-val" id="aot-sc-base-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-base-sentence">&mdash;</p>
-                    <details class="aot-sc-calc">
-                        <summary>Show calculation</summary>
-                        <div class="aot-sc-calc-body">
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Population</div><div class="aot-sc-calc-val" id="aot-sc-base-pop">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Metric used</div><div class="aot-sc-calc-val" id="aot-sc-base-metric">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Raw observed</div><div class="aot-sc-calc-val" id="aot-sc-base-raw">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Validated choice</div><div class="aot-sc-calc-val" id="aot-sc-base-choice">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Formula</div><div class="aot-sc-calc-val" id="aot-sc-base-formula">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Final displayed</div><div class="aot-sc-calc-val" id="aot-sc-base-final">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Secondary total</div><div class="aot-sc-calc-val" id="aot-sc-base-total">&mdash;</div></div>
-                        </div>
-                    </details>
+                    <button type="button" class="aot-sc-open" data-aot-scenario="base">Show calculation</button>
                 </div>
                 <div class="scenario-card aot-scenario-card" id="aot-sc-card-opt">
                     <h3>Optimistic</h3>
                     <div class="sc-val" id="aot-sc-opt-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-opt-sentence">&mdash;</p>
-                    <details class="aot-sc-calc">
-                        <summary>Show calculation</summary>
-                        <div class="aot-sc-calc-body">
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Population</div><div class="aot-sc-calc-val" id="aot-sc-opt-pop">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Metric used</div><div class="aot-sc-calc-val" id="aot-sc-opt-metric">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Raw observed</div><div class="aot-sc-calc-val" id="aot-sc-opt-raw">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Validated choice</div><div class="aot-sc-calc-val" id="aot-sc-opt-choice">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Formula</div><div class="aot-sc-calc-val" id="aot-sc-opt-formula">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Final displayed</div><div class="aot-sc-calc-val" id="aot-sc-opt-final">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Secondary total</div><div class="aot-sc-calc-val" id="aot-sc-opt-total">&mdash;</div></div>
-                        </div>
-                    </details>
+                    <button type="button" class="aot-sc-open" data-aot-scenario="opt">Show calculation</button>
                 </div>
                 <div class="scenario-card aot-scenario-card" id="aot-sc-card-bull">
                     <h3>Bull</h3>
                     <div class="sc-val" id="aot-sc-bull-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-bull-sentence">&mdash;</p>
-                    <details class="aot-sc-calc">
-                        <summary>Show calculation</summary>
-                        <div class="aot-sc-calc-body">
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Population</div><div class="aot-sc-calc-val" id="aot-sc-bull-pop">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Metric used</div><div class="aot-sc-calc-val" id="aot-sc-bull-metric">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Raw observed</div><div class="aot-sc-calc-val" id="aot-sc-bull-raw">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Validated choice</div><div class="aot-sc-calc-val" id="aot-sc-bull-choice">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Formula</div><div class="aot-sc-calc-val" id="aot-sc-bull-formula">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Final displayed</div><div class="aot-sc-calc-val" id="aot-sc-bull-final">&mdash;</div></div>
-                            <div class="aot-sc-calc-row"><div class="aot-sc-calc-key">Secondary total</div><div class="aot-sc-calc-val" id="aot-sc-bull-total">&mdash;</div></div>
-                        </div>
-                    </details>
+                    <button type="button" class="aot-sc-open" data-aot-scenario="bull">Show calculation</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="aot-sc-modal-backdrop" id="aot-sc-modal-backdrop" aria-hidden="true">
+            <div class="aot-sc-modal" role="dialog" aria-modal="true" aria-labelledby="aot-sc-modal-title">
+                <div class="aot-sc-modal-head">
+                    <div>
+                        <h3 class="aot-sc-modal-title" id="aot-sc-modal-title">Scenario</h3>
+                        <div class="aot-sc-modal-value" id="aot-sc-modal-value">&mdash;</div>
+                    </div>
+                    <button type="button" class="aot-sc-modal-close" id="aot-sc-modal-close">Close</button>
+                </div>
+                <div class="aot-sc-modal-section">
+                    <h4>Plain-language explanation</h4>
+                    <p id="aot-sc-modal-plain">&mdash;</p>
+                </div>
+                <div class="aot-sc-modal-section">
+                    <h4>Included scope</h4>
+                    <p id="aot-sc-modal-scope">&mdash;</p>
+                </div>
+                <div class="aot-sc-modal-section">
+                    <h4>Metric and rule</h4>
+                    <p id="aot-sc-modal-metric">&mdash;</p>
+                </div>
+                <div class="aot-sc-modal-section">
+                    <h4>Calculation</h4>
+                    <p id="aot-sc-modal-calc">&mdash;</p>
+                </div>
+                <div class="aot-sc-modal-section">
+                    <h4>Why this choice was validated</h4>
+                    <p id="aot-sc-modal-why">&mdash;</p>
+                </div>
+                <div class="aot-sc-modal-section">
+                    <h4>Secondary total reference</h4>
+                    <p id="aot-sc-modal-secondary">&mdash;</p>
                 </div>
             </div>
         </div>
@@ -2106,53 +2102,108 @@ function _renderAotTopPrograms(){
     var wrap = document.getElementById('aot-top-programs-table');
     if (wrap) wrap.innerHTML = h;
 }
+var _aotScenarioModalBound = false;
+var _aotScenarioExplain = {};
+function _setScenarioModalText(id, text){
+    var el = document.getElementById(id);
+    if (el) el.textContent = text || '—';
+}
+function _openAotScenarioModal(key){
+    var d = _aotScenarioExplain[key];
+    var backdrop = document.getElementById('aot-sc-modal-backdrop');
+    if (!d || !backdrop) return;
+    _setScenarioModalText('aot-sc-modal-title', d.title);
+    _setScenarioModalText('aot-sc-modal-value', d.value);
+    _setScenarioModalText('aot-sc-modal-plain', d.plain);
+    _setScenarioModalText('aot-sc-modal-scope', d.scope);
+    _setScenarioModalText('aot-sc-modal-metric', d.metric);
+    _setScenarioModalText('aot-sc-modal-calc', d.calculation);
+    _setScenarioModalText('aot-sc-modal-why', d.why);
+    _setScenarioModalText('aot-sc-modal-secondary', d.secondary);
+    backdrop.classList.add('show');
+    backdrop.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+}
+function _closeAotScenarioModal(){
+    var backdrop = document.getElementById('aot-sc-modal-backdrop');
+    if (!backdrop) return;
+    backdrop.classList.remove('show');
+    backdrop.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+}
+function _bindAotScenarioModal(){
+    if (_aotScenarioModalBound) return;
+    var backdrop = document.getElementById('aot-sc-modal-backdrop');
+    var closeBtn = document.getElementById('aot-sc-modal-close');
+    if (!backdrop || !closeBtn) return;
+    document.querySelectorAll('.aot-sc-open[data-aot-scenario]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            _openAotScenarioModal(btn.getAttribute('data-aot-scenario'));
+        });
+    });
+    closeBtn.addEventListener('click', _closeAotScenarioModal);
+    backdrop.addEventListener('click', function(ev){
+        if (ev.target === backdrop) _closeAotScenarioModal();
+    });
+    document.addEventListener('keydown', function(ev){
+        if (ev.key === 'Escape') _closeAotScenarioModal();
+    });
+    _aotScenarioModalBound = true;
+}
 function initAotFcuSection(){
     const con = document.getElementById('aot-sc-con-f'); if (con) con.textContent = _fCon.toFixed(2) + ' lam/CU';
     const base = document.getElementById('aot-sc-base-f'); if (base) base.textContent = _fBase.toFixed(2) + ' lam/CU';
     const opt = document.getElementById('aot-sc-opt-f'); if (opt) opt.textContent = _fOpt.toFixed(2) + ' lam/CU';
     const bull = document.getElementById('aot-sc-bull-f'); if (bull) bull.textContent = _fBull.toFixed(2) + ' lam/CU';
 
-    const conS = document.getElementById('aot-sc-con-sentence'); if (conS) conS.textContent = 'Lower-bound case: active fee payers still bid meaningfully, but we enforce a product floor.';
-    const baseS = document.getElementById('aot-sc-base-sentence'); if (baseS) baseS.textContent = 'Central case: typical non-base pressure after reducing outlier distortion.';
-    const optS = document.getElementById('aot-sc-opt-sentence'); if (optS) optS.textContent = 'Transition case: demand moves from robust baseline toward upper all-in pressure.';
-    const bullS = document.getElementById('aot-sc-bull-sentence'); if (bullS) bullS.textContent = 'Upper-bound case: sustained all-in fee pressure across core programs.';
+    const conS = document.getElementById('aot-sc-con-sentence'); if (conS) conS.textContent = 'Uses the 25th-percentile non-base fee/CU among active fee-paying AOT/Both programs, then applies a validated 0.10 lam/CU floor.';
+    const baseS = document.getElementById('aot-sc-base-sentence'); if (baseS) baseS.textContent = 'Uses winsorized CU-weighted non-base fee pressure across AOT/Both core programs so extreme outliers do not dominate the baseline.';
+    const optS = document.getElementById('aot-sc-opt-sentence'); if (optS) optS.textContent = 'Uses the midpoint between the approved Base non-base pressure and Bull all-in pressure.';
+    const bullS = document.getElementById('aot-sc-bull-sentence'); if (bullS) bullS.textContent = 'Uses CU-weighted total fee/CU across AOT/Both core programs, capturing full all-in pressure.';
 
-    const popCore = 'product_scope in {aot, both}, is_aot_relevant = true, cu > 0; benchmark rows excluded.';
-    const popActive = popCore + ' Active payers subset for this scenario: non-base fee/CU > 0.';
-    const conP = document.getElementById('aot-sc-con-pop'); if (conP) conP.textContent = popActive;
-    const baseP = document.getElementById('aot-sc-base-pop'); if (baseP) baseP.textContent = popCore;
-    const optP = document.getElementById('aot-sc-opt-pop'); if (optP) optP.textContent = popCore;
-    const bullP = document.getElementById('aot-sc-bull-pop'); if (bullP) bullP.textContent = popCore;
-
-    const conM = document.getElementById('aot-sc-con-metric'); if (conM) conM.textContent = 'p25(non-base fee/CU) on active fee-paying core programs.';
-    const baseM = document.getElementById('aot-sc-base-metric'); if (baseM) baseM.textContent = 'winsorized CU-weighted non-base fee/CU (program-level clipping).';
-    const optM = document.getElementById('aot-sc-opt-metric'); if (optM) optM.textContent = 'midpoint between Base and Bull assumptions.';
-    const bullM = document.getElementById('aot-sc-bull-metric'); if (bullM) bullM.textContent = 'CU-weighted total fee/CU.';
-
-    const conR = document.getElementById('aot-sc-con-raw'); if (conR) conR.textContent = 'p25(active non-base) = ' + _fConRaw.toFixed(2) + ' lam/CU.';
-    const baseR = document.getElementById('aot-sc-base-raw'); if (baseR) baseR.textContent = 'CU-weighted non-base = ' + _fBaseObserved.toFixed(2) + ' lam/CU; clipping thresholds p5=' + _scenarioWinsor.pLow.toFixed(2) + ', p95=' + _scenarioWinsor.pHigh.toFixed(2) + '.';
-    const optR = document.getElementById('aot-sc-opt-raw'); if (optR) optR.textContent = 'Base raw = ' + _fBaseRaw.toFixed(2) + ' lam/CU; Bull raw = ' + _fBullRaw.toFixed(2) + ' lam/CU.';
-    const bullR = document.getElementById('aot-sc-bull-raw'); if (bullR) bullR.textContent = 'CU-weighted total fee/CU = ' + _fBullRaw.toFixed(2) + ' lam/CU.';
-
-    const conC = document.getElementById('aot-sc-con-choice'); if (conC) conC.textContent = 'Validated methodological choice: apply explicit product floor at 0.10 lam/CU.';
-    const baseC = document.getElementById('aot-sc-base-choice'); if (baseC) baseC.textContent = 'Validated methodological choice: use winsorized central metric (p5/p95 clipping) instead of raw mean.';
-    const optC = document.getElementById('aot-sc-opt-choice'); if (optC) optC.textContent = 'Validated methodological choice: use midpoint between approved Base and Bull scenarios.';
-    const bullC = document.getElementById('aot-sc-bull-choice'); if (bullC) bullC.textContent = 'Validated methodological choice: treat observed CU-weighted total as upper-bound all-in pressure.';
-
-    const conFml = document.getElementById('aot-sc-con-formula'); if (conFml) conFml.textContent = 'max(0.10, p25(active non-base fee/CU)).';
-    const baseFml = document.getElementById('aot-sc-base-formula'); if (baseFml) baseFml.textContent = 'winsorized CU-weighted non-base fee/CU with program-level p5/p95 clipping.';
-    const optFml = document.getElementById('aot-sc-opt-formula'); if (optFml) optFml.textContent = '0.5 × (Base + Bull), using approved scenario anchors.';
-    const bullFml = document.getElementById('aot-sc-bull-formula'); if (bullFml) bullFml.textContent = 'CU-weighted total fee/CU (base + priority + MEV / JIT).';
-
-    const conFinal = document.getElementById('aot-sc-con-final'); if (conFinal) conFinal.textContent = _fCon.toFixed(2) + ' lam/CU (rounded display).';
-    const baseFinal = document.getElementById('aot-sc-base-final'); if (baseFinal) baseFinal.textContent = _fBase.toFixed(2) + ' lam/CU (rounded display).';
-    const optFinal = document.getElementById('aot-sc-opt-final'); if (optFinal) optFinal.textContent = _fOpt.toFixed(2) + ' lam/CU (rounded display).';
-    const bullFinal = document.getElementById('aot-sc-bull-final'); if (bullFinal) bullFinal.textContent = _fBull.toFixed(2) + ' lam/CU (rounded display).';
-
-    const conT = document.getElementById('aot-sc-con-total'); if (conT) conT.textContent = 'Secondary total reference: ' + _fConTotalRef.toFixed(2) + ' lam/CU';
-    const baseT = document.getElementById('aot-sc-base-total'); if (baseT) baseT.textContent = 'Secondary total reference: ' + _fBaseTotalRef.toFixed(2) + ' lam/CU';
-    const optT = document.getElementById('aot-sc-opt-total'); if (optT) optT.textContent = 'Secondary total reference: ' + _fOptTotalRef.toFixed(2) + ' lam/CU';
-    const bullT = document.getElementById('aot-sc-bull-total'); if (bullT) bullT.textContent = 'Secondary total reference: ' + _fBullTotalRef.toFixed(2) + ' lam/CU';
+    _aotScenarioExplain = {
+        con: {
+            title: 'Conservative',
+            value: _fCon.toFixed(2) + ' lam/CU',
+            plain: 'This scenario represents a realistic downside where AOT/Both programs still show willingness to pay non-base fees, but the assumption is prevented from falling to an unusably low level.',
+            scope: 'This scenario uses only core AOT/Both programs with positive compute usage over the 30-day window (product_scope in {aot, both}, is_aot_relevant = true, cu > 0). It then uses the active payer subset, meaning non-base fee/CU > 0. Benchmark arb-bot rows are excluded.',
+            metric: 'Metric: program-level non-base fee/CU. Rule: take the 25th percentile on active payers, then apply a validated minimum floor of 0.10 lam/CU.',
+            calculation: 'Observed p25 active non-base fee/CU = ' + _fConRaw.toFixed(4) + ' lam/CU. Validated minimum floor = 0.10 lam/CU. Formula: Conservative = max(0.10, observed p25 active non-base fee/CU). Final displayed value = ' + _fCon.toFixed(2) + ' lam/CU.',
+            why: 'This was retained because it reflects the lower end of observed paying behavior while keeping the product assumption operationally credible.',
+            secondary: 'Secondary total fee/CU reference for comparison: ' + _fConTotalRef.toFixed(2) + ' lam/CU.'
+        },
+        base: {
+            title: 'Base',
+            value: _fBase.toFixed(2) + ' lam/CU',
+            plain: 'This scenario is the robust central estimate of observed non-base fee pressure across core AOT/Both programs, with extreme outliers dampened.',
+            scope: 'This scenario uses only core AOT/Both programs with positive compute usage over the 30-day window (product_scope in {aot, both}, is_aot_relevant = true, cu > 0). Benchmark arb-bot rows are excluded.',
+            metric: 'Metric: CU-weighted non-base fee/CU across core programs. Rule: winsorize program-level non-base fee/CU at the p5/p95 bounds before computing the CU-weighted average.',
+            calculation: 'Observed raw CU-weighted non-base fee/CU = ' + _fBaseObserved.toFixed(4) + ' lam/CU. Program-level clipping bounds are p5 = ' + _scenarioWinsor.pLow.toFixed(4) + ' lam/CU and p95 = ' + _scenarioWinsor.pHigh.toFixed(4) + ' lam/CU. Formula: Base = winsorized CU-weighted non-base fee/CU. Final displayed value = ' + _fBase.toFixed(2) + ' lam/CU.',
+            why: 'This was retained because it captures central fee pressure while reducing sensitivity to a small number of extreme programs.',
+            secondary: 'Secondary total fee/CU reference for comparison: ' + _fBaseTotalRef.toFixed(2) + ' lam/CU.'
+        },
+        opt: {
+            title: 'Optimistic',
+            value: _fOpt.toFixed(2) + ' lam/CU',
+            plain: 'This scenario represents a transition regime where fee pressure moves above the robust baseline and toward sustained upper all-in pricing.',
+            scope: 'This scenario uses only core AOT/Both programs with positive compute usage over the 30-day window (product_scope in {aot, both}, is_aot_relevant = true, cu > 0). Benchmark arb-bot rows are excluded.',
+            metric: 'Metric: midpoint between the approved Base anchor and the approved Bull anchor. Rule: take the arithmetic mean of those two anchors.',
+            calculation: 'Base anchor = ' + _fBaseRaw.toFixed(4) + ' lam/CU. Bull anchor = ' + _fBullRaw.toFixed(4) + ' lam/CU. Formula: Optimistic = (Base + Bull) / 2 = ' + ((_fBaseRaw + _fBullRaw) / 2).toFixed(4) + ' lam/CU. Final displayed value = ' + _fOpt.toFixed(2) + ' lam/CU.',
+            why: 'This was retained because it gives a transparent bridge between the robust non-base baseline and the upper all-in regime.',
+            secondary: 'Secondary total fee/CU reference for comparison: ' + _fOptTotalRef.toFixed(2) + ' lam/CU.'
+        },
+        bull: {
+            title: 'Bull',
+            value: _fBull.toFixed(2) + ' lam/CU',
+            plain: 'This scenario represents sustained high congestion where programs pay the full all-in fee stack rather than only non-base pressure.',
+            scope: 'This scenario uses only core AOT/Both programs with positive compute usage over the 30-day window (product_scope in {aot, both}, is_aot_relevant = true, cu > 0). Benchmark arb-bot rows are excluded.',
+            metric: 'Metric: CU-weighted total fee/CU, where total fee/CU = base fee/CU + priority fee/CU + MEV / JIT fee/CU.',
+            calculation: 'Observed CU-weighted total fee/CU = ' + _fBullRaw.toFixed(4) + ' lam/CU. Formula: Bull = CU-weighted total fee/CU. Final displayed value = ' + _fBull.toFixed(2) + ' lam/CU.',
+            why: 'This was retained as the upper-bound assumption for sustained all-in pricing pressure across core application programs.',
+            secondary: 'Secondary total fee/CU reference for comparison: ' + _fBullTotalRef.toFixed(2) + ' lam/CU.'
+        }
+    };
+    _bindAotScenarioModal();
 
     const m1 = document.getElementById('aot-cat-chart-mode');
     const m2 = document.getElementById('sim-cat-chart-mode');
