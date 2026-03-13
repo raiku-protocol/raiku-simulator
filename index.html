@@ -2206,14 +2206,14 @@ function initAotFcuSection(){
         'Reminder: Raw CU-weighted non-base fee/CU (no clipping) = ' + _fOpt.toFixed(2) + ' lam/CU.',
         'Included programs: n = ' + includedCount,
         'Active payers: n = ' + activeCount,
-        'P70 active non-base fee/CU: ' + _scenarioP70Active.toFixed(4) + ' lam/CU',
+        'P70 active non-base fee/CU: ' + _scenarioP70Active.toFixed(4) + ' lam/CU (upper active-payer reference for stronger non-base demand).',
+        'Why shown: this gives an upper-end observed payer reference while the Optimistic anchor stays raw CU-weighted non-base.',
         activePayerAsterisk
     ].join('\n');
     const bullAdditionalContextText = [
         'Reminder: CU-weighted total fee/CU (all-in) = ' + _fBull.toFixed(2) + ' lam/CU.',
         'Included programs: n = ' + includedCount,
-        'All-in decomposition reminder: total = base + priority + MEV / JIT.',
-        'Secondary comparison only: CU-weighted base fee/CU component inside total = ' + _scenarioAgg.weightedBase.toFixed(4) + ' lam/CU'
+        'All-in decomposition reminder: total = base + priority + MEV / JIT.'
     ].join('\n');
 
     _aotScenarioExplain = {
