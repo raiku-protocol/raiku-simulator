@@ -192,13 +192,17 @@ details[open] summary::before { transform:rotate(90deg); }
 #model-params .section-label { grid-column:1/-1; }
 #model-params .controls-section { padding:6px 4px; }
 .globals-row { display:grid; grid-template-columns:1fr; gap:16px; grid-column:1/-1; }
+.globals-row.globals-row-solo { max-width:240px; gap:8px; }
 
 /* Panel redesign: 2-column AOT/JIT layout */
 .param-columns { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:4px; }
 .param-col { background:#111213; border-radius:5px; padding:5px 6px; border-top:2px solid #333; overflow:hidden; }
 .param-col.aot { border-top-color:var(--clr-aot, #6BF); }
 .param-col.jit { border-top-color:var(--clr-jit, #FFF); }
+.param-col .control { gap:0; margin-bottom:2px; }
+.param-col .control:last-child { margin-bottom:0; }
 .param-col .control label { font-size:9px; }
+.param-col .control .slider-row { gap:5px; }
 .param-col .control .val { font-size:11px; min-width:36px; }
 .param-col .control input[type=range] { height:3px; }
 .param-col-label { font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text2); margin-bottom:3px; }
@@ -225,6 +229,7 @@ details[open] summary::before { transform:rotate(90deg); }
     .sidebar .control .val { font-size:18px; min-width:70px; }
     .sidebar .control input[type=range] { height:8px; }
     .sidebar .control input[type=range]::-webkit-slider-thumb { width:20px; height:20px; }
+    .globals-row.globals-row-solo { max-width:none; }
     .kpi-row { grid-template-columns:repeat(2,1fr); }
     .chart-row { grid-template-columns:1fr; }
     .tab-btn { font-size:10px; padding:8px 10px; letter-spacing:0.5px; }
@@ -522,8 +527,7 @@ details[open] summary::before { transform:rotate(90deg); }
     <div class="controls-grid">
 
         <!-- ─── SECTION 1: GLOBAL SETTINGS ─── -->
-        <div class="section-label">Global Settings</div>
-        <div class="globals-row">
+        <div class="globals-row globals-row-solo">
             <div class="control">
                 <label>SOL Price (USD)</label>
                 <div class="slider-row"><input type="range" id="sl-price" min="10" max="400" step="5" value="109"><span class="val" id="v-price">$109</span></div>
