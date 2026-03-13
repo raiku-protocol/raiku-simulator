@@ -656,8 +656,8 @@ details[open] summary::before { transform:rotate(90deg); }
     <div class="sidebar-yield-grid">
         <div class="sidebar-yield-row">
             <div class="sidebar-yield-label">Current Total Solana Staked</div>
-            <div class="sidebar-yield-value" id="validator-staked-value">423.96M SOL</div>
-            <div class="sidebar-yield-sub" id="validator-staked-source">Source: <a href="https://solanacompass.com/tokenomics" target="_blank" rel="noopener noreferrer">Solana Compass Tokenomics</a></div>
+            <div class="sidebar-yield-value" id="validator-staked-value">423.95M SOL</div>
+            <div class="sidebar-yield-sub" id="validator-staked-source">Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a></div>
         </div>
         <div class="sidebar-yield-row">
             <div class="sidebar-yield-label">Validator Revenue</div>
@@ -1503,12 +1503,11 @@ const SC = {
            desc:"Bull — upper-bound all-in case using CU-weighted total fee/CU, including base fees."},
 };
 let _selectedScenario = 'base';
-const STAKE_RPC_URL = 'https://api.mainnet-beta.solana.com';
-const STAKE_FALLBACK_SOL = 423960262.118339;
+const STAKE_FALLBACK_SOL = 423948189.4;
 let _solanaStakeState = {
     sol: STAKE_FALLBACK_SOL,
-    sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics" target="_blank" rel="noopener noreferrer">Solana Compass Tokenomics</a>',
-    mode: 'fallback'
+    sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a>',
+    mode: 'reference'
 };
 
 function fmt(v,t){
@@ -1526,38 +1525,11 @@ function getCurrentTotalSolanaStakedSol(){
 }
 
 async function loadCurrentTotalSolanaStaked(){
-    try {
-        const res = await fetch(STAKE_RPC_URL, {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({
-                jsonrpc:'2.0',
-                id:1,
-                method:'getVoteAccounts',
-                params:[{keepUnstakedDelinquents:false}]
-            })
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const payload = await res.json();
-        const rows = []
-            .concat(payload && payload.result && Array.isArray(payload.result.current) ? payload.result.current : [])
-            .concat(payload && payload.result && Array.isArray(payload.result.delinquent) ? payload.result.delinquent : []);
-        const totalLamports = rows.reduce(function(sum, row){
-            return sum + (Number(row && row.activatedStake) || 0);
-        }, 0);
-        if (!(totalLamports > 0)) throw new Error('No activated stake returned');
-        _solanaStakeState = {
-            sol: totalLamports / LS,
-            sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics" target="_blank" rel="noopener noreferrer">Solana Compass Tokenomics</a>',
-            mode: 'live'
-        };
-    } catch (err) {
-        _solanaStakeState = {
-            sol: STAKE_FALLBACK_SOL,
-            sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics" target="_blank" rel="noopener noreferrer">Solana Compass Tokenomics</a>',
-            mode: 'fallback'
-        };
-    }
+    _solanaStakeState = {
+        sol: STAKE_FALLBACK_SOL,
+        sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a>',
+        mode: 'reference'
+    };
     update();
 }
 
