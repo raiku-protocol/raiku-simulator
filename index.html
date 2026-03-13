@@ -1120,6 +1120,12 @@ details[open] summary::before { transform:rotate(90deg); }
 <div class="validator-side">
     <div class="section fade-in fade-in-1">
         <h2>Scenario Context</h2>
+        <div class="scenario-btns" style="margin-bottom:10px;">
+            <button class="scenario-btn" id="validator-btn-con" onclick="applyScenario('con')">Conservative</button>
+            <button class="scenario-btn active" id="validator-btn-base" onclick="applyScenario('base')">Base Case</button>
+            <button class="scenario-btn" id="validator-btn-opt" onclick="applyScenario('opt')">Optimistic</button>
+            <button class="scenario-btn" id="validator-btn-bull" onclick="applyScenario('bull')">Bull Case</button>
+        </div>
         <div class="validator-context-grid">
             <div class="validator-context-item">
                 <div class="validator-context-label">Scenario</div>
@@ -1712,6 +1718,32 @@ function fmtRate(v){
     return (v * 100).toFixed(2) + '%';
 }
 
+function fmtValidatorUsd(v){
+    const a = Math.abs(v);
+    if (a >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+    if (a >= 1e6) return '$' + (v / 1e6).toFixed(a >= 10e6 ? 1 : 2) + 'M';
+    if (a >= 1e3) return '$' + (v / 1e3).toFixed(a >= 100e3 ? 0 : 1) + 'K';
+    if (a >= 1) return '$' + v.toFixed(0);
+    if (a >= 0.01) return '$' + v.toFixed(2);
+    return '$' + v.toFixed(4);
+}
+
+function fmtValidatorSol(v){
+    const a = Math.abs(v);
+    if (a >= 1e6) return (v / 1e6).toFixed(2) + 'M SOL';
+    if (a >= 1e3) return (v / 1e3).toFixed(a >= 100e3 ? 1 : 2) + 'K SOL';
+    if (a >= 1) return v.toFixed(2) + ' SOL';
+    if (a >= 0.01) return v.toFixed(4) + ' SOL';
+    return v.toFixed(6) + ' SOL';
+}
+
+function fmtValidatorRate(v){
+    const pct = v * 100;
+    const abs = Math.abs(pct);
+    if (abs < 1) return pct.toFixed(3) + '%';
+    return pct.toFixed(2) + '%';
+}
+
 function getDisplayedScenarioName(){
     const activeBtn = document.querySelector('.scenario-btn.active');
     if (activeBtn) return activeBtn.textContent.trim();
@@ -1764,8 +1796,10 @@ function applyScenario(n){
     document.getElementById('sl-price').value=s.p;
     document.getElementById('scenario-desc').textContent=s.desc;
     document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.remove('active'));
-        document.querySelectorAll('.scenario-card').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('.scenario-card').forEach(c=>c.classList.remove('active'));
     document.getElementById('btn-'+n).classList.add('active');
+    const validatorBtn = document.getElementById('validator-btn-'+n);
+    if (validatorBtn) validatorBtn.classList.add('active');
     document.querySelectorAll('.scenario-card').forEach(c=>c.classList.remove('active'));
     const sc=document.getElementById('sc-card-'+n); if(sc) sc.classList.add('active');
     update();
@@ -2721,21 +2755,21 @@ function update(){
     document.getElementById('validator-context-fee').textContent = (p.f < 0.1 ? p.f.toFixed(3) : p.f >= 10 ? p.f.toFixed(1) : p.f.toFixed(2)) + ' L';
     document.getElementById('validator-context-aot-take').textContent = p.ca.toFixed(1) + '%';
     document.getElementById('validator-context-jit-take').textContent = p.cj.toFixed(1) + '%';
-    document.getElementById('validator-base-apr').textContent = fmtRate(baseApr);
-    document.getElementById('validator-base-apy').textContent = fmtRate(baseApy);
+    document.getElementById('validator-base-apr').textContent = fmtValidatorRate(baseApr);
+    document.getElementById('validator-base-apy').textContent = fmtValidatorRate(baseApy);
     document.getElementById('validator-base-yield-source').innerHTML = BASE_YIELD_SOURCE_HTML;
-    document.getElementById('validator-jit-usd').textContent = fmt(r.jitValidatorBase * p.p, '$');
-    document.getElementById('validator-jit-sol').textContent = fmt(r.jitValidatorBase, 'S') + '/yr';
-    document.getElementById('validator-aot-usd').textContent = fmt(r.aotValidatorBase * p.p, '$');
-    document.getElementById('validator-aot-sol').textContent = fmt(r.aotValidatorBase, 'S') + '/yr';
-    document.getElementById('validator-bonus-usd').textContent = fmt(r.aotValBonus * p.p, '$');
-    document.getElementById('validator-bonus-sol').textContent = fmt(r.aotValBonus, 'S') + '/yr';
-    document.getElementById('validator-total-usd').textContent = fmt(totalValidatorRevenueUsd, '$');
-    document.getElementById('validator-total-sol').textContent = fmt(totalValidatorRevenueSol, 'S') + '/yr';
-    document.getElementById('validator-uplift-apr').textContent = fmtRate(incrementalAprUplift);
-    document.getElementById('validator-uplift-apy').textContent = fmtRate(incrementalApyUplift);
-    document.getElementById('validator-total-apr').textContent = fmtRate(totalApr);
-    document.getElementById('validator-total-apy').textContent = fmtRate(totalApy);
+    document.getElementById('validator-jit-usd').textContent = fmtValidatorUsd(r.jitValidatorBase * p.p);
+    document.getElementById('validator-jit-sol').textContent = fmtValidatorSol(r.jitValidatorBase) + '/yr';
+    document.getElementById('validator-aot-usd').textContent = fmtValidatorUsd(r.aotValidatorBase * p.p);
+    document.getElementById('validator-aot-sol').textContent = fmtValidatorSol(r.aotValidatorBase) + '/yr';
+    document.getElementById('validator-bonus-usd').textContent = fmtValidatorUsd(r.aotValBonus * p.p);
+    document.getElementById('validator-bonus-sol').textContent = fmtValidatorSol(r.aotValBonus) + '/yr';
+    document.getElementById('validator-total-usd').textContent = fmtValidatorUsd(totalValidatorRevenueUsd);
+    document.getElementById('validator-total-sol').textContent = fmtValidatorSol(totalValidatorRevenueSol) + '/yr';
+    document.getElementById('validator-uplift-apr').textContent = fmtValidatorRate(incrementalAprUplift);
+    document.getElementById('validator-uplift-apy').textContent = fmtValidatorRate(incrementalApyUplift);
+    document.getElementById('validator-total-apr').textContent = fmtValidatorRate(totalApr);
+    document.getElementById('validator-total-apy').textContent = fmtValidatorRate(totalApy);
     document.getElementById('validator-uplift-note').textContent = 'Default denominator: connected stake = ' + fmt(connectedStakeSol, 'S') + '. Incremental APR uplift = total validator revenue / connected stake. APY uses daily compounding.';
     document.getElementById('stake-sol-helper').innerHTML = '<strong>Implied stake:</strong> ' + fmt(raikuStakeSol, 'S') + ' of ' + fmt(totalStakedSol, 'S') + ' total staked';
     document.getElementById('blk-cu-helper').innerHTML = '<strong>Reserved CU:</strong> ' + fmt(reservedCu, 'i') + ' CU of ' + fmt(CB, 'i') + ' CU/block';
