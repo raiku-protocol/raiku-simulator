@@ -920,28 +920,24 @@ details[open] summary::before { transform:rotate(90deg); }
                     <button type="button" class="aot-sc-modal-close" id="aot-sc-modal-close">Close</button>
                 </div>
                 <div class="aot-sc-modal-section">
-                    <h4>Plain-language explanation</h4>
+                    <h4>What This Scenario Represents</h4>
                     <p id="aot-sc-modal-plain">&mdash;</p>
                 </div>
                 <div class="aot-sc-modal-section">
-                    <h4>Included scope</h4>
+                    <h4>Which Programs Are Included</h4>
                     <p id="aot-sc-modal-scope">&mdash;</p>
                 </div>
                 <div class="aot-sc-modal-section">
-                    <h4>Metric and rule</h4>
+                    <h4>Metric and Rule Used</h4>
                     <p id="aot-sc-modal-metric">&mdash;</p>
                 </div>
                 <div class="aot-sc-modal-section">
-                    <h4>Calculation</h4>
+                    <h4>How The Number Is Calculated</h4>
                     <p id="aot-sc-modal-calc">&mdash;</p>
                 </div>
                 <div class="aot-sc-modal-section">
-                    <h4>Why this choice was validated</h4>
+                    <h4>Why This Rule Is Used</h4>
                     <p id="aot-sc-modal-why">&mdash;</p>
-                </div>
-                <div class="aot-sc-modal-section">
-                    <h4>Secondary total reference</h4>
-                    <p id="aot-sc-modal-secondary">&mdash;</p>
                 </div>
             </div>
         </div>
@@ -1406,7 +1402,8 @@ const _fBaseObserved = Number(_scenarioAgg.weightedNonBase || 0);
 const _fBase = +_fBaseRaw.toFixed(2);
 const _fBullRaw = Number(_scenarioAgg.weightedTotal || 0);
 const _fBull = +_fBullRaw.toFixed(2);
-const _fOpt = +((_fBaseRaw + _fBullRaw) / 2).toFixed(2);
+const _fOptRaw = Number(_scenarioAgg.weightedNonBase || 0);
+const _fOpt = +_fOptRaw.toFixed(2);
 const _fConTotalRef = +((Number(_scenarioActiveAgg.p25Total || 0) > 0 ? _scenarioActiveAgg.p25Total : (_fCon + _scenarioAgg.weightedBase))).toFixed(2);
 const _fBaseTotalRef = +_fBullRaw.toFixed(2);
 const _fOptTotalRef = +_fBullRaw.toFixed(2);
@@ -1414,13 +1411,13 @@ const _fBullTotalRef = +_fBullRaw.toFixed(2);
 
 const SC = {
     con:  {c:5,j:2,s:1,b:5,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:Math.round(_jitBaseline*0.6/1000)*1000,
-           desc:"Conservative — lower-bound non-base assumption from active payers with validated 0.10 floor."},
+           desc:"Conservative — low but practical non-base assumption from active fee-paying application programs, with a hard floor at 0.10 lam/CU."},
     base: {c:5,j:5,s:5,b:10,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
-           desc:"Base — winsorized CU-weighted non-base pressure (p5/p95 clipping)."},
+           desc:"Base — observed non-base fees across included application categories, with extreme outliers clipped (p5/p95)."},
     opt:  {c:5,j:10,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:1500000,
-           desc:"Optimistic — midpoint between validated Base and Bull assumptions."},
+           desc:"Optimistic — raw observed CU-weighted non-base fees across included application categories, without outlier clipping."},
     bull: {c:5,j:20,s:30,b:20,f:+_fBull.toFixed(2),p:250,ra:1.00,rj:0.50,vb:2.0,jm:5000000,
-           desc:"Bull — upper-bound case using CU-weighted total fee/CU."},
+           desc:"Bull — upper-bound all-in case using CU-weighted total fee/CU, including base fees."},
 };
 
 function fmt(v,t){
@@ -2119,7 +2116,6 @@ function _openAotScenarioModal(key){
     _setScenarioModalText('aot-sc-modal-metric', d.metric);
     _setScenarioModalText('aot-sc-modal-calc', d.calculation);
     _setScenarioModalText('aot-sc-modal-why', d.why);
-    _setScenarioModalText('aot-sc-modal-secondary', d.secondary);
     backdrop.classList.add('show');
     backdrop.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -2156,51 +2152,50 @@ function initAotFcuSection(){
     const opt = document.getElementById('aot-sc-opt-f'); if (opt) opt.textContent = _fOpt.toFixed(2) + ' lam/CU';
     const bull = document.getElementById('aot-sc-bull-f'); if (bull) bull.textContent = _fBull.toFixed(2) + ' lam/CU';
 
-    const conS = document.getElementById('aot-sc-con-sentence'); if (conS) conS.textContent = 'Uses the 25th-percentile non-base fee/CU among active fee-paying AOT/Both programs, then applies a validated 0.10 lam/CU floor.';
-    const baseS = document.getElementById('aot-sc-base-sentence'); if (baseS) baseS.textContent = 'Uses winsorized CU-weighted non-base fee pressure across AOT/Both core programs so extreme outliers do not dominate the baseline.';
-    const optS = document.getElementById('aot-sc-opt-sentence'); if (optS) optS.textContent = 'Uses the midpoint between the approved Base non-base pressure and Bull all-in pressure.';
-    const bullS = document.getElementById('aot-sc-bull-sentence'); if (bullS) bullS.textContent = 'Uses CU-weighted total fee/CU across AOT/Both core programs, capturing full all-in pressure.';
+    const conS = document.getElementById('aot-sc-con-sentence'); if (conS) conS.textContent = 'Uses the lower end of observed non-base fees among active fee-paying application programs, with an explicit minimum floor of 0.10 lam/CU.';
+    const baseS = document.getElementById('aot-sc-base-sentence'); if (baseS) baseS.textContent = 'Uses the observed non-base fees paid by the main application categories relevant to AOT adoption, while clipping extreme outliers so a few dominant programs do not set the baseline.';
+    const optS = document.getElementById('aot-sc-opt-sentence'); if (optS) optS.textContent = 'Uses the raw observed non-base fees across the included application categories, without outlier clipping, to reflect a stronger but still market-observed state.';
+    const bullS = document.getElementById('aot-sc-bull-sentence'); if (bullS) bullS.textContent = 'Uses the full observed fee burden across the included application categories, including base fees, as an upper-bound all-in scenario.';
+
+    const includedCategoriesText = 'Included application categories are Prop AMM, DEX (aggregator, AMM pools, and orderbook), lending, oracle, bridge, perps, cranker-style programs, depin, payments, NFT, and gaming. Only programs with positive compute usage over the 30-day window are included. Arb-bot benchmark rows are excluded, and categories such as unknown and other are not used in scenario construction.';
+    const representativeText = 'Representative names in this included set include BisonFi and HumidiFi (Prop AMM), Jupiter and Pump.fun programs (DEX), and Kamino programs (lending).';
 
     _aotScenarioExplain = {
         con: {
             title: 'Conservative',
             value: _fCon.toFixed(2) + ' lam/CU',
-            plain: 'This scenario represents a realistic downside where AOT/Both programs still show willingness to pay non-base fees, but the assumption is prevented from falling to an unusably low level.',
-            scope: 'This scenario uses only core AOT/Both programs with positive compute usage over the 30-day window (product_scope in {aot, both}, is_aot_relevant = true, cu > 0). It then uses the active payer subset, meaning non-base fee/CU > 0. Benchmark arb-bot rows are excluded.',
-            metric: 'Metric: program-level non-base fee/CU. Rule: take the 25th percentile on active payers, then apply a validated minimum floor of 0.10 lam/CU.',
-            calculation: 'Observed p25 active non-base fee/CU = ' + _fConRaw.toFixed(4) + ' lam/CU. Validated minimum floor = 0.10 lam/CU. Formula: Conservative = max(0.10, observed p25 active non-base fee/CU). Final displayed value = ' + _fCon.toFixed(2) + ' lam/CU.',
-            why: 'This was retained because it reflects the lower end of observed paying behavior while keeping the product assumption operationally credible.',
-            secondary: 'Secondary total fee/CU reference for comparison: ' + _fConTotalRef.toFixed(2) + ' lam/CU.'
+            plain: 'This scenario represents a low but still credible willingness-to-pay environment among currently active application programs.',
+            scope: includedCategoriesText + ' For this scenario, we additionally require active fee-paying behavior, meaning non-base fee/CU is above zero. ' + representativeText,
+            metric: 'Metric used: non-base fee/CU, where non-base means priority fees plus MEV / JIT fees. Rule applied: take the lower quartile (p25) among active fee-paying included programs, then apply a hard floor of 0.10 lam/CU.',
+            calculation: 'Observed p25 non-base fee/CU among active fee-paying included programs = ' + _fConRaw.toFixed(4) + ' lam/CU. Floor rule = 0.10 lam/CU. Final displayed value = max(' + _fConRaw.toFixed(4) + ', 0.10) = ' + _fCon.toFixed(2) + ' lam/CU.',
+            why: 'This rule keeps the downside case realistic for product planning while remaining tied to observed paying behavior.'
         },
         base: {
             title: 'Base',
             value: _fBase.toFixed(2) + ' lam/CU',
-            plain: 'This scenario is the robust central estimate of observed non-base fee pressure across core AOT/Both programs, with extreme outliers dampened.',
-            scope: 'This scenario uses only core AOT/Both programs with positive compute usage over the 30-day window (product_scope in {aot, both}, is_aot_relevant = true, cu > 0). Benchmark arb-bot rows are excluded.',
-            metric: 'Metric: CU-weighted non-base fee/CU across core programs. Rule: winsorize program-level non-base fee/CU at the p5/p95 bounds before computing the CU-weighted average.',
-            calculation: 'Observed raw CU-weighted non-base fee/CU = ' + _fBaseObserved.toFixed(4) + ' lam/CU. Program-level clipping bounds are p5 = ' + _scenarioWinsor.pLow.toFixed(4) + ' lam/CU and p95 = ' + _scenarioWinsor.pHigh.toFixed(4) + ' lam/CU. Formula: Base = winsorized CU-weighted non-base fee/CU. Final displayed value = ' + _fBase.toFixed(2) + ' lam/CU.',
-            why: 'This was retained because it captures central fee pressure while reducing sensitivity to a small number of extreme programs.',
-            secondary: 'Secondary total fee/CU reference for comparison: ' + _fBaseTotalRef.toFixed(2) + ' lam/CU.'
+            plain: 'This scenario represents the robust central market state for current application demand.',
+            scope: includedCategoriesText + ' ' + representativeText,
+            metric: 'Metric used: CU-weighted non-base fee/CU across the included application categories. Rule applied: clip extreme program-level values at p5/p95 before computing the weighted average, so a few dominant names do not distort the baseline.',
+            calculation: 'Observed raw CU-weighted non-base fee/CU across included programs = ' + _fBaseObserved.toFixed(4) + ' lam/CU. Outlier clipping bounds are p5 = ' + _scenarioWinsor.pLow.toFixed(4) + ' and p95 = ' + _scenarioWinsor.pHigh.toFixed(4) + ' lam/CU. Final displayed value after clipping and CU-weighting = ' + _fBase.toFixed(2) + ' lam/CU.',
+            why: 'This rule gives a stable default market baseline without letting a few extreme values dominate.'
         },
         opt: {
             title: 'Optimistic',
             value: _fOpt.toFixed(2) + ' lam/CU',
-            plain: 'This scenario represents a transition regime where fee pressure moves above the robust baseline and toward sustained upper all-in pricing.',
-            scope: 'This scenario uses only core AOT/Both programs with positive compute usage over the 30-day window (product_scope in {aot, both}, is_aot_relevant = true, cu > 0). Benchmark arb-bot rows are excluded.',
-            metric: 'Metric: midpoint between the approved Base anchor and the approved Bull anchor. Rule: take the arithmetic mean of those two anchors.',
-            calculation: 'Base anchor = ' + _fBaseRaw.toFixed(4) + ' lam/CU. Bull anchor = ' + _fBullRaw.toFixed(4) + ' lam/CU. Formula: Optimistic = (Base + Bull) / 2 = ' + ((_fBaseRaw + _fBullRaw) / 2).toFixed(4) + ' lam/CU. Final displayed value = ' + _fOpt.toFixed(2) + ' lam/CU.',
-            why: 'This was retained because it gives a transparent bridge between the robust non-base baseline and the upper all-in regime.',
-            secondary: 'Secondary total fee/CU reference for comparison: ' + _fOptTotalRef.toFixed(2) + ' lam/CU.'
+            plain: 'This scenario represents a stronger but still market-observed state of willingness to pay.',
+            scope: includedCategoriesText + ' ' + representativeText,
+            metric: 'Metric used: raw CU-weighted non-base fee/CU across the included application categories. Rule applied: no outlier clipping is used in this scenario.',
+            calculation: 'Observed raw CU-weighted non-base fee/CU across included programs = ' + _fOptRaw.toFixed(4) + ' lam/CU. No clipping is applied. Final displayed value = ' + _fOpt.toFixed(2) + ' lam/CU.',
+            why: 'This rule keeps Optimistic fully anchored in observed market data and avoids an arbitrary midpoint construction.'
         },
         bull: {
             title: 'Bull',
             value: _fBull.toFixed(2) + ' lam/CU',
-            plain: 'This scenario represents sustained high congestion where programs pay the full all-in fee stack rather than only non-base pressure.',
-            scope: 'This scenario uses only core AOT/Both programs with positive compute usage over the 30-day window (product_scope in {aot, both}, is_aot_relevant = true, cu > 0). Benchmark arb-bot rows are excluded.',
-            metric: 'Metric: CU-weighted total fee/CU, where total fee/CU = base fee/CU + priority fee/CU + MEV / JIT fee/CU.',
-            calculation: 'Observed CU-weighted total fee/CU = ' + _fBullRaw.toFixed(4) + ' lam/CU. Formula: Bull = CU-weighted total fee/CU. Final displayed value = ' + _fBull.toFixed(2) + ' lam/CU.',
-            why: 'This was retained as the upper-bound assumption for sustained all-in pricing pressure across core application programs.',
-            secondary: 'Secondary total fee/CU reference for comparison: ' + _fBullTotalRef.toFixed(2) + ' lam/CU.'
+            plain: 'This scenario represents sustained high-demand conditions where applications absorb the full all-in fee burden.',
+            scope: includedCategoriesText + ' ' + representativeText,
+            metric: 'Metric used: CU-weighted total fee/CU across the included application categories. Rule applied: total fee/CU includes base fees plus priority and MEV / JIT components.',
+            calculation: 'Observed CU-weighted total fee/CU across included programs = ' + _fBullRaw.toFixed(4) + ' lam/CU. This includes base fees in addition to non-base fees. Final displayed value = ' + _fBull.toFixed(2) + ' lam/CU.',
+            why: 'This rule is used as an upper-bound reference for periods when applications face sustained all-in fee costs.'
         }
     };
     _bindAotScenarioModal();
