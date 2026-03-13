@@ -2108,13 +2108,21 @@ function _renderAotTopPrograms(){
 }
 var _aotScenarioModalBound = false;
 var _aotScenarioExplain = {};
+function _ensureAotScenarioModalRoot(){
+    var backdrop = document.getElementById('aot-sc-modal-backdrop');
+    if (!backdrop) return null;
+    if (document.body && backdrop.parentElement !== document.body) {
+        document.body.appendChild(backdrop);
+    }
+    return backdrop;
+}
 function _setScenarioModalText(id, text){
     var el = document.getElementById(id);
     if (el) el.textContent = text || '—';
 }
 function _openAotScenarioModal(key){
     var d = _aotScenarioExplain[key];
-    var backdrop = document.getElementById('aot-sc-modal-backdrop');
+    var backdrop = _ensureAotScenarioModalRoot();
     var modal = backdrop ? backdrop.querySelector('.aot-sc-modal') : null;
     if (!d || !backdrop) return;
     _setScenarioModalText('aot-sc-modal-title', d.title);
@@ -2138,7 +2146,7 @@ function _openAotScenarioModal(key){
     }
 }
 function _closeAotScenarioModal(){
-    var backdrop = document.getElementById('aot-sc-modal-backdrop');
+    var backdrop = _ensureAotScenarioModalRoot();
     if (!backdrop) return;
     backdrop.classList.remove('show');
     backdrop.setAttribute('aria-hidden', 'true');
@@ -2146,7 +2154,7 @@ function _closeAotScenarioModal(){
 }
 function _bindAotScenarioModal(){
     if (_aotScenarioModalBound) return;
-    var backdrop = document.getElementById('aot-sc-modal-backdrop');
+    var backdrop = _ensureAotScenarioModalRoot();
     var closeBtn = document.getElementById('aot-sc-modal-close');
     if (!backdrop || !closeBtn) return;
     document.querySelectorAll('.aot-sc-open[data-aot-scenario]').forEach(function(btn){
