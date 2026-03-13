@@ -1315,6 +1315,25 @@ function _aggPrograms(progs) {
         p75Total: _quantile(tfVals, 0.75)
     };
 }
+function _winsorizedWeightedNonBase(progs, lowQ, highQ) {
+    const lq = Number.isFinite(lowQ) ? lowQ : 0.05;
+    const hq = Number.isFinite(highQ) ? highQ : 0.95;
+    const vals = progs.map(function(p){ return Number(p.fpc_nb) || 0; });
+    if (!vals.length) return { value: 0, pLow: 0, pHigh: 0 };
+    const pLow = _quantile(vals, lq);
+    const pHigh = _quantile(vals, hq);
+    let num = 0;
+    let den = 0;
+    progs.forEach(function(p){
+        const cu = Number(p.cu) || 0;
+        if (cu <= 0) return;
+        const raw = Number(p.fpc_nb) || 0;
+        const clipped = Math.min(pHigh, Math.max(pLow, raw));
+        num += clipped * cu;
+        den += cu;
+    });
+    return { value: den > 0 ? (num / den) : 0, pLow, pHigh };
+}
 function _filterBySegments(progs, segments) {
     return progs.filter(p => segments.includes(p.segment_key));
 }
@@ -1332,25 +1351,29 @@ const _scenarioPool = CORE_GROUP_SPECS.map(g => _filterBySegments(_aotProgs, g.s
 const _scenarioAgg = _aggPrograms(_scenarioPool);
 const _scenarioActivePayers = _scenarioPool.filter(function(p){ return (p.fpc_nb || 0) > 0; });
 const _scenarioActiveAgg = _aggPrograms(_scenarioActivePayers);
-const _scenarioPopulationLabel = 'Population: AOT + Both core categories, CU > 0, 30d artifact.';
+const _scenarioWinsor = _winsorizedWeightedNonBase(_scenarioPool, 0.05, 0.95);
+const _scenarioPopulationLabel = 'Population: core only (aot + both), is_aot_relevant=true, cu>0; benchmark excluded.';
 
 const _fConRaw = Number(_scenarioActiveAgg.p25NonBase || 0);
-const _fCon = +Math.max(0.01, _fConRaw).toFixed(2);
-const _fBase = +_scenarioAgg.weightedNonBase.toFixed(2);
-const _fOpt = +((_scenarioAgg.weightedNonBase + _scenarioAgg.weightedTotal) / 2).toFixed(2);
-const _fBull = +_scenarioAgg.weightedTotal.toFixed(2);
+const _fCon = +Math.max(0.10, _fConRaw).toFixed(2);
+const _fBaseRaw = Number(_scenarioWinsor.value || 0);
+const _fBaseObserved = Number(_scenarioAgg.weightedNonBase || 0);
+const _fBase = +_fBaseRaw.toFixed(2);
+const _fBullRaw = Number(_scenarioAgg.weightedTotal || 0);
+const _fBull = +_fBullRaw.toFixed(2);
+const _fOpt = +((_fBaseRaw + _fBullRaw) / 2).toFixed(2);
 const _fConTotalRef = +((Number(_scenarioActiveAgg.p25Total || 0) > 0 ? _scenarioActiveAgg.p25Total : (_fCon + _scenarioAgg.weightedBase))).toFixed(2);
-const _fBaseTotalRef = +_scenarioAgg.weightedTotal.toFixed(2);
-const _fOptTotalRef = +_scenarioAgg.weightedTotal.toFixed(2);
-const _fBullTotalRef = +_scenarioAgg.weightedTotal.toFixed(2);
+const _fBaseTotalRef = +_fBullRaw.toFixed(2);
+const _fOptTotalRef = +_fBullRaw.toFixed(2);
+const _fBullTotalRef = +_fBullRaw.toFixed(2);
 
 const SC = {
     con:  {c:5,j:2,s:1,b:5,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:Math.round(_jitBaseline*0.6/1000)*1000,
-           desc:"Conservative — lower-bound non-base assumption from active fee payers (guardrailed floor)."},
+           desc:"Conservative — lower-bound non-base assumption from active payers with validated 0.10 floor."},
     base: {c:5,j:5,s:5,b:10,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:_jitBaseline,
-           desc:"Base — CU-weighted non-base level across core AOT categories."},
+           desc:"Base — winsorized CU-weighted non-base pressure (p5/p95 clipping)."},
     opt:  {c:5,j:10,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:1500000,
-           desc:"Optimistic — midpoint between current non-base and all-in total fee pressure."},
+           desc:"Optimistic — midpoint between validated Base and Bull assumptions."},
     bull: {c:5,j:20,s:30,b:20,f:+_fBull.toFixed(2),p:250,ra:1.00,rj:0.50,vb:2.0,jm:5000000,
            desc:"Bull — upper-bound case using CU-weighted total fee/CU."},
 };
@@ -2040,15 +2063,15 @@ function initAotFcuSection(){
     const opt = document.getElementById('aot-sc-opt-f'); if (opt) opt.textContent = _fOpt.toFixed(2) + ' lam/CU';
     const bull = document.getElementById('aot-sc-bull-f'); if (bull) bull.textContent = _fBull.toFixed(2) + ' lam/CU';
 
-    const conA = document.getElementById('aot-sc-con-anchor'); if (conA) conA.textContent = 'Anchor: lower-bound willingness-to-pay from active fee-paying programs.';
-    const baseA = document.getElementById('aot-sc-base-anchor'); if (baseA) baseA.textContent = 'Anchor: current CU-weighted non-base fee pressure across core categories.';
-    const optA = document.getElementById('aot-sc-opt-anchor'); if (optA) optA.textContent = 'Anchor: midpoint between current non-base and all-in total fee pressure.';
-    const bullA = document.getElementById('aot-sc-bull-anchor'); if (bullA) bullA.textContent = 'Anchor: upper-bound case using CU-weighted total fee pressure.';
+    const conA = document.getElementById('aot-sc-con-anchor'); if (conA) conA.textContent = 'Anchor: lower-bound willingness-to-pay among active fee-paying core programs.';
+    const baseA = document.getElementById('aot-sc-base-anchor'); if (baseA) baseA.textContent = 'Anchor: robust central non-base fee pressure.';
+    const optA = document.getElementById('aot-sc-opt-anchor'); if (optA) optA.textContent = 'Anchor: transition regime between Base and Bull.';
+    const bullA = document.getElementById('aot-sc-bull-anchor'); if (bullA) bullA.textContent = 'Anchor: upper-bound all-in fee pressure.';
 
-    const conB = document.getElementById('aot-sc-con-basis'); if (conB) conB.textContent = 'Metric basis: max(p25 non-base fee/CU among active fee payers, 0.01).';
-    const baseB = document.getElementById('aot-sc-base-basis'); if (baseB) baseB.textContent = 'Metric basis: CU-weighted mean non-base fee/CU.';
-    const optB = document.getElementById('aot-sc-opt-basis'); if (optB) optB.textContent = 'Metric basis: 0.5 × (CU-weighted non-base + CU-weighted total).';
-    const bullB = document.getElementById('aot-sc-bull-basis'); if (bullB) bullB.textContent = 'Metric basis: CU-weighted total fee/CU (base + priority + MEV / JIT).';
+    const conB = document.getElementById('aot-sc-con-basis'); if (conB) conB.textContent = 'Raw observed metric: p25(active non-base) = ' + _fConRaw.toFixed(2) + '. Validated choice: apply explicit floor at 0.10.';
+    const baseB = document.getElementById('aot-sc-base-basis'); if (baseB) baseB.textContent = 'Raw observed metric: CU-weighted non-base = ' + _fBaseObserved.toFixed(2) + '. Validated choice: winsorized CU-weighted non-base with p5/p95 clipping (p5=' + _scenarioWinsor.pLow.toFixed(2) + ', p95=' + _scenarioWinsor.pHigh.toFixed(2) + ').';
+    const optB = document.getElementById('aot-sc-opt-basis'); if (optB) optB.textContent = 'Raw observed metrics: Base=' + _fBase.toFixed(2) + ', Bull=' + _fBull.toFixed(2) + '. Validated choice: midpoint 0.5 × (Base + Bull).';
+    const bullB = document.getElementById('aot-sc-bull-basis'); if (bullB) bullB.textContent = 'Raw observed metric: CU-weighted total fee/CU = ' + _fBullRaw.toFixed(2) + '. Validated choice: use as upper-bound all-in anchor.';
 
     const conP = document.getElementById('aot-sc-con-pop'); if (conP) conP.textContent = _scenarioPopulationLabel;
     const baseP = document.getElementById('aot-sc-base-pop'); if (baseP) baseP.textContent = _scenarioPopulationLabel;
