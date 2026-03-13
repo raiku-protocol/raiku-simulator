@@ -211,6 +211,14 @@ details[open] summary::before { transform:rotate(90deg); }
 .method-link { display:inline-block; font-size:9px; color:var(--lime-soft); text-decoration:none; opacity:0.7; margin-top:3px; }
 .method-link:hover { opacity:1; text-decoration:underline; }
 .sidebar-note-copy { font-size:10px; color:var(--text-mid); line-height:1.45; }
+.sidebar-note-copy p { margin:0; }
+.sidebar-note-copy p + p { margin-top:8px; }
+.sidebar-info-trigger { margin-top:8px; }
+.sidebar-info-trigger summary { list-style:none; cursor:pointer; }
+.sidebar-info-trigger summary::-webkit-details-marker { display:none; }
+.sidebar-info-trigger-btn { display:inline-flex; align-items:center; gap:6px; font-size:9px; color:var(--text-mid); text-transform:uppercase; letter-spacing:0.5px; padding:5px 8px; border:1px solid #2a2d36; border-radius:999px; background:#111213; }
+.sidebar-info-trigger-icon { width:15px; height:15px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:10px; color:var(--text); background:#1b1d22; border:1px solid #353844; }
+.sidebar-info-popover { margin-top:8px; background:#111213; border:1px solid #23262f; border-radius:6px; padding:8px 9px; }
 .sidebar-yield-grid { display:grid; gap:6px; }
 .sidebar-yield-row { background:#111213; border:1px solid #1e2028; border-radius:5px; padding:6px 7px; }
 .sidebar-yield-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px; }
@@ -615,15 +623,23 @@ details[open] summary::before { transform:rotate(90deg); }
     </div>
 </div>
 <div class="controls-section fade-in fade-in-3">
-    <h2>Stake Share Context</h2>
-    <div class="sidebar-note-copy">
-        For AOT blockspace auctions, Raiku Stake % represents the share of total Solana stake delegated to Raiku-connected validators, because AOT capacity depends on validator stake share and reserved blockspace access.
-        <br><br>
-        JIT is modeled differently: it starts from an observed market benchmark and annualizes revenue, similar to Jito-like benchmark extrapolations. In this model, total Solana stake share is a direct driver for AOT, but not the direct entry point for JIT.
-    </div>
+    <details class="sidebar-info-trigger">
+        <summary>
+            <span class="sidebar-info-trigger-btn">
+                <span class="sidebar-info-trigger-icon">?</span>
+                Why AOT uses stake share
+            </span>
+        </summary>
+        <div class="sidebar-info-popover">
+            <div class="sidebar-note-copy">
+                <p>For AOT blockspace auctions, Raiku Stake % represents the share of total Solana stake delegated to Raiku-connected validators, because AOT capacity depends on validator stake share and reserved blockspace access.</p>
+                <p>JIT is modeled differently: it starts from an observed market benchmark and annualizes revenue, similar to Jito-like benchmark extrapolations. In this model, total Solana stake share is a direct driver for AOT, but not the direct entry point for JIT.</p>
+            </div>
+        </div>
+    </details>
 </div>
 <div class="controls-section fade-in fade-in-4">
-    <h2>APR / APY Context</h2>
+    <h2>Validator Revenue APR / APY</h2>
     <div class="sidebar-yield-grid">
         <div class="sidebar-yield-row">
             <div class="sidebar-yield-label">Current Total Solana Staked</div>
@@ -631,11 +647,15 @@ details[open] summary::before { transform:rotate(90deg); }
             <div class="sidebar-yield-sub">Not yet wired from the current simulator dataset.</div>
         </div>
         <div class="sidebar-yield-row">
-            <div class="sidebar-yield-label">Placeholder APR uplift</div>
+            <div class="sidebar-yield-label">Validator Revenue</div>
             <div class="sidebar-yield-value">Coming soon</div>
         </div>
         <div class="sidebar-yield-row">
-            <div class="sidebar-yield-label">Placeholder APY uplift</div>
+            <div class="sidebar-yield-label">APR</div>
+            <div class="sidebar-yield-value">Coming soon</div>
+        </div>
+        <div class="sidebar-yield-row">
+            <div class="sidebar-yield-label">APY</div>
             <div class="sidebar-yield-value">Coming soon</div>
         </div>
     </div>
