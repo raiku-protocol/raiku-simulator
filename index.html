@@ -601,7 +601,9 @@ details[open] summary::before { transform:rotate(90deg); }
 .bf-input-group select:focus { border-color:var(--lime); outline:none; }
 .bf-profile-note { font-size:9px; color:var(--text2); line-height:1.4; margin:-1px 0 6px; }
 .bf-tag.custom { background:#2a2210; color:#F5A623; }
-.bf-derived { font-size:10px; color:var(--text2); font-family:var(--font-mono); padding:4px 0 2px; line-height:1.5; border-top:1px solid #1a1c22; margin-top:2px; }
+.bf-derived { font-size:11px; color:var(--text-mid); font-family:var(--font-mono); padding:5px 0 2px; line-height:1.55; border-top:1px solid #1a1c22; margin-top:2px; font-weight:500; }
+.bf-derived .bf-em { color:var(--text); font-weight:600; }
+.bf-derived .bf-sub { color:var(--text-mid); }
 </style>
 </head>
 <body>
@@ -3169,8 +3171,14 @@ function buildCategoryData(){
         // Dispersion follows frozen spec: non-base fee/CU distribution
         var progFpcs = progs.map(function(p){ return p.cu > 0 ? (p.fpc_nb || 0) : 0; });
         var avgCuPerBlock = cu > 0 ? (cu * 1e9 / S30) : 0; // CU per block on average
-        var primaryUsable = progs.filter(function(p){ return p.cu > 0 && (p.fpc_nb || 0) > 0; });
-        var fallbackUsable = progs.filter(function(p){ return p.cu > 0; });
+        var primaryUsable = progs.filter(function(p){
+            var avgCu = p.cu > 0 ? (p.cu * 1e9 / S30) : 0;
+            return avgCu > 0 && (p.fpc_nb || 0) > 0;
+        });
+        var fallbackUsable = progs.filter(function(p){
+            var avgCu = p.cu > 0 ? (p.cu * 1e9 / S30) : 0;
+            return avgCu > 0;
+        });
         var usablePrograms = (primaryUsable.length >= 2 ? primaryUsable : fallbackUsable).slice().sort(function(a,b){
             return String(a.n || '').localeCompare(String(b.n || ''));
         });
@@ -3937,6 +3945,22 @@ function renderBlockBuilder(){
     var totalUsed = cumCU;
     var data = getCatData();
     var fmtFpc = function(v){ return v < 0.01 ? v.toFixed(4) : v < 0.1 ? v.toFixed(3) : v >= 10 ? v.toFixed(1) : v.toFixed(2); };
+    var fmtPct = function(v){
+        if(v <= 0) return '0.000';
+        if(v < 0.1) return v.toFixed(3);
+        if(v < 1) return v.toFixed(2);
+        return v.toFixed(1);
+    };
+    var fmtUsd = function(v){
+        if(v >= 1000) return '$' + fmtK(v.toFixed(0));
+        if(v >= 1) return '$' + fmtK(v.toFixed(2));
+        return '$' + v.toFixed(4);
+    };
+    var fmtSolBlock = function(v){
+        if(v >= 0.01) return v.toFixed(4);
+        if(v >= 0.0001) return v.toFixed(6);
+        return v.toFixed(8);
+    };
 
     // ── Fill bar (sorted by fee/CU desc) ──
     var fillBar = document.getElementById('bb-fill-bar');
@@ -3971,7 +3995,7 @@ function renderBlockBuilder(){
             var feeSol = fm.usedCU * f.feePerCU / LS;
             var feeUSD = feeSol * sp.p;
             var isRejected = !fm.fits;
-            var pctBlock = avail > 0 ? (f.cu / avail * 100).toFixed(1) : '0';
+            var pctBlock = avail > 0 ? fmtPct(f.cu / avail * 100) : '0.000';
             var isCustom = !!(f.userAdjustedCU || f.userAdjustedFee);
 
             // Divider between included and excluded
@@ -4034,10 +4058,10 @@ function renderBlockBuilder(){
 
                 // ── DERIVED OUTPUTS (secondary) ──
                 '<div class="bf-derived">' +
-                    fmtHuman(f.cu) + ' CU \u00B7 ' + pctBlock + '% of AOT block' +
+                    '<span class="bf-em">' + fmtHuman(f.cu) + ' CU</span> <span class="bf-sub">\u00B7</span> <span class="bf-em">' + pctBlock + '%</span> <span class="bf-sub">of AOT block</span>' +
                     (isRejected ?
-                        ' \u00B7 <span style="color:#e55">\u26D4 excluded — does not fit remaining capacity</span>' :
-                        ' \u00B7 \u2192 ' + feeSol.toFixed(6) + ' SOL <span style="color:var(--text2)">($' + fmtK(feeUSD.toFixed(4)) + ')</span>'
+                        ' <span class="bf-sub">\u00B7</span> <span style="color:#e55">\u26D4 excluded \u2014 does not fit remaining capacity</span>' :
+                        ' <span class="bf-sub">\u00B7</span> <span class="bf-em">\u2192 ' + fmtSolBlock(feeSol) + ' SOL/block</span> <span class="bf-sub">(' + fmtUsd(feeUSD) + ')</span>'
                     ) +
                 '</div>' +
             '</div>';
