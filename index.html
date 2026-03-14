@@ -3173,11 +3173,12 @@ function buildCategoryData(){
         var avgCuPerBlock = cu > 0 ? (cu * 1e9 / S30) : 0; // CU per block on average
         var primaryUsable = progs.filter(function(p){
             var avgCu = p.cu > 0 ? (p.cu * 1e9 / S30) : 0;
-            return avgCu > 0 && (p.fpc_nb || 0) > 0;
+            var usableCu = Math.round(avgCu);
+            return usableCu > 0 && (p.fpc_nb || 0) > 0;
         });
         var fallbackUsable = progs.filter(function(p){
             var avgCu = p.cu > 0 ? (p.cu * 1e9 / S30) : 0;
-            return avgCu > 0;
+            return Math.round(avgCu) > 0;
         });
         var usablePrograms = (primaryUsable.length >= 2 ? primaryUsable : fallbackUsable).slice().sort(function(a,b){
             return String(a.n || '').localeCompare(String(b.n || ''));
