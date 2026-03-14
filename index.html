@@ -597,6 +597,10 @@ details[open] summary::before { transform:rotate(90deg); }
 .bf-input-group { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
 .bf-input-group .bf-label { font-size:9px; color:var(--text2); min-width:80px; flex-shrink:0; }
 .bf-input-group input { width:90px; font-size:12px; }
+.bf-input-group select { flex:1; min-width:0; font-size:11px; font-family:var(--font-mono); background:#0a0b10; border:1px solid #1a1c22; border-radius:4px; padding:4px 6px; color:var(--text); }
+.bf-input-group select:focus { border-color:var(--lime); outline:none; }
+.bf-profile-note { font-size:9px; color:var(--text2); line-height:1.4; margin:-1px 0 6px; }
+.bf-tag.custom { background:#2a2210; color:#F5A623; }
 .bf-derived { font-size:10px; color:var(--text2); font-family:var(--font-mono); padding:4px 0 2px; line-height:1.5; border-top:1px solid #1a1c22; margin-top:2px; }
 </style>
 </head>
@@ -3120,6 +3124,27 @@ function fmtHuman(n){
     if(abs >= 1e3){ var k = n/1e3; return (k === Math.round(k) ? String(Math.round(k)) : k.toFixed(1)) + 'K'; }
     return String(Math.round(n));
 }
+function mean(arr){
+    if(!arr || !arr.length) return 0;
+    return arr.reduce(function(sum, value){ return sum + value; }, 0) / arr.length;
+}
+function escHtml(str){
+    return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+function getFragmentProfile(cat, profileKey){
+    if(!cat) return null;
+    if(profileKey === 'mean') return cat.meanProfile || cat.medianProfile || null;
+    if(profileKey && profileKey.indexOf('program:') === 0){
+        var match = (cat.programOptions || []).find(function(opt){ return opt.key === profileKey; });
+        if(match) return match;
+    }
+    return cat.medianProfile || cat.meanProfile || ((cat.programOptions || [])[0]) || null;
+}
 
 // ── Build category-level aggregates from external AOT artifact ──
 function buildCategoryData(){
@@ -3144,6 +3169,40 @@ function buildCategoryData(){
         // Dispersion follows frozen spec: non-base fee/CU distribution
         var progFpcs = progs.map(function(p){ return p.cu > 0 ? (p.fpc_nb || 0) : 0; });
         var avgCuPerBlock = cu > 0 ? (cu * 1e9 / S30) : 0; // CU per block on average
+        var primaryUsable = progs.filter(function(p){ return p.cu > 0 && (p.fpc_nb || 0) > 0; });
+        var fallbackUsable = progs.filter(function(p){ return p.cu > 0; });
+        var usablePrograms = (primaryUsable.length >= 2 ? primaryUsable : fallbackUsable).slice().sort(function(a,b){
+            return String(a.n || '').localeCompare(String(b.n || ''));
+        });
+        var profileFallbackUsed = primaryUsable.length < 2;
+        var programOptions = usablePrograms.map(function(p, idx){
+            return {
+                key: 'program:' + idx,
+                kind: 'program',
+                label: p.n || ('Program ' + (idx + 1)),
+                sourceLabel: p.n || ('Program ' + (idx + 1)),
+                cu: p.cu > 0 ? (p.cu * 1e9 / S30) : 0,
+                feePerCU: p.cu > 0 ? (p.fpc_nb || 0) : 0
+            };
+        });
+        var profileCu = programOptions.map(function(p){ return p.cu; });
+        var profileFees = programOptions.map(function(p){ return p.feePerCU; });
+        var medianProfile = {
+            key: 'median',
+            kind: 'median',
+            label: 'Median',
+            sourceLabel: 'Median profile',
+            cu: percentile(profileCu, 50),
+            feePerCU: percentile(profileFees, 50)
+        };
+        var meanProfile = {
+            key: 'mean',
+            kind: 'mean',
+            label: 'Mean',
+            sourceLabel: 'Mean profile',
+            cu: mean(profileCu),
+            feePerCU: mean(profileFees)
+        };
         return {
             id: cat.id, label: cat.label, tier: cat.tier, icon: cat.icon, lowData: !!cat.lowData,
             progs: progs, allMatch: allMatch, n: progs.length, nAll: allMatch.length,
@@ -3152,6 +3211,11 @@ function buildCategoryData(){
             totFeePerCU: totFeePerCU, priFeePerCU: priFeePerCU,
             cuB: cu, // already in billions in artifact contract
             avgCuPerBlock: avgCuPerBlock,
+            usablePrograms: usablePrograms,
+            profileFallbackUsed: profileFallbackUsed,
+            medianProfile: medianProfile,
+            meanProfile: meanProfile,
+            programOptions: programOptions,
             // Distribution stats
             medianFpc: percentile(progFpcs, 50),
             p25Fpc: percentile(progFpcs, 25),
@@ -3774,7 +3838,7 @@ function updateCatFcuChart(){
 }
 
 // ── Block Builder v2 — Sort-Fill-Stop logic ──
-var _bbFragments = []; // [{catId, cu, feePerCU, userAdjustedFee: bool}]
+var _bbFragments = []; // [{catId, profileKey, cu, feePerCU, userAdjustedCU: bool, userAdjustedFee: bool}]
 var cBlockMix = null;
 var SLOTS_PER_EPOCH = 432000; // Solana epoch length
 
@@ -3782,13 +3846,14 @@ function addFragment(catId){
     var data = getCatData();
     var c = data.find(function(d){ return d.id === catId; });
     if(!c) return;
-    var sp = getSimParams();
-    var avail = CB * sp.b;
-    var defaultCU = c.avgCuPerBlock > 0 ? Math.round(c.avgCuPerBlock) : 1000; // data-backed: observed avg CU/block (30d)
+    var profile = getFragmentProfile(c, 'median');
+    var defaultCU = (profile && profile.cu > 0) ? Math.round(profile.cu) : 1000;
     _bbFragments.push({
         catId: catId,
+        profileKey: profile ? profile.key : 'median',
         cu: defaultCU,
-        feePerCU: c.priFeePerCU,
+        feePerCU: profile ? profile.feePerCU : 0,
+        userAdjustedCU: false,
         userAdjustedFee: false
     });
     renderBlockBuilder();
@@ -3803,7 +3868,10 @@ function updateFragment(idx, field, value){
     if(!_bbFragments[idx]) return;
     var numVal = parseFloat(value);
     if(isNaN(numVal) || numVal < 0) return;
-    if(field === 'cu') _bbFragments[idx].cu = Math.round(numVal);
+    if(field === 'cu'){
+        _bbFragments[idx].cu = Math.round(numVal);
+        _bbFragments[idx].userAdjustedCU = true;
+    }
     if(field === 'feePerCU'){
         _bbFragments[idx].feePerCU = numVal;
         _bbFragments[idx].userAdjustedFee = true;
@@ -3811,15 +3879,34 @@ function updateFragment(idx, field, value){
     renderBlockBuilder();
 }
 
+function applyFragmentProfile(idx, profileKey){
+    if(!_bbFragments[idx]) return;
+    var data = getCatData();
+    var c = data.find(function(d){ return d.id === _bbFragments[idx].catId; });
+    var profile = getFragmentProfile(c, profileKey);
+    if(!profile) return;
+    _bbFragments[idx].profileKey = profile.key;
+    _bbFragments[idx].cu = profile.cu > 0 ? Math.round(profile.cu) : 1000;
+    _bbFragments[idx].feePerCU = profile.feePerCU || 0;
+    _bbFragments[idx].userAdjustedCU = false;
+    _bbFragments[idx].userAdjustedFee = false;
+    renderBlockBuilder();
+}
+
 function resetFragment(idx){
     if(!_bbFragments[idx]) return;
     var data = getCatData();
     var c = data.find(function(d){ return d.id === _bbFragments[idx].catId; });
-    if(c){
-        _bbFragments[idx].feePerCU = c.priFeePerCU;
-        _bbFragments[idx].userAdjustedFee = false;
+    var profile = getFragmentProfile(c, _bbFragments[idx].profileKey);
+    if(profile){
+        _bbFragments[idx].feePerCU = profile.feePerCU || 0;
+        _bbFragments[idx].cu = profile.cu > 0 ? Math.round(profile.cu) : 1000;
+    } else {
+        _bbFragments[idx].feePerCU = 0;
+        _bbFragments[idx].cu = 1000;
     }
-    _bbFragments[idx].cu = (c && c.avgCuPerBlock > 0) ? Math.round(c.avgCuPerBlock) : 1000;
+    _bbFragments[idx].userAdjustedCU = false;
+    _bbFragments[idx].userAdjustedFee = false;
     renderBlockBuilder();
 }
 
@@ -3877,12 +3964,15 @@ function renderBlockBuilder(){
         sortedIdxs.forEach(function(origIdx, rank){
             var f = _bbFragments[origIdx];
             var cat = BIZ_CATEGORIES.find(function(c){ return c.id===f.catId; });
+            var catData = data.find(function(d){ return d.id===f.catId; });
+            var profile = getFragmentProfile(catData, f.profileKey);
             var col = CAT_COLORS[f.catId] || '#555';
             var fm = fitMap[origIdx] || { fits: false, usedCU: 0 };
             var feeSol = fm.usedCU * f.feePerCU / LS;
             var feeUSD = feeSol * sp.p;
             var isRejected = !fm.fits;
             var pctBlock = avail > 0 ? (f.cu / avail * 100).toFixed(1) : '0';
+            var isCustom = !!(f.userAdjustedCU || f.userAdjustedFee);
 
             // Divider between included and excluded
             if(isRejected && !showedDivider){
@@ -3894,12 +3984,26 @@ function renderBlockBuilder(){
                 '<span class="bf-rank">NOT INCLUDED</span>' :
                 '<span class="bf-rank">FILL #' + (rank+1) + '</span>';
 
-            // Data/adjusted tags (no Dune link — source embedded)
-            var cuTag = f.userAdjustedFee ? '' :
-                '<span class="bf-tag from-data">\uD83D\uDCCA observed avg/block</span>';
+            var profileNote = '';
+            if(catData && catData.profileFallbackUsed){
+                profileNote = '<div class="bf-profile-note">Profile list uses the CU&gt;0 fallback because fewer than 2 programs have positive non-base fee/CU.</div>';
+            }
+            var cuTag = f.userAdjustedCU ?
+                '<span class="bf-tag custom">Custom</span>' :
+                '<span class="bf-tag from-data">Profile value</span>';
             var feeTag = f.userAdjustedFee ?
-                '<span class="bf-tag user-adj">\u270F adjusted</span>' :
-                '<span class="bf-tag from-data">\uD83D\uDCCA from data</span>';
+                '<span class="bf-tag custom">Custom</span>' :
+                '<span class="bf-tag from-data">Profile value</span>';
+            var profileTag = profile ? '<span class="bf-tag from-data">' + escHtml(profile.sourceLabel) + '</span>' : '';
+            var customTag = isCustom ? '<span class="bf-tag custom">Customized</span>' : '';
+            var profileOptionsHtml = '';
+            if(catData){
+                var options = [catData.medianProfile, catData.meanProfile].concat(catData.programOptions || []);
+                profileOptionsHtml = options.map(function(opt){
+                    if(!opt) return '';
+                    return '<option value="' + escHtml(opt.key) + '"' + (f.profileKey === opt.key ? ' selected' : '') + '>' + escHtml(opt.label) + '</option>';
+                }).join('');
+            }
 
             html += '<div class="bb-frag' + (isRejected ? ' rejected' : '') + '" style="border-left:3px solid ' + col + '">' +
                 '<button class="bf-remove" onclick="removeFragment(' + origIdx + ')">&times;</button>' +
@@ -3909,6 +4013,13 @@ function renderBlockBuilder(){
                 // ── INPUTS ──
                 '<div class="bf-inputs">' +
                     '<div class="bf-input-group">' +
+                        '<span class="bf-label">Client profile</span>' +
+                        '<select onchange="applyFragmentProfile(' + origIdx + ',this.value)">' + profileOptionsHtml + '</select>' +
+                        profileTag +
+                        customTag +
+                    '</div>' +
+                    profileNote +
+                    '<div class="bf-input-group">' +
                         '<span class="bf-label">CU Allocation</span>' +
                         '<input type="text" value="' + fmtK(f.cu) + '" onchange="updateFragment(' + origIdx + ',\'cu\',this.value.replace(/,/g,\'\'))" style="text-align:right">' +
                         cuTag +
@@ -3917,7 +4028,7 @@ function renderBlockBuilder(){
                         '<span class="bf-label">Fee/CU (lam)</span>' +
                         '<input type="number" value="' + fmtFpc(f.feePerCU) + '" step="0.01" onchange="updateFragment(' + origIdx + ',\'feePerCU\',this.value)" min="0">' +
                         feeTag +
-                        '<button class="bf-reset" onclick="resetFragment(' + origIdx + ')" title="Reset to data defaults">\u21BA</button>' +
+                        '<button class="bf-reset" onclick="resetFragment(' + origIdx + ')" title="Reset to selected profile">\u21BA</button>' +
                     '</div>' +
                 '</div>' +
 
@@ -3934,7 +4045,8 @@ function renderBlockBuilder(){
         html += '<button class="bb-add-btn" onclick="document.getElementById(\'bb-add-dropdown\').style.display=document.getElementById(\'bb-add-dropdown\').style.display===\'block\'?\'none\':\'block\'">+ Add Category</button>';
         html += '<div id="bb-add-dropdown" style="display:none;position:absolute;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:6px;z-index:10;margin-top:4px;">';
         data.forEach(function(c){
-            html += '<div style="padding:4px 10px;cursor:pointer;font-size:11px;color:var(--text-mid);border-radius:4px;" onmouseover="this.style.background=\'#1a1c22\'" onmouseout="this.style.background=\'\'" onclick="addFragment(\'' + c.id + '\');document.getElementById(\'bb-add-dropdown\').style.display=\'none\';">' + c.label + ' <span style="color:var(--text2);font-size:9px">(NB ' + fmtFpc(c.priFeePerCU) + ' lam/CU)</span></div>';
+            var medianLabel = c.medianProfile ? fmtFpc(c.medianProfile.feePerCU) : '0.00';
+            html += '<div style="padding:4px 10px;cursor:pointer;font-size:11px;color:var(--text-mid);border-radius:4px;" onmouseover="this.style.background=\'#1a1c22\'" onmouseout="this.style.background=\'\'" onclick="addFragment(\'' + c.id + '\');document.getElementById(\'bb-add-dropdown\').style.display=\'none\';">' + c.label + ' <span style="color:var(--text2);font-size:9px">(Median ' + medianLabel + ' lam/CU)</span></div>';
         });
         html += '</div>';
         fragEl.innerHTML = html;
@@ -4026,6 +4138,7 @@ window.selectCategory = selectCategory;
 window.addFragment = addFragment;
 window.removeFragment = removeFragment;
 window.updateFragment = updateFragment;
+window.applyFragmentProfile = applyFragmentProfile;
 window.resetFragment = resetFragment;
 window.updateSimParam = updateSimParam;
 window.toggleRawDB = toggleRawDB;
