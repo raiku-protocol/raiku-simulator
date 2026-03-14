@@ -1739,14 +1739,14 @@ const _fConRaw = Number(_scenarioActiveAgg.p25NonBase || 0);
 const _fCon = +Math.max(0.10, _fConRaw).toFixed(2);
 const _fBaseRaw = Number(_scenarioAgg.weightedNonBase || 0);
 const _fBase = +_fBaseRaw.toFixed(2);
-const _fOptRaw = Number(_scenarioP75Active || 0);
-const _fOpt = 1.00;
-const _fBullRaw = Number(_scenarioAgg.weightedTotal || 0);
-const _fBull = 1.50;
+const _fOptRaw = Number(_scenarioAgg.weightedTotal || 0);
+const _fOpt = 1.50;
+const _fBullRaw = Number(_scenarioP75Active || 0);
+const _fBull = 2.00;
 const _fConTotalRef = +((Number(_scenarioActiveAgg.p25Total || 0) > 0 ? _scenarioActiveAgg.p25Total : (_fCon + _scenarioAgg.weightedBase))).toFixed(2);
 const _fBaseTotalRef = +_fBullRaw.toFixed(2);
-const _fOptTotalRef = +_fBullRaw.toFixed(2);
-const _fBullTotalRef = +_fBullRaw.toFixed(2);
+const _fOptTotalRef = +_fOptRaw.toFixed(2);
+const _fBullTotalRef = +((Number(_scenarioActiveAgg.p75Total || 0) > 0 ? _scenarioActiveAgg.p75Total : (_fBull + _scenarioAgg.weightedBase))).toFixed(2);
 
 const SC = {
     con:  {ca:5,cj:5,j:5,s:2,b:1,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:1_000_000,
@@ -1754,9 +1754,9 @@ const SC = {
     base: {ca:5,cj:5,j:13,s:10,b:5,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:2_350_000,
            desc:"Base — raw observed CU-weighted non-base fees across included application categories, without outlier clipping."},
     opt:  {ca:5,cj:5,j:15,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:3_000_000,
-           desc:"Optimistic — active-payer P75 non-base fee/CU anchor, displayed at 1.00 lam/CU."},
+           desc:"Optimistic — strong upside case using CU-weighted total fee/CU, displayed at 1.50 lam/CU."},
     bull: {ca:5,cj:5,j:20,s:25,b:20,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:5_000_000,
-           desc:"Bull — upper-bound all-in case using CU-weighted total fee/CU, displayed at 1.50 lam/CU."},
+           desc:"Bull — high-payer stress case using active-payer P75 non-base fee/CU, displayed at 2.00 lam/CU."},
 };
 let _selectedScenario = 'base';
 const STAKE_FALLBACK_SOL = 423948189.4;
@@ -2689,8 +2689,8 @@ function initAotFcuSection(){
 
     const conS = document.getElementById('aot-sc-con-sentence'); if (conS) conS.textContent = 'Uses the lower end of observed non-base fees among active fee-paying application programs, with an explicit minimum floor of 0.10 lam/CU.';
     const baseS = document.getElementById('aot-sc-base-sentence'); if (baseS) baseS.textContent = 'Uses the raw observed non-base fees across the included application categories, without outlier clipping, as the new base anchor.';
-    const optS = document.getElementById('aot-sc-opt-sentence'); if (optS) optS.textContent = 'Uses the P75 active payer non-base fee/CU anchor as a stronger scenario step, displayed at 1.00 lam/CU.';
-    const bullS = document.getElementById('aot-sc-bull-sentence'); if (bullS) bullS.textContent = 'Uses the full observed fee burden across the included application categories, including base fees, and displays it as 1.50 lam/CU for the upper-bound case.';
+    const optS = document.getElementById('aot-sc-opt-sentence'); if (optS) optS.textContent = 'Uses the full observed fee burden across the included application categories, including base fees, and displays it as 1.50 lam/CU for the strong upside case.';
+    const bullS = document.getElementById('aot-sc-bull-sentence'); if (bullS) bullS.textContent = 'Uses the P75 active payer non-base fee/CU anchor as the high-payer stress case, displayed at 2.00 lam/CU.';
 
     const includedCategoriesText = 'Included application categories are Prop AMM, DEX (aggregator, AMM pools, and orderbook), lending, oracle, bridge, perps, cranker-style programs, depin, payments, NFT, and gaming. Only programs with positive compute usage over the 30-day window are included. Arb-bot benchmark rows are excluded, and categories such as unknown and other are not used in scenario construction.';
     const representativeText = 'Representative names in this included set include BisonFi and HumidiFi (Prop AMM), Jupiter and Pump.fun programs (DEX), and Kamino programs (lending).';
@@ -2708,14 +2708,14 @@ function initAotFcuSection(){
         activePayerAsterisk
     ].join('\n');
     const optAdditionalContextText = [
-        'Case 1: P75 active payer non-base fee/CU* (n = ' + activeCount + ') \u2192 ' + _fOptRaw.toFixed(4) + ' lam/CU.',
+        'Case 1: P80 total fee/CU (included set, n = ' + includedCount + ') \u2192 ' + _scenarioP80TotalIncluded.toFixed(4) + ' lam/CU.',
+        'Case 2: P90 total fee/CU (included set, n = ' + includedCount + ') \u2192 ' + _scenarioP90TotalIncluded.toFixed(4) + ' lam/CU.'
+    ].join('\n');
+    const bullAdditionalContextText = [
+        'Case 1: P75 active payer non-base fee/CU* (n = ' + activeCount + ') \u2192 ' + _fBullRaw.toFixed(4) + ' lam/CU.',
         'Case 2: P75 of the included reference set (n = ' + includedCount + ') \u2192 ' + _scenarioP75Included.toFixed(4) + ' lam/CU.',
         'Case 3: Raw CU-weighted non-base fee/CU on included programs (n = ' + includedCount + ') \u2192 ' + _fBaseRaw.toFixed(4) + ' lam/CU.',
         activePayerAsterisk
-    ].join('\n');
-    const bullAdditionalContextText = [
-        'Case 1: P80 total fee/CU (included set, n = ' + includedCount + ') \u2192 ' + _scenarioP80TotalIncluded.toFixed(4) + ' lam/CU.',
-        'Case 2: P90 total fee/CU (included set, n = ' + includedCount + ') \u2192 ' + _scenarioP90TotalIncluded.toFixed(4) + ' lam/CU.'
     ].join('\n');
 
     _aotScenarioExplain = {
@@ -2742,21 +2742,21 @@ function initAotFcuSection(){
         opt: {
             title: 'Optimistic',
             value: _fOpt.toFixed(2) + ' lam/CU',
-            plain: 'This scenario represents a stronger willingness-to-pay state anchored to the upper end of active payer behavior.',
+            plain: 'This scenario represents a strong upside case where applications absorb the full observed all-in fee burden.',
             scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
-            metric: 'Metric used: non-base fee/CU among active payers. Rule applied: use the P75 active payer non-base fee/CU as the optimistic anchor, then display the scenario at 1.00 lam/CU.',
-            calculation: 'Base case: P75 active payer non-base fee/CU (n = ' + activeCount + ') is ' + _fOptRaw.toFixed(4) + ' lam/CU. This is used as the optimistic anchor and displayed as ' + _fOpt.toFixed(2) + ' lam/CU.',
-            why: 'Using the P75 among active payers is a strong optimistic proxy because it isolates applications that are already demonstrably paying for blockspace and moves the assumption into the stronger part of the observed distribution without assuming the full all-in fee stack.',
+            metric: 'Metric used: CU-weighted total fee/CU across the included application categories. Rule applied: total fee/CU includes base fees plus priority and MEV / JIT components, then the scenario is displayed at 1.50 lam/CU.',
+            calculation: 'Base case: CU-weighted total fee/CU on included programs (n = ' + includedCount + ') is ' + _fOptRaw.toFixed(4) + ' lam/CU, and the scenario is displayed as ' + _fOpt.toFixed(2) + ' lam/CU.',
+            why: 'Using total fee/CU rather than non-base fee/CU is appropriate for a strong upside case because it captures periods when applications are exposed to the full marginal cost of execution, while still staying below the more aggressive high-payer percentile stress case.',
             context: optAdditionalContextText
         },
         bull: {
             title: 'Bull',
             value: _fBull.toFixed(2) + ' lam/CU',
-            plain: 'This scenario represents sustained high-demand conditions where applications absorb the full all-in fee burden.',
-            scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
-            metric: 'Metric used: CU-weighted total fee/CU across the included application categories. Rule applied: total fee/CU includes base fees plus priority and MEV / JIT components.',
-            calculation: 'Base case: CU-weighted total fee/CU on included programs (n = ' + includedCount + ') is ' + _fBullRaw.toFixed(4) + ' lam/CU, and the scenario is displayed as ' + _fBull.toFixed(2) + ' lam/CU.',
-            why: 'Using total fee/CU rather than non-base fee/CU is appropriate for the upper-bound case because, in sustained congestion, applications are effectively exposed to the full marginal cost of execution; this makes the scenario a deliberate proxy for all-in fee intensity.',
+            plain: 'This scenario represents the most aggressive case, anchored to the upper tail of observed willingness to pay among active fee-paying programs.',
+            scope: includedCategoriesText + ' Included programs for scenario construction: n = ' + includedCount + '. For this scenario, we additionally use active payers only: n = ' + activeCount + '. ' + activePayerDefinition + ' ' + representativeText,
+            metric: 'Metric used: non-base fee/CU among active payers. Rule applied: use the P75 active payer non-base fee/CU as the bull anchor, then display the scenario at 2.00 lam/CU.',
+            calculation: 'Base case: P75 active payer non-base fee/CU (n = ' + activeCount + ') is ' + _fBullRaw.toFixed(4) + ' lam/CU. This is used as the bull anchor and displayed as ' + _fBull.toFixed(2) + ' lam/CU.',
+            why: 'Using the P75 among active payers is appropriate for the most aggressive scenario because it anchors the assumption in the upper tail of observed willingness to pay among real fee-paying programs, making it a deliberate proxy for sustained high-intensity demand.',
             context: bullAdditionalContextText
         }
     };
