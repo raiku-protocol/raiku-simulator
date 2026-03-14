@@ -1427,14 +1427,14 @@ details[open] summary::before { transform:rotate(90deg); }
     <div id="sim-benchmark-block" style="margin-bottom:12px;"></div>
     <div id="sim-caveat-legend" style="margin-bottom:6px;"></div>
 
+    <!-- v6: Secondary — Programs in selected category (demoted from primary) -->
+    <div id="sim-cat-progs" style="max-height:400px;overflow-y:auto;"></div>
+
     <!-- v6: Temporal context + distribution stats -->
     <div id="sim-cat-distrib-view"></div>
 
     <!-- v6: Network temporal charts (from D.e epoch data) -->
     <div id="sim-cat-temporal"></div>
-
-    <!-- v6: Secondary — Programs in selected category (demoted from primary) -->
-    <div id="sim-cat-progs" style="max-height:400px;overflow-y:auto;"></div>
 </div>
 
 <!-- D. METHODOLOGY & SOURCES (full-width card grid) -->
@@ -3238,6 +3238,7 @@ function getCatData(){ if(!_catData) _catData = buildCategoryData(); return _cat
 
 var _selectedCat = null;
 var _peakMode = false;
+var _showBenchmarkBlock = false;
 
 // ── Category Explorer ──
 function initCategoryExplorer(){
@@ -3259,7 +3260,7 @@ function initCategoryExplorer(){
         var low = (c.lowData || c.n < 3 || c.n === 0) ? ' <span style="font-size:9px;opacity:0.8;">(low-data)</span>' : '';
         return '<button class="cat-btn' + (c.id===_selectedCat?' active':'') + '" onclick="selectCategory(\'' + c.id + '\')">' + c.label + low + '</button>';
     }).join('');
-    renderDexBreakdown();
+    renderDexBreakdown(_selectedCat);
     renderBenchmarkBlock();
     renderCaveatLegend();
     selectCategory(_selectedCat);
@@ -3270,14 +3271,19 @@ function selectCategory(id){
     document.querySelectorAll('.cat-btn').forEach(function(b,i){
         b.classList.toggle('active', BIZ_CATEGORIES[i] && BIZ_CATEGORIES[i].id === id);
     });
+    renderDexBreakdown(id);
     renderCategoryDetail(id);
     renderCategoryTable(id);
     updateCatFcuChart();
 }
 
-function renderDexBreakdown(){
+function renderDexBreakdown(id){
     var el = document.getElementById('sim-dex-breakdown');
     if(!el) return;
+    if(id !== 'dex'){
+        el.innerHTML = '';
+        return;
+    }
     var rows = DEX_COMPONENT_SPECS.map(function(s){
         var a = _dexAggByComponent[s.id] || {n:0,cu:0,weightedNonBase:0,weightedTotal:0,medianNonBase:0,p25NonBase:0,p75NonBase:0};
         return '<tr style="border-bottom:1px solid #1a1a1a;">' +
@@ -3314,14 +3320,20 @@ function renderBenchmarkBlock(){
     var el = document.getElementById('sim-benchmark-block');
     if(!el) return;
     var b = _benchmarkAgg || {n:0,weightedNonBase:0,weightedTotal:0,medianNonBase:0,p25NonBase:0,p75NonBase:0,cu:0};
+    var toggleLabel = _showBenchmarkBlock ? 'Hide benchmark' : 'Show benchmark';
+    var html = '<button class="bb-add-btn" style="margin-top:0;" onclick="toggleBenchmarkBlock()">' + toggleLabel + '</button>';
+    if(!_showBenchmarkBlock){
+        el.innerHTML = html;
+        return;
+    }
     if(!b.n){
-        el.innerHTML = '<div style="padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;font-size:11px;color:var(--text2);">' +
+        el.innerHTML = html + '<div style="margin-top:8px;padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;font-size:11px;color:var(--text2);">' +
             '<strong style="color:var(--text);">Benchmark — Arb Bot:</strong> benchmark rows are not present in the current artifact. The chart/table benchmark line auto-activates when benchmark-enriched data is loaded.' +
         '</div>';
         return;
     }
-    el.innerHTML =
-        '<div style="padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;">' +
+    el.innerHTML = html +
+        '<div style="margin-top:8px;padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;">' +
             '<div style="font-size:11px;color:#A78BFA;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Benchmark — Arb Bot</div>' +
             '<div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Shown separately and excluded from core AOT customer story.</div>' +
             '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-family:var(--font-mono);font-size:11px;">' +
@@ -3333,6 +3345,10 @@ function renderBenchmarkBlock(){
             '</div>' +
         '</div>';
 }
+function toggleBenchmarkBlock(){
+    _showBenchmarkBlock = !_showBenchmarkBlock;
+    renderBenchmarkBlock();
+}
 
 function renderCaveatLegend(){
     var el = document.getElementById('sim-caveat-legend');
@@ -3341,7 +3357,11 @@ function renderCaveatLegend(){
         return '<div style="font-size:10px;color:var(--text2);"><strong style="color:' + g.color + ';">' + g.label + ':</strong> ' + (CAVEAT_NOTES[g.id] || '') + '</div>';
     }).join('');
     items += '<div style="font-size:10px;color:var(--text2);"><strong style="color:#A78BFA;">Benchmark:</strong> ' + CAVEAT_NOTES.benchmark_arb_bot + '</div>';
-    el.innerHTML = '<div style="padding:8px 10px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;display:grid;gap:4px;">' + items + '</div>';
+    el.innerHTML =
+        '<details style="padding:8px 10px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;">' +
+            '<summary style="cursor:pointer;font-size:10px;color:var(--text2);font-family:var(--font-mono);">Method note: interpretation cues by category</summary>' +
+            '<div style="display:grid;gap:4px;margin-top:8px;">' + items + '</div>' +
+        '</details>';
 }
 
 function renderCategoryDetail(id){
@@ -3650,13 +3670,16 @@ function renderCategoryTable(id){
     var fmtFpc = function(v){ return v < 0.01 ? v.toFixed(4) : v < 0.1 ? v.toFixed(3) : v >= 10 ? v.toFixed(1) : v.toFixed(2); };
     var S30 = SY * 30 / 365;
     var sorted = [].concat(c.progs).sort(function(a,b){
-        var afpc = a.cu > 0 ? (a.fpc_nb || 0) : 0;
-        var bfpc = b.cu > 0 ? (b.fpc_nb || 0) : 0;
-        return bfpc - afpc;
+        var acuPerBlock = a.cu > 0 ? (a.cu * 1e9 / S30) : 0;
+        var bcuPerBlock = b.cu > 0 ? (b.cu * 1e9 / S30) : 0;
+        var aImplied = (a.cu > 0 ? (a.fpc_nb || 0) : 0) * acuPerBlock / LS;
+        var bImplied = (b.cu > 0 ? (b.fpc_nb || 0) : 0) * bcuPerBlock / LS;
+        if(bImplied !== aImplied) return bImplied - aImplied;
+        return (b.fpc_nb || 0) - (a.fpc_nb || 0);
     });
     el.innerHTML = '<div class="secondary-chart-label">\u25BD SECONDARY — Per-Program Snapshot (30d aggregate)</div>' +
         '<div style="font-size:11px;font-weight:600;color:var(--text-mid);margin-bottom:4px;font-family:var(--font-mono);">PROGRAM EXPLORER — ' + c.label.toUpperCase() + ' (' + c.n + ' programs)</div>' +
-        '<div style="font-size:9px;color:var(--text2);margin-bottom:6px">Per-program fee/CU comparison \u00B7 Sorted by non-base fee/CU descending \u00B7 Source: artifact (30d window) \u00B7 Static snapshot, not temporal</div>' +
+        '<div style="font-size:9px;color:var(--text2);margin-bottom:6px">Per-program fee/CU comparison \u00B7 Sorted by implied non-base fees/block descending \u00B7 Source: artifact (30d window) \u00B7 Static snapshot, not temporal</div>' +
         '<div class="cat-prog-chart"><canvas id="chart-prog-explorer"></canvas></div>' +
         '<table class="cat-prog-table"><thead><tr>' +
         '<th>Program</th><th style="color:#F5A623">NB Fee/CU (lam)</th><th>Total Fee/CU (lam)</th><th style="color:#8ddb6a;font-weight:700">Avg CU/block</th><th style="color:var(--lime)">Implied NB fees/block</th><th>30d CU (B)</th><th>30d Fees (SOL)</th></tr></thead><tbody>' +
@@ -4168,6 +4191,7 @@ window.resetFragment = resetFragment;
 window.updateSimParam = updateSimParam;
 window.toggleRawDB = toggleRawDB;
 window.togglePeak = togglePeak;
+window.toggleBenchmarkBlock = toggleBenchmarkBlock;
 
 // Initialize simulation module (after all definitions are assigned)
 initCatFcuChart(); initCategoryExplorer(); initBlockBuilder();
