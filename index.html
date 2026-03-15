@@ -1460,7 +1460,6 @@ details[open] summary::before { transform:rotate(90deg); }
     <!-- Strict spec blocks -->
     <div id="sim-dex-breakdown" style="margin-bottom:12px;"></div>
     <div id="sim-benchmark-block" style="margin-bottom:12px;"></div>
-    <div id="sim-caveat-legend" style="margin-bottom:6px;"></div>
 
     <!-- v6: Secondary — Programs in selected category (demoted from primary) -->
     <div id="sim-cat-progs" style="max-height:400px;overflow-y:auto;"></div>
@@ -1539,12 +1538,6 @@ details[open] summary::before { transform:rotate(90deg); }
         <div class="table-wrap" id="prog-table"></div>
     </div>
 
-    <!-- FEE/CU BY SUBCATEGORY (program-level data) -->
-    <div class="section fade-in" style="margin-top:var(--gap);">
-        <h2>Fee/CU by Program Segment</h2>
-        <div class="note" style="margin-bottom:10px">Average non-base fee/CU (lamports per compute unit) across program segments from the loaded artifact. Higher = stronger revealed blockspace willingness-to-pay.</div>
-        <div class="chart-box" style="min-height:260px;"><canvas id="chart-fcu"></canvas></div>
-    </div>
 </div>
 
 </div><!-- end sim-main -->
@@ -2086,7 +2079,7 @@ function calc(p){
     };
 }
 
-let cE,cA,cP,cF;
+let cE,cA,cP,cSegFcu,cSegCuActive,cSegFeesActive;
 function initCharts(){
     const o={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:10}}}},scales:{x:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'},title:{display:true,color:'#A0A3A9',font:{size:10}}},y:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'},title:{display:true,color:'#A0A3A9',font:{size:10}}}}};
     // Full D_JITO history with highlighted computation window (last 100 non-zero)
@@ -2101,10 +2094,87 @@ function initCharts(){
     ]},options:{...o,plugins:{...o.plugins,legend:{labels:{color:'#888',font:{size:10}},display:true}},scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'Epoch'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'SOL / epoch'}}}}});
     cA=new Chart(document.getElementById('chart-aot'),{type:'bar',data:{labels:['1%','2%','5%','10%','15%','20%','25%','30%','50%'],datasets:[{label:'AOT Protocol Treasury',data:Array(9).fill(0),backgroundColor:'#C0FF3860'}]},options:{...o,scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'RAIKU Stake %'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'AOT Protocol Treasury (USD/yr)'}}}}});
     cP=new Chart(document.getElementById('chart-price'),{type:'line',data:{labels:D.e.map(e=>e.e),datasets:[{label:'SOL',data:D.e.map(e=>e.p),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:false}]},options:{...o,scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'Epoch'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'Price (USD)'}}}}});
-    const st={};AOT_PROGRAMS.forEach(p=>{if(p.fpc_nb>0){const k=p.segment_key||p.sub||'other';if(!st[k])st[k]=[];st[k].push(p.fpc_nb);}});
-    const ss=Object.entries(st).map(([k,v])=>({k,a:v.reduce((a,b)=>a+b,0)/v.length})).sort((a,b)=>b.a-a.a).slice(0,15);
-    cF=new Chart(document.getElementById('chart-fcu'),{type:'bar',data:{labels:ss.map(s=>s.k),datasets:[{label:'Avg Non-base Fee/CU (L)',data:ss.map(s=>s.a),backgroundColor:'#d4e8a0'}]},options:{...o,plugins:{...o.plugins,legend:{display:false}},scales:{...o.scales,x:{...o.scales.x,title:{...o.scales.x.title,text:'Segment'}},y:{...o.scales.y,title:{...o.scales.y.title,text:'Non-base Fee/CU (lamports)'}}}}});
+    renderSegmentBackdropCharts(o);
+}
 
+function _segmentBackdropMeta(seg){
+    var dexHit = DEX_COMPONENT_SPECS.find(function(g){ return g.segments.includes(seg); });
+    if(dexHit){
+        return { label: dexHit.label, color: dexHit.color, order: 50 + DEX_COMPONENT_SPECS.indexOf(dexHit) };
+    }
+    var coreHit = CORE_GROUP_SPECS.find(function(g){ return g.segments.includes(seg); });
+    if(coreHit){
+        return { label: coreHit.label, color: coreHit.color, order: coreHit.order };
+    }
+    return { label: seg || 'Other', color: '#94A3B8', order: 999 };
+}
+function getSegmentBackdropStats(){
+    var s30 = SY * 30 / 365;
+    var grouped = {};
+    _aotProgs.forEach(function(p){
+        var seg = p.segment_key || 'other';
+        if(!grouped[seg]){
+            grouped[seg] = { count: 0, fpcNbSum: 0, cuActiveSum: 0, totalFeesActiveSum: 0 };
+        }
+        var blocksTouched = Number.isFinite(p.blocks_touched_30d) && p.blocks_touched_30d > 0 ? p.blocks_touched_30d : null;
+        var blockDen = blocksTouched || s30;
+        grouped[seg].count += 1;
+        grouped[seg].fpcNbSum += (p.fpc_nb || 0);
+        grouped[seg].cuActiveSum += getProgramTouchedCuPerBlock(p);
+        grouped[seg].totalFeesActiveSum += blockDen > 0 ? ((p.tf || 0) / blockDen) : 0;
+    });
+    return Object.keys(grouped).map(function(seg){
+        var meta = _segmentBackdropMeta(seg);
+        var g = grouped[seg];
+        return {
+            key: seg,
+            label: meta.label,
+            color: meta.color,
+            order: meta.order,
+            count: g.count,
+            avgNonBaseFeePerCU: g.count > 0 ? (g.fpcNbSum / g.count) : 0,
+            avgCuPerActiveBlock: g.count > 0 ? (g.cuActiveSum / g.count) : 0,
+            avgTotalFeesPerActiveBlock: g.count > 0 ? (g.totalFeesActiveSum / g.count) : 0
+        };
+    }).sort(function(a,b){
+        if(a.order !== b.order) return a.order - b.order;
+        return a.label.localeCompare(b.label);
+    });
+}
+function renderSegmentBackdropCharts(baseOptions){
+    var stats = getSegmentBackdropStats();
+    var labels = stats.map(function(s){ return s.label; });
+    var colors = stats.map(function(s){ return s.color; });
+    var barFill = colors.map(function(c){ return c + 'B0'; });
+    var barBorder = colors.map(function(c){ return c; });
+    var chartOptions = baseOptions || {responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:10}}}},scales:{x:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'},title:{display:true,color:'#A0A3A9',font:{size:10}}},y:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'},title:{display:true,color:'#A0A3A9',font:{size:10}}}}};
+    var segFcuCanvas = document.getElementById('chart-seg-fcu');
+    var segCuCanvas = document.getElementById('chart-seg-cu-active');
+    var segFeesCanvas = document.getElementById('chart-seg-fees-active');
+    if(segFcuCanvas){
+        if(cSegFcu) cSegFcu.destroy();
+        cSegFcu = new Chart(segFcuCanvas,{
+            type:'bar',
+            data:{labels:labels,datasets:[{label:'Avg non-base fee/CU',data:stats.map(function(s){ return s.avgNonBaseFeePerCU; }),backgroundColor:barFill,borderColor:barBorder,borderWidth:1}]},
+            options:{...chartOptions,plugins:{...chartOptions.plugins,legend:{display:false},tooltip:{callbacks:{label:function(ctx){ return ctx.dataset.label + ': ' + fmtMetricDot(ctx.raw) + ' lam/CU'; }}}},scales:{...chartOptions.scales,x:{...chartOptions.scales.x,title:{...chartOptions.scales.x.title,text:'Program segment'}},y:{...chartOptions.scales.y,title:{...chartOptions.scales.y.title,text:'Non-base Fee/CU (lamports)'},ticks:{...chartOptions.scales.y.ticks,callback:function(v){ return fmtMetricDot(v); }}}}}
+        });
+    }
+    if(segCuCanvas){
+        if(cSegCuActive) cSegCuActive.destroy();
+        cSegCuActive = new Chart(segCuCanvas,{
+            type:'bar',
+            data:{labels:labels,datasets:[{label:'Avg CU / active block',data:stats.map(function(s){ return s.avgCuPerActiveBlock; }),backgroundColor:barFill,borderColor:barBorder,borderWidth:1}]},
+            options:{...chartOptions,plugins:{...chartOptions.plugins,legend:{display:false},tooltip:{callbacks:{label:function(ctx){ return ctx.dataset.label + ': ' + fmtK(Math.round(ctx.raw)) + ' CU'; }}}},scales:{...chartOptions.scales,x:{...chartOptions.scales.x,title:{...chartOptions.scales.x.title,text:'Program segment'}},y:{...chartOptions.scales.y,title:{...chartOptions.scales.y.title,text:'CU / active block'},ticks:{...chartOptions.scales.y.ticks,callback:function(v){ return fmtHuman(v); }}}}}
+        });
+    }
+    if(segFeesCanvas){
+        if(cSegFeesActive) cSegFeesActive.destroy();
+        cSegFeesActive = new Chart(segFeesCanvas,{
+            type:'bar',
+            data:{labels:labels,datasets:[{label:'Avg total fees / active block',data:stats.map(function(s){ return s.avgTotalFeesPerActiveBlock; }),backgroundColor:barFill,borderColor:barBorder,borderWidth:1}]},
+            options:{...chartOptions,plugins:{...chartOptions.plugins,legend:{display:false},tooltip:{callbacks:{label:function(ctx){ return ctx.dataset.label + ': ' + _fmtSol(ctx.raw) + ' SOL'; }}}},scales:{...chartOptions.scales,x:{...chartOptions.scales.x,title:{...chartOptions.scales.x.title,text:'Program segment'}},y:{...chartOptions.scales.y,title:{...chartOptions.scales.y.title,text:'Total fees / active block (SOL)'},ticks:{...chartOptions.scales.y.ticks,callback:function(v){ return _fmtSol(v); }}}}}
+        });
+    }
 }
 
 // Inline JIT history chart (inside Data Sources section)
@@ -3084,7 +3154,7 @@ function switchTab(id){
     // Chart.js needs resize when container becomes visible
     requestAnimationFrame(()=>{
         if(id==='macro'){[cA].forEach(c=>{if(c)c.resize();});}
-        if(id==='micro'){[cF,cCatFcu,cBlockMix,cProgExplorer,cTempFees,cTempRevenue,cTempCatFpc,cTempCatCU].forEach(c=>{if(c)c.resize();});}
+        if(id==='micro'){[cSegFcu,cSegCuActive,cSegFeesActive,cCatFcu,cBlockMix,cProgExplorer,cTempFees,cTempRevenue,cTempCatFpc,cTempCatCU].forEach(c=>{if(c)c.resize();});}
         if(id==='data'){[cE,cP].forEach(c=>{if(c)c.resize();});}
     });
 }
@@ -3308,13 +3378,18 @@ function buildArbBotSizeProfiles(rows, stats){
         if(!members.length) return;
         var cuVals = members.map(function(row){ return row.cuActiveBlock; });
         var feeVals = members.map(function(row){ return row.feePerCU; });
+        var zeroFeeCount = members.filter(function(row){ return row.feePerCU === 0; }).length;
+        var nonZeroFees = feeVals.filter(function(v){ return v > 0; });
+        var medianFeeAll = percentile(feeVals, 50);
+        var medianFeePositive = nonZeroFees.length ? percentile(nonZeroFees, 50) : null;
+        var displayFeePerCU = medianFeePositive !== null ? medianFeePositive : medianFeeAll;
         profiles.push({
             key: def.key,
             kind: 'bucket',
             label: def.label,
             sourceLabel: def.label + ' size bucket',
             cu: percentile(cuVals, 50),
-            feePerCU: percentile(feeVals, 50)
+            feePerCU: displayFeePerCU
         });
         summaries.push({
             key: def.key,
@@ -3325,8 +3400,13 @@ function buildArbBotSizeProfiles(rows, stats){
             count: members.length,
             minFee: Math.min.apply(null, feeVals),
             maxFee: Math.max.apply(null, feeVals),
+            zeroFeeCount: zeroFeeCount,
+            minNonZeroFee: nonZeroFees.length ? Math.min.apply(null, nonZeroFees) : null,
+            maxNonZeroFee: nonZeroFees.length ? Math.max.apply(null, nonZeroFees) : null,
             cu: percentile(cuVals, 50),
-            feePerCU: percentile(feeVals, 50)
+            feePerCU: displayFeePerCU,
+            medianFeePerCUAll: medianFeeAll,
+            medianFeePerCUPositive: medianFeePositive
         });
     });
     return { profiles: profiles, summaries: summaries };
@@ -3542,7 +3622,6 @@ function initCategoryExplorer(){
     }).join('');
     renderDexBreakdown(_selectedCat);
     renderBenchmarkBlock();
-    renderCaveatLegend();
     selectCategory(_selectedCat);
 }
 
@@ -3628,10 +3707,20 @@ function renderBenchmarkBlock(){
                 : (bucket.key === 'xl'
                     ? ('> ' + fmtMetricDot(bucket.lowerBound) + ' lam/CU')
                     : (fmtMetricDot(bucket.lowerBound) + ' to ' + fmtMetricDot(bucket.upperBound) + ' lam/CU'));
+            var zeroFeeNote = '';
+            if(bucket.zeroFeeCount > 0){
+                zeroFeeNote = '<div style="color:var(--text2);margin-top:3px;">Zero-fee rows still count for bucket membership: ' + fmtK(bucket.zeroFeeCount) + ' / ' + fmtK(bucket.count) + ' bots are at 0 non-base fee/CU.' +
+                    ((bucket.medianFeePerCUPositive !== null && bucket.medianFeePerCUAll !== bucket.feePerCU)
+                        ? ' Displayed typical fee/CU uses the positive-fee median (' + fmtMetricDot(bucket.feePerCU) + ' lam/CU); raw bucket median including zeros is ' + fmtMetricDot(bucket.medianFeePerCUAll) + ' lam/CU.'
+                        : '') +
+                    (bucket.minNonZeroFee !== null ? ' Non-zero bots span ' + fmtMetricDot(bucket.minNonZeroFee) + ' to ' + fmtMetricDot(bucket.maxNonZeroFee) + ' lam/CU.' : '') +
+                '</div>';
+            }
             return '<div style="padding:6px 8px;background:#0f1218;border:1px solid #1b1f28;border-radius:8px;font-size:10px;font-family:var(--font-mono);">' +
                 '<div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:' + meta.color + ';"></span><span style="color:var(--text);font-weight:600;">' + bucket.label + '</span></div>' +
-                '<div style="color:var(--text2);margin-top:2px;">' + rangeText + ' · ' + fmtK(bucket.count) + ' bots</div>' +
+                '<div style="color:var(--text2);margin-top:2px;">Bucket: ' + rangeText + ' · ' + fmtK(bucket.count) + ' bots</div>' +
                 '<div style="color:var(--text-mid);margin-top:3px;">Typical bot: ' + fmtMetricDot(bucket.feePerCU) + ' lam/CU · ' + fmtCuExact(bucket.cu) + ' CU</div>' +
+                zeroFeeNote +
             '</div>';
         }).join('');
         distHtml =
@@ -3832,20 +3921,6 @@ function toggleBenchmarkBlock(){
     renderBenchmarkBlock();
 }
 
-function renderCaveatLegend(){
-    var el = document.getElementById('sim-caveat-legend');
-    if(!el) return;
-    var items = CORE_GROUP_SPECS.map(function(g){
-        return '<div style="font-size:10px;color:var(--text2);"><strong style="color:' + g.color + ';">' + g.label + ':</strong> ' + (CAVEAT_NOTES[g.id] || '') + '</div>';
-    }).join('');
-    items += '<div style="font-size:10px;color:var(--text2);"><strong style="color:#A78BFA;">Arbitrage bot:</strong> ' + CAVEAT_NOTES.benchmark_arb_bot + '</div>';
-    el.innerHTML =
-        '<details style="padding:8px 10px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;">' +
-            '<summary style="cursor:pointer;font-size:10px;color:var(--text2);font-family:var(--font-mono);">Method note: interpretation cues by category</summary>' +
-            '<div style="display:grid;gap:4px;margin-top:8px;">' + items + '</div>' +
-        '</details>';
-}
-
 function renderCategoryDetail(id){
     var data = getCatData();
     var c = data.find(function(d){ return d.id === id; });
@@ -3924,15 +3999,23 @@ function renderTemporalCharts(id, c){
 
     // Network-level charts (existing D.e)
     html += '<div class="temporal-section-title" style="margin-top:12px">\u{1F310} Network Market Backdrop</div>' +
-        '<div class="temporal-section-sub">Network-level data from ' + D.e.length + ' epochs (' + D.e[0].d + ' \u2192 ' + D.e[D.e.length-1].d + ') \u00B7 Shown as market backdrop for ' + c.label + '</div>' +
+        '<div class="temporal-section-sub">Network-level data from ' + D.e.length + ' epochs (' + D.e[0].d + ' \u2192 ' + D.e[D.e.length-1].d + ') \u00B7 Same network-wide series for every selected category in the current build.</div>' +
         '<div class="temporal-charts-grid">' +
             '<div class="temporal-chart-box"><h4>Priority Fees + MEV Over Time (SOL per epoch)</h4><div class="temporal-chart-wrap"><canvas id="chart-temp-fees"></canvas></div></div>' +
             '<div class="temporal-chart-box"><h4>Network Fee Revenue Over Time (USD per epoch)</h4><div class="temporal-chart-wrap"><canvas id="chart-temp-revenue"></canvas></div></div>' +
         '</div>';
 
+    html += '<div class="temporal-section-title" style="margin-top:12px">General Segment Market View</div>' +
+        '<div class="temporal-section-sub">Artifact-wide segment comparison from the active AOT core universe. These charts stay fixed when switching categories and reuse the same per-program segment breakdown across all three metrics.</div>' +
+        '<div class="temporal-charts-grid" style="margin-top:8px;">' +
+            '<div class="temporal-chart-box"><h4>Non-base fee/CU by Program Segment</h4><div class="temporal-chart-wrap"><canvas id="chart-seg-fcu"></canvas></div></div>' +
+            '<div class="temporal-chart-box"><h4>CU / active block by Program Segment</h4><div class="temporal-chart-wrap"><canvas id="chart-seg-cu-active"></canvas></div></div>' +
+            '<div class="temporal-chart-box"><h4>Total fees / active block by Program Segment</h4><div class="temporal-chart-wrap"><canvas id="chart-seg-fees-active"></canvas></div></div>' +
+        '</div>';
+
     // Data source notice (replaces the old PLANNED gap)
     html += '<div style="font-size:9px;color:var(--text2);padding:6px 8px;background:#080a0c;border:1px solid #12141a;border-radius:4px;font-family:var(--font-mono);margin-top:6px;line-height:1.7;">' +
-        '<span style="color:var(--text-mid)">Data sources:</span> Per-category daily = not loaded (awaiting dedicated upstream artifact) \u00B7 Network epochs = <code>D.e</code> (' + D.e.length + ' epochs)' +
+        '<span style="color:var(--text-mid)">Data sources:</span> Per-category daily = not loaded (awaiting dedicated upstream artifact) \u00B7 Network epochs = <code>D.e</code> (' + D.e.length + ' epochs) \u00B7 Segment charts = active <code>aot + both</code> artifact rows grouped by <code>segment_key</code>' +
     '</div>';
 
     html += '</div>';
@@ -3944,6 +4027,7 @@ function renderTemporalCharts(id, c){
         if(catDaily.length > 0) drawTemporalCatCU(catDaily, catColor);
         drawTemporalFees();
         drawTemporalRevenue();
+        renderSegmentBackdropCharts();
     });
 }
 
@@ -4696,7 +4780,7 @@ function toggleRawDB(){
     el.style.display = visible ? 'none' : 'block';
     var btn = document.getElementById('sim-raw-toggle-btn');
     if(btn) btn.textContent = visible ? '\uD83D\uDCCB Inspect Raw Program Data' : '\u2715 Hide Raw Data';
-    if(!visible && cF) setTimeout(function(){ cF.resize(); }, 100);
+    if(!visible) setTimeout(function(){ [cSegFcu,cSegCuActive,cSegFeesActive].forEach(function(c){ if(c) c.resize(); }); }, 100);
 }
 
 // ── Peak toggle (WIP) ──
