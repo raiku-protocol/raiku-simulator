@@ -445,6 +445,19 @@ details[open] summary::before { transform:rotate(90deg); }
 /* Block builder */
 .bb-section { padding:16px; background:#0c0d12; border:1px solid var(--card-border); border-radius:var(--radius); margin-bottom:var(--gap); }
 .bb-fill-bar { height:32px; background:#0a0b10; border-radius:6px; overflow:hidden; display:flex; margin-bottom:12px; border:1px solid #1a1c22; position:relative; }
+.bb-header { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:12px; }
+.bb-header-copy { min-width:0; }
+.bb-arb-toggle { display:flex; align-items:center; gap:10px; padding:8px 10px; background:#0e1018; border:1px solid #201a33; border-radius:10px; flex-shrink:0; }
+.bb-arb-toggle-copy { display:flex; flex-direction:column; gap:2px; }
+.bb-arb-toggle-label { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:#C8B5FF; font-family:var(--font-mono); }
+.bb-arb-toggle-sub { font-size:9px; color:var(--text2); font-family:var(--font-mono); }
+.bb-arb-switch { position:relative; display:inline-block; width:40px; height:22px; flex-shrink:0; }
+.bb-arb-switch input { opacity:0; width:0; height:0; position:absolute; }
+.bb-arb-slider { position:absolute; inset:0; background:#161820; border:1px solid #2a2340; border-radius:999px; transition:all .2s ease; cursor:pointer; }
+.bb-arb-slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; top:2px; background:#8A8F9C; border-radius:50%; transition:transform .2s ease, background .2s ease; box-shadow:0 1px 4px rgba(0,0,0,.35); }
+.bb-arb-switch input:checked + .bb-arb-slider { background:rgba(167,139,250,.22); border-color:#A78BFA; box-shadow:0 0 0 1px rgba(167,139,250,.15) inset; }
+.bb-arb-switch input:checked + .bb-arb-slider::before { transform:translateX(18px); background:#A78BFA; }
+.bb-arb-switch input:disabled + .bb-arb-slider { opacity:.5; cursor:not-allowed; }
 .bb-fill-seg { height:100%; transition:width .3s; display:flex; align-items:center; justify-content:center; font-size:9px; font-family:var(--font-mono); color:#000; font-weight:600; overflow:hidden; min-width:0; }
 .bb-fill-empty { flex:1; display:flex; align-items:center; justify-content:center; font-size:9px; color:var(--text2); font-family:var(--font-mono); }
 .bb-fragments { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
@@ -1136,7 +1149,7 @@ details[open] summary::before { transform:rotate(90deg); }
         <!-- Inclusions / Exclusions -->
         <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;">
             <div style="margin-bottom:6px;"><span style="color:#8ddb6a;font-size:14px;">&#9745;</span> <strong style="color:var(--text);">What this includes:</strong> Only Solana programs flagged as <em>AOT-relevant</em> in the canonical upstream taxonomy. Non-base (priority + MEV / JIT) and total fees (base + priority + MEV / JIT) over a 30-day period, weighted by CU consumption.</div>
-            <div style="margin-bottom:6px;"><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">What this excludes from core display:</strong> `neither` and `potential` populations. JIT arbitrage/searcher programs are benchmarked separately.</div>
+            <div style="margin-bottom:6px;"><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">What this excludes from core display:</strong> `neither` and `potential` populations. JIT arbitrage/searcher programs are shown as a separate arbitrage-bot layer.</div>
             <div style="color:var(--text2);font-style:italic;">If <code>market_maker</code> or <code>quantitative_desk</code> are absent in the loaded taxonomy/economics, they are explicitly reported in methodology notes rather than implied as active groups.</div>
         </div>
     </div>
@@ -1388,8 +1401,22 @@ details[open] summary::before { transform:rotate(90deg); }
 <!-- RIGHT PANEL: Block Builder + Output -->
 <div class="sim-main">
     <div class="section fade-in fade-in-1" style="margin-bottom:var(--gap);">
-        <h2 style="margin-bottom:4px;">Block Builder</h2>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:12px;">Allocate blockspace fragments to customer categories. Fragments are <b style="color:var(--text-mid)">sorted by fee/CU descending</b> and fill the block in order until capacity is exhausted.</div>
+        <div class="bb-header">
+            <div class="bb-header-copy">
+                <h2 style="margin-bottom:4px;">Block Builder</h2>
+                <div style="font-size:11px;color:var(--text2);">Allocate blockspace fragments to customer categories. Fragments are <b style="color:var(--text-mid)">sorted by fee/CU descending</b> and fill the block in order until capacity is exhausted.</div>
+            </div>
+            <div class="bb-arb-toggle">
+                <div class="bb-arb-toggle-copy">
+                    <div class="bb-arb-toggle-label">Include arbitrage bot</div>
+                    <div class="bb-arb-toggle-sub" id="bb-arb-toggle-sub">Excluded by default from core AOT customer mix</div>
+                </div>
+                <label class="bb-arb-switch" title="Include arbitrage bot in the block simulation">
+                    <input type="checkbox" id="bb-arb-toggle" onchange="toggleArbBotInBuilder(this.checked)">
+                    <span class="bb-arb-slider"></span>
+                </label>
+            </div>
+        </div>
         <div class="bb-fill-bar" id="bb-fill-bar"></div>
         <div class="bb-fragments" id="bb-fragments" style="position:relative;"></div>
     </div>
@@ -1401,7 +1428,7 @@ details[open] summary::before { transform:rotate(90deg); }
 <!-- C. CATEGORY EXPLORER (reference data for fragment selection) -->
 <div class="section fade-in fade-in-2">
     <h2 style="margin-bottom:8px;">Category Explorer</h2>
-    <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">Fixed canonical order: <strong>Prop AMM, Cranker, Oracle, Depin, Payments, DEX, Lending, Perps, Bridge, NFT, Gaming</strong>. Core scope uses <strong>aot + both</strong>. Benchmark appears separately as <strong>Arb Bot</strong> only when benchmark rows are present.</div>
+    <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">Fixed canonical order: <strong>Prop AMM, Cranker, Oracle, Depin, Payments, DEX, Lending, Perps, Bridge, NFT, Gaming</strong>. Core scope uses <strong>aot + both</strong>. The <strong>arbitrage-bot</strong> layer appears separately and stays excluded by default unless explicitly toggled on in Block Builder.</div>
 
     <!-- Normal / Peak toggle -->
     <div class="regime-toggle">
@@ -1456,7 +1483,7 @@ details[open] summary::before { transform:rotate(90deg); }
                     <strong>Input artifact:</strong> <code>data/aot_programs.v1.js</code> (produced upstream from canonical revenue-model outputs)<br>
                     <strong>Schema:</strong> <code>aot_programs.v1</code><br>
                     <strong>Period:</strong> 30-day window from artifact metadata<br>
-                    <strong>Programs:</strong> Artifact rows with CU &gt; 0 (core: <code>aot + both</code>, benchmark: <code>jit</code> where available)
+                    <strong>Programs:</strong> Artifact rows with CU &gt; 0 (core: <code>aot + both</code>, separate arbitrage-bot layer: <code>jit</code> where available)
                 </div>
             </div>
             <div class="meth-card">
@@ -1477,7 +1504,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="meth-card-title">Category Mapping</div>
                 <div class="meth-card-body">
                     Runtime groups consume <code>segment_key</code> directly from the artifact contract and follow the frozen UI structure.<br>
-                    <span class="meth-mapping">Core groups: <code>prop_amm</code>, <code>cranker</code>, <code>oracle</code>, <code>depin</code>, <code>payments</code>, <code>dex</code> (aggregator + amm_family + orderbook), <code>lending</code>, <code>perps</code>, <code>bridge</code>, <code>nft</code>, <code>gaming</code>. Benchmark group is separated: <code>arb_bot</code> (when benchmark rows exist).</span>
+                    <span class="meth-mapping">Core groups: <code>prop_amm</code>, <code>cranker</code>, <code>oracle</code>, <code>depin</code>, <code>payments</code>, <code>dex</code> (aggregator + amm_family + orderbook), <code>lending</code>, <code>perps</code>, <code>bridge</code>, <code>nft</code>, <code>gaming</code>. Separate arbitrage-bot layer: <code>arb_bot</code> (when JIT rows exist).</span>
                     <span class="meth-mapping" id="sim-absent-actors-note"></span>
                 </div>
             </div>
@@ -1638,7 +1665,7 @@ const CORE_GROUP_SPECS = [
 ];
 const BENCHMARK_GROUP_SPEC = {
     id: 'arb_bot',
-    label: 'Arb Bot',
+    label: 'Arbitrage Bot',
     segments: ['arbitrage_bot', 'arb_bot', 'trading_bots'],
     color: '#A78BFA'
 };
@@ -1659,7 +1686,7 @@ const CAVEAT_NOTES = {
     bridge: 'Often sparse and bursty; percentile spread matters.',
     nft: 'Category currently not populated in this artifact window.',
     gaming: 'Category currently not populated in this artifact window.',
-    benchmark_arb_bot: 'Benchmark only; separate from core AOT application story.'
+    benchmark_arb_bot: 'Arbitrage-bot layer only; shown separately from the core AOT application story.'
 };
 const BENCHMARK_SEGMENT_KEYS = new Set(BENCHMARK_GROUP_SPEC.segments);
 
@@ -1747,7 +1774,7 @@ const _scenarioP75Included = _quantile(_scenarioPool.map(function(p){ return Num
 const _scenarioP80TotalIncluded = _quantile(_scenarioPool.map(function(p){ return Number(p.fpc_tot) || 0; }), 0.80);
 const _scenarioP90TotalIncluded = _quantile(_scenarioPool.map(function(p){ return Number(p.fpc_tot) || 0; }), 0.90);
 const _scenarioWinsor = _winsorizedWeightedNonBase(_scenarioPool, 0.05, 0.95);
-const _scenarioPopulationLabel = 'Population: core only (aot + both), is_aot_relevant=true, cu>0; benchmark excluded.';
+const _scenarioPopulationLabel = 'Population: core only (aot + both), is_aot_relevant=true, cu>0; arbitrage-bot rows excluded.';
 
 const _fConRaw = Number(_scenarioActiveAgg.p25NonBase || 0);
 const _fCon = +Math.max(0.10, _fConRaw).toFixed(2);
@@ -2706,7 +2733,7 @@ function initAotFcuSection(){
     const optS = document.getElementById('aot-sc-opt-sentence'); if (optS) optS.textContent = 'Uses the full observed fee burden across the included application categories, including base fees, and displays it as 1.50 lam/CU for the strong upside case.';
     const bullS = document.getElementById('aot-sc-bull-sentence'); if (bullS) bullS.textContent = 'Uses the P75 active payer non-base fee/CU anchor as the high-payer stress case, displayed at 2.00 lam/CU.';
 
-    const includedCategoriesText = 'Included application categories are Prop AMM, DEX (aggregator, AMM pools, and orderbook), lending, oracle, bridge, perps, cranker-style programs, depin, payments, NFT, and gaming. Only programs with positive compute usage over the 30-day window are included. Arb-bot benchmark rows are excluded, and categories such as unknown and other are not used in scenario construction.';
+    const includedCategoriesText = 'Included application categories are Prop AMM, DEX (aggregator, AMM pools, and orderbook), lending, oracle, bridge, perps, cranker-style programs, depin, payments, NFT, and gaming. Only programs with positive compute usage over the 30-day window are included. Arbitrage-bot rows are excluded from the core scenario set, and categories such as unknown and other are not used in scenario construction.';
     const representativeText = 'Representative names in this included set include BisonFi and HumidiFi (Prop AMM), Jupiter and Pump.fun programs (DEX), and Kamino programs (lending).';
     const activePayerDefinition = 'Active payers are included application programs with non-base fee/CU > 0 over the 30-day window.';
     const activePayerAsterisk = '* Active payer = priority fees + MEV / JIT fees > 0 over the 30-day window.';
@@ -3175,6 +3202,54 @@ function getProgramTouchedCuPerBlock(p){
     return den > 0 ? (p.cu * 1e9 / den) : 0;
 }
 
+function getArbBotProfile(){
+    if(!_jitBenchmarkProgs || !_jitBenchmarkProgs.length) return null;
+    var touchedRows = _jitBenchmarkProgs.filter(function(p){
+        return Number.isFinite(p.blocks_touched_30d) && p.blocks_touched_30d > 0;
+    });
+    var sourceRows = touchedRows.length ? touchedRows : _jitBenchmarkProgs;
+    var sourceTouched = sourceRows.reduce(function(sum, p){
+        return sum + (Number.isFinite(p.blocks_touched_30d) && p.blocks_touched_30d > 0 ? p.blocks_touched_30d : 0);
+    }, 0);
+    var fallbackDen = SY * 30 / 365;
+    var den = sourceTouched > 0 ? sourceTouched : (sourceRows.length * fallbackDen);
+    var totalCu = sourceRows.reduce(function(sum, p){ return sum + ((p.cu || 0) * 1e9); }, 0);
+    var totalNonBase = sourceRows.reduce(function(sum, p){ return sum + (p.pf || 0) + (p.jt || 0); }, 0);
+    return {
+        key: 'arb-bot-default',
+        kind: 'median',
+        label: 'Arbitrage Bot',
+        sourceLabel: 'Arbitrage bot benchmark profile',
+        cu: den > 0 ? (totalCu / den) : 0,
+        feePerCU: _benchmarkAgg.weightedNonBase || 0,
+        nonBaseFeesPerBlock: den > 0 ? (totalNonBase / den) : 0,
+        usesTouchedBlocks: sourceTouched > 0
+    };
+}
+
+function getBuilderCatData(catId, data){
+    if(catId === BENCHMARK_GROUP_SPEC.id){
+        var arbProfile = getArbBotProfile();
+        if(!arbProfile) return null;
+        return {
+            id: BENCHMARK_GROUP_SPEC.id,
+            label: BENCHMARK_GROUP_SPEC.label,
+            color: BENCHMARK_GROUP_SPEC.color,
+            profileFallbackUsed: false,
+            medianProfile: arbProfile,
+            meanProfile: arbProfile,
+            programOptions: [],
+            isArbBot: true
+        };
+    }
+    return (data || getCatData()).find(function(d){ return d.id === catId; }) || null;
+}
+
+function getBuilderCatSpec(catId){
+    if(catId === BENCHMARK_GROUP_SPEC.id) return BENCHMARK_GROUP_SPEC;
+    return BIZ_CATEGORIES.find(function(c){ return c.id === catId; }) || null;
+}
+
 // ── Build category-level aggregates from external AOT artifact ──
 function buildCategoryData(){
     var aotProgs = _aotProgs.slice();
@@ -3346,7 +3421,8 @@ function renderBenchmarkBlock(){
     var el = document.getElementById('sim-benchmark-block');
     if(!el) return;
     var b = _benchmarkAgg || {n:0,weightedNonBase:0,weightedTotal:0,medianNonBase:0,p25NonBase:0,p75NonBase:0,cu:0};
-    var toggleLabel = _showBenchmarkBlock ? 'Hide benchmark' : 'Show benchmark';
+    var arbProfile = getArbBotProfile();
+    var toggleLabel = _showBenchmarkBlock ? 'Hide arbitrage bot details' : 'Show arbitrage bot details';
     var html = '<button class="bb-add-btn" style="margin-top:0;" onclick="toggleBenchmarkBlock()">' + toggleLabel + '</button>';
     if(!_showBenchmarkBlock){
         el.innerHTML = html;
@@ -3354,21 +3430,24 @@ function renderBenchmarkBlock(){
     }
     if(!b.n){
         el.innerHTML = html + '<div style="margin-top:8px;padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;font-size:11px;color:var(--text2);">' +
-            '<strong style="color:var(--text);">Benchmark — Arb Bot:</strong> benchmark rows are not present in the current artifact. The chart/table benchmark line auto-activates when benchmark-enriched data is loaded.' +
+            '<strong style="color:var(--text);">Arbitrage Bot Layer:</strong> arbitrage-bot rows are not present in the current artifact. The chart/table comparison line auto-activates when benchmark-enriched data is loaded.' +
         '</div>';
         return;
     }
     el.innerHTML = html +
         '<div style="margin-top:8px;padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;">' +
-            '<div style="font-size:11px;color:#A78BFA;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Benchmark — Arb Bot</div>' +
-            '<div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Shown separately and excluded from core AOT customer story.</div>' +
+            '<div style="font-size:11px;color:#A78BFA;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Arbitrage Bot Layer</div>' +
+            '<div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Shown separately and excluded by default from the core AOT customer story. Non-base means priority fees plus MEV / JIT tips.</div>' +
             '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-family:var(--font-mono);font-size:11px;">' +
                 '<div><span style="color:var(--text2);">Programs</span><br><span style="color:var(--text);font-weight:600;">' + b.n + '</span></div>' +
-                '<div><span style="color:var(--text2);">NB fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + b.weightedNonBase.toFixed(3) + ' lam</span></div>' +
+                '<div><span style="color:var(--text2);">Non-base fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + b.weightedNonBase.toFixed(3) + ' lam</span></div>' +
                 '<div><span style="color:var(--text2);">Total fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + b.weightedTotal.toFixed(3) + ' lam</span></div>' +
-                '<div><span style="color:var(--text2);">Median NB</span><br><span style="color:var(--text);font-weight:600;">' + b.medianNonBase.toFixed(3) + ' lam</span></div>' +
-                '<div><span style="color:var(--text2);">p25 / p75</span><br><span style="color:var(--text);font-weight:600;">' + b.p25NonBase.toFixed(3) + ' / ' + b.p75NonBase.toFixed(3) + '</span></div>' +
+                '<div><span style="color:var(--text2);">Median non-base</span><br><span style="color:var(--text);font-weight:600;">' + b.medianNonBase.toFixed(3) + ' lam</span></div>' +
+                '<div><span style="color:var(--text2);">p25 / p75 non-base</span><br><span style="color:var(--text);font-weight:600;">' + b.p25NonBase.toFixed(3) + ' / ' + b.p75NonBase.toFixed(3) + '</span></div>' +
+                '<div><span style="color:var(--text2);">Avg CU / active block</span><br><span style="color:var(--text);font-weight:600;">' + fmtHuman(arbProfile ? arbProfile.cu : 0) + ' CU</span></div>' +
+                '<div><span style="color:var(--text2);">Implied non-base fees / active block</span><br><span style="color:var(--text);font-weight:600;">' + ((arbProfile && Number.isFinite(arbProfile.nonBaseFeesPerBlock)) ? arbProfile.nonBaseFeesPerBlock.toFixed(6) : '0.000000') + ' SOL</span></div>' +
             '</div>' +
+            '<div style="font-size:9px;color:var(--text2);margin-top:8px;font-family:var(--font-mono);">' + ((arbProfile && arbProfile.usesTouchedBlocks) ? 'Active-block metrics use touched-block semantics from benchmark rows when available.' : 'Active-block metrics fall back to 30d window averages when touched-block counts are unavailable.') + '</div>' +
         '</div>';
 }
 function toggleBenchmarkBlock(){
@@ -3382,7 +3461,7 @@ function renderCaveatLegend(){
     var items = CORE_GROUP_SPECS.map(function(g){
         return '<div style="font-size:10px;color:var(--text2);"><strong style="color:' + g.color + ';">' + g.label + ':</strong> ' + (CAVEAT_NOTES[g.id] || '') + '</div>';
     }).join('');
-    items += '<div style="font-size:10px;color:var(--text2);"><strong style="color:#A78BFA;">Benchmark:</strong> ' + CAVEAT_NOTES.benchmark_arb_bot + '</div>';
+    items += '<div style="font-size:10px;color:var(--text2);"><strong style="color:#A78BFA;">Arbitrage bot:</strong> ' + CAVEAT_NOTES.benchmark_arb_bot + '</div>';
     el.innerHTML =
         '<details style="padding:8px 10px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;">' +
             '<summary style="cursor:pointer;font-size:10px;color:var(--text2);font-family:var(--font-mono);">Method note: interpretation cues by category</summary>' +
@@ -3896,12 +3975,45 @@ function updateCatFcuChart(){
 
 // ── Block Builder v2 — Sort-Fill-Stop logic ──
 var _bbFragments = []; // [{catId, profileKey, cu, feePerCU, userAdjustedCU: bool, userAdjustedFee: bool}]
+var _includeArbBotInBuilder = false;
 var cBlockMix = null;
 var SLOTS_PER_EPOCH = 432000; // Solana epoch length
 
+function syncArbBotFragment(){
+    var arbIdx = _bbFragments.findIndex(function(f){ return f.catId === BENCHMARK_GROUP_SPEC.id; });
+    if(!_includeArbBotInBuilder || !(_benchmarkAgg && _benchmarkAgg.n > 0)){
+        if(arbIdx >= 0) _bbFragments.splice(arbIdx, 1);
+        return;
+    }
+    var arbCat = getBuilderCatData(BENCHMARK_GROUP_SPEC.id);
+    var arbProfile = arbCat ? getFragmentProfile(arbCat, 'median') : null;
+    if(!arbProfile) return;
+    var arbCu = arbProfile.cu > 0 ? Math.round(arbProfile.cu) : 1000;
+    if(arbIdx === -1){
+        _bbFragments.push({
+            catId: BENCHMARK_GROUP_SPEC.id,
+            profileKey: arbProfile.key,
+            cu: arbCu,
+            feePerCU: arbProfile.feePerCU || 0,
+            userAdjustedCU: false,
+            userAdjustedFee: false
+        });
+        return;
+    }
+    _bbFragments[arbIdx].profileKey = arbProfile.key;
+    if(!_bbFragments[arbIdx].userAdjustedCU) _bbFragments[arbIdx].cu = arbCu;
+    if(!_bbFragments[arbIdx].userAdjustedFee) _bbFragments[arbIdx].feePerCU = arbProfile.feePerCU || 0;
+}
+
+function toggleArbBotInBuilder(force){
+    _includeArbBotInBuilder = typeof force === 'boolean' ? force : !_includeArbBotInBuilder;
+    syncArbBotFragment();
+    renderBlockBuilder();
+}
+
 function addFragment(catId){
     var data = getCatData();
-    var c = data.find(function(d){ return d.id === catId; });
+    var c = getBuilderCatData(catId, data);
     if(!c) return;
     var profile = getFragmentProfile(c, 'median');
     var defaultCU = (profile && profile.cu > 0) ? Math.round(profile.cu) : 1000;
@@ -3939,7 +4051,7 @@ function updateFragment(idx, field, value){
 function applyFragmentProfile(idx, profileKey){
     if(!_bbFragments[idx]) return;
     var data = getCatData();
-    var c = data.find(function(d){ return d.id === _bbFragments[idx].catId; });
+    var c = getBuilderCatData(_bbFragments[idx].catId, data);
     var profile = getFragmentProfile(c, profileKey);
     if(!profile) return;
     _bbFragments[idx].profileKey = profile.key;
@@ -3953,7 +4065,7 @@ function applyFragmentProfile(idx, profileKey){
 function resetFragment(idx){
     if(!_bbFragments[idx]) return;
     var data = getCatData();
-    var c = data.find(function(d){ return d.id === _bbFragments[idx].catId; });
+    var c = getBuilderCatData(_bbFragments[idx].catId, data);
     var profile = getFragmentProfile(c, _bbFragments[idx].profileKey);
     if(profile){
         _bbFragments[idx].feePerCU = profile.feePerCU || 0;
@@ -3969,8 +4081,19 @@ function resetFragment(idx){
 
 function renderBlockBuilder(){
     if(!_bbFragments || !Array.isArray(_bbFragments)) return;
+    syncArbBotFragment();
     var sp = getSimParams();
     var avail = CB * sp.b; // total available CU
+    var arbToggle = document.getElementById('bb-arb-toggle');
+    var arbToggleSub = document.getElementById('bb-arb-toggle-sub');
+    if(arbToggle){
+        arbToggle.checked = !!_includeArbBotInBuilder;
+        arbToggle.disabled = !(_benchmarkAgg && _benchmarkAgg.n > 0);
+    }
+    if(arbToggleSub){
+        if(!(_benchmarkAgg && _benchmarkAgg.n > 0)) arbToggleSub.textContent = 'No arbitrage-bot rows in the current artifact';
+        else arbToggleSub.textContent = _includeArbBotInBuilder ? 'Included intentionally as a separate bot layer' : 'Excluded by default from core AOT customer mix';
+    }
     // SORT fragments by fee/CU descending (greedy auction fill)
     var sortedIdxs = _bbFragments.map(function(_,i){ return i; });
     sortedIdxs.sort(function(a,b){ return _bbFragments[b].feePerCU - _bbFragments[a].feePerCU; });
@@ -4033,7 +4156,8 @@ function renderBlockBuilder(){
             if(!fm.fits || fm.usedCU <= 0) return;
             var pct = avail > 0 ? (fm.usedCU / avail * 100) : 0;
             var col = CAT_COLORS[f.catId] || '#555';
-            var cat = BIZ_CATEGORIES.find(function(c){ return c.id===f.catId; });
+            if(f.catId === BENCHMARK_GROUP_SPEC.id) col = BENCHMARK_GROUP_SPEC.color;
+            var cat = getBuilderCatSpec(f.catId);
             html += '<div class="bb-fill-seg" style="width:' + pct + '%;background:' + col + '" title="' + (cat?cat.label:f.catId) + ': ' + fmtHuman(fm.usedCU) + ' CU (' + pct.toFixed(1) + '%)">' + (pct > 8 ? (cat?cat.label.substring(0,8):'') : '') + '</div>';
         });
         var emptyPct = Math.max(0, 100 - (avail > 0 ? totalUsed/avail*100 : 0));
@@ -4048,10 +4172,11 @@ function renderBlockBuilder(){
         var showedDivider = false;
         sortedIdxs.forEach(function(origIdx, rank){
             var f = _bbFragments[origIdx];
-            var cat = BIZ_CATEGORIES.find(function(c){ return c.id===f.catId; });
-            var catData = data.find(function(d){ return d.id===f.catId; });
+            var cat = getBuilderCatSpec(f.catId);
+            var catData = getBuilderCatData(f.catId, data);
             var profile = getFragmentProfile(catData, f.profileKey);
             var col = CAT_COLORS[f.catId] || '#555';
+            if(f.catId === BENCHMARK_GROUP_SPEC.id) col = BENCHMARK_GROUP_SPEC.color;
             var fm = fitMap[origIdx] || { fits: false, usedCU: 0 };
             var naturalFeeLamports = Math.round(fm.usedCU * f.feePerCU);
             var effectiveFeeLamports = fm.usedCU > 0 ? Math.max(naturalFeeLamports, minBidLamports) : 0;
@@ -4085,7 +4210,7 @@ function renderBlockBuilder(){
             var profileTag = profile ? '<span class="bf-tag from-data">' + escHtml(profile.sourceLabel) + '</span>' : '';
             var customTag = isCustom ? '<span class="bf-tag custom">Customized</span>' : '';
             var profileOptionsHtml = '';
-            if(catData){
+            if(catData && !catData.isArbBot){
                 var options = [catData.medianProfile, catData.meanProfile].concat(catData.programOptions || []);
                 profileOptionsHtml = options.map(function(opt){
                     if(!opt) return '';
@@ -4094,7 +4219,7 @@ function renderBlockBuilder(){
             }
 
             html += '<div class="bb-frag' + (isRejected ? ' rejected' : '') + '" style="border-left:3px solid ' + col + '">' +
-                '<button class="bf-remove" onclick="removeFragment(' + origIdx + ')">&times;</button>' +
+                (f.catId === BENCHMARK_GROUP_SPEC.id ? '' : '<button class="bf-remove" onclick="removeFragment(' + origIdx + ')">&times;</button>') +
                 rankBadge +
                 '<div class="bf-cat" style="color:' + col + '">' + (cat?cat.label:f.catId) + '</div>' +
 
@@ -4102,9 +4227,14 @@ function renderBlockBuilder(){
                 '<div class="bf-inputs">' +
                     '<div class="bf-input-group">' +
                         '<span class="bf-label">Client profile</span>' +
-                        '<select onchange="applyFragmentProfile(' + origIdx + ',this.value)">' + profileOptionsHtml + '</select>' +
-                        profileTag +
-                        customTag +
+                        (catData && catData.isArbBot ?
+                            '<div style="font-size:11px;font-family:var(--font-mono);color:var(--text);padding:6px 0 2px;">Arbitrage bot benchmark profile</div>' +
+                            '<span class="bf-tag from-data">Separate layer</span>' +
+                            customTag :
+                            '<select onchange="applyFragmentProfile(' + origIdx + ',this.value)">' + profileOptionsHtml + '</select>' +
+                            profileTag +
+                            customTag
+                        ) +
                     '</div>' +
                     profileNote +
                     '<div class="bf-input-group">' +
@@ -4194,6 +4324,7 @@ function renderBlockBuilder(){
 
 function initBlockBuilder(){
     _bbFragments = [];
+    _includeArbBotInBuilder = false;
     _simParams = null; // reset to re-seed from sidebar
     if(BIZ_CATEGORIES.length) addFragment(BIZ_CATEGORIES[0].id);
 }
@@ -4238,6 +4369,7 @@ window.updateSimParam = updateSimParam;
 window.toggleRawDB = toggleRawDB;
 window.togglePeak = togglePeak;
 window.toggleBenchmarkBlock = toggleBenchmarkBlock;
+window.toggleArbBotInBuilder = toggleArbBotInBuilder;
 
 // Initialize simulation module (after all definitions are assigned)
 initCatFcuChart(); initCategoryExplorer(); initBlockBuilder();
