@@ -3255,6 +3255,7 @@ function buildArbBotDistribution(values, stats){
         return {
             from: Math.pow(10, from),
             to: Math.pow(10, to),
+            center: Math.pow(10, (from + to) / 2),
             count: 0
         };
     });
@@ -3283,10 +3284,59 @@ function buildArbBotDistribution(values, stats){
     };
 }
 
+function buildArbBotSizeProfiles(rows, stats){
+    if(!rows || !rows.length) return { profiles: [], summaries: [] };
+    var defs = [
+        { key: 'small', label: 'Small', min: -Infinity, max: stats.p25CuPerBlock, rangeLabel: '≤ P25 CU' },
+        { key: 'medium', label: 'Medium', min: stats.p25CuPerBlock, max: stats.medianCuPerBlock, rangeLabel: 'P25–P50 CU' },
+        { key: 'large', label: 'Large', min: stats.medianCuPerBlock, max: stats.p75CuPerBlock, rangeLabel: 'P50–P75 CU' },
+        { key: 'xl', label: 'XL', min: stats.p75CuPerBlock, max: Infinity, rangeLabel: '> P75 CU' }
+    ];
+    var profiles = [];
+    var summaries = [];
+    defs.forEach(function(def, idx){
+        var members = rows.filter(function(row){
+            if(idx === 0) return row.cuActiveBlock <= def.max;
+            if(idx === defs.length - 1) return row.cuActiveBlock > def.min;
+            return row.cuActiveBlock > def.min && row.cuActiveBlock <= def.max;
+        });
+        if(!members.length) return;
+        var cuVals = members.map(function(row){ return row.cuActiveBlock; });
+        var feeVals = members.map(function(row){ return row.feePerCU; });
+        profiles.push({
+            key: def.key,
+            kind: 'bucket',
+            label: def.label,
+            sourceLabel: def.label + ' size bucket',
+            cu: percentile(cuVals, 50),
+            feePerCU: percentile(feeVals, 50)
+        });
+        summaries.push({
+            key: def.key,
+            label: def.label,
+            rangeLabel: def.rangeLabel,
+            count: members.length,
+            min: Math.min.apply(null, cuVals),
+            max: Math.max.apply(null, cuVals),
+            cu: percentile(cuVals, 50),
+            feePerCU: percentile(feeVals, 50)
+        });
+    });
+    return { profiles: profiles, summaries: summaries };
+}
+
 function getArbBotBuilderData(){
     if(!_jitBenchmarkProgs || !_jitBenchmarkProgs.length) return null;
-    var cuValues = _jitBenchmarkProgs.map(function(p){ return getProgramTouchedCuPerBlock(p); }).filter(function(v){ return v > 0; });
-    var feeValues = _jitBenchmarkProgs.map(function(p){ return p.cu > 0 ? (p.fpc_nb || 0) : 0; }).filter(function(v){ return v >= 0; });
+    var processedRows = _jitBenchmarkProgs.map(function(p){
+        return {
+            cuActiveBlock: getProgramTouchedCuPerBlock(p),
+            feePerCU: p.cu > 0 ? (p.fpc_nb || 0) : 0
+        };
+    }).filter(function(row){
+        return row.cuActiveBlock > 0 && row.feePerCU >= 0;
+    });
+    var cuValues = processedRows.map(function(row){ return row.cuActiveBlock; });
+    var feeValues = processedRows.map(function(row){ return row.feePerCU; });
     var arbProfile = getArbBotProfile();
     if(!cuValues.length || !feeValues.length || !arbProfile) return null;
     var stats = {
@@ -3299,6 +3349,7 @@ function getArbBotBuilderData(){
         meanFeePerCU: mean(feeValues),
         p75FeePerCU: percentile(feeValues, 75)
     };
+    var sizeBuckets = buildArbBotSizeProfiles(processedRows, stats);
     return {
         id: BENCHMARK_GROUP_SPEC.id,
         label: BENCHMARK_GROUP_SPEC.label,
@@ -3336,11 +3387,16 @@ function getArbBotBuilderData(){
             cu: stats.p75CuPerBlock,
             feePerCU: stats.p75FeePerCU
         },
+        smallProfile: sizeBuckets.profiles.find(function(p){ return p.key === 'small'; }) || null,
+        mediumProfile: sizeBuckets.profiles.find(function(p){ return p.key === 'medium'; }) || null,
+        largeProfile: sizeBuckets.profiles.find(function(p){ return p.key === 'large'; }) || null,
+        xlProfile: sizeBuckets.profiles.find(function(p){ return p.key === 'xl'; }) || null,
         programOptions: [],
         isArbBot: true,
         arbInfo: arbProfile,
         arbStats: stats,
         distribution: buildArbBotDistribution(feeValues, stats),
+        sizeBuckets: sizeBuckets.summaries,
         rowCount: feeValues.length
     };
 }
@@ -3533,10 +3589,12 @@ function renderBenchmarkBlock(){
     var toggleLabel = _showBenchmarkBlock ? 'Hide arbitrage bot details' : 'Show arbitrage bot details';
     var html = '<button class="bb-add-btn" style="margin-top:0;" onclick="toggleBenchmarkBlock()">' + toggleLabel + '</button>';
     if(!_showBenchmarkBlock){
+        if(cArbBotDistribution) { cArbBotDistribution.destroy(); cArbBotDistribution = null; }
         el.innerHTML = html;
         return;
     }
     if(!b.n){
+        if(cArbBotDistribution) { cArbBotDistribution.destroy(); cArbBotDistribution = null; }
         el.innerHTML = html + '<div style="margin-top:8px;padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;font-size:11px;color:var(--text2);">' +
             '<strong style="color:var(--text);">Arbitrage Bot Layer:</strong> arbitrage-bot rows are not present in the current artifact. The chart/table comparison line auto-activates when benchmark-enriched data is loaded.' +
         '</div>';
@@ -3544,18 +3602,15 @@ function renderBenchmarkBlock(){
     }
     var distHtml = '';
     if(arbBuilder && arbBuilder.distribution){
-        var dist = arbBuilder.distribution;
-        var barsHtml = dist.bins.map(function(bin){
-            var h = dist.maxCount > 0 ? Math.max(6, Math.round((bin.count / dist.maxCount) * 52)) : 6;
-            return '<div title="' + fmtMetricDot(bin.from) + ' to ' + fmtMetricDot(bin.to) + ' lam/CU: ' + fmtK(bin.count) + ' bots" style="flex:1;min-width:0;height:' + h + 'px;background:linear-gradient(180deg,rgba(167,139,250,.9),rgba(192,255,56,.6));border-radius:2px 2px 0 0;opacity:' + (bin.count ? '1' : '.18') + ';"></div>';
+        var statChips = arbBuilder.distribution.markers.map(function(marker){
+            return '<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;background:#0f1218;border:1px solid #1b1f28;border-radius:999px;"><span style="display:inline-block;width:10px;height:2px;background:' + marker.color + ';box-shadow:0 0 0 1px rgba(0,0,0,.25);"></span><span style="color:var(--text-mid);">' + marker.label + '</span><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(marker.value) + ' lam/CU</span></div>';
         }).join('');
-        var markersHtml = dist.markers.map(function(marker, idx){
-            var topOffset = 2 + (idx % 2) * 14;
-            return '<div style="position:absolute;left:calc(' + marker.pos.toFixed(2) + '% - 1px);top:0;bottom:14px;width:2px;background:' + marker.color + ';box-shadow:0 0 0 1px rgba(0,0,0,.25);"></div>' +
-                '<div style="position:absolute;left:' + marker.pos.toFixed(2) + '%;top:' + topOffset + 'px;transform:translateX(-50%);padding:1px 5px;border-radius:999px;background:#0f1218;border:1px solid ' + marker.color + ';color:' + marker.color + ';font-size:9px;font-family:var(--font-mono);white-space:nowrap;">' + marker.label + '</div>';
-        }).join('');
-        var statChips = dist.markers.map(function(marker){
-            return '<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;background:#0f1218;border:1px solid #1b1f28;border-radius:999px;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + marker.color + ';"></span><span style="color:var(--text-mid);">' + marker.label + '</span><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(marker.value) + ' lam/CU</span></div>';
+        var bucketChips = (arbBuilder.sizeBuckets || []).map(function(bucket){
+            return '<div style="padding:6px 8px;background:#0f1218;border:1px solid #1b1f28;border-radius:8px;font-size:10px;font-family:var(--font-mono);">' +
+                '<div style="color:#C8B5FF;font-weight:600;">' + bucket.label + '</div>' +
+                '<div style="color:var(--text2);margin-top:2px;">' + bucket.rangeLabel + ' · ' + fmtK(bucket.count) + ' bots</div>' +
+                '<div style="color:var(--text-mid);margin-top:3px;">' + fmtCuExact(bucket.min) + '–' + fmtCuExact(bucket.max) + ' CU / active block</div>' +
+            '</div>';
         }).join('');
         distHtml =
             '<div style="margin-top:10px;padding-top:10px;border-top:1px solid #161922;">' +
@@ -3563,13 +3618,11 @@ function renderBenchmarkBlock(){
                     '<div style="font-size:10px;color:var(--text-mid);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.6px;">Non-base fee/CU distribution</div>' +
                     '<div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">' + fmtK(arbBuilder.rowCount) + ' arbitrage-bot rows · log scale</div>' +
                 '</div>' +
-                '<div style="position:relative;height:92px;padding:28px 8px 16px;background:#0d1016;border:1px solid #181c24;border-radius:8px;overflow:hidden;">' +
-                    '<div style="position:absolute;left:8px;right:8px;bottom:16px;height:52px;display:flex;align-items:flex-end;gap:2px;">' + barsHtml + '</div>' +
-                    '<div style="position:absolute;left:8px;right:8px;top:4px;bottom:16px;pointer-events:none;">' + markersHtml + '</div>' +
-                    '<div style="position:absolute;left:8px;bottom:2px;font-size:9px;color:var(--text2);font-family:var(--font-mono);">' + fmtMetricDot(dist.minValue) + '</div>' +
-                    '<div style="position:absolute;right:8px;bottom:2px;font-size:9px;color:var(--text2);font-family:var(--font-mono);">' + fmtMetricDot(dist.maxValue) + ' lam/CU</div>' +
+                '<div style="padding:8px;background:#0d1016;border:1px solid #181c24;border-radius:8px;">' +
+                    '<div style="height:220px;"><canvas id="chart-arb-bot-dist"></canvas></div>' +
                 '</div>' +
                 '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:10px;font-family:var(--font-mono);">' + statChips + '</div>' +
+                '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px;">' + bucketChips + '</div>' +
             '</div>';
     }
     el.innerHTML = html +
@@ -3589,6 +3642,117 @@ function renderBenchmarkBlock(){
             distHtml +
             '<div style="font-size:9px;color:var(--text2);margin-top:8px;font-family:var(--font-mono);">' + ((arbProfile && arbProfile.usesTouchedBlocks) ? 'Active-block metrics use touched-block semantics from benchmark rows when available.' : 'Active-block metrics fall back to 30d window averages when touched-block counts are unavailable.') + '</div>' +
         '</div>';
+    renderArbBotDistributionChart(arbBuilder ? arbBuilder.distribution : null);
+}
+
+function renderArbBotDistributionChart(dist){
+    var canvas = document.getElementById('chart-arb-bot-dist');
+    if(cArbBotDistribution) { cArbBotDistribution.destroy(); cArbBotDistribution = null; }
+    if(!canvas || !dist) return;
+    var markerPlugin = {
+        id: 'arbBotMarkers',
+        afterDatasetsDraw: function(chart){
+            var ctx = chart.ctx;
+            var xScale = chart.scales.x;
+            var yScale = chart.scales.y;
+            if(!xScale || !yScale) return;
+            var top = chart.chartArea.top + 8;
+            var bottom = yScale.getPixelForValue(0);
+            ctx.save();
+            dist.markers.forEach(function(marker){
+                var x = xScale.getPixelForValue(marker.value);
+                ctx.strokeStyle = marker.color;
+                ctx.setLineDash([5, 4]);
+                ctx.lineWidth = 1.25;
+                ctx.beginPath();
+                ctx.moveTo(x, bottom);
+                ctx.lineTo(x, top);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = marker.color;
+                ctx.beginPath();
+                ctx.arc(x, bottom, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.restore();
+        }
+    };
+    cArbBotDistribution = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            datasets: [{
+                label: 'Arbitrage bots',
+                parsing: false,
+                data: dist.bins.map(function(bin){
+                    return { x: bin.center, y: bin.count, from: bin.from, to: bin.to };
+                }),
+                backgroundColor: 'rgba(167,139,250,0.72)',
+                borderColor: '#A78BFA',
+                borderWidth: 1,
+                hoverBackgroundColor: 'rgba(167,139,250,0.88)',
+                categoryPercentage: 1,
+                barPercentage: 0.98
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: function(items){
+                            var raw = items && items[0] ? items[0].raw : null;
+                            if(!raw) return 'Arbitrage bot bin';
+                            return fmtMetricDot(raw.from) + ' to ' + fmtMetricDot(raw.to) + ' lam/CU';
+                        },
+                        label: function(ctx){
+                            return fmtK(ctx.raw.y) + ' bots in this bin';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'logarithmic',
+                    grid: { color: '#181c24' },
+                    ticks: {
+                        color: '#9aa2b1',
+                        font: { size: 9, family: 'JetBrains Mono' },
+                        callback: function(value){
+                            var num = Number(value);
+                            if(!(num > 0)) return '';
+                            var log = Math.log(num) / Math.LN10;
+                            return Math.abs(log - Math.round(log)) < 1e-6 ? fmtMetricDot(num) : '';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Non-base fee/CU (lam/CU, log scale)',
+                        color: '#888',
+                        font: { size: 9, family: 'JetBrains Mono' }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#181c24' },
+                    ticks: {
+                        precision: 0,
+                        color: '#9aa2b1',
+                        font: { size: 9, family: 'JetBrains Mono' }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Bots per bin',
+                        color: '#888',
+                        font: { size: 9, family: 'JetBrains Mono' }
+                    }
+                }
+            }
+        },
+        plugins: [markerPlugin]
+    });
 }
 function toggleBenchmarkBlock(){
     _showBenchmarkBlock = !_showBenchmarkBlock;
@@ -3671,6 +3835,7 @@ var cTempFees = null;
 var cTempRevenue = null;
 var cTempCatFpc = null;
 var cTempCatCU = null;
+var cArbBotDistribution = null;
 function renderTemporalCharts(id, c){
     var el = document.getElementById('sim-cat-temporal');
     if(!el) return;
@@ -4324,7 +4489,7 @@ function renderBlockBuilder(){
             var customTag = isCustom ? '<span class="bf-tag custom">Customized</span>' : '';
             var profileOptionsHtml = '';
             if(catData){
-                var options = [catData.medianProfile, catData.meanProfile, catData.p25Profile, catData.p75Profile].concat(catData.programOptions || []);
+                var options = [catData.medianProfile, catData.meanProfile, catData.p25Profile, catData.p75Profile, catData.smallProfile, catData.mediumProfile, catData.largeProfile, catData.xlProfile].concat(catData.programOptions || []);
                 profileOptionsHtml = options.map(function(opt){
                     if(!opt) return '';
                     return '<option value="' + escHtml(opt.key) + '"' + (f.profileKey === opt.key ? ' selected' : '') + '>' + escHtml(opt.label) + '</option>';
