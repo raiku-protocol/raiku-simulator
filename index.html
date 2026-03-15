@@ -3239,8 +3239,9 @@ function getArbBotProfile(){
     };
 }
 
-function buildArbBotDistribution(values, stats){
-    if(!values || !values.length) return null;
+function buildArbBotDistribution(rows, stats){
+    if(!rows || !rows.length) return null;
+    var values = rows.map(function(row){ return row.feePerCU; });
     var positive = values.filter(function(v){ return v > 0; });
     var minValue = positive.length ? Math.min.apply(null, positive) : 0.0001;
     minValue = Math.max(minValue, 0.0001);
@@ -3256,31 +3257,35 @@ function buildArbBotDistribution(values, stats){
             from: Math.pow(10, from),
             to: Math.pow(10, to),
             center: Math.pow(10, (from + to) / 2),
-            count: 0
+            totalCount: 0,
+            bucketCounts: { small: 0, medium: 0, large: 0, xl: 0 }
         };
     });
-    values.forEach(function(v){
-        var clamped = Math.max(v, minValue);
+    rows.forEach(function(row){
+        var clamped = Math.max(row.feePerCU, minValue);
         var pos = (Math.log(clamped) / Math.LN10 - minLog) / (maxLog - minLog);
         var idx = Math.min(binCount - 1, Math.max(0, Math.floor(pos * binCount)));
-        bins[idx].count += 1;
+        bins[idx].totalCount += 1;
+        bins[idx].bucketCounts[row.bucketKey] += 1;
     });
-    var maxCount = bins.reduce(function(max, bin){ return Math.max(max, bin.count); }, 1);
-    var markerPos = function(v){
-        var clamped = Math.max(v, minValue);
-        return ((Math.log(clamped) / Math.LN10 - minLog) / (maxLog - minLog)) * 100;
-    };
     return {
         bins: bins,
-        maxCount: maxCount,
         minValue: minValue,
         maxValue: maxValue,
+        bucketOrder: ['small', 'medium', 'large', 'xl'],
+        bucketMeta: {
+            small: { label: 'Small', color: '#6FB1FF' },
+            medium: { label: 'Medium', color: '#6DE1C2' },
+            large: { label: 'Large', color: '#C0FF38' },
+            xl: { label: 'XL', color: '#A78BFA' }
+        },
         markers: [
-            { key: 'p25', label: 'P25', color: '#7AA2FF', value: stats.p25FeePerCU, pos: markerPos(stats.p25FeePerCU) },
-            { key: 'median', label: 'Median', color: '#C0FF38', value: stats.medianFeePerCU, pos: markerPos(stats.medianFeePerCU) },
-            { key: 'mean', label: 'Mean', color: '#F5A623', value: stats.meanFeePerCU, pos: markerPos(stats.meanFeePerCU) },
-            { key: 'p75', label: 'P75', color: '#A78BFA', value: stats.p75FeePerCU, pos: markerPos(stats.p75FeePerCU) }
-        ]
+            { key: 'p25', label: 'P25', color: '#7AA2FF', value: stats.p25FeePerCU },
+            { key: 'median', label: 'Median', color: '#C0FF38', value: stats.medianFeePerCU },
+            { key: 'p75', label: 'P75', color: '#A78BFA', value: stats.p75FeePerCU },
+            { key: 'mean', label: 'Mean', color: '#F5A623', value: stats.meanFeePerCU }
+        ],
+        totalRows: rows.length
     };
 }
 
@@ -3315,6 +3320,8 @@ function buildArbBotSizeProfiles(rows, stats){
             key: def.key,
             label: def.label,
             rangeLabel: def.rangeLabel,
+            lowerBound: def.min,
+            upperBound: def.max,
             count: members.length,
             min: Math.min.apply(null, cuVals),
             max: Math.max.apply(null, cuVals),
@@ -3330,7 +3337,8 @@ function getArbBotBuilderData(){
     var processedRows = _jitBenchmarkProgs.map(function(p){
         return {
             cuActiveBlock: getProgramTouchedCuPerBlock(p),
-            feePerCU: p.cu > 0 ? (p.fpc_nb || 0) : 0
+            feePerCU: p.cu > 0 ? (p.fpc_nb || 0) : 0,
+            bucketKey: null
         };
     }).filter(function(row){
         return row.cuActiveBlock > 0 && row.feePerCU >= 0;
@@ -3350,6 +3358,14 @@ function getArbBotBuilderData(){
         p75FeePerCU: percentile(feeValues, 75)
     };
     var sizeBuckets = buildArbBotSizeProfiles(processedRows, stats);
+    processedRows.forEach(function(row){
+        var matched = sizeBuckets.summaries.find(function(bucket){
+            if(bucket.key === 'small') return row.cuActiveBlock <= bucket.upperBound;
+            if(bucket.key === 'xl') return row.cuActiveBlock > bucket.lowerBound;
+            return row.cuActiveBlock > bucket.lowerBound && row.cuActiveBlock <= bucket.upperBound;
+        });
+        row.bucketKey = matched ? matched.key : 'xl';
+    });
     return {
         id: BENCHMARK_GROUP_SPEC.id,
         label: BENCHMARK_GROUP_SPEC.label,
@@ -3395,7 +3411,7 @@ function getArbBotBuilderData(){
         isArbBot: true,
         arbInfo: arbProfile,
         arbStats: stats,
-        distribution: buildArbBotDistribution(feeValues, stats),
+        distribution: buildArbBotDistribution(processedRows, stats),
         sizeBuckets: sizeBuckets.summaries,
         rowCount: feeValues.length
     };
@@ -3602,26 +3618,27 @@ function renderBenchmarkBlock(){
     }
     var distHtml = '';
     if(arbBuilder && arbBuilder.distribution){
-        var statChips = arbBuilder.distribution.markers.map(function(marker){
+        var markerLegend = arbBuilder.distribution.markers.map(function(marker){
             return '<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;background:#0f1218;border:1px solid #1b1f28;border-radius:999px;"><span style="display:inline-block;width:10px;height:2px;background:' + marker.color + ';box-shadow:0 0 0 1px rgba(0,0,0,.25);"></span><span style="color:var(--text-mid);">' + marker.label + '</span><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(marker.value) + ' lam/CU</span></div>';
         }).join('');
         var bucketChips = (arbBuilder.sizeBuckets || []).map(function(bucket){
+            var meta = arbBuilder.distribution.bucketMeta[bucket.key];
             return '<div style="padding:6px 8px;background:#0f1218;border:1px solid #1b1f28;border-radius:8px;font-size:10px;font-family:var(--font-mono);">' +
-                '<div style="color:#C8B5FF;font-weight:600;">' + bucket.label + '</div>' +
+                '<div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:' + meta.color + ';"></span><span style="color:var(--text);font-weight:600;">' + bucket.label + '</span></div>' +
                 '<div style="color:var(--text2);margin-top:2px;">' + bucket.rangeLabel + ' · ' + fmtK(bucket.count) + ' bots</div>' +
-                '<div style="color:var(--text-mid);margin-top:3px;">' + fmtCuExact(bucket.min) + '–' + fmtCuExact(bucket.max) + ' CU / active block</div>' +
+                '<div style="color:var(--text-mid);margin-top:3px;">Median ' + fmtCuExact(bucket.cu) + ' CU · ' + fmtMetricDot(bucket.feePerCU) + ' lam/CU</div>' +
             '</div>';
         }).join('');
         distHtml =
             '<div style="margin-top:10px;padding-top:10px;border-top:1px solid #161922;">' +
                 '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;">' +
-                    '<div style="font-size:10px;color:var(--text-mid);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.6px;">Non-base fee/CU distribution</div>' +
+                    '<div style="font-size:10px;color:var(--text-mid);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.6px;">Share of arbitrage bots by non-base fee/CU</div>' +
                     '<div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">' + fmtK(arbBuilder.rowCount) + ' arbitrage-bot rows · log scale</div>' +
                 '</div>' +
                 '<div style="padding:8px;background:#0d1016;border:1px solid #181c24;border-radius:8px;">' +
-                    '<div style="height:220px;"><canvas id="chart-arb-bot-dist"></canvas></div>' +
+                    '<div style="height:260px;"><canvas id="chart-arb-bot-dist"></canvas></div>' +
                 '</div>' +
-                '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:10px;font-family:var(--font-mono);">' + statChips + '</div>' +
+                '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:10px;font-family:var(--font-mono);">' + markerLegend + '</div>' +
                 '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:8px;">' + bucketChips + '</div>' +
             '</div>';
     }
@@ -3633,8 +3650,6 @@ function renderBenchmarkBlock(){
                 '<div><span style="color:var(--text2);">Programs</span><br><span style="color:var(--text);font-weight:600;">' + fmtK(b.n) + '</span></div>' +
                 '<div><span style="color:var(--text2);">Non-base fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(b.weightedNonBase) + ' lam</span></div>' +
                 '<div><span style="color:var(--text2);">Total fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(b.weightedTotal) + ' lam</span></div>' +
-                '<div><span style="color:var(--text2);">Median non-base</span><br><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(b.medianNonBase) + ' lam</span></div>' +
-                '<div><span style="color:var(--text2);">p25 / p75 non-base</span><br><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(b.p25NonBase) + ' / ' + fmtMetricDot(b.p75NonBase) + '</span></div>' +
                 '<div><span style="color:var(--text2);">Median CU / active block</span><br><span style="color:var(--text);font-weight:600;">' + fmtCuExact(arbBuilder && arbBuilder.medianProfile ? arbBuilder.medianProfile.cu : 0) + ' CU</span></div>' +
                 '<div><span style="color:var(--text2);">Observed avg CU / active block</span><br><span style="color:var(--text);font-weight:600;">' + fmtCuExact(arbProfile ? arbProfile.cu : 0) + ' CU</span></div>' +
                 '<div><span style="color:var(--text2);">Implied non-base fees / active block</span><br><span style="color:var(--text);font-weight:600;">' + ((arbProfile && Number.isFinite(arbProfile.nonBaseFeesPerBlock)) ? arbProfile.nonBaseFeesPerBlock.toFixed(6) : '0.000000') + ' SOL</span></div>' +
@@ -3649,6 +3664,31 @@ function renderArbBotDistributionChart(dist){
     var canvas = document.getElementById('chart-arb-bot-dist');
     if(cArbBotDistribution) { cArbBotDistribution.destroy(); cArbBotDistribution = null; }
     if(!canvas || !dist) return;
+    var bucketOrder = dist.bucketOrder || ['small', 'medium', 'large', 'xl'];
+    var datasets = bucketOrder.map(function(bucketKey){
+        var meta = dist.bucketMeta[bucketKey];
+        return {
+            label: meta.label,
+            parsing: false,
+            data: dist.bins.map(function(bin){
+                return {
+                    x: bin.center,
+                    y: dist.totalRows > 0 ? (bin.bucketCounts[bucketKey] / dist.totalRows) * 100 : 0,
+                    from: bin.from,
+                    to: bin.to,
+                    totalCount: bin.totalCount,
+                    bucketCount: bin.bucketCounts[bucketKey],
+                    bucketKey: bucketKey
+                };
+            }),
+            backgroundColor: meta.color,
+            borderColor: meta.color,
+            borderWidth: 0,
+            categoryPercentage: 1,
+            barPercentage: 0.98,
+            stack: 'population'
+        };
+    });
     var markerPlugin = {
         id: 'arbBotMarkers',
         afterDatasetsDraw: function(chart){
@@ -3680,26 +3720,24 @@ function renderArbBotDistributionChart(dist){
     cArbBotDistribution = new Chart(canvas, {
         type: 'bar',
         data: {
-            datasets: [{
-                label: 'Arbitrage bots',
-                parsing: false,
-                data: dist.bins.map(function(bin){
-                    return { x: bin.center, y: bin.count, from: bin.from, to: bin.to };
-                }),
-                backgroundColor: 'rgba(167,139,250,0.72)',
-                borderColor: '#A78BFA',
-                borderWidth: 1,
-                hoverBackgroundColor: 'rgba(167,139,250,0.88)',
-                categoryPercentage: 1,
-                barPercentage: 0.98
-            }]
+            datasets: datasets
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             animation: false,
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        color: '#b7bfca',
+                        font: { size: 9, family: 'JetBrains Mono' },
+                        boxWidth: 10,
+                        boxHeight: 10,
+                        padding: 10
+                    }
+                },
                 tooltip: {
                     callbacks: {
                         title: function(items){
@@ -3707,8 +3745,14 @@ function renderArbBotDistributionChart(dist){
                             if(!raw) return 'Arbitrage bot bin';
                             return fmtMetricDot(raw.from) + ' to ' + fmtMetricDot(raw.to) + ' lam/CU';
                         },
+                        beforeBody: function(items){
+                            var raw = items && items[0] ? items[0].raw : null;
+                            if(!raw) return '';
+                            return fmtK(raw.totalCount) + ' bots in this price range';
+                        },
                         label: function(ctx){
-                            return fmtK(ctx.raw.y) + ' bots in this bin';
+                            if(!ctx.raw.bucketCount) return null;
+                            return ctx.dataset.label + ': ' + fmtMetricDot(ctx.raw.y) + '% of arbitrage bots (' + fmtK(ctx.raw.bucketCount) + ')';
                         }
                     }
                 }
@@ -3736,15 +3780,16 @@ function renderArbBotDistributionChart(dist){
                 },
                 y: {
                     beginAtZero: true,
+                    stacked: true,
                     grid: { color: '#181c24' },
                     ticks: {
-                        precision: 0,
                         color: '#9aa2b1',
-                        font: { size: 9, family: 'JetBrains Mono' }
+                        font: { size: 9, family: 'JetBrains Mono' },
+                        callback: function(value){ return fmtMetricDot(value) + '%'; }
                     },
                     title: {
                         display: true,
-                        text: 'Bots per bin',
+                        text: '% of arbitrage bots',
                         color: '#888',
                         font: { size: 9, family: 'JetBrains Mono' }
                     }
