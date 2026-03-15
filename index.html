@@ -1375,7 +1375,10 @@ details[open] summary::before { transform:rotate(90deg); }
             </div>
             <div class="slp-group">
                 <label class="slp-label">AOT minimum bid</label>
-                <input type="number" id="sim-min-bid" value="10000" min="0" step="1000" onchange="updateSimParam('mb',parseFloat(this.value))">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <input type="text" id="sim-min-bid" value="10,000" inputmode="numeric" onchange="updateSimParam('mb',parseFloat(this.value.replace(/,/g,'')))" style="text-align:right">
+                    <span style="font-size:11px;color:var(--text-mid);font-family:var(--font-mono);">lamports</span>
+                </div>
                 <div class="slp-note" id="sim-min-bid-note">Minimum total bid per AOT fragment. Default floor: 10,000 lamports. Block Simulation realism only; does not affect the Revenue Model.</div>
             </div>
         </div>
@@ -3112,7 +3115,7 @@ function renderSimParamDisplay(){
     var minBidNote = document.getElementById('sim-min-bid-note');
     var minBidLamports = Number.isFinite(sp.mb) && sp.mb >= 0 ? Math.round(sp.mb) : 10000;
     var minBidSol = minBidLamports / LS;
-    if(minBidInput && document.activeElement !== minBidInput) minBidInput.value = minBidLamports;
+    if(minBidInput && document.activeElement !== minBidInput) minBidInput.value = fmtK(minBidLamports);
     if(minBidNote) minBidNote.textContent = 'Minimum total bid per AOT fragment. Default floor: 10,000 lamports. Current setting: ' + fmtK(minBidLamports) + ' lamports (~' + minBidSol.toFixed(6) + ' SOL). Block Simulation realism only; does not affect the Revenue Model.';
 }
 
@@ -4006,11 +4009,19 @@ function renderBlockBuilder(){
         if(!Number.isFinite(v)) return '0';
         return fmtK(Math.round(v));
     };
+    var fmtUsdSmall = function(v){
+        if(v >= 1000) return '$' + fmtK(v.toFixed(0));
+        if(v >= 1) return '$' + fmtK(v.toFixed(2));
+        if(v >= 0.01) return '$' + v.toFixed(4);
+        return '$' + v.toFixed(6);
+    };
     var fmtSolBlock = function(v){
         if(v >= 0.01) return v.toFixed(4);
         if(v >= 0.0001) return v.toFixed(6);
-        return v.toFixed(8);
+        if(v >= 0.000001) return v.toFixed(8);
+        return v.toFixed(10);
     };
+    var minBidLamports = Number.isFinite(sp.mb) && sp.mb >= 0 ? Math.round(sp.mb) : 10000;
 
     // ── Fill bar (sorted by fee/CU desc) ──
     var fillBar = document.getElementById('bb-fill-bar');
@@ -4042,11 +4053,11 @@ function renderBlockBuilder(){
             var profile = getFragmentProfile(catData, f.profileKey);
             var col = CAT_COLORS[f.catId] || '#555';
             var fm = fitMap[origIdx] || { fits: false, usedCU: 0 };
-            var feeLamports = Math.round(fm.usedCU * f.feePerCU);
-            var feeSol = fm.usedCU * f.feePerCU / LS;
+            var naturalFeeLamports = Math.round(fm.usedCU * f.feePerCU);
+            var effectiveFeeLamports = fm.usedCU > 0 ? Math.max(naturalFeeLamports, minBidLamports) : 0;
+            var floorForced = fm.usedCU > 0 && naturalFeeLamports < minBidLamports;
+            var feeSol = effectiveFeeLamports / LS;
             var feeUSD = feeSol * sp.p;
-            var minBidLamports = Number.isFinite(sp.mb) && sp.mb >= 0 ? Math.round(sp.mb) : 10000;
-            var minBidMet = feeLamports >= minBidLamports;
             var isRejected = !fm.fits;
             var pctBlock = avail > 0 ? fmtPct(f.cu / avail * 100) : '0.000';
             var isCustom = !!(f.userAdjustedCU || f.userAdjustedFee);
@@ -4114,9 +4125,13 @@ function renderBlockBuilder(){
                     '<span class="bf-em">' + fmtHuman(f.cu) + ' CU</span> <span class="bf-sub">\u00B7</span> <span class="bf-em">' + pctBlock + '%</span> <span class="bf-sub">of AOT block</span>' +
                     (isRejected ?
                         ' <span class="bf-sub">\u00B7</span> <span style="color:#e55">\u26D4 excluded \u2014 does not fit remaining capacity</span>' :
-                        ' <span class="bf-sub">\u00B7</span> <span class="bf-em">Bid: ' + fmtLamportsBid(feeLamports) + ' lamports</span> <span class="bf-sub">\u00B7</span> <span class="bf-em">' + fmtSolBlock(feeSol) + ' SOL</span> <span class="bf-sub">\u00B7</span> <span class="bf-em">' + fmtUsd(feeUSD) + '</span> <span class="bf-sub">\u00B7</span> <span style="color:' + (minBidMet ? 'var(--lime-soft)' : '#F5A623') + '">' + (minBidMet ? 'above' : 'below') + ' ' + fmtLamportsBid(minBidLamports) + ' lam floor</span>'
+                        ''
                     ) +
                 '</div>' +
+                (!isRejected ?
+                    '<div class="bf-derived"><span class="bf-em">Bid: ' + fmtLamportsBid(effectiveFeeLamports) + ' lamports</span> <span class="bf-sub">\u00B7</span> <span class="bf-em">' + fmtSolBlock(feeSol) + ' SOL</span> <span class="bf-sub">\u00B7</span> <span class="bf-em">' + fmtUsdSmall(feeUSD) + '</span> <span class="bf-sub">\u00B7</span> <span style="color:' + (floorForced ? '#F5A623' : 'var(--lime-soft)') + '">' + (floorForced ? 'forced to ' + fmtLamportsBid(minBidLamports) + ' lam floor' : 'above floor') + '</span></div>' :
+                    ''
+                ) +
             '</div>';
         });
         html += '<button class="bb-add-btn" onclick="document.getElementById(\'bb-add-dropdown\').style.display=document.getElementById(\'bb-add-dropdown\').style.display===\'block\'?\'none\':\'block\'">+ Add Category</button>';
@@ -4133,7 +4148,9 @@ function renderBlockBuilder(){
     var totalFeesSol = 0;
     _bbFragments.forEach(function(f, i){
         var fm = fitMap[i] || { usedCU: 0 };
-        totalFeesSol += fm.usedCU * f.feePerCU / LS;
+        var naturalFeeLamports = Math.round(fm.usedCU * f.feePerCU);
+        var effectiveFeeLamports = fm.usedCU > 0 ? Math.max(naturalFeeLamports, minBidLamports) : 0;
+        totalFeesSol += effectiveFeeLamports / LS;
     });
     var wtAvgFee = totalUsed > 0 ? (totalFeesSol * LS / totalUsed) : 0;
     var totalFeesUSD = totalFeesSol * sp.p;
