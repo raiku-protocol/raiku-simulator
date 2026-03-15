@@ -3163,6 +3163,10 @@ function fmtK(n){
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return parts.join('.');
 }
+function fmtCuExact(n){
+    if(n === undefined || n === null || isNaN(n)) return '0';
+    return fmtK(Math.round(Number(n)));
+}
 function fmtHuman(n){
     if(n === undefined || n === null || isNaN(n)) return '0';
     n = Number(n);
@@ -3444,6 +3448,8 @@ function renderBenchmarkBlock(){
     if(!el) return;
     var b = _benchmarkAgg || {n:0,weightedNonBase:0,weightedTotal:0,medianNonBase:0,p25NonBase:0,p75NonBase:0,cu:0};
     var arbProfile = getArbBotProfile();
+    var arbBuilder = getArbBotBuilderData();
+    var fmtArbFpc = function(v){ return v < 0.01 ? v.toFixed(4) : v < 0.1 ? v.toFixed(3) : v >= 10 ? v.toFixed(1) : v.toFixed(2); };
     var toggleLabel = _showBenchmarkBlock ? 'Hide arbitrage bot details' : 'Show arbitrage bot details';
     var html = '<button class="bb-add-btn" style="margin-top:0;" onclick="toggleBenchmarkBlock()">' + toggleLabel + '</button>';
     if(!_showBenchmarkBlock){
@@ -3461,12 +3467,13 @@ function renderBenchmarkBlock(){
             '<div style="font-size:11px;color:#A78BFA;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Arbitrage Bot Layer</div>' +
             '<div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Shown separately and excluded by default from the core AOT customer story. Non-base means priority fees plus MEV / JIT tips.</div>' +
             '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-family:var(--font-mono);font-size:11px;">' +
-                '<div><span style="color:var(--text2);">Programs</span><br><span style="color:var(--text);font-weight:600;">' + b.n + '</span></div>' +
-                '<div><span style="color:var(--text2);">Non-base fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + b.weightedNonBase.toFixed(3) + ' lam</span></div>' +
-                '<div><span style="color:var(--text2);">Total fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + b.weightedTotal.toFixed(3) + ' lam</span></div>' +
-                '<div><span style="color:var(--text2);">Median non-base</span><br><span style="color:var(--text);font-weight:600;">' + b.medianNonBase.toFixed(3) + ' lam</span></div>' +
-                '<div><span style="color:var(--text2);">p25 / p75 non-base</span><br><span style="color:var(--text);font-weight:600;">' + b.p25NonBase.toFixed(3) + ' / ' + b.p75NonBase.toFixed(3) + '</span></div>' +
-                '<div><span style="color:var(--text2);">Avg CU / active block</span><br><span style="color:var(--text);font-weight:600;">' + fmtHuman(arbProfile ? arbProfile.cu : 0) + ' CU</span></div>' +
+                '<div><span style="color:var(--text2);">Programs</span><br><span style="color:var(--text);font-weight:600;">' + fmtK(b.n) + '</span></div>' +
+                '<div><span style="color:var(--text2);">Non-base fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + fmtArbFpc(b.weightedNonBase) + ' lam</span></div>' +
+                '<div><span style="color:var(--text2);">Total fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + fmtArbFpc(b.weightedTotal) + ' lam</span></div>' +
+                '<div><span style="color:var(--text2);">Median non-base</span><br><span style="color:var(--text);font-weight:600;">' + fmtArbFpc(b.medianNonBase) + ' lam</span></div>' +
+                '<div><span style="color:var(--text2);">p25 / p75 non-base</span><br><span style="color:var(--text);font-weight:600;">' + fmtArbFpc(b.p25NonBase) + ' / ' + fmtArbFpc(b.p75NonBase) + '</span></div>' +
+                '<div><span style="color:var(--text2);">Median CU / active block</span><br><span style="color:var(--text);font-weight:600;">' + fmtCuExact(arbBuilder && arbBuilder.medianProfile ? arbBuilder.medianProfile.cu : 0) + ' CU</span></div>' +
+                '<div><span style="color:var(--text2);">Observed avg CU / active block</span><br><span style="color:var(--text);font-weight:600;">' + fmtCuExact(arbProfile ? arbProfile.cu : 0) + ' CU</span></div>' +
                 '<div><span style="color:var(--text2);">Implied non-base fees / active block</span><br><span style="color:var(--text);font-weight:600;">' + ((arbProfile && Number.isFinite(arbProfile.nonBaseFeesPerBlock)) ? arbProfile.nonBaseFeesPerBlock.toFixed(6) : '0.000000') + ' SOL</span></div>' +
             '</div>' +
             '<div style="font-size:9px;color:var(--text2);margin-top:8px;font-family:var(--font-mono);">' + ((arbProfile && arbProfile.usesTouchedBlocks) ? 'Active-block metrics use touched-block semantics from benchmark rows when available.' : 'Active-block metrics fall back to 30d window averages when touched-block counts are unavailable.') + '</div>' +
@@ -4086,7 +4093,7 @@ function renderBlockBuilder(){
     }
     if(arbToggleSub){
         if(!(_benchmarkAgg && _benchmarkAgg.n > 0)) arbToggleSub.textContent = 'No arbitrage-bot rows in the current artifact';
-        else arbToggleSub.textContent = _includeArbBotInBuilder ? 'Available in Add Category' : 'Available in Add Category when enabled';
+        else arbToggleSub.textContent = _includeArbBotInBuilder ? 'Available in Add Category' : 'Excluded by default';
     }
     // SORT fragments by fee/CU descending (greedy auction fill)
     var sortedIdxs = _bbFragments.map(function(_,i){ return i; });
@@ -4180,6 +4187,7 @@ function renderBlockBuilder(){
             var isRejected = !fm.fits;
             var pctBlock = avail > 0 ? fmtPct(f.cu / avail * 100) : '0.000';
             var isCustom = !!(f.userAdjustedCU || f.userAdjustedFee);
+            var derivedCuDisplay = f.catId === BENCHMARK_GROUP_SPEC.id ? fmtCuExact(f.cu) : fmtHuman(f.cu);
 
             // Divider between included and excluded
             if(isRejected && !showedDivider){
@@ -4241,7 +4249,7 @@ function renderBlockBuilder(){
 
                 // ── DERIVED OUTPUTS (secondary) ──
                 '<div class="bf-derived">' +
-                    '<span class="bf-em">' + fmtHuman(f.cu) + ' CU</span> <span class="bf-sub">\u00B7</span> <span class="bf-em">' + pctBlock + '%</span> <span class="bf-sub">of AOT block</span>' +
+                    '<span class="bf-em">' + derivedCuDisplay + ' CU</span> <span class="bf-sub">\u00B7</span> <span class="bf-em">' + pctBlock + '%</span> <span class="bf-sub">of AOT block</span>' +
                     (isRejected ?
                         ' <span class="bf-sub">\u00B7</span> <span style="color:#e55">\u26D4 excluded \u2014 does not fit remaining capacity</span>' :
                         ''
