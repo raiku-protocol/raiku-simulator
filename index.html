@@ -3623,10 +3623,15 @@ function renderBenchmarkBlock(){
         }).join('');
         var bucketChips = (arbBuilder.sizeBuckets || []).map(function(bucket){
             var meta = arbBuilder.distribution.bucketMeta[bucket.key];
+            var rangeText = bucket.key === 'small'
+                ? ('0.0000 to ' + fmtMetricDot(bucket.upperBound) + ' lam/CU')
+                : (bucket.key === 'xl'
+                    ? ('> ' + fmtMetricDot(bucket.lowerBound) + ' lam/CU')
+                    : (fmtMetricDot(bucket.lowerBound) + ' to ' + fmtMetricDot(bucket.upperBound) + ' lam/CU'));
             return '<div style="padding:6px 8px;background:#0f1218;border:1px solid #1b1f28;border-radius:8px;font-size:10px;font-family:var(--font-mono);">' +
                 '<div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:' + meta.color + ';"></span><span style="color:var(--text);font-weight:600;">' + bucket.label + '</span></div>' +
-                '<div style="color:var(--text2);margin-top:2px;">' + bucket.rangeLabel + ' · ' + fmtK(bucket.count) + ' bots</div>' +
-                '<div style="color:var(--text-mid);margin-top:3px;">Median ' + fmtCuExact(bucket.cu) + ' CU · ' + fmtMetricDot(bucket.feePerCU) + ' lam/CU</div>' +
+                '<div style="color:var(--text2);margin-top:2px;">' + rangeText + ' · ' + fmtK(bucket.count) + ' bots</div>' +
+                '<div style="color:var(--text-mid);margin-top:3px;">Typical bot: ' + fmtMetricDot(bucket.feePerCU) + ' lam/CU · ' + fmtCuExact(bucket.cu) + ' CU</div>' +
             '</div>';
         }).join('');
         distHtml =
@@ -3664,31 +3669,66 @@ function renderArbBotDistributionChart(dist){
     var canvas = document.getElementById('chart-arb-bot-dist');
     if(cArbBotDistribution) { cArbBotDistribution.destroy(); cArbBotDistribution = null; }
     if(!canvas || !dist) return;
-    var bucketOrder = dist.bucketOrder || ['small', 'medium', 'large', 'xl'];
-    var datasets = bucketOrder.map(function(bucketKey){
-        var meta = dist.bucketMeta[bucketKey];
-        return {
-            label: meta.label,
-            parsing: false,
-            data: dist.bins.map(function(bin){
-                return {
-                    x: bin.center,
-                    y: dist.totalRows > 0 ? (bin.bucketCounts[bucketKey] / dist.totalRows) * 100 : 0,
-                    from: bin.from,
-                    to: bin.to,
-                    totalCount: bin.totalCount,
-                    bucketCount: bin.bucketCounts[bucketKey],
-                    bucketKey: bucketKey
-                };
-            }),
-            backgroundColor: meta.color,
-            borderColor: meta.color,
-            borderWidth: 0,
-            categoryPercentage: 1,
-            barPercentage: 0.98,
-            stack: 'population'
-        };
-    });
+    var dataset = {
+        label: 'Share of arbitrage bots',
+        parsing: false,
+        data: dist.bins.map(function(bin){
+            return {
+                x: bin.center,
+                y: dist.totalRows > 0 ? (bin.totalCount / dist.totalRows) * 100 : 0,
+                from: bin.from,
+                to: bin.to,
+                totalCount: bin.totalCount
+            };
+        }),
+        backgroundColor: 'rgba(198, 208, 225, 0.78)',
+        borderColor: '#D5DCEA',
+        borderWidth: 1,
+        hoverBackgroundColor: 'rgba(214, 222, 238, 0.9)',
+        categoryPercentage: 1,
+        barPercentage: 0.98
+    };
+    var regionBounds = [
+        { key: 'small', label: 'Small', start: dist.minValue, end: dist.markers.find(function(m){ return m.key === 'p25'; }).value },
+        { key: 'medium', label: 'Medium', start: dist.markers.find(function(m){ return m.key === 'p25'; }).value, end: dist.markers.find(function(m){ return m.key === 'median'; }).value },
+        { key: 'large', label: 'Large', start: dist.markers.find(function(m){ return m.key === 'median'; }).value, end: dist.markers.find(function(m){ return m.key === 'p75'; }).value },
+        { key: 'xl', label: 'XL', start: dist.markers.find(function(m){ return m.key === 'p75'; }).value, end: dist.maxValue }
+    ];
+    var regionPlugin = {
+        id: 'arbBotRegions',
+        beforeDatasetsDraw: function(chart){
+            var ctx = chart.ctx;
+            var xScale = chart.scales.x;
+            var area = chart.chartArea;
+            if(!xScale || !area) return;
+            ctx.save();
+            regionBounds.forEach(function(region){
+                var meta = dist.bucketMeta[region.key];
+                var x1 = Math.max(area.left, xScale.getPixelForValue(Math.max(region.start, dist.minValue)));
+                var x2 = Math.min(area.right, xScale.getPixelForValue(Math.min(region.end, dist.maxValue)));
+                if(!(x2 > x1)) return;
+                ctx.fillStyle = meta.color + '18';
+                ctx.fillRect(x1, area.top, x2 - x1, area.bottom - area.top);
+                ctx.strokeStyle = meta.color + 'AA';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x1, area.top);
+                ctx.lineTo(x1, area.bottom);
+                ctx.stroke();
+                if(region.key === 'xl'){
+                    ctx.beginPath();
+                    ctx.moveTo(x2, area.top);
+                    ctx.lineTo(x2, area.bottom);
+                    ctx.stroke();
+                }
+                ctx.fillStyle = meta.color;
+                ctx.font = '9px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText(region.label, x1 + ((x2 - x1) / 2), area.top + 12);
+            });
+            ctx.restore();
+        }
+    };
     var markerPlugin = {
         id: 'arbBotMarkers',
         afterDatasetsDraw: function(chart){
@@ -3696,7 +3736,7 @@ function renderArbBotDistributionChart(dist){
             var xScale = chart.scales.x;
             var yScale = chart.scales.y;
             if(!xScale || !yScale) return;
-            var top = chart.chartArea.top + 8;
+            var top = chart.chartArea.top + 18;
             var bottom = yScale.getPixelForValue(0);
             ctx.save();
             dist.markers.forEach(function(marker){
@@ -3720,24 +3760,14 @@ function renderArbBotDistributionChart(dist){
     cArbBotDistribution = new Chart(canvas, {
         type: 'bar',
         data: {
-            datasets: datasets
+            datasets: [dataset]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             animation: false,
             plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                    labels: {
-                        color: '#b7bfca',
-                        font: { size: 9, family: 'JetBrains Mono' },
-                        boxWidth: 10,
-                        boxHeight: 10,
-                        padding: 10
-                    }
-                },
+                legend: { display: false },
                 tooltip: {
                     callbacks: {
                         title: function(items){
@@ -3751,8 +3781,7 @@ function renderArbBotDistributionChart(dist){
                             return fmtK(raw.totalCount) + ' bots in this price range';
                         },
                         label: function(ctx){
-                            if(!ctx.raw.bucketCount) return null;
-                            return ctx.dataset.label + ': ' + fmtMetricDot(ctx.raw.y) + '% of arbitrage bots (' + fmtK(ctx.raw.bucketCount) + ')';
+                            return fmtMetricDot(ctx.raw.y) + '% of arbitrage bots';
                         }
                     }
                 }
@@ -3780,7 +3809,6 @@ function renderArbBotDistributionChart(dist){
                 },
                 y: {
                     beginAtZero: true,
-                    stacked: true,
                     grid: { color: '#181c24' },
                     ticks: {
                         color: '#9aa2b1',
@@ -3796,7 +3824,7 @@ function renderArbBotDistributionChart(dist){
                 }
             }
         },
-        plugins: [markerPlugin]
+        plugins: [regionPlugin, markerPlugin]
     });
 }
 function toggleBenchmarkBlock(){
