@@ -1409,7 +1409,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <div class="bb-arb-toggle">
                 <div class="bb-arb-toggle-copy">
                     <div class="bb-arb-toggle-label">Include arbitrage bot</div>
-                    <div class="bb-arb-toggle-sub" id="bb-arb-toggle-sub">Excluded by default from core AOT customer mix</div>
+                    <div class="bb-arb-toggle-sub" id="bb-arb-toggle-sub">Excluded by default</div>
                 </div>
                 <label class="bb-arb-switch" title="Include arbitrage bot in the block simulation">
                     <input type="checkbox" id="bb-arb-toggle" onchange="toggleArbBotInBuilder(this.checked)">
@@ -3167,6 +3167,14 @@ function fmtCuExact(n){
     if(n === undefined || n === null || isNaN(n)) return '0';
     return fmtK(Math.round(Number(n)));
 }
+function fmtMetricDot(v){
+    if(v === undefined || v === null || isNaN(v)) return '0.00';
+    v = Number(v);
+    if(Math.abs(v) < 0.01) return v.toFixed(4);
+    if(Math.abs(v) < 0.1) return v.toFixed(3);
+    if(Math.abs(v) >= 10) return v.toFixed(1);
+    return v.toFixed(2);
+}
 function fmtHuman(n){
     if(n === undefined || n === null || isNaN(n)) return '0';
     n = Number(n);
@@ -3190,7 +3198,7 @@ function escHtml(str){
 }
 function getFragmentProfile(cat, profileKey){
     if(!cat) return null;
-    if(profileKey === 'mean') return cat.meanProfile || cat.medianProfile || null;
+    if(profileKey && cat[profileKey + 'Profile']) return cat[profileKey + 'Profile'] || cat.medianProfile || null;
     if(profileKey && profileKey.indexOf('program:') === 0){
         var match = (cat.programOptions || []).find(function(opt){ return opt.key === profileKey; });
         if(match) return match;
@@ -3231,12 +3239,66 @@ function getArbBotProfile(){
     };
 }
 
+function buildArbBotDistribution(values, stats){
+    if(!values || !values.length) return null;
+    var positive = values.filter(function(v){ return v > 0; });
+    var minValue = positive.length ? Math.min.apply(null, positive) : 0.0001;
+    minValue = Math.max(minValue, 0.0001);
+    var maxValue = Math.max.apply(null, values.concat([minValue * 10]));
+    var minLog = Math.log(minValue) / Math.LN10;
+    var maxLog = Math.log(maxValue) / Math.LN10;
+    if(!(maxLog > minLog)) maxLog = minLog + 1;
+    var binCount = Math.max(12, Math.min(20, Math.ceil(Math.sqrt(values.length) * 1.5)));
+    var bins = Array.from({ length: binCount }, function(_, idx){
+        var from = minLog + ((maxLog - minLog) * idx / binCount);
+        var to = minLog + ((maxLog - minLog) * (idx + 1) / binCount);
+        return {
+            from: Math.pow(10, from),
+            to: Math.pow(10, to),
+            count: 0
+        };
+    });
+    values.forEach(function(v){
+        var clamped = Math.max(v, minValue);
+        var pos = (Math.log(clamped) / Math.LN10 - minLog) / (maxLog - minLog);
+        var idx = Math.min(binCount - 1, Math.max(0, Math.floor(pos * binCount)));
+        bins[idx].count += 1;
+    });
+    var maxCount = bins.reduce(function(max, bin){ return Math.max(max, bin.count); }, 1);
+    var markerPos = function(v){
+        var clamped = Math.max(v, minValue);
+        return ((Math.log(clamped) / Math.LN10 - minLog) / (maxLog - minLog)) * 100;
+    };
+    return {
+        bins: bins,
+        maxCount: maxCount,
+        minValue: minValue,
+        maxValue: maxValue,
+        markers: [
+            { key: 'p25', label: 'P25', color: '#7AA2FF', value: stats.p25FeePerCU, pos: markerPos(stats.p25FeePerCU) },
+            { key: 'median', label: 'Median', color: '#C0FF38', value: stats.medianFeePerCU, pos: markerPos(stats.medianFeePerCU) },
+            { key: 'mean', label: 'Mean', color: '#F5A623', value: stats.meanFeePerCU, pos: markerPos(stats.meanFeePerCU) },
+            { key: 'p75', label: 'P75', color: '#A78BFA', value: stats.p75FeePerCU, pos: markerPos(stats.p75FeePerCU) }
+        ]
+    };
+}
+
 function getArbBotBuilderData(){
     if(!_jitBenchmarkProgs || !_jitBenchmarkProgs.length) return null;
     var cuValues = _jitBenchmarkProgs.map(function(p){ return getProgramTouchedCuPerBlock(p); }).filter(function(v){ return v > 0; });
     var feeValues = _jitBenchmarkProgs.map(function(p){ return p.cu > 0 ? (p.fpc_nb || 0) : 0; }).filter(function(v){ return v >= 0; });
     var arbProfile = getArbBotProfile();
     if(!cuValues.length || !feeValues.length || !arbProfile) return null;
+    var stats = {
+        p25CuPerBlock: percentile(cuValues, 25),
+        medianCuPerBlock: percentile(cuValues, 50),
+        meanCuPerBlock: mean(cuValues),
+        p75CuPerBlock: percentile(cuValues, 75),
+        p25FeePerCU: percentile(feeValues, 25),
+        medianFeePerCU: percentile(feeValues, 50),
+        meanFeePerCU: mean(feeValues),
+        p75FeePerCU: percentile(feeValues, 75)
+    };
     return {
         id: BENCHMARK_GROUP_SPEC.id,
         label: BENCHMARK_GROUP_SPEC.label,
@@ -3247,20 +3309,39 @@ function getArbBotBuilderData(){
             kind: 'median',
             label: 'Median',
             sourceLabel: 'Median profile',
-            cu: percentile(cuValues, 50),
-            feePerCU: percentile(feeValues, 50)
+            cu: stats.medianCuPerBlock,
+            feePerCU: stats.medianFeePerCU
         },
         meanProfile: {
             key: 'mean',
             kind: 'mean',
             label: 'Mean',
             sourceLabel: 'Mean profile',
-            cu: mean(cuValues),
-            feePerCU: mean(feeValues)
+            cu: stats.meanCuPerBlock,
+            feePerCU: stats.meanFeePerCU
+        },
+        p25Profile: {
+            key: 'p25',
+            kind: 'percentile',
+            label: 'P25',
+            sourceLabel: 'P25 profile',
+            cu: stats.p25CuPerBlock,
+            feePerCU: stats.p25FeePerCU
+        },
+        p75Profile: {
+            key: 'p75',
+            kind: 'percentile',
+            label: 'P75',
+            sourceLabel: 'P75 profile',
+            cu: stats.p75CuPerBlock,
+            feePerCU: stats.p75FeePerCU
         },
         programOptions: [],
         isArbBot: true,
-        arbInfo: arbProfile
+        arbInfo: arbProfile,
+        arbStats: stats,
+        distribution: buildArbBotDistribution(feeValues, stats),
+        rowCount: feeValues.length
     };
 }
 
@@ -3449,7 +3530,6 @@ function renderBenchmarkBlock(){
     var b = _benchmarkAgg || {n:0,weightedNonBase:0,weightedTotal:0,medianNonBase:0,p25NonBase:0,p75NonBase:0,cu:0};
     var arbProfile = getArbBotProfile();
     var arbBuilder = getArbBotBuilderData();
-    var fmtArbFpc = function(v){ return v < 0.01 ? v.toFixed(4) : v < 0.1 ? v.toFixed(3) : v >= 10 ? v.toFixed(1) : v.toFixed(2); };
     var toggleLabel = _showBenchmarkBlock ? 'Hide arbitrage bot details' : 'Show arbitrage bot details';
     var html = '<button class="bb-add-btn" style="margin-top:0;" onclick="toggleBenchmarkBlock()">' + toggleLabel + '</button>';
     if(!_showBenchmarkBlock){
@@ -3462,20 +3542,51 @@ function renderBenchmarkBlock(){
         '</div>';
         return;
     }
+    var distHtml = '';
+    if(arbBuilder && arbBuilder.distribution){
+        var dist = arbBuilder.distribution;
+        var barsHtml = dist.bins.map(function(bin){
+            var h = dist.maxCount > 0 ? Math.max(6, Math.round((bin.count / dist.maxCount) * 52)) : 6;
+            return '<div title="' + fmtMetricDot(bin.from) + ' to ' + fmtMetricDot(bin.to) + ' lam/CU: ' + fmtK(bin.count) + ' bots" style="flex:1;min-width:0;height:' + h + 'px;background:linear-gradient(180deg,rgba(167,139,250,.9),rgba(192,255,56,.6));border-radius:2px 2px 0 0;opacity:' + (bin.count ? '1' : '.18') + ';"></div>';
+        }).join('');
+        var markersHtml = dist.markers.map(function(marker, idx){
+            var topOffset = 2 + (idx % 2) * 14;
+            return '<div style="position:absolute;left:calc(' + marker.pos.toFixed(2) + '% - 1px);top:0;bottom:14px;width:2px;background:' + marker.color + ';box-shadow:0 0 0 1px rgba(0,0,0,.25);"></div>' +
+                '<div style="position:absolute;left:' + marker.pos.toFixed(2) + '%;top:' + topOffset + 'px;transform:translateX(-50%);padding:1px 5px;border-radius:999px;background:#0f1218;border:1px solid ' + marker.color + ';color:' + marker.color + ';font-size:9px;font-family:var(--font-mono);white-space:nowrap;">' + marker.label + '</div>';
+        }).join('');
+        var statChips = dist.markers.map(function(marker){
+            return '<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;background:#0f1218;border:1px solid #1b1f28;border-radius:999px;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + marker.color + ';"></span><span style="color:var(--text-mid);">' + marker.label + '</span><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(marker.value) + ' lam/CU</span></div>';
+        }).join('');
+        distHtml =
+            '<div style="margin-top:10px;padding-top:10px;border-top:1px solid #161922;">' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;">' +
+                    '<div style="font-size:10px;color:var(--text-mid);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.6px;">Non-base fee/CU distribution</div>' +
+                    '<div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">' + fmtK(arbBuilder.rowCount) + ' arbitrage-bot rows · log scale</div>' +
+                '</div>' +
+                '<div style="position:relative;height:92px;padding:28px 8px 16px;background:#0d1016;border:1px solid #181c24;border-radius:8px;overflow:hidden;">' +
+                    '<div style="position:absolute;left:8px;right:8px;bottom:16px;height:52px;display:flex;align-items:flex-end;gap:2px;">' + barsHtml + '</div>' +
+                    '<div style="position:absolute;left:8px;right:8px;top:4px;bottom:16px;pointer-events:none;">' + markersHtml + '</div>' +
+                    '<div style="position:absolute;left:8px;bottom:2px;font-size:9px;color:var(--text2);font-family:var(--font-mono);">' + fmtMetricDot(dist.minValue) + '</div>' +
+                    '<div style="position:absolute;right:8px;bottom:2px;font-size:9px;color:var(--text2);font-family:var(--font-mono);">' + fmtMetricDot(dist.maxValue) + ' lam/CU</div>' +
+                '</div>' +
+                '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:10px;font-family:var(--font-mono);">' + statChips + '</div>' +
+            '</div>';
+    }
     el.innerHTML = html +
         '<div style="margin-top:8px;padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;">' +
             '<div style="font-size:11px;color:#A78BFA;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Arbitrage Bot Layer</div>' +
             '<div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Shown separately and excluded by default from the core AOT customer story. Non-base means priority fees plus MEV / JIT tips.</div>' +
             '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-family:var(--font-mono);font-size:11px;">' +
                 '<div><span style="color:var(--text2);">Programs</span><br><span style="color:var(--text);font-weight:600;">' + fmtK(b.n) + '</span></div>' +
-                '<div><span style="color:var(--text2);">Non-base fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + fmtArbFpc(b.weightedNonBase) + ' lam</span></div>' +
-                '<div><span style="color:var(--text2);">Total fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + fmtArbFpc(b.weightedTotal) + ' lam</span></div>' +
-                '<div><span style="color:var(--text2);">Median non-base</span><br><span style="color:var(--text);font-weight:600;">' + fmtArbFpc(b.medianNonBase) + ' lam</span></div>' +
-                '<div><span style="color:var(--text2);">p25 / p75 non-base</span><br><span style="color:var(--text);font-weight:600;">' + fmtArbFpc(b.p25NonBase) + ' / ' + fmtArbFpc(b.p75NonBase) + '</span></div>' +
+                '<div><span style="color:var(--text2);">Non-base fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(b.weightedNonBase) + ' lam</span></div>' +
+                '<div><span style="color:var(--text2);">Total fee/CU</span><br><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(b.weightedTotal) + ' lam</span></div>' +
+                '<div><span style="color:var(--text2);">Median non-base</span><br><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(b.medianNonBase) + ' lam</span></div>' +
+                '<div><span style="color:var(--text2);">p25 / p75 non-base</span><br><span style="color:var(--text);font-weight:600;">' + fmtMetricDot(b.p25NonBase) + ' / ' + fmtMetricDot(b.p75NonBase) + '</span></div>' +
                 '<div><span style="color:var(--text2);">Median CU / active block</span><br><span style="color:var(--text);font-weight:600;">' + fmtCuExact(arbBuilder && arbBuilder.medianProfile ? arbBuilder.medianProfile.cu : 0) + ' CU</span></div>' +
                 '<div><span style="color:var(--text2);">Observed avg CU / active block</span><br><span style="color:var(--text);font-weight:600;">' + fmtCuExact(arbProfile ? arbProfile.cu : 0) + ' CU</span></div>' +
                 '<div><span style="color:var(--text2);">Implied non-base fees / active block</span><br><span style="color:var(--text);font-weight:600;">' + ((arbProfile && Number.isFinite(arbProfile.nonBaseFeesPerBlock)) ? arbProfile.nonBaseFeesPerBlock.toFixed(6) : '0.000000') + ' SOL</span></div>' +
             '</div>' +
+            distHtml +
             '<div style="font-size:9px;color:var(--text2);margin-top:8px;font-family:var(--font-mono);">' + ((arbProfile && arbProfile.usesTouchedBlocks) ? 'Active-block metrics use touched-block semantics from benchmark rows when available.' : 'Active-block metrics fall back to 30d window averages when touched-block counts are unavailable.') + '</div>' +
         '</div>';
 }
@@ -4213,7 +4324,7 @@ function renderBlockBuilder(){
             var customTag = isCustom ? '<span class="bf-tag custom">Customized</span>' : '';
             var profileOptionsHtml = '';
             if(catData){
-                var options = [catData.medianProfile, catData.meanProfile].concat(catData.programOptions || []);
+                var options = [catData.medianProfile, catData.meanProfile, catData.p25Profile, catData.p75Profile].concat(catData.programOptions || []);
                 profileOptionsHtml = options.map(function(opt){
                     if(!opt) return '';
                     return '<option value="' + escHtml(opt.key) + '"' + (f.profileKey === opt.key ? ' selected' : '') + '>' + escHtml(opt.label) + '</option>';
