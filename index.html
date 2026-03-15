@@ -3292,18 +3292,18 @@ function buildArbBotDistribution(rows, stats){
 function buildArbBotSizeProfiles(rows, stats){
     if(!rows || !rows.length) return { profiles: [], summaries: [] };
     var defs = [
-        { key: 'small', label: 'Small', min: -Infinity, max: stats.p25CuPerBlock, rangeLabel: '≤ P25 CU' },
-        { key: 'medium', label: 'Medium', min: stats.p25CuPerBlock, max: stats.medianCuPerBlock, rangeLabel: 'P25–P50 CU' },
-        { key: 'large', label: 'Large', min: stats.medianCuPerBlock, max: stats.p75CuPerBlock, rangeLabel: 'P50–P75 CU' },
-        { key: 'xl', label: 'XL', min: stats.p75CuPerBlock, max: Infinity, rangeLabel: '> P75 CU' }
+        { key: 'small', label: 'Small', min: -Infinity, max: stats.p25FeePerCU, rangeLabel: '≤ P25 fee/CU' },
+        { key: 'medium', label: 'Medium', min: stats.p25FeePerCU, max: stats.medianFeePerCU, rangeLabel: 'P25–P50 fee/CU' },
+        { key: 'large', label: 'Large', min: stats.medianFeePerCU, max: stats.p75FeePerCU, rangeLabel: 'P50–P75 fee/CU' },
+        { key: 'xl', label: 'XL', min: stats.p75FeePerCU, max: Infinity, rangeLabel: '> P75 fee/CU' }
     ];
     var profiles = [];
     var summaries = [];
     defs.forEach(function(def, idx){
         var members = rows.filter(function(row){
-            if(idx === 0) return row.cuActiveBlock <= def.max;
-            if(idx === defs.length - 1) return row.cuActiveBlock > def.min;
-            return row.cuActiveBlock > def.min && row.cuActiveBlock <= def.max;
+            if(idx === 0) return row.feePerCU <= def.max;
+            if(idx === defs.length - 1) return row.feePerCU > def.min;
+            return row.feePerCU > def.min && row.feePerCU <= def.max;
         });
         if(!members.length) return;
         var cuVals = members.map(function(row){ return row.cuActiveBlock; });
@@ -3323,8 +3323,8 @@ function buildArbBotSizeProfiles(rows, stats){
             lowerBound: def.min,
             upperBound: def.max,
             count: members.length,
-            min: Math.min.apply(null, cuVals),
-            max: Math.max.apply(null, cuVals),
+            minFee: Math.min.apply(null, feeVals),
+            maxFee: Math.max.apply(null, feeVals),
             cu: percentile(cuVals, 50),
             feePerCU: percentile(feeVals, 50)
         });
@@ -3360,9 +3360,9 @@ function getArbBotBuilderData(){
     var sizeBuckets = buildArbBotSizeProfiles(processedRows, stats);
     processedRows.forEach(function(row){
         var matched = sizeBuckets.summaries.find(function(bucket){
-            if(bucket.key === 'small') return row.cuActiveBlock <= bucket.upperBound;
-            if(bucket.key === 'xl') return row.cuActiveBlock > bucket.lowerBound;
-            return row.cuActiveBlock > bucket.lowerBound && row.cuActiveBlock <= bucket.upperBound;
+            if(bucket.key === 'small') return row.feePerCU <= bucket.upperBound;
+            if(bucket.key === 'xl') return row.feePerCU > bucket.lowerBound;
+            return row.feePerCU > bucket.lowerBound && row.feePerCU <= bucket.upperBound;
         });
         row.bucketKey = matched ? matched.key : 'xl';
     });
