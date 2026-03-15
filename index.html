@@ -3148,11 +3148,18 @@ function getFragmentProfile(cat, profileKey){
     return cat.medianProfile || cat.meanProfile || ((cat.programOptions || [])[0]) || null;
 }
 
+function getProgramTouchedCuPerBlock(p){
+    if(!p || !(p.cu > 0)) return 0;
+    var blocksTouched = Number.isFinite(p.blocks_touched_30d) && p.blocks_touched_30d > 0 ? p.blocks_touched_30d : null;
+    var fallbackDen = SY * 30 / 365;
+    var den = blocksTouched || fallbackDen;
+    return den > 0 ? (p.cu * 1e9 / den) : 0;
+}
+
 // ── Build category-level aggregates from external AOT artifact ──
 function buildCategoryData(){
     var aotProgs = _aotProgs.slice();
     var allCore = _aotCoreUniverse.slice();
-    var S30 = SY * 30 / 365; // slots in 30-day window
     return BIZ_CATEGORIES.map(function(cat){
         var progs = aotProgs.filter(function(p){ return (cat.segments || []).includes(p.segment_key || 'other'); });
         var allMatch = allCore.filter(function(p){ return (cat.segments || []).includes(p.segment_key || 'other'); });
@@ -3170,14 +3177,14 @@ function buildCategoryData(){
         var priFeePerCU = cu > 0 ? (pf / cu) : 0;
         // Dispersion follows frozen spec: non-base fee/CU distribution
         var progFpcs = progs.map(function(p){ return p.cu > 0 ? (p.fpc_nb || 0) : 0; });
-        var avgCuPerBlock = cu > 0 ? (cu * 1e9 / S30) : 0; // CU per block on average
+        var avgCuPerBlock = progs.reduce(function(sum, p){ return sum + getProgramTouchedCuPerBlock(p); }, 0);
         var primaryUsable = progs.filter(function(p){
-            var avgCu = p.cu > 0 ? (p.cu * 1e9 / S30) : 0;
+            var avgCu = getProgramTouchedCuPerBlock(p);
             var usableCu = Math.round(avgCu);
             return usableCu > 0 && (p.fpc_nb || 0) > 0;
         });
         var fallbackUsable = progs.filter(function(p){
-            var avgCu = p.cu > 0 ? (p.cu * 1e9 / S30) : 0;
+            var avgCu = getProgramTouchedCuPerBlock(p);
             return Math.round(avgCu) > 0;
         });
         var usablePrograms = (primaryUsable.length >= 2 ? primaryUsable : fallbackUsable).slice().sort(function(a,b){
@@ -3190,7 +3197,7 @@ function buildCategoryData(){
                 kind: 'program',
                 label: p.n || ('Program ' + (idx + 1)),
                 sourceLabel: p.n || ('Program ' + (idx + 1)),
-                cu: p.cu > 0 ? (p.cu * 1e9 / S30) : 0,
+                cu: getProgramTouchedCuPerBlock(p),
                 feePerCU: p.cu > 0 ? (p.fpc_nb || 0) : 0
             };
         });
@@ -3668,10 +3675,9 @@ function renderCategoryTable(id){
         return;
     }
     var fmtFpc = function(v){ return v < 0.01 ? v.toFixed(4) : v < 0.1 ? v.toFixed(3) : v >= 10 ? v.toFixed(1) : v.toFixed(2); };
-    var S30 = SY * 30 / 365;
     var sorted = [].concat(c.progs).sort(function(a,b){
-        var acuPerBlock = a.cu > 0 ? (a.cu * 1e9 / S30) : 0;
-        var bcuPerBlock = b.cu > 0 ? (b.cu * 1e9 / S30) : 0;
+        var acuPerBlock = getProgramTouchedCuPerBlock(a);
+        var bcuPerBlock = getProgramTouchedCuPerBlock(b);
         var aImplied = (a.cu > 0 ? (a.fpc_nb || 0) : 0) * acuPerBlock / LS;
         var bImplied = (b.cu > 0 ? (b.fpc_nb || 0) : 0) * bcuPerBlock / LS;
         if(bImplied !== aImplied) return bImplied - aImplied;
@@ -3686,7 +3692,7 @@ function renderCategoryTable(id){
         sorted.map(function(p){
             var nbc = p.cu > 0 ? (p.fpc_nb || 0) : 0;
             var tfc = p.cu > 0 ? (p.fpc_tot || 0) : 0;
-            var cuPerBlock = p.cu > 0 ? (p.cu * 1e9 / S30) : 0;
+            var cuPerBlock = getProgramTouchedCuPerBlock(p);
             var impliedFeesBlock = nbc * cuPerBlock / LS;
             var cuPerBlockFmt = fmtHuman(cuPerBlock);
             var impliedFmt = impliedFeesBlock >= 0.01 ? impliedFeesBlock.toFixed(4) : impliedFeesBlock.toFixed(6);
