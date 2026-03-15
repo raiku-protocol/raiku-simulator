@@ -3227,20 +3227,42 @@ function getArbBotProfile(){
     };
 }
 
+function getArbBotBuilderData(){
+    if(!_jitBenchmarkProgs || !_jitBenchmarkProgs.length) return null;
+    var cuValues = _jitBenchmarkProgs.map(function(p){ return getProgramTouchedCuPerBlock(p); }).filter(function(v){ return v > 0; });
+    var feeValues = _jitBenchmarkProgs.map(function(p){ return p.cu > 0 ? (p.fpc_nb || 0) : 0; }).filter(function(v){ return v >= 0; });
+    var arbProfile = getArbBotProfile();
+    if(!cuValues.length || !feeValues.length || !arbProfile) return null;
+    return {
+        id: BENCHMARK_GROUP_SPEC.id,
+        label: BENCHMARK_GROUP_SPEC.label,
+        color: BENCHMARK_GROUP_SPEC.color,
+        profileFallbackUsed: false,
+        medianProfile: {
+            key: 'median',
+            kind: 'median',
+            label: 'Median',
+            sourceLabel: 'Median profile',
+            cu: percentile(cuValues, 50),
+            feePerCU: percentile(feeValues, 50)
+        },
+        meanProfile: {
+            key: 'mean',
+            kind: 'mean',
+            label: 'Mean',
+            sourceLabel: 'Mean profile',
+            cu: mean(cuValues),
+            feePerCU: mean(feeValues)
+        },
+        programOptions: [],
+        isArbBot: true,
+        arbInfo: arbProfile
+    };
+}
+
 function getBuilderCatData(catId, data){
     if(catId === BENCHMARK_GROUP_SPEC.id){
-        var arbProfile = getArbBotProfile();
-        if(!arbProfile) return null;
-        return {
-            id: BENCHMARK_GROUP_SPEC.id,
-            label: BENCHMARK_GROUP_SPEC.label,
-            color: BENCHMARK_GROUP_SPEC.color,
-            profileFallbackUsed: false,
-            medianProfile: arbProfile,
-            meanProfile: arbProfile,
-            programOptions: [],
-            isArbBot: true
-        };
+        return getArbBotBuilderData();
     }
     return (data || getCatData()).find(function(d){ return d.id === catId; }) || null;
 }
@@ -3979,35 +4001,8 @@ var _includeArbBotInBuilder = false;
 var cBlockMix = null;
 var SLOTS_PER_EPOCH = 432000; // Solana epoch length
 
-function syncArbBotFragment(){
-    var arbIdx = _bbFragments.findIndex(function(f){ return f.catId === BENCHMARK_GROUP_SPEC.id; });
-    if(!_includeArbBotInBuilder || !(_benchmarkAgg && _benchmarkAgg.n > 0)){
-        if(arbIdx >= 0) _bbFragments.splice(arbIdx, 1);
-        return;
-    }
-    var arbCat = getBuilderCatData(BENCHMARK_GROUP_SPEC.id);
-    var arbProfile = arbCat ? getFragmentProfile(arbCat, 'median') : null;
-    if(!arbProfile) return;
-    var arbCu = arbProfile.cu > 0 ? Math.round(arbProfile.cu) : 1000;
-    if(arbIdx === -1){
-        _bbFragments.push({
-            catId: BENCHMARK_GROUP_SPEC.id,
-            profileKey: arbProfile.key,
-            cu: arbCu,
-            feePerCU: arbProfile.feePerCU || 0,
-            userAdjustedCU: false,
-            userAdjustedFee: false
-        });
-        return;
-    }
-    _bbFragments[arbIdx].profileKey = arbProfile.key;
-    if(!_bbFragments[arbIdx].userAdjustedCU) _bbFragments[arbIdx].cu = arbCu;
-    if(!_bbFragments[arbIdx].userAdjustedFee) _bbFragments[arbIdx].feePerCU = arbProfile.feePerCU || 0;
-}
-
 function toggleArbBotInBuilder(force){
     _includeArbBotInBuilder = typeof force === 'boolean' ? force : !_includeArbBotInBuilder;
-    syncArbBotFragment();
     renderBlockBuilder();
 }
 
@@ -4081,7 +4076,6 @@ function resetFragment(idx){
 
 function renderBlockBuilder(){
     if(!_bbFragments || !Array.isArray(_bbFragments)) return;
-    syncArbBotFragment();
     var sp = getSimParams();
     var avail = CB * sp.b; // total available CU
     var arbToggle = document.getElementById('bb-arb-toggle');
@@ -4092,7 +4086,7 @@ function renderBlockBuilder(){
     }
     if(arbToggleSub){
         if(!(_benchmarkAgg && _benchmarkAgg.n > 0)) arbToggleSub.textContent = 'No arbitrage-bot rows in the current artifact';
-        else arbToggleSub.textContent = _includeArbBotInBuilder ? 'Included intentionally as a separate bot layer' : 'Excluded by default from core AOT customer mix';
+        else arbToggleSub.textContent = _includeArbBotInBuilder ? 'Available in Add Category' : 'Available in Add Category when enabled';
     }
     // SORT fragments by fee/CU descending (greedy auction fill)
     var sortedIdxs = _bbFragments.map(function(_,i){ return i; });
@@ -4210,7 +4204,7 @@ function renderBlockBuilder(){
             var profileTag = profile ? '<span class="bf-tag from-data">' + escHtml(profile.sourceLabel) + '</span>' : '';
             var customTag = isCustom ? '<span class="bf-tag custom">Customized</span>' : '';
             var profileOptionsHtml = '';
-            if(catData && !catData.isArbBot){
+            if(catData){
                 var options = [catData.medianProfile, catData.meanProfile].concat(catData.programOptions || []);
                 profileOptionsHtml = options.map(function(opt){
                     if(!opt) return '';
@@ -4219,7 +4213,7 @@ function renderBlockBuilder(){
             }
 
             html += '<div class="bb-frag' + (isRejected ? ' rejected' : '') + '" style="border-left:3px solid ' + col + '">' +
-                (f.catId === BENCHMARK_GROUP_SPEC.id ? '' : '<button class="bf-remove" onclick="removeFragment(' + origIdx + ')">&times;</button>') +
+                '<button class="bf-remove" onclick="removeFragment(' + origIdx + ')">&times;</button>' +
                 rankBadge +
                 '<div class="bf-cat" style="color:' + col + '">' + (cat?cat.label:f.catId) + '</div>' +
 
@@ -4227,14 +4221,9 @@ function renderBlockBuilder(){
                 '<div class="bf-inputs">' +
                     '<div class="bf-input-group">' +
                         '<span class="bf-label">Client profile</span>' +
-                        (catData && catData.isArbBot ?
-                            '<div style="font-size:11px;font-family:var(--font-mono);color:var(--text);padding:6px 0 2px;">Arbitrage bot benchmark profile</div>' +
-                            '<span class="bf-tag from-data">Separate layer</span>' +
-                            customTag :
-                            '<select onchange="applyFragmentProfile(' + origIdx + ',this.value)">' + profileOptionsHtml + '</select>' +
-                            profileTag +
-                            customTag
-                        ) +
+                        '<select onchange="applyFragmentProfile(' + origIdx + ',this.value)">' + profileOptionsHtml + '</select>' +
+                        profileTag +
+                        customTag +
                     '</div>' +
                     profileNote +
                     '<div class="bf-input-group">' +
@@ -4266,7 +4255,12 @@ function renderBlockBuilder(){
         });
         html += '<button class="bb-add-btn" onclick="document.getElementById(\'bb-add-dropdown\').style.display=document.getElementById(\'bb-add-dropdown\').style.display===\'block\'?\'none\':\'block\'">+ Add Category</button>';
         html += '<div id="bb-add-dropdown" style="display:none;position:absolute;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:6px;z-index:10;margin-top:4px;">';
-        data.forEach(function(c){
+        var addableCategories = data.slice();
+        if(_includeArbBotInBuilder){
+            var arbCatData = getBuilderCatData(BENCHMARK_GROUP_SPEC.id, data);
+            if(arbCatData) addableCategories.push(arbCatData);
+        }
+        addableCategories.forEach(function(c){
             var medianLabel = c.medianProfile ? fmtFpc(c.medianProfile.feePerCU) : '0.00';
             html += '<div style="padding:4px 10px;cursor:pointer;font-size:11px;color:var(--text-mid);border-radius:4px;" onmouseover="this.style.background=\'#1a1c22\'" onmouseout="this.style.background=\'\'" onclick="addFragment(\'' + c.id + '\');document.getElementById(\'bb-add-dropdown\').style.display=\'none\';">' + c.label + ' <span style="color:var(--text2);font-size:9px">(Median ' + medianLabel + ' lam/CU)</span></div>';
         });
