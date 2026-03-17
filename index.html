@@ -436,31 +436,6 @@ details[open] summary::before { transform:rotate(90deg); }
 .regime-btn.wip { opacity:.5; cursor:not-allowed; }
 .regime-wip-msg { font-size:11px; color:#F5A623; background:#1a1710; border:1px solid #2a2210; border-radius:6px; padding:8px 12px; margin-bottom:12px; display:none; }
 
-/* Congestion context */
-.sim-congestion { margin-bottom:14px; padding:12px; background:linear-gradient(180deg,#0b0d12 0%,#10131a 100%); border:1px solid #1b2230; border-radius:10px; }
-.sim-congestion-head { display:grid; grid-template-columns:minmax(0, 1fr) minmax(280px, 360px); gap:12px; margin-bottom:12px; align-items:start; }
-.sim-congestion-kicker { font-size:9px; text-transform:uppercase; letter-spacing:1px; color:#A7B4C7; font-family:var(--font-mono); margin-bottom:3px; }
-.sim-congestion-head h3 { font-size:14px; margin:0; color:var(--text); }
-.sim-congestion-sub { font-size:10px; color:var(--text2); line-height:1.5; }
-.sim-congestion-cards { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; margin-bottom:12px; }
-.sim-congestion-card { padding:11px 12px; background:#0d1017; border:1px solid #1a2130; border-radius:8px; }
-.sim-congestion-label { font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text2); font-family:var(--font-mono); margin-bottom:5px; }
-.sim-congestion-value { font-size:24px; line-height:1.1; font-weight:700; color:var(--text); font-family:var(--font-mono); }
-.sim-congestion-value span { font-size:11px; color:var(--text2); font-weight:500; margin-left:4px; }
-.sim-congestion-detail { font-size:10px; color:var(--text2); margin-top:5px; line-height:1.45; }
-.sim-congestion-table-wrap { background:#090b10; border:1px solid #171d28; border-radius:8px; overflow:hidden; margin-bottom:10px; }
-.sim-congestion-table-caption { padding:9px 11px; font-size:10px; color:var(--text2); border-bottom:1px solid #171d28; background:#0c0f15; }
-.sim-congestion-table { width:100%; border-collapse:collapse; font-size:11px; font-family:var(--font-mono); }
-.sim-congestion-table th { text-align:left; padding:8px 11px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text2); border-bottom:1px solid #171d28; background:#0a0d13; }
-.sim-congestion-table td { padding:8px 11px; border-bottom:1px solid #121722; color:var(--text-mid); }
-.sim-congestion-table tbody tr:last-child td { border-bottom:none; }
-.sim-congestion-table td strong { color:var(--text); font-weight:600; }
-.sim-congestion-note { font-size:10px; color:var(--text2); line-height:1.55; padding:10px 11px; background:#0b0d12; border:1px solid #171d28; border-radius:8px; }
-@media(max-width:900px){
-    .sim-congestion-head { grid-template-columns:1fr; }
-    .sim-congestion-cards { grid-template-columns:1fr; }
-}
-
 /* Category programs table */
 .cat-prog-table { width:100%; font-size:11px; border-collapse:collapse; font-family:var(--font-mono); }
 .cat-prog-table th { text-align:left; font-size:9px; text-transform:uppercase; letter-spacing:.8px; color:var(--text2); padding:4px 8px; border-bottom:1px solid #1a1c22; cursor:pointer; }
@@ -1455,52 +1430,12 @@ details[open] summary::before { transform:rotate(90deg); }
     <h2 style="margin-bottom:8px;">Category Explorer</h2>
     <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">Fixed canonical order: <strong>Prop AMM, Cranker, Oracle, Depin, Payments, DEX, Lending, Perps, Bridge, NFT, Gaming</strong>. Core scope uses <strong>aot + both</strong>. The <strong>arbitrage-bot</strong> layer appears separately and stays excluded by default unless explicitly toggled on in Block Builder.</div>
 
-    <div class="sim-congestion">
-        <div class="sim-congestion-head">
-            <div>
-                <div class="sim-congestion-kicker">Macro Market Context</div>
-                <h3>Congestion Context</h3>
-            </div>
-            <div class="sim-congestion-sub">Read-only network backdrop from the additive epoch dataset. It highlights how competitive fee conditions change during stressed periods and does not modify the live scenario presets, revenue formulas, or Block Builder calculations.</div>
-        </div>
-        <div class="sim-congestion-cards">
-            <div class="sim-congestion-card">
-                <div class="sim-congestion-label">Baseline normal median</div>
-                <div class="sim-congestion-value">1.44 <span>lam/CU</span></div>
-                <div class="sim-congestion-detail">Non-base fee/CU across normal epochs.</div>
-            </div>
-            <div class="sim-congestion-card">
-                <div class="sim-congestion-label">Congestion reference</div>
-                <div class="sim-congestion-value">2.80 <span>lam/CU</span></div>
-                <div class="sim-congestion-detail">Peak-tagged p75 on non-base fee/CU.</div>
-            </div>
-            <div class="sim-congestion-card">
-                <div class="sim-congestion-label">Observed uplift</div>
-                <div class="sim-congestion-value">~2.0x</div>
-                <div class="sim-congestion-detail">2.80 / 1.44 = 1.94x versus the normal baseline.</div>
-            </div>
-        </div>
-        <div class="sim-congestion-table-wrap">
-            <div class="sim-congestion-table-caption">Median epoch values by regime (lam/CU). The congestion reference above uses the peak-tagged <strong>p75</strong> as a stressed benchmark.</div>
-            <table class="sim-congestion-table">
-                <thead>
-                    <tr>
-                        <th>Regime</th>
-                        <th>Non-base fee/CU</th>
-                        <th>Total fee/CU</th>
-                        <th>Priority fee/CU</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td><strong>Normal</strong></td><td>1.44</td><td>1.54</td><td>0.67</td></tr>
-                    <tr><td><strong>Elevated</strong></td><td>1.85</td><td>1.97</td><td>0.79</td></tr>
-                    <tr><td><strong>Extreme</strong></td><td>1.74</td><td>1.82</td><td>0.87</td></tr>
-                    <tr><td><strong>Peak tagged</strong></td><td>1.89</td><td>2.03</td><td>0.86</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="sim-congestion-note"><strong>Regime definitions.</strong> <strong>Normal</strong>, <strong>Elevated</strong>, and <strong>Extreme</strong> come from the rolling anomaly logic on SOL price change, priority-fee spikes, and MEV spikes. <strong>Peak tagged</strong> means an intraday overlay is available for a volatile subset; here, <strong>intraday</strong> means short fine-grained buckets inside a single epoch, not a multi-day period. This block is macro market context only, and it does not replace the current scenario framework. Average CU per block moves much less than fee/CU across these regimes, so the congestion signal is shown through fee competition first.</div>
+    <!-- Normal / Peak toggle -->
+    <div class="regime-toggle">
+        <button class="regime-btn active" onclick="togglePeak(false);this.classList.add('active');this.nextElementSibling.classList.remove('active')">● Normal (30d avg)</button>
+        <button class="regime-btn wip" onclick="togglePeak(true);this.classList.add('active');this.previousElementSibling.classList.remove('active')">Peak (congestion) — planned, not live</button>
     </div>
+    <div class="regime-wip-msg" id="sim-peak-msg">Peak congestion mode is a placeholder only. It requires a separate extraction pipeline (per-slot or per-epoch granularity) and is not yet available in the live simulator. All values below remain Normal regime.</div>
 
     <!-- Category buttons -->
     <div class="cat-bar" id="sim-cat-bar"></div>
