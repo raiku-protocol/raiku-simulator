@@ -1113,29 +1113,44 @@ details[open] summary::before { transform:rotate(90deg); }
             </div>
         </div>
 
-        <!-- Top programs by fee/CU (from external artifact) — BOTH metrics shown -->
+        <!-- Macro market context (read-only, explanatory only) -->
         <div style="margin-bottom:16px;">
-            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;">Top AOT-Relevant Programs (Top 100)</div>
-            <div id="aot-top-programs-table" style="overflow-x:auto;border:1px solid var(--card-border);border-radius:6px;background:#0a0b0c;max-height:360px;overflow-y:auto;"></div>
-            <div style="font-size:11px;color:var(--text2);margin-top:6px;">Source: external simulator artifact (<code style="font-size:10px;">data/aot_programs.v1.js</code>) — 30-day window from artifact metadata. Default sort is <strong>non-base fees 30d</strong> descending. Click column headers to re-sort. <strong>Non-base fee/CU</strong> = priority + MEV / JIT. <strong>Total fee/CU</strong> = base + priority + MEV / JIT.</div>
-        </div>
-
-        <!-- Chart: fee/CU by category -->
-        <div style="margin-bottom:16px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
-                <div style="font-size:12px;font-weight:600;color:var(--text);">Category Fee/CU (fixed canonical order)</div>
-                <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text2);">
-                    <label for="aot-cat-chart-mode">View:</label>
-                    <select id="aot-cat-chart-mode" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:4px 8px;font-size:11px;">
-                        <option value="non_base">Non-base (Priority + MEV / JIT)</option>
-                        <option value="total">Total (Base + Non-base)</option>
-                    </select>
-                </div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+                <div style="font-size:12px;font-weight:600;color:var(--text);">Macro Market Context</div>
+                <div style="font-size:10px;color:var(--text2);font-style:italic;">Read-only context — no scenario remapping is applied here.</div>
             </div>
-            <div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Non-base view uses stacked components <strong>priority + MEV / JIT</strong>. Total view uses stacked components <strong>base + priority + MEV / JIT</strong>; tooltip always shows full decomposition. <strong>Total</strong> = base + non-base.</div>
-            <div style="height:380px;background:#0a0b0c;border-radius:6px;padding:8px;"><canvas id="chart-aot-fcu-tiers"></canvas></div>
-            <div style="font-size:11px;color:var(--text2);margin-top:6px;">Weighted mean is CU-weighted while p25 / median / p75 are unweighted program percentiles; large gaps imply concentration.</div>
-            <div style="font-size:11px;color:var(--text2);margin-top:4px;" id="aot-near-zero-note"></div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px;">Network-wide epoch summaries for <strong>non-base fee/CU</strong>. This panel is explanatory only and prepares a later calibration step; it does not change the current preset ladder.</div>
+            <div style="padding:12px 14px;background:#10131a;border:1px solid #1c2330;border-radius:8px;margin-bottom:10px;">
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#A7B4C7;font-family:var(--font-mono);margin-bottom:4px;">Headline congestion uplift</div>
+                <div style="font-size:24px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;">1.96x</div>
+                <div style="font-size:11px;color:var(--text2);margin-top:5px;line-height:1.5;">Extreme mean / normal mean on non-base fee/CU = <strong style="color:var(--text);">3.363 / 1.717 = 1.96x</strong>.</div>
+            </div>
+            <div style="overflow-x:auto;border:1px solid var(--card-border);border-radius:6px;background:#0a0b0c;margin-bottom:10px;">
+                <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
+                    <thead style="background:#111213;">
+                        <tr style="border-bottom:1px solid var(--card-border);">
+                            <th style="padding:8px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Regime</th>
+                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">n</th>
+                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Mean</th>
+                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Median</th>
+                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">p75</th>
+                            <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">p90</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid #1a1a1a;"><td style="padding:8px 10px;color:var(--text);">All epochs</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">385</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">2.004</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">1.514</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">2.222</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">3.959</td></tr>
+                        <tr style="border-bottom:1px solid #1a1a1a;"><td style="padding:8px 10px;color:var(--text);">Normal</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">269</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">1.717</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">1.441</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">2.026</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">3.416</td></tr>
+                        <tr style="border-bottom:1px solid #1a1a1a;"><td style="padding:8px 10px;color:var(--text);">Elevated</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">71</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">2.231</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">1.848</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">2.361</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">4.431</td></tr>
+                        <tr><td style="padding:8px 10px;color:var(--text);">Extreme</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">45</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">3.363</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">1.743</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">4.165</td><td style="padding:8px 10px;text-align:right;color:var(--text2);">8.258</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.65;padding:12px 14px;background:#111213;border-radius:6px;border-left:3px solid #5B8DEF;">
+                <div style="font-weight:600;color:#5B8DEF;margin-bottom:6px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Method note</div>
+                <div style="margin-bottom:6px;">Displayed regime levels are descriptive summary statistics. The congestion uplift shown here is derived from <strong style="color:var(--text);">mean extreme vs mean normal</strong> because that preserves the expected economic ordering across regimes.</div>
+                <div style="margin-bottom:6px;">Extreme has a lower median than elevated because it is a smaller fat-tailed subset, so median alone should not be used for congestion scaling.</div>
+                <div>The future 30d market context refers to the simulator’s canonical AOT-relevant program scope, with arbitrage-bot excluded by default.</div>
+            </div>
         </div>
 
         <!-- Source metadata -->
