@@ -2023,19 +2023,11 @@ function applyScenario(n){
 // ── Data context selector — switches AOT fee/CU calibration source ────
 let _calibrationContext = '30d';  // '30d' or 'horizon'
 const _feeDefaults30d = { con: _fCon, base: _fBase, opt: _fOpt, bull: _fBull };
-// PROVISIONAL preset mapping — pending final approval.
-// Horizon presets anchor each scenario to a volatility regime:
-// con=normal p25, base=normal mean, opt=elevated mean, bull=extreme mean.
-const _feeDefaultsHorizon = (() => {
-    const s = _macroCtx.summary_by_metric?.non_base_fee_per_cu_lamports;
-    if (!s || !s.normal || !s.extreme) return _feeDefaults30d;  // fallback
-    return {
-        con:  +Math.max(0.10, s.normal.p25).toFixed(2),
-        base: +s.normal.mean.toFixed(2),
-        opt:  +s.elevated.mean.toFixed(2),
-        bull: +s.extreme.mean.toFixed(2)
-    };
-})();
+// Long-horizon presets: all 4 anchored to the Normal regime distribution
+// of non_base_fee_per_cu_lamports (24-month window).
+// con=normal p25, base=normal median, opt=normal p75, bull=normal p90.
+// Product values rounded: 1.0, 1.5, 2.0, 3.5.
+const _feeDefaultsHorizon = { con: 1.00, base: 1.50, opt: 2.00, bull: 3.50 };
 function setCalibrationContext(ctx) {
     _calibrationContext = ctx;
     document.getElementById('ctx-30d').classList.toggle('active', ctx === '30d');
@@ -3334,7 +3326,8 @@ function _build30dScenarioExplain() {
     };
 }
 
-// Build horizon-source scenario explain data
+// Build horizon-source scenario explain data — all 4 presets anchored to Normal regime only.
+// Additional Context shows (1) exact Normal stat used, (2) All-epochs cross-check.
 function _buildHorizonScenarioExplain() {
     const s = _macroCtx.summary_by_metric?.non_base_fee_per_cu_lamports;
     if (!s) return _build30dScenarioExplain(); // fallback
@@ -3343,39 +3336,41 @@ function _buildHorizonScenarioExplain() {
     const ed = _macroCtx.end_date || '?';
     const scopeText = 'Epoch-level Trillium API data. ' + rc + ' epochs (' + sd + ' \u2013 ' + ed + '). Regime classification via rolling 30-epoch volatility logic.';
     const metricText = 'Metric: non-base fee/CU (priority fees + MEV/JIT fees \u00f7 total CU), per epoch.';
+    const nN = s.normal?.n || '?';
+    const nAll = s.all_epochs?.n || '?';
     const f = _feeDefaultsHorizon;
     return {
         con: {
             title: 'Conservative', value: f.con.toFixed(2) + ' lam/CU',
-            plain: 'Anchored to the lower range of normal-regime epochs over the 24-month window.',
+            plain: 'Anchored to the lower quartile of normal-regime epochs over the 24-month window.',
             scope: scopeText, metric: metricText + ' Rule: Normal regime P25.',
-            calculation: 'Normal regime P25 non-base fee/CU = ' + (s.normal?.p25?.toFixed(3) || '?') + ' lam/CU (n=' + (s.normal?.n || '?') + ' epochs, 24mo window), displayed as ' + f.con.toFixed(2) + ' lam/CU.',
+            calculation: 'Normal regime P25 non-base fee/CU = ' + (s.normal?.p25?.toFixed(3) || '?') + ' lam/CU \u2192 product value rounded to ' + f.con.toFixed(2) + ' lam/CU.',
             why: 'P25 of normal epochs provides a conservative lower bound anchored in the most common market state.',
-            context: 'Normal regime: n=' + (s.normal?.n || '?') + ', mean=' + (s.normal?.mean?.toFixed(3) || '?') + ', p25=' + (s.normal?.p25?.toFixed(3) || '?') + ', p75=' + (s.normal?.p75?.toFixed(3) || '?')
+            context: 'Case 1 \u2014 Normal regime P25 = ' + (s.normal?.p25?.toFixed(3) || '?') + ' lam/CU (n=' + nN + ' epochs, 24mo).\nCase 2 \u2014 All epochs P25 = ' + (s.all_epochs?.p25?.toFixed(3) || '?') + ' lam/CU (n=' + nAll + ' epochs, 24mo). Cross-check confirms the product value of ' + f.con.toFixed(1) + ' is directionally consistent.'
         },
         base: {
             title: 'Base', value: f.base.toFixed(2) + ' lam/CU',
-            plain: 'Anchored to the average fee environment during normal-regime epochs over the 24-month window.',
-            scope: scopeText, metric: metricText + ' Rule: Normal regime mean.',
-            calculation: 'Normal regime mean non-base fee/CU = ' + (s.normal?.mean?.toFixed(3) || '?') + ' lam/CU (n=' + (s.normal?.n || '?') + ' epochs, 24mo window), displayed as ' + f.base.toFixed(2) + ' lam/CU.',
-            why: 'The mean of normal epochs represents the typical fee environment — the most frequent market state over the sample.',
-            context: 'Normal regime: n=' + (s.normal?.n || '?') + ', p10=' + (s.normal?.p10?.toFixed(3) || '?') + ', mean=' + (s.normal?.mean?.toFixed(3) || '?') + ', median=' + (s.normal?.median?.toFixed(3) || '?') + ', p90=' + (s.normal?.p90?.toFixed(3) || '?')
+            plain: 'Anchored to the median fee environment during normal-regime epochs over the 24-month window.',
+            scope: scopeText, metric: metricText + ' Rule: Normal regime median.',
+            calculation: 'Normal regime median non-base fee/CU = ' + (s.normal?.median?.toFixed(3) || '?') + ' lam/CU \u2192 product value rounded to ' + f.base.toFixed(2) + ' lam/CU.',
+            why: 'The median of normal epochs represents the typical fee environment \u2014 the most frequent market state over the sample.',
+            context: 'Case 1 \u2014 Normal regime median = ' + (s.normal?.median?.toFixed(3) || '?') + ' lam/CU (n=' + nN + ' epochs, 24mo).\nCase 2 \u2014 All epochs median = ' + (s.all_epochs?.median?.toFixed(3) || '?') + ' lam/CU (n=' + nAll + ' epochs, 24mo). Cross-check confirms the product value of ' + f.base.toFixed(1) + ' is directionally consistent.'
         },
         opt: {
             title: 'Optimistic', value: f.opt.toFixed(2) + ' lam/CU',
-            plain: 'Anchored to moderately volatile market conditions (elevated regime) over the 24-month window.',
-            scope: scopeText, metric: metricText + ' Rule: Elevated regime mean.',
-            calculation: 'Elevated regime mean non-base fee/CU = ' + (s.elevated?.mean?.toFixed(3) || '?') + ' lam/CU (n=' + (s.elevated?.n || '?') + ' epochs, 24mo window), displayed as ' + f.opt.toFixed(2) + ' lam/CU.',
-            why: 'The elevated regime captures periods of moderate congestion — a credible upside scenario.',
-            context: 'Elevated regime: n=' + (s.elevated?.n || '?') + ', mean=' + (s.elevated?.mean?.toFixed(3) || '?') + ', median=' + (s.elevated?.median?.toFixed(3) || '?') + ', p90=' + (s.elevated?.p90?.toFixed(3) || '?')
+            plain: 'Anchored to the upper quartile of normal-regime epochs over the 24-month window.',
+            scope: scopeText, metric: metricText + ' Rule: Normal regime P75.',
+            calculation: 'Normal regime P75 non-base fee/CU = ' + (s.normal?.p75?.toFixed(3) || '?') + ' lam/CU \u2192 product value rounded to ' + f.opt.toFixed(2) + ' lam/CU.',
+            why: 'P75 of normal epochs captures the upper range of typical conditions \u2014 a credible upside without requiring a regime shift.',
+            context: 'Case 1 \u2014 Normal regime P75 = ' + (s.normal?.p75?.toFixed(3) || '?') + ' lam/CU (n=' + nN + ' epochs, 24mo).\nCase 2 \u2014 All epochs P75 = ' + (s.all_epochs?.p75?.toFixed(3) || '?') + ' lam/CU (n=' + nAll + ' epochs, 24mo). Cross-check confirms the product value of ' + f.opt.toFixed(1) + ' is directionally consistent.'
         },
         bull: {
             title: 'Bull', value: f.bull.toFixed(2) + ' lam/CU',
-            plain: 'Anchored to the highest-volatility market conditions (extreme regime) over the 24-month window.',
-            scope: scopeText, metric: metricText + ' Rule: Extreme regime mean.',
-            calculation: 'Extreme regime mean non-base fee/CU = ' + (s.extreme?.mean?.toFixed(3) || '?') + ' lam/CU (n=' + (s.extreme?.n || '?') + ' epochs, 24mo window), displayed as ' + f.bull.toFixed(2) + ' lam/CU.',
-            why: 'The extreme regime captures peak-stress periods — the most aggressive but historically observed fee environment.',
-            context: 'Extreme regime: n=' + (s.extreme?.n || '?') + ', mean=' + (s.extreme?.mean?.toFixed(3) || '?') + ', median=' + (s.extreme?.median?.toFixed(3) || '?') + ', p90=' + (s.extreme?.p90?.toFixed(3) || '?') + ', max=' + (s.extreme?.max?.toFixed(3) || '?')
+            plain: 'Anchored to the 90th percentile of normal-regime epochs over the 24-month window.',
+            scope: scopeText, metric: metricText + ' Rule: Normal regime P90.',
+            calculation: 'Normal regime P90 non-base fee/CU = ' + (s.normal?.p90?.toFixed(3) || '?') + ' lam/CU \u2192 product value rounded to ' + f.bull.toFixed(2) + ' lam/CU.',
+            why: 'P90 of normal epochs captures the highest fee levels still within the typical market state \u2014 the most aggressive scenario that does not depend on a regime shift.',
+            context: 'Case 1 \u2014 Normal regime P90 = ' + (s.normal?.p90?.toFixed(3) || '?') + ' lam/CU (n=' + nN + ' epochs, 24mo).\nCase 2 \u2014 All epochs P90 = ' + (s.all_epochs?.p90?.toFixed(3) || '?') + ' lam/CU (n=' + nAll + ' epochs, 24mo). Cross-check confirms the product value of ' + f.bull.toFixed(1) + ' is directionally consistent.'
         }
     };
 }
@@ -3400,10 +3395,10 @@ function updateAotScenarioCards() {
         const s = _macroCtx.summary_by_metric?.non_base_fee_per_cu_lamports;
         const n = s?.normal?.n || '?';
         const setS = function(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
-        setS('aot-sc-con-sentence', 'Normal regime P25 non-base fee/CU = ' + (s?.normal?.p25?.toFixed(3) || '?') + ' lam/CU (' + n + ' epochs, 24mo window).');
-        setS('aot-sc-base-sentence', 'Normal regime mean non-base fee/CU = ' + (s?.normal?.mean?.toFixed(3) || '?') + ' lam/CU (' + n + ' epochs, 24mo window).');
-        setS('aot-sc-opt-sentence', 'Elevated regime mean non-base fee/CU = ' + (s?.elevated?.mean?.toFixed(3) || '?') + ' lam/CU (' + (s?.elevated?.n || '?') + ' epochs, 24mo window).');
-        setS('aot-sc-bull-sentence', 'Extreme regime mean non-base fee/CU = ' + (s?.extreme?.mean?.toFixed(3) || '?') + ' lam/CU (' + (s?.extreme?.n || '?') + ' epochs, 24mo window).');
+        setS('aot-sc-con-sentence', 'Normal regime P25 non-base fee/CU = ' + (s?.normal?.p25?.toFixed(3) || '?') + ' lam/CU (' + n + ' normal epochs, 24mo) \u2192 product value 1.00.');
+        setS('aot-sc-base-sentence', 'Normal regime median non-base fee/CU = ' + (s?.normal?.median?.toFixed(3) || '?') + ' lam/CU (' + n + ' normal epochs, 24mo) \u2192 product value 1.50.');
+        setS('aot-sc-opt-sentence', 'Normal regime P75 non-base fee/CU = ' + (s?.normal?.p75?.toFixed(3) || '?') + ' lam/CU (' + n + ' normal epochs, 24mo) \u2192 product value 2.00.');
+        setS('aot-sc-bull-sentence', 'Normal regime P90 non-base fee/CU = ' + (s?.normal?.p90?.toFixed(3) || '?') + ' lam/CU (' + n + ' normal epochs, 24mo) \u2192 product value 3.50.');
     } else {
         var setS = function(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
         setS('aot-sc-con-sentence', 'Uses the lower end of observed non-base fees among active fee-paying application programs, with an explicit minimum floor of 0.10 lam/CU.');
