@@ -394,7 +394,15 @@ details[open] summary::before { transform:rotate(90deg); }
 .aot-sc-modal-section p { margin:0; font-size:12px; line-height:1.6; color:var(--text); }
 .aot-sc-modal-refs { white-space:pre-line; }
 
-
+/* Calibration source info popover */
+.ctx-info-wrap { position:relative; display:inline-block; }
+.ctx-info-btn { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; border:1px solid #3a3d42; background:#17181b; color:var(--text2); font-size:10px; font-weight:600; cursor:pointer; line-height:1; vertical-align:middle; margin-left:4px; }
+.ctx-info-btn:hover { border-color:#5a5d62; color:var(--text); }
+.ctx-info-pop { display:none; position:absolute; left:0; top:calc(100% + 6px); z-index:100; width:320px; padding:12px 14px; background:#0f1012; border:1px solid #2e3135; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.5); font-size:11px; color:var(--text2); line-height:1.6; }
+.ctx-info-pop.show { display:block; }
+.ctx-info-pop strong { color:var(--text); font-weight:600; }
+.ctx-info-pop .pop-close { float:right; cursor:pointer; color:var(--text2); font-size:9px; border:1px solid #333; border-radius:3px; padding:1px 5px; background:#17181b; margin:-2px -4px 4px 8px; }
+.ctx-info-pop .pop-close:hover { border-color:#555; }
 
 /* Revenue grid layouts */
 .rev-sources-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:10px; }
@@ -662,12 +670,23 @@ details[open] summary::before { transform:rotate(90deg); }
     <div class="scenario-desc" id="scenario-desc"></div>
     <!-- Data context selector -->
     <div style="margin-top:10px;padding:8px 12px;background:#10131a;border:1px solid #1c2330;border-radius:6px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);margin-bottom:6px;">AOT fee/CU calibration source</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text2);margin-bottom:6px;">AOT fee/CU calibration source
+            <span class="ctx-info-wrap">
+                <span class="ctx-info-btn" id="ctx-info-toggle" title="Source details">?</span>
+                <div class="ctx-info-pop" id="ctx-info-pop">
+                    <span class="pop-close" id="ctx-info-close">&times;</span>
+                    <div id="ctx-info-content">
+                        <strong>30d AOT scope</strong><br>
+                        Program-level fee/CU data from Dune Analytics over a 30-day window. Includes AOT-relevant programs only (Prop AMM, DEX, lending, oracle, bridge, perps, crankers, etc.). CU-weighted. Arb-bots, unknown, and other categories excluded.
+                    </div>
+                </div>
+            </span>
+        </div>
         <div style="display:flex;gap:6px;">
             <button class="regime-btn active" id="ctx-30d" onclick="setCalibrationContext('30d')" style="font-size:10px;padding:4px 10px;">30d AOT scope</button>
             <button class="regime-btn" id="ctx-horizon" onclick="setCalibrationContext('horizon')" style="font-size:10px;padding:4px 10px;">Long-horizon</button>
         </div>
-        <div id="ctx-source-label" style="font-size:10px;color:var(--text2);margin-top:5px;line-height:1.4;">Default AOT fee/CU derived from 30-day AOT-relevant program scope (arb-bot excluded).</div>
+        <div id="ctx-source-label" style="font-size:10px;color:var(--text2);margin-top:5px;line-height:1.4;">AOT fee/CU calibrated from 30-day program-level data (arb-bot excluded).</div>
     </div>
 </div>
 
@@ -1044,6 +1063,10 @@ details[open] summary::before { transform:rotate(90deg); }
             <span style="font-size:26px;font-weight:700;color:var(--text);font-family:var(--font-mono);" id="aot-fcu-headline">&mdash;</span>
             <span style="font-size:14px;color:var(--text2);font-family:var(--font-mono);">lamports per CU</span>
         </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:12px;font-weight:600;color:var(--text);" id="aot-active-preset">Base Case</span>
+            <span id="aot-active-source-badge" style="display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:0.3px;padding:3px 8px;border-radius:3px;background:#0d3b3b;color:#4dd0e1;">30d AOT scope</span>
+        </div>
         <div style="font-size:12px;color:var(--text2);margin-bottom:16px;">
             Blended average fee per compute unit across all AOT auction customers. Controlled by the <strong>Avg Auction Fee/CU</strong> slider in the left panel. This is the second of two core model assumptions (alongside JIT market size).
         </div>
@@ -1126,21 +1149,14 @@ details[open] summary::before { transform:rotate(90deg); }
         <!-- Macro market context (data-driven from macro_context.v1.js) -->
         <div id="macro-ctx-panel" style="margin-bottom:16px;"></div>
         <!-- Epoch-level chart -->
-        <div style="margin-bottom:16px;"><canvas id="epoch-fee-chart" height="160"></canvas></div>
+        <div style="margin-bottom:16px;height:280px;"><canvas id="epoch-fee-chart"></canvas></div>
 
-        <!-- Source metadata -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px 18px;font-size:12px;margin-bottom:16px;">
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Program source</span><br><span style="color:var(--text);font-weight:500;">data/aot_programs.v1.js (30d AOT scope)</span></div>
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Epoch source</span><br><span style="color:var(--text);font-weight:500;">data/macro_context.v1.js (long-horizon)</span></div>
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Metrics</span><br><span style="color:var(--text);font-weight:500;">priority, MEV / JIT, base, non-base, total</span></div>
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Weighting</span><br><span style="color:var(--text);font-weight:500;">CU-weighted avg per group</span></div>
+        <!-- Source metadata (C10 — dynamic) -->
+        <div id="aot-source-meta-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px 18px;font-size:12px;margin-bottom:16px;">
         </div>
 
-        <!-- Inclusions / Exclusions -->
-        <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;">
-            <div style="margin-bottom:6px;"><span style="color:#8ddb6a;font-size:14px;">&#9745;</span> <strong style="color:var(--text);">What this includes:</strong> Only Solana programs flagged as <em>AOT-relevant</em> in the canonical upstream taxonomy. Non-base (priority + MEV / JIT) and total fees (base + priority + MEV / JIT) over a 30-day period, weighted by CU consumption.</div>
-            <div style="margin-bottom:6px;"><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">What this excludes from core display:</strong> `neither` and `potential` populations. JIT arbitrage/searcher programs are shown as a separate arbitrage-bot layer.</div>
-            <div style="color:var(--text2);font-style:italic;">If <code>market_maker</code> or <code>quantitative_desk</code> are absent in the loaded taxonomy/economics, they are explicitly reported in methodology notes rather than implied as active groups.</div>
+        <!-- Inclusions / Exclusions (C10 — dynamic) -->
+        <div id="aot-source-incl-excl" style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;">
         </div>
     </div>
     </details>
@@ -1990,6 +2006,10 @@ function applyScenario(n){
     if (validatorBtn) validatorBtn.classList.add('active');
     document.querySelectorAll('.scenario-card').forEach(c=>c.classList.remove('active'));
     const sc=document.getElementById('sc-card-'+n); if(sc) sc.classList.add('active');
+    // Update AOT headline preset name (C2)
+    const presetNames = { con: 'Conservative', base: 'Base Case', opt: 'Optimistic', bull: 'Bull Case' };
+    const presetEl = document.getElementById('aot-active-preset');
+    if (presetEl) presetEl.textContent = presetNames[n] || n;
     update();
 }
 
@@ -2026,22 +2046,40 @@ function setCalibrationContext(ctx) {
     SC.base.f = fees.base;
     SC.opt.f = fees.opt;
     SC.bull.f = fees.bull;
-    // Update source label
+    // Update source label — lead with "24 months" for horizon
     const lbl = document.getElementById('ctx-source-label');
     if (lbl) {
         lbl.textContent = ctx === 'horizon'
-            ? `AOT fee/CU calibrated from long-horizon epoch-level data (${_macroCtx.row_count} epochs, ${_macroCtx.start_date || '?'} – ${_macroCtx.end_date || '?'}).`
+            ? `AOT fee/CU calibrated from 24-month epoch-level data (${_macroCtx.row_count} epochs, ${_macroCtx.start_date || '?'} – ${_macroCtx.end_date || '?'}).`
             : 'AOT fee/CU calibrated from 30-day program-level data (arb-bot excluded).';
     }
     // Update calibration badge
     const ind = document.getElementById('fcu-ctx-indicator');
     if (ind) {
         if (ctx === 'horizon') {
-            ind.textContent = `Long-horizon (${_macroCtx.row_count} ep, 2024-03 – 2026-03)`;
+            ind.textContent = `Long-horizon (24mo, ${_macroCtx.row_count} ep)`;
             ind.style.background = '#6b5b00'; ind.style.color = '#ffd54f';
         } else {
             ind.textContent = '30d AOT scope';
             ind.style.background = '#0d3b3b'; ind.style.color = '#4dd0e1';
+        }
+    }
+    // Update info popover content for current source
+    const infoPop = document.getElementById('ctx-info-content');
+    if (infoPop) {
+        infoPop.innerHTML = ctx === 'horizon'
+            ? '<strong>Long-horizon (24 months)</strong><br>Epoch-level Trillium API data. ' + (_macroCtx.row_count || '?') + ' epochs (' + (_macroCtx.start_date || '?') + ' \u2013 ' + (_macroCtx.end_date || '?') + '), epoch range ' + (_macroCtx.start_epoch || '?') + '\u2013' + (_macroCtx.end_epoch || '?') + '. Metric: non-base fee/CU (priority + MEV/JIT). Regime mapping: normal p25, normal mean, elevated mean, extreme mean.'
+            : '<strong>30d AOT scope</strong><br>Program-level fee/CU data from Dune Analytics over a 30-day window. Includes AOT-relevant programs only (Prop AMM, DEX, lending, oracle, bridge, perps, crankers, etc.). CU-weighted. Arb-bots, unknown, and other categories excluded.';
+    }
+    // Update AOT headline source badge (C2)
+    const srcBadge = document.getElementById('aot-active-source-badge');
+    if (srcBadge) {
+        if (ctx === 'horizon') {
+            srcBadge.textContent = 'Long-horizon, 24 months';
+            srcBadge.style.background = '#6b5b00'; srcBadge.style.color = '#ffd54f';
+        } else {
+            srcBadge.textContent = '30d AOT scope';
+            srcBadge.style.background = '#0d3b3b'; srcBadge.style.color = '#4dd0e1';
         }
     }
     // Move fee/CU slider to new value if a preset is active
@@ -2051,8 +2089,38 @@ function setCalibrationContext(ctx) {
         const sliderLabel = document.getElementById('v-fcu');
         if (sliderLabel) sliderLabel.textContent = SC[_selectedScenario].f;
     }
+    // Update scenario cards + explain data for new source (C3+C4)
+    updateAotScenarioCards();
+    // Update bottom source copy (C10)
+    _updateAotSourceCopy();
     // Re-apply current scenario to propagate new fee/CU through model
     if (_selectedScenario) applyScenario(_selectedScenario);
+}
+
+// Source-aware bottom copy (C10)
+function _updateAotSourceCopy() {
+    const grid = document.getElementById('aot-source-meta-grid');
+    const ie = document.getElementById('aot-source-incl-excl');
+    if (!grid || !ie) return;
+    const isH = _calibrationContext === 'horizon';
+    const mkCell = (label, val) => '<div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">' + label + '</span><br><span style="color:var(--text);font-weight:500;">' + val + '</span></div>';
+    if (isH) {
+        grid.innerHTML = mkCell('Source', 'data/macro_context.v1.js (24-month epoch-level)')
+            + mkCell('Window', (_macroCtx.start_date || '?') + ' \u2013 ' + (_macroCtx.end_date || '?'))
+            + mkCell('Epochs', (_macroCtx.row_count || '?') + ' epochs (' + (_macroCtx.start_epoch || '?') + '\u2013' + (_macroCtx.end_epoch || '?') + ')')
+            + mkCell('Metrics', 'priority, MEV/JIT, base, non-base, total fee/CU + avg CU/block');
+        ie.innerHTML = '<div style="margin-bottom:6px;"><span style="color:#8ddb6a;font-size:14px;">&#9745;</span> <strong style="color:var(--text);">What this includes:</strong> All Solana non-base fees per epoch, regime-classified via rolling 30-epoch volatility logic. 352 epochs of Trillium API data.</div>'
+            + '<div style="margin-bottom:6px;"><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">What this excludes:</strong> No program-level filtering. This is an epoch-level aggregate \u2014 individual program breakdown is not available in this source.</div>'
+            + '<div style="color:var(--text2);font-style:italic;">Epoch-level data captures the full Solana fee environment, not just AOT-relevant programs.</div>';
+    } else {
+        grid.innerHTML = mkCell('Program source', 'data/aot_programs.v1.js (30d AOT scope)')
+            + mkCell('Epoch source', 'data/macro_context.v1.js (long-horizon)')
+            + mkCell('Metrics', 'priority, MEV / JIT, base, non-base, total')
+            + mkCell('Weighting', 'CU-weighted avg per group');
+        ie.innerHTML = '<div style="margin-bottom:6px;"><span style="color:#8ddb6a;font-size:14px;">&#9745;</span> <strong style="color:var(--text);">What this includes:</strong> Only Solana programs flagged as <em>AOT-relevant</em> in the canonical upstream taxonomy. Non-base (priority + MEV / JIT) and total fees over a 30-day period, weighted by CU consumption.</div>'
+            + '<div style="margin-bottom:6px;"><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">What this excludes from core display:</strong> <code>neither</code> and <code>potential</code> populations. JIT arbitrage/searcher programs are shown as a separate arbitrage-bot layer.</div>'
+            + '<div style="color:var(--text2);font-style:italic;">If <code>market_maker</code> or <code>quantitative_desk</code> are absent in the loaded taxonomy, they are explicitly reported rather than implied as active groups.</div>';
+    }
 }
 
 function gp(){return{
@@ -2190,6 +2258,77 @@ function _renderMacroStatsTable(metricKey) {
     }).join('');
 }
 
+function _renderRegimeDetailTable() {
+    const tbody = document.getElementById('macro-regime-tbody');
+    if (!tbody) return;
+    const regimeColors = { all_epochs: 'var(--text)', normal: '#8ddb6a', elevated: '#F5A623', extreme: '#e06c75' };
+    const subsets = [
+        { key: 'all_epochs', label: 'All' },
+        { key: 'normal', label: 'Normal' },
+        { key: 'elevated', label: 'Elevated' },
+        { key: 'extreme', label: 'Extreme' }
+    ];
+    const primaryKey = 'non_base_fee_per_cu_lamports';
+    const s = _macroCtx.summary_by_metric?.[primaryKey];
+    if (!s) { tbody.innerHTML = '<tr><td colspan="10" style="padding:12px;color:var(--text2);">No data.</td></tr>'; return; }
+
+    const fmt = (v, mk) => _macroMfmt(v, mk);
+    const td = (v, mk) => '<td style="padding:6px 8px;text-align:right;color:var(--text2);">' + fmt(v, mk) + '</td>';
+
+    let html = '';
+    subsets.forEach((sub, idx) => {
+        const r = s[sub.key];
+        const border = idx < subsets.length - 1 ? 'border-bottom:1px solid #1a1a1a;' : '';
+        const nFmt = r?.n != null ? r.n.toLocaleString('en-US') : '\u2014';
+        const rowId = 'regime-expand-' + sub.key;
+
+        // Summary row (non-base fee/CU) — clickable
+        html += '<tr style="' + border + 'cursor:pointer;" data-regime-toggle="' + sub.key + '">';
+        html += '<td style="padding:6px 8px;color:' + regimeColors[sub.key] + ';font-weight:500;white-space:nowrap;">';
+        html += '<span class="regime-expand-arrow" id="arrow-' + sub.key + '" style="display:inline-block;width:12px;font-size:9px;color:var(--text2);">\u25b6</span> ' + sub.label + '</td>';
+        html += '<td style="padding:6px 8px;text-align:right;color:var(--text2);">' + nFmt + '</td>';
+        html += td(r?.p10, primaryKey) + td(r?.p25, primaryKey) + td(r?.mean, primaryKey) + td(r?.median, primaryKey) + td(r?.p75, primaryKey) + td(r?.p90, primaryKey) + td(r?.min, primaryKey) + td(r?.max, primaryKey);
+        html += '</tr>';
+
+        // Expanded detail rows (hidden by default)
+        const detailMetrics = [
+            { key: 'priority_fee_per_cu_lamports', label: 'Priority fee/CU', highlight: false },
+            { key: 'mev_jito_fee_per_cu_lamports', label: 'MEV/JIT fee/CU', highlight: false },
+            { key: 'non_base_fee_per_cu_lamports', label: 'Non-base fee/CU', highlight: true },
+            { key: 'base_fee_per_cu_lamports', label: 'Base fee/CU', highlight: false },
+            { key: 'total_fee_per_cu_lamports', label: 'Total fee/CU', highlight: false },
+            { key: 'avg_cu_per_block', label: 'Avg CU/block', highlight: false }
+        ];
+        detailMetrics.forEach(dm => {
+            const dr = _macroCtx.summary_by_metric?.[dm.key]?.[sub.key];
+            const bg = dm.highlight ? 'background:rgba(192,255,56,0.04);' : '';
+            const fw = dm.highlight ? 'font-weight:600;color:var(--text);' : 'color:var(--text2);';
+            html += '<tr class="regime-detail-row" data-regime-detail="' + sub.key + '" style="display:none;' + bg + '">';
+            html += '<td style="padding:4px 8px 4px 24px;font-size:10px;' + fw + '">' + dm.label + '</td>';
+            html += '<td style="padding:4px 8px;text-align:right;color:var(--text2);font-size:10px;">' + (dr?.n != null ? dr.n : '\u2014') + '</td>';
+            html += td(dr?.p10, dm.key) + td(dr?.p25, dm.key) + td(dr?.mean, dm.key) + td(dr?.median, dm.key) + td(dr?.p75, dm.key) + td(dr?.p90, dm.key) + td(dr?.min, dm.key) + td(dr?.max, dm.key);
+            html += '</tr>';
+        });
+        // Relationship footnote row
+        html += '<tr class="regime-detail-row" data-regime-detail="' + sub.key + '" style="display:none;">';
+        html += '<td colspan="10" style="padding:3px 8px 6px 24px;font-size:9px;color:var(--text2);font-style:italic;">non-base = priority + MEV/JIT &nbsp;\u00b7&nbsp; total = base + non-base</td>';
+        html += '</tr>';
+    });
+    tbody.innerHTML = html;
+
+    // Attach toggle handlers
+    tbody.querySelectorAll('tr[data-regime-toggle]').forEach(row => {
+        row.addEventListener('click', () => {
+            const key = row.dataset.regimeToggle;
+            const details = tbody.querySelectorAll('tr[data-regime-detail="' + key + '"]');
+            const arrow = document.getElementById('arrow-' + key);
+            const isOpen = details[0]?.style.display !== 'none';
+            details.forEach(d => d.style.display = isOpen ? 'none' : 'table-row');
+            if (arrow) arrow.textContent = isOpen ? '\u25b6' : '\u25bc';
+        });
+    });
+}
+
 function renderMacroContextPanel() {
     const el = document.getElementById('macro-ctx-panel');
     if (!el) return;
@@ -2211,38 +2350,50 @@ function renderMacroContextPanel() {
             <div style="font-size:11px;color:var(--text2);">${rowCount} epochs | ${startDate} – ${endDate}</div>
         </div>
 
-        <!-- Regime cards (non_base_fee_per_cu_lamports) -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
-            ${['normal','elevated','extreme'].map(k => {
-                const r = s[k];
-                const pct = r && s.all_epochs?.n ? ((r.n / s.all_epochs.n) * 100).toFixed(0) : '?';
-                return `<div style="padding:10px 12px;background:#10131a;border:1px solid #1c2330;border-radius:8px;border-top:3px solid ${regimeColors[k]};">
-                    <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${regimeColors[k]};font-family:var(--font-mono);margin-bottom:4px;">${k}</div>
-                    <div style="font-size:18px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;">${r ? r.mean.toFixed(3) : '—'}</div>
-                    <div style="font-size:10px;color:var(--text2);margin-top:4px;">n=${r ? r.n : 0} (${pct}%) · med ${r ? r.median.toFixed(3) : '—'}</div>
-                </div>`;
-            }).join('')}
-        </div>
-
-        <!-- Congestion headline ~2.0x -->
-        <div style="padding:12px 14px;background:#10131a;border:1px solid #1c2330;border-radius:8px;margin-bottom:12px;">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#A7B4C7;font-family:var(--font-mono);margin-bottom:4px;">Congestion uplift</div>
-            <div style="font-size:28px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;margin-bottom:6px;">~${Math.round(ratio * 10) / 10}x</div>
-            <div style="font-size:11px;color:var(--text2);line-height:1.55;">
-                Extreme mean (${s.extreme.mean.toFixed(3)} lam/CU) &divide; Normal mean (${s.normal.mean.toFixed(3)} lam/CU) = ${ratio.toFixed(2)}x<br>
-                <span style="font-size:10px;">non-base fee/CU, ${rowCount} epochs, ${startDate} to ${endDate}</span>
+        <!-- Regime cards (left) + Congestion result (right) — 2-column layout -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;align-items:start;">
+            <!-- Left: regime cards stacked vertically -->
+            <div style="display:flex;flex-direction:column;gap:6px;">
+                ${['normal','elevated','extreme'].map(k => {
+                    const r = s[k];
+                    const pct = r && s.all_epochs?.n ? ((r.n / s.all_epochs.n) * 100).toFixed(0) : '?';
+                    const defs = {
+                        normal: 'Default market state. None of the volatility thresholds are breached. Represents ~71% of the 24-month sample.',
+                        elevated: 'Moderately volatile. Triggered when any of: |price change| \u2265 8%, MEV z-score \u2265 2.0, priority fee z-score \u2265 2.0, MEV multiple \u2265 2.5\u00d7, or fee multiple \u2265 2.5\u00d7. Represents ~18% of the sample.',
+                        extreme: 'Highly volatile. Triggered when any of: |price change| \u2265 15%, MEV z-score \u2265 3.0, priority fee z-score \u2265 3.0, MEV multiple \u2265 5.0\u00d7, or fee multiple \u2265 5.0\u00d7. Represents ~10% of the sample.'
+                    };
+                    return `<div style="padding:8px 10px;background:#10131a;border:1px solid #1c2330;border-radius:6px;border-left:3px solid ${regimeColors[k]};">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+                            <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:${regimeColors[k]};font-family:var(--font-mono);font-weight:600;">${k}</span>
+                            <span style="font-size:10px;color:var(--text2);">n=${r ? r.n : 0} (${pct}%)</span>
+                        </div>
+                        <div style="font-size:16px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;">${r ? r.mean.toFixed(3) : '\u2014'} <span style="font-size:10px;font-weight:400;color:var(--text2);">mean</span></div>
+                        <div style="font-size:10px;color:var(--text2);margin-top:2px;">med ${r ? r.median.toFixed(3) : '\u2014'} · p25 ${r ? r.p25.toFixed(3) : '\u2014'} · p75 ${r ? r.p75.toFixed(3) : '\u2014'}</div>
+                        <details style="margin-top:4px;">
+                            <summary style="font-size:9px;color:var(--text2);cursor:pointer;">\u24d8 What is ${k}?</summary>
+                            <div style="font-size:10px;color:var(--text2);line-height:1.5;padding:4px 0 2px 0;">${defs[k]}</div>
+                        </details>
+                    </div>`;
+                }).join('')}
+                <div style="font-size:9px;color:var(--text2);line-height:1.4;padding:2px 0 0 2px;">Rolling 30-epoch classification. Any single threshold breach is sufficient.</div>
+            </div>
+            <!-- Right: congestion result -->
+            <div style="padding:14px 16px;background:#10131a;border:1px solid #1c2330;border-radius:8px;display:flex;flex-direction:column;justify-content:center;min-height:100%;">
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#A7B4C7;font-family:var(--font-mono);margin-bottom:6px;">Congestion uplift</div>
+                <div style="font-size:36px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.0;margin-bottom:8px;">2&times;</div>
+                <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:6px;">
+                    ${s.extreme.mean.toFixed(3)} &divide; ${s.normal.mean.toFixed(3)} = ${ratio.toFixed(2)}&times;
+                </div>
+                <div style="font-size:10px;color:var(--text2);line-height:1.5;">
+                    Product multiplier rounded to 2&times; from exact ${ratio.toFixed(2)}&times;.<br>
+                    non-base fee/CU, extreme mean &divide; normal mean, 24mo.
+                </div>
             </div>
         </div>
 
-        <!-- Metric tabs + stats table -->
-        <div style="margin-bottom:12px;">
-            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;" id="macro-metric-tabs">
-                ${_macroMetricTabs.map(t => `
-                    <button class="regime-btn${t.key === _selectedMacroMetric ? ' active' : ''}"
-                            style="font-size:10px;padding:4px 9px;"
-                            data-metric="${t.key}">${t.label}</button>
-                `).join('')}
-            </div>
+        <!-- Regime data table — collapsible regime-oriented detail (C7) -->
+        <div style="margin-bottom:12px;" id="macro-regime-detail">
+            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Non-base fee/CU (lam) by regime — click a row to expand all 6 metrics</div>
             <div style="overflow-x:auto;border:1px solid var(--card-border);border-radius:6px;background:#0a0b0c;">
                 <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
                     <thead style="background:#111213;">
@@ -2259,38 +2410,51 @@ function renderMacroContextPanel() {
                             <th style="padding:7px 9px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Max</th>
                         </tr>
                     </thead>
-                    <tbody id="macro-stats-tbody">
-                        ${_renderMacroStatsTable(_selectedMacroMetric)}
-                    </tbody>
+                    <tbody id="macro-regime-tbody"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Methodology collapsible -->
+        <!-- Methodology collapsible (C8) -->
         <details style="margin-bottom:0;">
-            <summary style="font-size:11px;color:#5B8DEF;cursor:pointer;font-weight:600;padding:4px 0;user-select:none;">Methodology: rolling 30-epoch volatility regime classification</summary>
-            <div style="font-size:11px;color:var(--text2);line-height:1.65;padding:12px 14px;background:#111213;border-radius:6px;border-left:3px solid #5B8DEF;margin-top:6px;">
-                <div style="font-weight:600;color:#5B8DEF;margin-bottom:4px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Regime assignment</div>
-                <div style="margin-bottom:8px;">${_macroCtx.assignment_logic_text || 'Not available.'}</div>
-                <div style="font-weight:600;color:#5B8DEF;margin-bottom:4px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Key metric</div>
-                <div style="margin-bottom:8px;"><strong style="color:var(--text);">non-base fee/CU</strong> = (priority fees + MEV/JIT tips) &divide; total compute units, in lamports/CU. Base (signature) fees are excluded.</div>
-                <div style="font-weight:600;color:#5B8DEF;margin-bottom:4px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Sample</div>
-                <div>Epochs ${_macroCtx.start_epoch || '?'}–${_macroCtx.end_epoch || '?'} (${rowCount} epochs, ${startDate} – ${endDate}). Source: Trillium API epoch data.</div>
+            <summary style="font-size:11px;color:#5B8DEF;cursor:pointer;font-weight:600;padding:4px 0;user-select:none;">Methodology: volatility regime classification</summary>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:14px 16px;background:#111213;border-radius:6px;border-left:3px solid #5B8DEF;margin-top:6px;">
+
+                <div style="font-weight:600;color:#5B8DEF;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">What is a regime?</div>
+                <div style="margin-bottom:14px;">A volatility classification applied to each Solana epoch based on rolling 30-epoch statistics. Each epoch is tagged as Normal, Elevated, or Extreme.</div>
+
+                <div style="font-weight:600;color:#5B8DEF;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">How regimes are assigned</div>
+                <div style="margin-bottom:14px;">Any single threshold breach is sufficient to trigger a regime:
+                    <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:6px;">
+                        <tr style="border-bottom:1px solid #222;">
+                            <td style="padding:5px 8px;color:#e06c75;font-weight:600;">Extreme</td>
+                            <td style="padding:5px 8px;color:var(--text2);">|price change| &ge; 15% &nbsp;&middot;&nbsp; MEV z &ge; 3.0 &nbsp;&middot;&nbsp; PF z &ge; 3.0 &nbsp;&middot;&nbsp; MEV mult &ge; 5&times; &nbsp;&middot;&nbsp; fee mult &ge; 5&times;</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #222;">
+                            <td style="padding:5px 8px;color:#F5A623;font-weight:600;">Elevated</td>
+                            <td style="padding:5px 8px;color:var(--text2);">|price change| &ge; 8% &nbsp;&middot;&nbsp; MEV z &ge; 2.0 &nbsp;&middot;&nbsp; PF z &ge; 2.0 &nbsp;&middot;&nbsp; MEV mult &ge; 2.5&times; &nbsp;&middot;&nbsp; fee mult &ge; 2.5&times;</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:5px 8px;color:#8ddb6a;font-weight:600;">Normal</td>
+                            <td style="padding:5px 8px;color:var(--text2);">None of the above thresholds breached</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="font-weight:600;color:#5B8DEF;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Window</div>
+                <div style="margin-bottom:14px;">Rolling 30-epoch classification applied to a trailing 24-month dataset (${startDate} &ndash; ${endDate}, ${rowCount} epochs).</div>
+
+                <div style="font-weight:600;color:#5B8DEF;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Primary metric</div>
+                <div style="margin-bottom:14px;"><strong style="color:var(--text);">Non-base fee/CU</strong> = priority fees + MEV/JIT fees, divided by total CU, in lamports. Base (signature) fees are excluded.</div>
+
+                <div style="font-weight:600;color:#5B8DEF;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Source</div>
+                <div>Trillium API epoch data. Epochs ${_macroCtx.start_epoch || '?'}&ndash;${_macroCtx.end_epoch || '?'}.</div>
             </div>
         </details>
     `;
 
-    // Attach tab click handlers after innerHTML is set
-    document.getElementById('macro-metric-tabs')?.querySelectorAll('button[data-metric]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            _selectedMacroMetric = btn.dataset.metric;
-            document.querySelectorAll('#macro-metric-tabs button[data-metric]').forEach(b => {
-                b.classList.toggle('active', b.dataset.metric === _selectedMacroMetric);
-            });
-            const tbody = document.getElementById('macro-stats-tbody');
-            if (tbody) tbody.innerHTML = _renderMacroStatsTable(_selectedMacroMetric);
-        });
-    });
+    // Populate regime detail table with expand/collapse (C7)
+    _renderRegimeDetailTable();
 }
 
 function initEpochFeeChart() {
@@ -3122,82 +3286,144 @@ function _bindAotScenarioModal(){
     });
     _aotScenarioModalBound = true;
 }
-function initAotFcuSection(){
-    const con = document.getElementById('aot-sc-con-f'); if (con) con.textContent = _fCon.toFixed(2) + ' lam/CU';
-    const base = document.getElementById('aot-sc-base-f'); if (base) base.textContent = _fBase.toFixed(2) + ' lam/CU';
-    const opt = document.getElementById('aot-sc-opt-f'); if (opt) opt.textContent = _fOpt.toFixed(2) + ' lam/CU';
-    const bull = document.getElementById('aot-sc-bull-f'); if (bull) bull.textContent = _fBull.toFixed(2) + ' lam/CU';
-
-    const conS = document.getElementById('aot-sc-con-sentence'); if (conS) conS.textContent = 'Uses the lower end of observed non-base fees among active fee-paying application programs, with an explicit minimum floor of 0.10 lam/CU.';
-    const baseS = document.getElementById('aot-sc-base-sentence'); if (baseS) baseS.textContent = 'Uses the raw observed non-base fees across the included application categories, without outlier clipping, as the new base anchor.';
-    const optS = document.getElementById('aot-sc-opt-sentence'); if (optS) optS.textContent = 'Uses the full observed fee burden across the included application categories, including base fees, and displays it as 1.50 lam/CU for the strong upside case.';
-    const bullS = document.getElementById('aot-sc-bull-sentence'); if (bullS) bullS.textContent = 'Uses the P75 active payer non-base fee/CU anchor as the high-payer stress case, displayed at 2.00 lam/CU.';
-
+// Build 30d-source scenario explain data (called once at init, cached)
+function _build30dScenarioExplain() {
     const includedCategoriesText = 'Included application categories are Prop AMM, DEX (aggregator, AMM pools, and orderbook), lending, oracle, bridge, perps, cranker-style programs, depin, payments, NFT, and gaming. Only programs with positive compute usage over the 30-day window are included. Arbitrage-bot rows are excluded from the core scenario set, and categories such as unknown and other are not used in scenario construction.';
     const representativeText = 'Representative names in this included set include BisonFi and HumidiFi (Prop AMM), Jupiter and Pump.fun programs (DEX), and Kamino programs (lending).';
     const activePayerDefinition = 'Active payers are included application programs with non-base fee/CU > 0 over the 30-day window.';
     const activePayerAsterisk = '* Active payer = priority fees + MEV / JIT fees > 0 over the 30-day window.';
     const includedCount = _scenarioPool.length;
     const activeCount = _scenarioActivePayers.length;
-    const conAdditionalContextText = [
-        'Case 1: P30 active payer non-base fee/CU* \u2192 ' + _scenarioP30Active.toFixed(4) + ' lam/CU.',
-        activePayerAsterisk
-    ].join('\n');
-    const baseAdditionalContextText = [
-        'Case 1: Raw CU-weighted non-base fee/CU on included programs (n = ' + includedCount + ') \u2192 ' + _fBaseRaw.toFixed(4) + ' lam/CU.',
-        'Case 2: Active payers only* (raw CU-weighted non-base fee/CU, n = ' + activeCount + ') \u2192 ' + _scenarioActiveAgg.weightedNonBase.toFixed(4) + ' lam/CU.',
-        activePayerAsterisk
-    ].join('\n');
-    const optAdditionalContextText = [
-        'Case 1: P75 of the included reference set (n = ' + includedCount + ') \u2192 ' + _scenarioP75Included.toFixed(4) + ' lam/CU.'
-    ].join('\n');
-    const bullAdditionalContextText = [
-        'Case 1: P80 total fee/CU (included set, n = ' + includedCount + ') \u2192 ' + _scenarioP80TotalIncluded.toFixed(4) + ' lam/CU.',
-        'Case 2: P90 total fee/CU (included set, n = ' + includedCount + ') \u2192 ' + _scenarioP90TotalIncluded.toFixed(4) + ' lam/CU.'
-    ].join('\n');
-
-    _aotScenarioExplain = {
+    return {
         con: {
-            title: 'Conservative',
-            value: _fCon.toFixed(2) + ' lam/CU',
+            title: 'Conservative', value: _fCon.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents a low but still credible willingness-to-pay environment among currently active application programs.',
             scope: includedCategoriesText + ' Included programs for scenario construction: n = ' + includedCount + '. For this scenario, we additionally use active payers only: n = ' + activeCount + '. ' + activePayerDefinition + ' ' + representativeText,
             metric: 'Metric used: non-base fee/CU, where non-base means priority fees plus MEV / JIT fees. Rule applied: take P25 among active payers, then apply a hard floor of 0.10 lam/CU.',
-            calculation: 'Base case: P25 active payer non-base fee/CU (n = ' + activeCount + ') is ' + _fConRaw.toFixed(4) + ' lam/CU, then the 0.10 floor is applied, so the displayed value is ' + _fCon.toFixed(2) + ' lam/CU.',
+            calculation: 'P25 active payer non-base fee/CU (n = ' + activeCount + ') is ' + _fConRaw.toFixed(4) + ' lam/CU, then the 0.10 floor is applied, so the displayed value is ' + _fCon.toFixed(2) + ' lam/CU.',
             why: 'Using the P25 of active payers with a hard floor provides a defensible lower-bound proxy: it reflects observed willingness to pay among real fee-paying programs while preventing the scenario from collapsing to negligible levels driven by very low-activity tails.',
-            context: conAdditionalContextText
+            context: 'Case 1: P30 active payer non-base fee/CU* \u2192 ' + _scenarioP30Active.toFixed(4) + ' lam/CU.\n' + activePayerAsterisk
         },
         base: {
-            title: 'Base',
-            value: _fBase.toFixed(2) + ' lam/CU',
+            title: 'Base', value: _fBase.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents the new default market-observed state for current application demand.',
             scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
             metric: 'Metric used: raw CU-weighted non-base fee/CU across the included application categories. Rule applied: no outlier clipping is used in this scenario.',
-            calculation: 'Base case: raw CU-weighted non-base fee/CU on included programs (n = ' + includedCount + ') is ' + _fBaseRaw.toFixed(4) + ' lam/CU with no clipping, displayed as ' + _fBase.toFixed(2) + ' lam/CU.',
-            why: 'Using the raw CU-weighted non-base fee/CU across the included set makes the base case the closest proxy to the currently observed fee environment: higher-CU applications carry proportionally more influence, and avoiding clipping preserves the aggregate economics visible in recent activity.',
-            context: baseAdditionalContextText
+            calculation: 'Raw CU-weighted non-base fee/CU on included programs (n = ' + includedCount + ') is ' + _fBaseRaw.toFixed(4) + ' lam/CU with no clipping, displayed as ' + _fBase.toFixed(2) + ' lam/CU.',
+            why: 'Using the raw CU-weighted non-base fee/CU across the included set makes the base case the closest proxy to the currently observed fee environment.',
+            context: 'Case 1: Raw CU-weighted non-base fee/CU on included programs (n = ' + includedCount + ') \u2192 ' + _fBaseRaw.toFixed(4) + ' lam/CU.\nCase 2: Active payers only* (n = ' + activeCount + ') \u2192 ' + _scenarioActiveAgg.weightedNonBase.toFixed(4) + ' lam/CU.\n' + activePayerAsterisk
         },
         opt: {
-            title: 'Optimistic',
-            value: _fOpt.toFixed(2) + ' lam/CU',
+            title: 'Optimistic', value: _fOpt.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents a strong upside case where applications absorb the full observed all-in fee burden.',
             scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
-            metric: 'Metric used: CU-weighted total fee/CU across the included application categories. Rule applied: total fee/CU includes base fees plus priority and MEV / JIT components, then the scenario is displayed at 1.50 lam/CU.',
-            calculation: 'Base case: CU-weighted total fee/CU on included programs (n = ' + includedCount + ') is ' + _fOptRaw.toFixed(4) + ' lam/CU, and the scenario is displayed as ' + _fOpt.toFixed(2) + ' lam/CU.',
-            why: 'Using total fee/CU rather than non-base fee/CU is appropriate for a strong upside case because it captures periods when applications are exposed to the full marginal cost of execution, while still staying below the more aggressive high-payer percentile stress case.',
-            context: optAdditionalContextText
+            metric: 'Metric used: CU-weighted total fee/CU across the included application categories. Rule applied: total fee/CU includes base fees plus priority and MEV / JIT components.',
+            calculation: 'CU-weighted total fee/CU on included programs (n = ' + includedCount + ') is ' + _fOptRaw.toFixed(4) + ' lam/CU, displayed as ' + _fOpt.toFixed(2) + ' lam/CU.',
+            why: 'Using total fee/CU rather than non-base fee/CU is appropriate for a strong upside case because it captures the full marginal cost of execution.',
+            context: 'Case 1: P75 of the included reference set (n = ' + includedCount + ') \u2192 ' + _scenarioP75Included.toFixed(4) + ' lam/CU.'
         },
         bull: {
-            title: 'Bull',
-            value: _fBull.toFixed(2) + ' lam/CU',
+            title: 'Bull', value: _fBull.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents the most aggressive case, anchored to the upper tail of observed willingness to pay among active fee-paying programs.',
             scope: includedCategoriesText + ' Included programs for scenario construction: n = ' + includedCount + '. For this scenario, we additionally use active payers only: n = ' + activeCount + '. ' + activePayerDefinition + ' ' + representativeText,
-            metric: 'Metric used: non-base fee/CU among active payers. Rule applied: use the P75 active payer non-base fee/CU as the bull anchor, then display the scenario at 2.00 lam/CU.',
-            calculation: 'Base case: P75 active payer non-base fee/CU (n = ' + activeCount + ') is ' + _fBullRaw.toFixed(4) + ' lam/CU. This is used as the bull anchor and displayed as ' + _fBull.toFixed(2) + ' lam/CU.',
-            why: 'Using the P75 among active payers is appropriate for the most aggressive scenario because it anchors the assumption in the upper tail of observed willingness to pay among real fee-paying programs, making it a deliberate proxy for sustained high-intensity demand.',
-            context: bullAdditionalContextText
+            metric: 'Metric used: non-base fee/CU among active payers. Rule applied: use the P75 active payer non-base fee/CU as the bull anchor.',
+            calculation: 'P75 active payer non-base fee/CU (n = ' + activeCount + ') is ' + _fBullRaw.toFixed(4) + ' lam/CU, displayed as ' + _fBull.toFixed(2) + ' lam/CU.',
+            why: 'Using the P75 among active payers anchors the assumption in the upper tail of observed willingness to pay among real fee-paying programs.',
+            context: 'Case 1: P80 total fee/CU (included set, n = ' + includedCount + ') \u2192 ' + _scenarioP80TotalIncluded.toFixed(4) + ' lam/CU.\nCase 2: P90 total fee/CU (included set, n = ' + includedCount + ') \u2192 ' + _scenarioP90TotalIncluded.toFixed(4) + ' lam/CU.'
         }
     };
+}
+
+// Build horizon-source scenario explain data
+function _buildHorizonScenarioExplain() {
+    const s = _macroCtx.summary_by_metric?.non_base_fee_per_cu_lamports;
+    if (!s) return _build30dScenarioExplain(); // fallback
+    const rc = _macroCtx.row_count || '?';
+    const sd = _macroCtx.start_date || '?';
+    const ed = _macroCtx.end_date || '?';
+    const scopeText = 'Epoch-level Trillium API data. ' + rc + ' epochs (' + sd + ' \u2013 ' + ed + '). Regime classification via rolling 30-epoch volatility logic.';
+    const metricText = 'Metric: non-base fee/CU (priority fees + MEV/JIT fees \u00f7 total CU), per epoch.';
+    const f = _feeDefaultsHorizon;
+    return {
+        con: {
+            title: 'Conservative', value: f.con.toFixed(2) + ' lam/CU',
+            plain: 'Anchored to the lower range of normal-regime epochs over the 24-month window.',
+            scope: scopeText, metric: metricText + ' Rule: Normal regime P25.',
+            calculation: 'Normal regime P25 non-base fee/CU = ' + (s.normal?.p25?.toFixed(3) || '?') + ' lam/CU (n=' + (s.normal?.n || '?') + ' epochs, 24mo window), displayed as ' + f.con.toFixed(2) + ' lam/CU.',
+            why: 'P25 of normal epochs provides a conservative lower bound anchored in the most common market state.',
+            context: 'Normal regime: n=' + (s.normal?.n || '?') + ', mean=' + (s.normal?.mean?.toFixed(3) || '?') + ', p25=' + (s.normal?.p25?.toFixed(3) || '?') + ', p75=' + (s.normal?.p75?.toFixed(3) || '?')
+        },
+        base: {
+            title: 'Base', value: f.base.toFixed(2) + ' lam/CU',
+            plain: 'Anchored to the average fee environment during normal-regime epochs over the 24-month window.',
+            scope: scopeText, metric: metricText + ' Rule: Normal regime mean.',
+            calculation: 'Normal regime mean non-base fee/CU = ' + (s.normal?.mean?.toFixed(3) || '?') + ' lam/CU (n=' + (s.normal?.n || '?') + ' epochs, 24mo window), displayed as ' + f.base.toFixed(2) + ' lam/CU.',
+            why: 'The mean of normal epochs represents the typical fee environment — the most frequent market state over the sample.',
+            context: 'Normal regime: n=' + (s.normal?.n || '?') + ', p10=' + (s.normal?.p10?.toFixed(3) || '?') + ', mean=' + (s.normal?.mean?.toFixed(3) || '?') + ', median=' + (s.normal?.median?.toFixed(3) || '?') + ', p90=' + (s.normal?.p90?.toFixed(3) || '?')
+        },
+        opt: {
+            title: 'Optimistic', value: f.opt.toFixed(2) + ' lam/CU',
+            plain: 'Anchored to moderately volatile market conditions (elevated regime) over the 24-month window.',
+            scope: scopeText, metric: metricText + ' Rule: Elevated regime mean.',
+            calculation: 'Elevated regime mean non-base fee/CU = ' + (s.elevated?.mean?.toFixed(3) || '?') + ' lam/CU (n=' + (s.elevated?.n || '?') + ' epochs, 24mo window), displayed as ' + f.opt.toFixed(2) + ' lam/CU.',
+            why: 'The elevated regime captures periods of moderate congestion — a credible upside scenario.',
+            context: 'Elevated regime: n=' + (s.elevated?.n || '?') + ', mean=' + (s.elevated?.mean?.toFixed(3) || '?') + ', median=' + (s.elevated?.median?.toFixed(3) || '?') + ', p90=' + (s.elevated?.p90?.toFixed(3) || '?')
+        },
+        bull: {
+            title: 'Bull', value: f.bull.toFixed(2) + ' lam/CU',
+            plain: 'Anchored to the highest-volatility market conditions (extreme regime) over the 24-month window.',
+            scope: scopeText, metric: metricText + ' Rule: Extreme regime mean.',
+            calculation: 'Extreme regime mean non-base fee/CU = ' + (s.extreme?.mean?.toFixed(3) || '?') + ' lam/CU (n=' + (s.extreme?.n || '?') + ' epochs, 24mo window), displayed as ' + f.bull.toFixed(2) + ' lam/CU.',
+            why: 'The extreme regime captures peak-stress periods — the most aggressive but historically observed fee environment.',
+            context: 'Extreme regime: n=' + (s.extreme?.n || '?') + ', mean=' + (s.extreme?.mean?.toFixed(3) || '?') + ', median=' + (s.extreme?.median?.toFixed(3) || '?') + ', p90=' + (s.extreme?.p90?.toFixed(3) || '?') + ', max=' + (s.extreme?.max?.toFixed(3) || '?')
+        }
+    };
+}
+
+var _aotExplain30d = null; // cached at init
+
+// Update scenario cards + explain data for current calibration source (C3+C4)
+function updateAotScenarioCards() {
+    const isHorizon = _calibrationContext === 'horizon';
+    const fees = isHorizon ? _feeDefaultsHorizon : _feeDefaults30d;
+    const sourceTag = isHorizon ? 'long-horizon' : '30d program data';
+
+    // Update card fee/CU values
+    const ids = ['con', 'base', 'opt', 'bull'];
+    ids.forEach(function(k) {
+        const el = document.getElementById('aot-sc-' + k + '-f');
+        if (el) el.textContent = fees[k].toFixed(2) + ' lam/CU';
+    });
+
+    // Update card sentences
+    if (isHorizon) {
+        const s = _macroCtx.summary_by_metric?.non_base_fee_per_cu_lamports;
+        const n = s?.normal?.n || '?';
+        const setS = function(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
+        setS('aot-sc-con-sentence', 'Normal regime P25 non-base fee/CU = ' + (s?.normal?.p25?.toFixed(3) || '?') + ' lam/CU (' + n + ' epochs, 24mo window).');
+        setS('aot-sc-base-sentence', 'Normal regime mean non-base fee/CU = ' + (s?.normal?.mean?.toFixed(3) || '?') + ' lam/CU (' + n + ' epochs, 24mo window).');
+        setS('aot-sc-opt-sentence', 'Elevated regime mean non-base fee/CU = ' + (s?.elevated?.mean?.toFixed(3) || '?') + ' lam/CU (' + (s?.elevated?.n || '?') + ' epochs, 24mo window).');
+        setS('aot-sc-bull-sentence', 'Extreme regime mean non-base fee/CU = ' + (s?.extreme?.mean?.toFixed(3) || '?') + ' lam/CU (' + (s?.extreme?.n || '?') + ' epochs, 24mo window).');
+    } else {
+        var setS = function(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
+        setS('aot-sc-con-sentence', 'Uses the lower end of observed non-base fees among active fee-paying application programs, with an explicit minimum floor of 0.10 lam/CU.');
+        setS('aot-sc-base-sentence', 'Uses the raw observed non-base fees across the included application categories, without outlier clipping, as the new base anchor.');
+        setS('aot-sc-opt-sentence', 'Uses the full observed fee burden across the included application categories, including base fees, and displays it as 1.50 lam/CU for the strong upside case.');
+        setS('aot-sc-bull-sentence', 'Uses the P75 active payer non-base fee/CU anchor as the high-payer stress case, displayed at 2.00 lam/CU.');
+    }
+
+    // Rebuild explain data (C4)
+    _aotScenarioExplain = isHorizon ? _buildHorizonScenarioExplain() : _aotExplain30d;
+}
+
+function initAotFcuSection(){
+    // Cache 30d explain data once
+    _aotExplain30d = _build30dScenarioExplain();
+    _aotScenarioExplain = _aotExplain30d;
+
+    // Set initial card state
+    updateAotScenarioCards();
+
     _bindAotScenarioModal();
 
     const m1 = document.getElementById('aot-cat-chart-mode');
@@ -3465,7 +3691,19 @@ function update(){
     if(typeof renderBlockBuilder==='function') renderBlockBuilder();
 }
 
-renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked();
+renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked();
+
+// Calibration source info popover toggle
+(function() {
+    var toggle = document.getElementById('ctx-info-toggle');
+    var pop = document.getElementById('ctx-info-pop');
+    var close = document.getElementById('ctx-info-close');
+    if (toggle && pop) {
+        toggle.addEventListener('click', function(e) { e.stopPropagation(); pop.classList.toggle('show'); });
+        if (close) close.addEventListener('click', function() { pop.classList.remove('show'); });
+        document.addEventListener('click', function(e) { if (!pop.contains(e.target) && e.target !== toggle) pop.classList.remove('show'); });
+    }
+})();
 
 // Populate Solana Data KPIs from computed stats
 const _js = getJitStats();
