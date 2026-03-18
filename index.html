@@ -733,7 +733,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="sidebar-info-popover">
                     <div class="sidebar-note-copy">
                         <p>For AOT blockspace auctions, Raiku Stake % represents the share of total Solana stake delegated to Raiku-connected validators, because AOT capacity depends on validator stake share and reserved blockspace access.</p>
-                        <p>JIT is modeled differently: it starts from an observed market benchmark and annualizes revenue, similar to Jito-like benchmark extrapolations. In this model, total Solana stake share is a direct driver for AOT, but not the direct entry point for JIT.</p>
+                        <p>JIT is modeled differently: it starts from an observed market benchmark and annualizes revenue, similar to MEV tip-based benchmark extrapolations. In this model, total Solana stake share is a direct driver for AOT, but not the direct entry point for JIT.</p>
                     </div>
                 </div>
             </details>
@@ -755,7 +755,7 @@ details[open] summary::before { transform:rotate(90deg); }
                     <label>Avg Auction Fee/CU (lamports)</label>
                     <div class="slider-row"><input type="range" id="sl-fcu" min="0" max="25" step="0.01" value="1.00"><span class="val blue" id="v-fcu">1.00</span></div>
                     <div class="control-derivation" id="fcu-block-fee-helper">Auction fees/block: 6,000,000 lamports/block (~0.006000 SOL/block)</div>
-                    <div class="control-derivation" id="fcu-ctx-indicator" style="color:#5B8DEF;margin-top:2px;">Calibration: 30d AOT scope</div>
+                    <div class="control-derivation" id="fcu-ctx-indicator" style="display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:0.3px;padding:3px 8px;border-radius:3px;margin-top:4px;background:#0d3b3b;color:#4dd0e1;">30d AOT scope</div>
                 </div>
                 <a href="#aot-fcu-data-section" class="method-link" onclick="document.getElementById('aot-fcu-data-section').scrollIntoView({behavior:'smooth'});return false;">&#x2197; Source &amp; Methodology</a>
             </div>
@@ -2003,6 +2003,9 @@ function applyScenario(n){
 // ── Data context selector — switches AOT fee/CU calibration source ────
 let _calibrationContext = '30d';  // '30d' or 'horizon'
 const _feeDefaults30d = { con: _fCon, base: _fBase, opt: _fOpt, bull: _fBull };
+// PROVISIONAL preset mapping — pending final approval.
+// Horizon presets anchor each scenario to a volatility regime:
+// con=normal p25, base=normal mean, opt=elevated mean, bull=extreme mean.
 const _feeDefaultsHorizon = (() => {
     const s = _macroCtx.summary_by_metric?.non_base_fee_per_cu_lamports;
     if (!s || !s.normal || !s.extreme) return _feeDefaults30d;  // fallback
@@ -2013,45 +2016,42 @@ const _feeDefaultsHorizon = (() => {
         bull: +s.extreme.mean.toFixed(2)
     };
 })();
-const _feeDescriptions = {
-    '30d': {
-        con:  `Conservative — P25 active-payer non-base fee/CU from 30d AOT-relevant scope (floor 0.10 lam/CU).`,
-        base: `Base — CU-weighted mean non-base fee/CU across 30d AOT-relevant programs.`,
-        opt:  `Optimistic — upside anchor at 1.50 lam/CU (from 30d program data).`,
-        bull: `Bull — high-payer stress case at 2.00 lam/CU (P75 active payers, 30d scope).`
-    },
-    horizon: {
-        con:  `Conservative — P25 of normal-regime epoch non-base fee/CU (long-horizon, ${_macroCtx.row_count || '?'} epochs).`,
-        base: `Base — mean normal-regime non-base fee/CU (long-horizon, ${_macroCtx.summary_by_metric?.non_base_fee_per_cu_lamports?.normal?.n || '?'} normal epochs).`,
-        opt:  `Optimistic — mean elevated-regime non-base fee/CU (long-horizon, ${_macroCtx.summary_by_metric?.non_base_fee_per_cu_lamports?.elevated?.n || '?'} elevated epochs).`,
-        bull: `Bull — mean extreme-regime non-base fee/CU (long-horizon, ${_macroCtx.summary_by_metric?.non_base_fee_per_cu_lamports?.extreme?.n || '?'} extreme epochs).`
-    }
-};
 function setCalibrationContext(ctx) {
     _calibrationContext = ctx;
-    // Update button states
     document.getElementById('ctx-30d').classList.toggle('active', ctx === '30d');
     document.getElementById('ctx-horizon').classList.toggle('active', ctx === 'horizon');
-    // Update fee/CU defaults in SC
+    // Update fee/CU defaults — SC.*.desc is NOT touched (preset meaning stays stable)
     const fees = ctx === 'horizon' ? _feeDefaultsHorizon : _feeDefaults30d;
-    const descs = _feeDescriptions[ctx];
-    SC.con.f = fees.con;   SC.con.desc = descs.con;
-    SC.base.f = fees.base; SC.base.desc = descs.base;
-    SC.opt.f = fees.opt;   SC.opt.desc = descs.opt;
-    SC.bull.f = fees.bull; SC.bull.desc = descs.bull;
+    SC.con.f = fees.con;
+    SC.base.f = fees.base;
+    SC.opt.f = fees.opt;
+    SC.bull.f = fees.bull;
     // Update source label
     const lbl = document.getElementById('ctx-source-label');
     if (lbl) {
         lbl.textContent = ctx === 'horizon'
-            ? `Default AOT fee/CU derived from long-horizon epoch-level non-base fee/CU (${_macroCtx.row_count} epochs, normal/elevated/extreme means).`
-            : 'Default AOT fee/CU derived from 30-day AOT-relevant program scope (arb-bot excluded).';
+            ? `AOT fee/CU calibrated from long-horizon epoch-level data (${_macroCtx.row_count} epochs, ${_macroCtx.start_date || '?'} – ${_macroCtx.end_date || '?'}).`
+            : 'AOT fee/CU calibrated from 30-day program-level data (arb-bot excluded).';
     }
-    // Update fee/CU slider indicator
+    // Update calibration badge
     const ind = document.getElementById('fcu-ctx-indicator');
-    if (ind) ind.textContent = ctx === 'horizon'
-        ? 'Calibration: long-horizon epoch context'
-        : 'Calibration: 30d AOT scope';
-    // Re-apply current scenario to propagate new fee/CU
+    if (ind) {
+        if (ctx === 'horizon') {
+            ind.textContent = `Long-horizon (${_macroCtx.row_count} ep, 2024-03 – 2026-03)`;
+            ind.style.background = '#6b5b00'; ind.style.color = '#ffd54f';
+        } else {
+            ind.textContent = '30d AOT scope';
+            ind.style.background = '#0d3b3b'; ind.style.color = '#4dd0e1';
+        }
+    }
+    // Move fee/CU slider to new value if a preset is active
+    const slider = document.getElementById('sl-fcu');
+    if (slider && _selectedScenario) {
+        slider.value = SC[_selectedScenario].f;
+        const sliderLabel = document.getElementById('v-fcu');
+        if (sliderLabel) sliderLabel.textContent = SC[_selectedScenario].f;
+    }
+    // Re-apply current scenario to propagate new fee/CU through model
     if (_selectedScenario) applyScenario(_selectedScenario);
 }
 
@@ -2147,6 +2147,49 @@ function calc(p){
 
 // ── Macro Market Context — data-driven rendering ──────────────────────
 let _epochFeeChart = null;
+let _selectedMacroMetric = 'non_base_fee_per_cu_lamports';
+
+const _macroMetricTabs = [
+    { key: 'non_base_fee_per_cu_lamports', label: 'Non-base fee/CU' },
+    { key: 'priority_fee_per_cu_lamports', label: 'Priority fee/CU' },
+    { key: 'mev_jito_fee_per_cu_lamports', label: 'MEV/JIT fee/CU' },
+    { key: 'base_fee_per_cu_lamports',     label: 'Base fee/CU' },
+    { key: 'total_fee_per_cu_lamports',    label: 'Total fee/CU' },
+    { key: 'avg_cu_per_block',             label: 'Avg CU/block' }
+];
+
+function _macroMfmt(v, metricKey) {
+    if (v == null) return '—';
+    if (metricKey === 'avg_cu_per_block') return Math.round(v).toLocaleString('en-US');
+    return v.toFixed(3);
+}
+
+function _renderMacroStatsTable(metricKey) {
+    const s = _macroCtx.summary_by_metric?.[metricKey];
+    const regimeColors = { normal: '#8ddb6a', elevated: '#F5A623', extreme: '#e06c75' };
+    const subsets = [
+        { key: 'all_epochs', label: 'All', color: 'var(--text)' },
+        { key: 'normal',     label: 'Normal',   color: regimeColors.normal },
+        { key: 'elevated',   label: 'Elevated', color: regimeColors.elevated },
+        { key: 'extreme',    label: 'Extreme',  color: regimeColors.extreme }
+    ];
+    if (!s) {
+        return `<tr><td colspan="10" style="padding:12px 10px;color:var(--text2);font-size:11px;">No data for this metric.</td></tr>`;
+    }
+    return subsets.map((sub, i) => {
+        const r = s[sub.key];
+        const border = i < subsets.length - 1 ? 'border-bottom:1px solid #1a1a1a;' : '';
+        const fmt = (v) => _macroMfmt(v, metricKey);
+        const td = (v) => `<td style="padding:7px 9px;text-align:right;color:var(--text2);">${fmt(v)}</td>`;
+        const nFmt = r?.n != null ? r.n.toLocaleString('en-US') : '—';
+        return `<tr style="${border}">
+            <td style="padding:7px 9px;color:${sub.color};font-weight:500;">${sub.label}</td>
+            <td style="padding:7px 9px;text-align:right;color:var(--text2);">${nFmt}</td>
+            ${td(r?.p10)}${td(r?.p25)}${td(r?.mean)}${td(r?.median)}${td(r?.p75)}${td(r?.p90)}${td(r?.min)}${td(r?.max)}
+        </tr>`;
+    }).join('');
+}
+
 function renderMacroContextPanel() {
     const el = document.getElementById('macro-ctx-panel');
     if (!el) return;
@@ -2155,95 +2198,99 @@ function renderMacroContextPanel() {
         el.innerHTML = '<div style="font-size:12px;color:var(--text2);">Macro context artifact not loaded.</div>';
         return;
     }
-    const mfmt = (v, d) => v == null ? '—' : v.toFixed(d ?? 3);
-    const ratio = s.extreme.mean / s.normal.mean;
     const regimeColors = { normal: '#8ddb6a', elevated: '#F5A623', extreme: '#e06c75' };
-    const subsets = [
-        { key: 'all_epochs', label: 'All epochs', color: 'var(--text)' },
-        { key: 'normal', label: 'Normal', color: regimeColors.normal },
-        { key: 'elevated', label: 'Elevated', color: regimeColors.elevated },
-        { key: 'extreme', label: 'Extreme', color: regimeColors.extreme }
-    ];
-    const window_str = _macroCtx.start_date && _macroCtx.end_date
-        ? `${_macroCtx.start_date} → ${_macroCtx.end_date} (${_macroCtx.row_count} epochs)`
-        : `${_macroCtx.row_count} epochs`;
+    const ratio = s.extreme.mean / s.normal.mean;
+    const startDate = _macroCtx.start_date || '?';
+    const endDate   = _macroCtx.end_date   || '?';
+    const rowCount  = _macroCtx.row_count  || '?';
 
     el.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
-            <div style="font-size:12px;font-weight:600;color:var(--text);">Macro Market Context</div>
-            <div style="font-size:10px;color:var(--text2);font-style:italic;">Long-horizon epoch context &mdash; ${window_str}</div>
-        </div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px;">
-            Network-wide epoch summaries for <strong>non-base fee/CU</strong> (priority + MEV, excluding base/signature fees).
-            Derived from upstream canonical dataset (${_macroCtx.row_count} Trillium epochs).
+        <!-- Header with date range -->
+        <div style="margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;">Macro Market Context</div>
+            <div style="font-size:11px;color:var(--text2);">${rowCount} epochs | ${startDate} – ${endDate}</div>
         </div>
 
-        <!-- Regime cards -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">
+        <!-- Regime cards (non_base_fee_per_cu_lamports) -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
             ${['normal','elevated','extreme'].map(k => {
                 const r = s[k];
-                const pct = r ? ((r.n / s.all_epochs.n) * 100).toFixed(0) : '?';
+                const pct = r && s.all_epochs?.n ? ((r.n / s.all_epochs.n) * 100).toFixed(0) : '?';
                 return `<div style="padding:10px 12px;background:#10131a;border:1px solid #1c2330;border-radius:8px;border-top:3px solid ${regimeColors[k]};">
                     <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${regimeColors[k]};font-family:var(--font-mono);margin-bottom:4px;">${k}</div>
-                    <div style="font-size:18px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;">${r ? mfmt(r.mean) : '—'}</div>
-                    <div style="font-size:10px;color:var(--text2);margin-top:4px;">n=${r ? r.n : 0} (${pct}%) · med ${r ? mfmt(r.median) : '—'}</div>
+                    <div style="font-size:18px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;">${r ? r.mean.toFixed(3) : '—'}</div>
+                    <div style="font-size:10px;color:var(--text2);margin-top:4px;">n=${r ? r.n : 0} (${pct}%) · med ${r ? r.median.toFixed(3) : '—'}</div>
                 </div>`;
             }).join('')}
         </div>
 
-        <!-- Headline ratio -->
-        <div style="padding:12px 14px;background:#10131a;border:1px solid #1c2330;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;gap:16px;">
-            <div>
-                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#A7B4C7;font-family:var(--font-mono);margin-bottom:4px;">Congestion uplift</div>
-                <div style="font-size:28px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;">${mfmt(ratio, 2)}x</div>
-            </div>
-            <div style="font-size:11px;color:var(--text2);line-height:1.5;">
-                Extreme mean / Normal mean<br>
-                <strong style="color:var(--text);">${mfmt(s.extreme.mean)} / ${mfmt(s.normal.mean)} = ${mfmt(ratio, 2)}x</strong>
+        <!-- Congestion headline ~2.0x -->
+        <div style="padding:12px 14px;background:#10131a;border:1px solid #1c2330;border-radius:8px;margin-bottom:12px;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#A7B4C7;font-family:var(--font-mono);margin-bottom:4px;">Congestion uplift</div>
+            <div style="font-size:28px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;margin-bottom:6px;">~${Math.round(ratio * 10) / 10}x</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.55;">
+                Extreme mean (${s.extreme.mean.toFixed(3)} lam/CU) &divide; Normal mean (${s.normal.mean.toFixed(3)} lam/CU) = ${ratio.toFixed(2)}x<br>
+                <span style="font-size:10px;">non-base fee/CU, ${rowCount} epochs, ${startDate} to ${endDate}</span>
             </div>
         </div>
 
-        <!-- Full stats table -->
-        <div style="overflow-x:auto;border:1px solid var(--card-border);border-radius:6px;background:#0a0b0c;margin-bottom:10px;">
-            <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
-                <thead style="background:#111213;">
-                    <tr style="border-bottom:1px solid var(--card-border);">
-                        <th style="padding:8px 10px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Regime</th>
-                        <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">n</th>
-                        <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Mean</th>
-                        <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Median</th>
-                        <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">p75</th>
-                        <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">p90</th>
-                        <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Min</th>
-                        <th style="padding:8px 10px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Max</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${subsets.map((sub, i) => {
-                        const r = s[sub.key];
-                        const border = i < subsets.length - 1 ? 'border-bottom:1px solid #1a1a1a;' : '';
-                        const td = (v, d) => `<td style="padding:8px 10px;text-align:right;color:var(--text2);">${r ? mfmt(v, d) : '—'}</td>`;
-                        return `<tr style="${border}"><td style="padding:8px 10px;color:${sub.color};font-weight:500;">${sub.label}</td>${td(r?.n,0)}${td(r?.mean)}${td(r?.median)}${td(r?.p75)}${td(r?.p90)}${td(r?.min)}${td(r?.max)}</tr>`;
-                    }).join('')}
-                </tbody>
-            </table>
+        <!-- Metric tabs + stats table -->
+        <div style="margin-bottom:12px;">
+            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;" id="macro-metric-tabs">
+                ${_macroMetricTabs.map(t => `
+                    <button class="regime-btn${t.key === _selectedMacroMetric ? ' active' : ''}"
+                            style="font-size:10px;padding:4px 9px;"
+                            data-metric="${t.key}">${t.label}</button>
+                `).join('')}
+            </div>
+            <div style="overflow-x:auto;border:1px solid var(--card-border);border-radius:6px;background:#0a0b0c;">
+                <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
+                    <thead style="background:#111213;">
+                        <tr style="border-bottom:1px solid var(--card-border);">
+                            <th style="padding:7px 9px;text-align:left;color:var(--lime-soft);font-size:10px;text-transform:uppercase;white-space:nowrap;">Regime</th>
+                            <th style="padding:7px 9px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">n</th>
+                            <th style="padding:7px 9px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">p10</th>
+                            <th style="padding:7px 9px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">p25</th>
+                            <th style="padding:7px 9px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Mean</th>
+                            <th style="padding:7px 9px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Median</th>
+                            <th style="padding:7px 9px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">p75</th>
+                            <th style="padding:7px 9px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">p90</th>
+                            <th style="padding:7px 9px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Min</th>
+                            <th style="padding:7px 9px;text-align:right;color:var(--lime-soft);font-size:10px;text-transform:uppercase;">Max</th>
+                        </tr>
+                    </thead>
+                    <tbody id="macro-stats-tbody">
+                        ${_renderMacroStatsTable(_selectedMacroMetric)}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- Methodology -->
+        <!-- Methodology collapsible -->
         <details style="margin-bottom:0;">
-            <summary style="font-size:11px;color:#5B8DEF;cursor:pointer;font-weight:600;padding:4px 0;">Methodology & regime definitions</summary>
+            <summary style="font-size:11px;color:#5B8DEF;cursor:pointer;font-weight:600;padding:4px 0;user-select:none;">Methodology: rolling 30-epoch volatility regime classification</summary>
             <div style="font-size:11px;color:var(--text2);line-height:1.65;padding:12px 14px;background:#111213;border-radius:6px;border-left:3px solid #5B8DEF;margin-top:6px;">
-                <div style="font-weight:600;color:#5B8DEF;margin-bottom:6px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Regime assignment</div>
-                <div style="margin-bottom:6px;">${_macroCtx.assignment_logic_text || 'Not available.'}</div>
-                <div style="font-weight:600;color:#5B8DEF;margin-bottom:6px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Key metric</div>
-                <div style="margin-bottom:6px;"><strong style="color:var(--text);">non-base fee/CU</strong> = (priority fees + MEV/Jito tips) &divide; total compute units, in lamports/CU. Base (signature) fees are excluded.</div>
-                <div style="font-weight:600;color:#5B8DEF;margin-bottom:6px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Congestion ratio</div>
-                <div style="margin-bottom:6px;">Derived from <strong style="color:var(--text);">mean extreme vs mean normal</strong> to preserve expected economic ordering. Extreme has a lower median than elevated (smaller fat-tailed subset), so median alone is not used for scaling.</div>
-                <div style="font-weight:600;color:#5B8DEF;margin-bottom:6px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Sample</div>
-                <div>Epochs ${_macroCtx.start_epoch || '?'}–${_macroCtx.end_epoch || '?'} (${window_str}). Source: Trillium API epoch data with Jito/SC cross-checks.</div>
+                <div style="font-weight:600;color:#5B8DEF;margin-bottom:4px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Regime assignment</div>
+                <div style="margin-bottom:8px;">${_macroCtx.assignment_logic_text || 'Not available.'}</div>
+                <div style="font-weight:600;color:#5B8DEF;margin-bottom:4px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Key metric</div>
+                <div style="margin-bottom:8px;"><strong style="color:var(--text);">non-base fee/CU</strong> = (priority fees + MEV/JIT tips) &divide; total compute units, in lamports/CU. Base (signature) fees are excluded.</div>
+                <div style="font-weight:600;color:#5B8DEF;margin-bottom:4px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Sample</div>
+                <div>Epochs ${_macroCtx.start_epoch || '?'}–${_macroCtx.end_epoch || '?'} (${rowCount} epochs, ${startDate} – ${endDate}). Source: Trillium API epoch data.</div>
             </div>
         </details>
     `;
+
+    // Attach tab click handlers after innerHTML is set
+    document.getElementById('macro-metric-tabs')?.querySelectorAll('button[data-metric]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            _selectedMacroMetric = btn.dataset.metric;
+            document.querySelectorAll('#macro-metric-tabs button[data-metric]').forEach(b => {
+                b.classList.toggle('active', b.dataset.metric === _selectedMacroMetric);
+            });
+            const tbody = document.getElementById('macro-stats-tbody');
+            if (tbody) tbody.innerHTML = _renderMacroStatsTable(_selectedMacroMetric);
+        });
+    });
 }
 
 function initEpochFeeChart() {
@@ -2256,6 +2303,35 @@ function initEpochFeeChart() {
     const values = rows.map(r => r.non_base_fee_per_cu_lamports);
     const bgColors = rows.map(r => (regimeColors[r.volatility_tag] || '#555') + '99');
     const borderColors = rows.map(r => regimeColors[r.volatility_tag] || '#555');
+
+    const aot30dPlugin = {
+        id: 'aot30dLine',
+        afterDraw(chart) {
+            const allRows = _macroCtx.epoch_rows || [];
+            if (allRows.length < 15) return;
+            const aotStartIdx = rows.length - 14;
+            if (aotStartIdx < 0) return;
+            const meta = chart.getDatasetMeta(0);
+            if (!meta.data[aotStartIdx]) return;
+            const x = meta.data[aotStartIdx].x;
+            const ctx = chart.ctx;
+            const yTop = chart.chartArea.top;
+            const yBottom = chart.chartArea.bottom;
+            ctx.save();
+            ctx.strokeStyle = '#4dd0e1';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(x, yTop);
+            ctx.lineTo(x, yBottom);
+            ctx.stroke();
+            ctx.fillStyle = '#4dd0e1';
+            ctx.font = '9px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('30d AOT window', x, yTop - 4);
+            ctx.restore();
+        }
+    };
 
     _epochFeeChart = new Chart(canvas, {
         type: 'bar',
@@ -2275,7 +2351,24 @@ function initEpochFeeChart() {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        generateLabels: function() {
+                            return [
+                                { text: 'Normal', fillStyle: '#8ddb6a', strokeStyle: '#8ddb6a', lineWidth: 0 },
+                                { text: 'Elevated', fillStyle: '#F5A623', strokeStyle: '#F5A623', lineWidth: 0 },
+                                { text: 'Extreme', fillStyle: '#e06c75', strokeStyle: '#e06c75', lineWidth: 0 }
+                            ];
+                        },
+                        boxWidth: 12,
+                        boxHeight: 12,
+                        padding: 8,
+                        font: { size: 10 },
+                        color: '#999'
+                    }
+                },
                 title: {
                     display: true,
                     text: 'Non-base fee/CU by epoch (lamports) — colored by regime',
@@ -2311,7 +2404,8 @@ function initEpochFeeChart() {
                     title: { display: true, text: 'lam/CU', color: '#A0A3A9', font: { size: 10 } }
                 }
             }
-        }
+        },
+        plugins: [aot30dPlugin]
     });
 }
 
