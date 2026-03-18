@@ -398,7 +398,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .ctx-info-wrap { position:relative; display:inline-block; }
 .ctx-info-btn { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; border:1px solid #3a3d42; background:#17181b; color:var(--text2); font-size:10px; font-weight:600; cursor:pointer; line-height:1; vertical-align:middle; margin-left:4px; }
 .ctx-info-btn:hover { border-color:#5a5d62; color:var(--text); }
-.ctx-info-pop { display:none; position:absolute; left:0; top:calc(100% + 6px); z-index:100; width:320px; padding:12px 14px; background:#0f1012; border:1px solid #2e3135; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.5); font-size:11px; color:var(--text2); line-height:1.6; }
+.ctx-info-pop { display:none; position:absolute; left:0; top:calc(100% + 6px); z-index:9999; width:320px; padding:12px 14px; background:#0f1012; border:1px solid #2e3135; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.5); font-size:11px; color:var(--text2); line-height:1.6; }
 .ctx-info-pop.show { display:block; }
 .ctx-info-pop strong { color:var(--text); font-weight:600; }
 .ctx-info-pop .pop-close { float:right; cursor:pointer; color:var(--text2); font-size:9px; border:1px solid #333; border-radius:3px; padding:1px 5px; background:#17181b; margin:-2px -4px 4px 8px; }
@@ -1058,14 +1058,15 @@ details[open] summary::before { transform:rotate(90deg); }
             <span style="font-size:11px;color:var(--text2);font-style:italic;" id="aot-fcu-badge">data-driven framework</span>
         </div>
 
+        <!-- Active preset + source badge (top-left) -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:12px;font-weight:600;color:var(--text);" id="aot-active-preset">Base Case</span>
+            <span id="aot-active-source-badge" style="display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:0.3px;padding:3px 8px;border-radius:3px;background:#0d3b3b;color:#4dd0e1;">30d AOT scope</span>
+        </div>
         <!-- Headline: current slider value -->
         <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
             <span style="font-size:26px;font-weight:700;color:var(--text);font-family:var(--font-mono);" id="aot-fcu-headline">&mdash;</span>
             <span style="font-size:14px;color:var(--text2);font-family:var(--font-mono);">lamports per CU</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-            <span style="font-size:12px;font-weight:600;color:var(--text);" id="aot-active-preset">Base Case</span>
-            <span id="aot-active-source-badge" style="display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:0.3px;padding:3px 8px;border-radius:3px;background:#0d3b3b;color:#4dd0e1;">30d AOT scope</span>
         </div>
         <div style="font-size:12px;color:var(--text2);margin-bottom:16px;">
             Blended average fee per compute unit across all AOT auction customers. Controlled by the <strong>Avg Auction Fee/CU</strong> slider in the left panel. This is the second of two core model assumptions (alongside JIT market size).
@@ -1149,7 +1150,7 @@ details[open] summary::before { transform:rotate(90deg); }
         <!-- Macro market context (data-driven from macro_context.v1.js) -->
         <div id="macro-ctx-panel" style="margin-bottom:16px;"></div>
         <!-- Epoch-level chart -->
-        <div style="margin-bottom:16px;height:280px;"><canvas id="epoch-fee-chart"></canvas></div>
+        <div style="margin-bottom:16px;height:380px;"><canvas id="epoch-fee-chart"></canvas></div>
 
         <!-- Source metadata (C10 — dynamic) -->
         <div id="aot-source-meta-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px 18px;font-size:12px;margin-bottom:16px;">
@@ -2301,9 +2302,27 @@ function _renderRegimeDetailTable() {
             html += td(dr?.p10, dm.key) + td(dr?.p25, dm.key) + td(dr?.mean, dm.key) + td(dr?.median, dm.key) + td(dr?.p75, dm.key) + td(dr?.p90, dm.key) + td(dr?.min, dm.key) + td(dr?.max, dm.key);
             html += '</tr>';
         });
+        // Derived block-fee rows: fee/CU × avg CU/block
+        const cuData = _macroCtx.summary_by_metric?.['avg_cu_per_block']?.[sub.key];
+        [
+            { feeKey: 'non_base_fee_per_cu_lamports', label: 'Non-base fee/block (derived)' },
+            { feeKey: 'total_fee_per_cu_lamports', label: 'Total fee/block (derived)' }
+        ].forEach(derived => {
+            const feeData = _macroCtx.summary_by_metric?.[derived.feeKey]?.[sub.key];
+            html += '<tr class="regime-detail-row" data-regime-detail="' + sub.key + '" style="display:none;border-top:1px dashed #222;">';
+            html += '<td style="padding:4px 8px 4px 24px;font-size:10px;color:#5B8DEF;font-style:italic;">' + derived.label + '</td>';
+            html += '<td style="padding:4px 8px;text-align:right;color:var(--text2);font-size:10px;">' + (feeData?.n != null ? feeData.n : '\u2014') + '</td>';
+            ['p10','p25','mean','median','p75','p90','min','max'].forEach(stat => {
+                const fv = feeData?.[stat];
+                const cv = cuData?.[stat];
+                const val = (fv != null && cv != null) ? (fv * cv).toFixed(0) : '\u2014';
+                html += '<td style="padding:4px 8px;text-align:right;color:var(--text2);font-size:10px;">' + (val !== '\u2014' ? Number(val).toLocaleString('en-US') : '\u2014') + '</td>';
+            });
+            html += '</tr>';
+        });
         // Relationship footnote row
         html += '<tr class="regime-detail-row" data-regime-detail="' + sub.key + '" style="display:none;">';
-        html += '<td colspan="10" style="padding:3px 8px 6px 24px;font-size:9px;color:var(--text2);font-style:italic;">non-base = priority + MEV/JIT &nbsp;\u00b7&nbsp; total = base + non-base</td>';
+        html += '<td colspan="10" style="padding:3px 8px 6px 24px;font-size:9px;color:var(--text2);font-style:italic;">non-base = priority + MEV/JIT &nbsp;\u00b7&nbsp; total = base + non-base &nbsp;\u00b7&nbsp; fee/block = fee/CU &times; avg CU/block (stat-by-stat)</td>';
         html += '</tr>';
     });
     tbody.innerHTML = html;
@@ -2342,46 +2361,42 @@ function renderMacroContextPanel() {
             <div style="font-size:11px;color:var(--text2);">${rowCount} epochs | ${startDate} – ${endDate}</div>
         </div>
 
-        <!-- Regime cards (left) + Congestion result (right) — 2-column layout -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;align-items:start;">
-            <!-- Left: regime cards stacked vertically -->
-            <div style="display:flex;flex-direction:column;gap:6px;">
-                ${['normal','elevated','extreme'].map(k => {
-                    const r = s[k];
-                    const pct = r && s.all_epochs?.n ? ((r.n / s.all_epochs.n) * 100).toFixed(0) : '?';
-                    const defs = {
-                        normal: 'Default market state. None of the volatility thresholds are breached. Represents ~71% of the 24-month sample.',
-                        elevated: 'Moderately volatile. Triggered when any of: |price change| \u2265 8%, MEV z-score \u2265 2.0, priority fee z-score \u2265 2.0, MEV multiple \u2265 2.5\u00d7, or fee multiple \u2265 2.5\u00d7. Represents ~18% of the sample.',
-                        extreme: 'Highly volatile. Triggered when any of: |price change| \u2265 15%, MEV z-score \u2265 3.0, priority fee z-score \u2265 3.0, MEV multiple \u2265 5.0\u00d7, or fee multiple \u2265 5.0\u00d7. Represents ~10% of the sample.'
-                    };
-                    return `<div style="padding:8px 10px;background:#10131a;border:1px solid #1c2330;border-radius:6px;border-left:3px solid ${regimeColors[k]};">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
-                            <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:${regimeColors[k]};font-family:var(--font-mono);font-weight:600;">${k}</span>
-                            <span style="font-size:10px;color:var(--text2);">n=${r ? r.n : 0} (${pct}%)</span>
-                        </div>
-                        <div style="font-size:16px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;">${r ? r.mean.toFixed(3) : '\u2014'} <span style="font-size:10px;font-weight:400;color:var(--text2);">mean</span></div>
-                        <div style="font-size:10px;color:var(--text2);margin-top:2px;">med ${r ? r.median.toFixed(3) : '\u2014'} · p25 ${r ? r.p25.toFixed(3) : '\u2014'} · p75 ${r ? r.p75.toFixed(3) : '\u2014'}</div>
-                        <details style="margin-top:4px;">
-                            <summary style="font-size:9px;color:var(--text2);cursor:pointer;">\u24d8 What is ${k}?</summary>
-                            <div style="font-size:10px;color:var(--text2);line-height:1.5;padding:4px 0 2px 0;">${defs[k]}</div>
-                        </details>
-                    </div>`;
-                }).join('')}
-                <div style="font-size:9px;color:var(--text2);line-height:1.4;padding:2px 0 0 2px;">Rolling 30-epoch classification. Any single threshold breach is sufficient.</div>
-            </div>
-            <!-- Right: congestion result -->
-            <div style="padding:14px 16px;background:#10131a;border:1px solid #1c2330;border-radius:8px;display:flex;flex-direction:column;justify-content:center;min-height:100%;">
-                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#A7B4C7;font-family:var(--font-mono);margin-bottom:6px;">Congestion uplift</div>
-                <div style="font-size:36px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.0;margin-bottom:8px;">2&times;</div>
-                <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:6px;">
-                    ${s.extreme.mean.toFixed(3)} &divide; ${s.normal.mean.toFixed(3)} = ${ratio.toFixed(2)}&times;
+        <!-- Regime cards + Congestion — single-row 4-card layout -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px;align-items:stretch;">
+            ${['normal','elevated','extreme'].map(k => {
+                const r = s[k];
+                const pct = r && s.all_epochs?.n ? ((r.n / s.all_epochs.n) * 100).toFixed(0) : '?';
+                const defs = {
+                    normal: 'Default market state. None of the volatility thresholds are breached. Represents ~71% of the 24-month sample.',
+                    elevated: 'Moderately volatile. Triggered when any of: |price change| \u2265 8%, MEV z-score \u2265 2.0, priority fee z-score \u2265 2.0, MEV multiple \u2265 2.5\u00d7, or fee multiple \u2265 2.5\u00d7. Represents ~18% of the sample.',
+                    extreme: 'Highly volatile. Triggered when any of: |price change| \u2265 15%, MEV z-score \u2265 3.0, priority fee z-score \u2265 3.0, MEV multiple \u2265 5.0\u00d7, or fee multiple \u2265 5.0\u00d7. Represents ~10% of the sample.'
+                };
+                return `<div style="padding:7px 9px;background:#10131a;border:1px solid #1c2330;border-radius:6px;border-left:3px solid ${regimeColors[k]};">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+                        <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:${regimeColors[k]};font-family:var(--font-mono);font-weight:600;">${k}</span>
+                        <span style="font-size:9px;color:var(--text2);">n=${r ? r.n : 0} (${pct}%)</span>
+                    </div>
+                    <div style="font-size:15px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;">${r ? r.mean.toFixed(3) : '\u2014'} <span style="font-size:9px;font-weight:400;color:var(--text2);">mean</span></div>
+                    <div style="font-size:9px;color:var(--text2);margin-top:2px;">med ${r ? r.median.toFixed(3) : '\u2014'} · p25 ${r ? r.p25.toFixed(3) : '\u2014'} · p75 ${r ? r.p75.toFixed(3) : '\u2014'}</div>
+                    <details style="margin-top:3px;">
+                        <summary style="font-size:9px;color:var(--text2);cursor:pointer;">\u24d8 definition</summary>
+                        <div style="font-size:9px;color:var(--text2);line-height:1.4;padding:3px 0 1px 0;">${defs[k]}</div>
+                    </details>
+                </div>`;
+            }).join('')}
+            <!-- Congestion uplift card -->
+            <div style="padding:7px 9px;background:#10131a;border:1px solid #1c2330;border-radius:6px;border-left:3px solid #5B8DEF;">
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:#5B8DEF;font-family:var(--font-mono);font-weight:600;margin-bottom:2px;">Congestion uplift</div>
+                <div style="font-size:24px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;">2&times;</div>
+                <div style="font-size:10px;color:var(--text2);margin-top:3px;font-family:var(--font-mono);">
+                    <span style="color:var(--text);">${s.extreme.mean.toFixed(3)}</span> &divide; <span style="color:var(--text);">${s.normal.mean.toFixed(3)}</span> = <span style="color:var(--text);">${ratio.toFixed(2)}&times;</span>
                 </div>
-                <div style="font-size:10px;color:var(--text2);line-height:1.5;">
-                    Product multiplier rounded to 2&times; from exact ${ratio.toFixed(2)}&times;.<br>
-                    non-base fee/CU, extreme mean &divide; normal mean, 24mo.
+                <div style="font-size:9px;color:var(--text2);margin-top:2px;line-height:1.4;">
+                    Rounded to 2&times;. Extreme &divide; normal mean, 24mo.
                 </div>
             </div>
         </div>
+        <div style="font-size:9px;color:var(--text2);line-height:1.3;margin-bottom:10px;">Rolling 30-epoch classification. Any single threshold breach is sufficient.</div>
 
         <!-- Regime data table — collapsible regime-oriented detail (C7) -->
         <div style="margin-bottom:12px;" id="macro-regime-detail">
@@ -2520,9 +2535,9 @@ function initEpochFeeChart() {
                         },
                         boxWidth: 12,
                         boxHeight: 12,
-                        padding: 8,
-                        font: { size: 10 },
-                        color: '#999'
+                        padding: 10,
+                        font: { size: 11 },
+                        color: '#e0e0e0'
                     }
                 },
                 title: {
