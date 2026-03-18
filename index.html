@@ -398,7 +398,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .ctx-info-wrap { position:relative; display:inline-block; }
 .ctx-info-btn { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; border:1px solid #3a3d42; background:#17181b; color:var(--text2); font-size:10px; font-weight:600; cursor:pointer; line-height:1; vertical-align:middle; margin-left:4px; }
 .ctx-info-btn:hover { border-color:#5a5d62; color:var(--text); }
-.ctx-info-pop { display:none; position:absolute; left:0; top:calc(100% + 6px); z-index:9999; width:320px; padding:12px 14px; background:#0f1012; border:1px solid #2e3135; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.5); font-size:11px; color:var(--text2); line-height:1.6; }
+.ctx-info-pop { display:none; position:fixed; z-index:99999; width:320px; padding:12px 14px; background:#0f1012; border:1px solid #2e3135; border-radius:8px; box-shadow:0 12px 32px rgba(0,0,0,.7); font-size:11px; color:var(--text2); line-height:1.6; }
 .ctx-info-pop.show { display:block; }
 .ctx-info-pop strong { color:var(--text); font-weight:600; }
 .ctx-info-pop .pop-close { float:right; cursor:pointer; color:var(--text2); font-size:9px; border:1px solid #333; border-radius:3px; padding:1px 5px; background:#17181b; margin:-2px -4px 4px 8px; }
@@ -1053,15 +1053,12 @@ details[open] summary::before { transform:rotate(90deg); }
     </summary>
     <div id="aot-fcu-data-section" style="background:#0d0e0f;border:1px solid var(--card-border);border-radius:8px;padding:20px 24px;">
 
-        <!-- Header badge -->
-        <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:10px;">
-            <span style="font-size:11px;color:var(--text2);font-style:italic;" id="aot-fcu-badge">data-driven framework</span>
-        </div>
-
-        <!-- Active preset + source badge (top-left) -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <!-- Header line: active preset + source badge + framework label -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
             <span style="font-size:12px;font-weight:600;color:var(--text);" id="aot-active-preset">Base Case</span>
             <span id="aot-active-source-badge" style="display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:0.3px;padding:3px 8px;border-radius:3px;background:#0d3b3b;color:#4dd0e1;">30d AOT scope</span>
+            <span style="flex:1;"></span>
+            <span style="font-size:10px;color:var(--text2);font-style:italic;" id="aot-fcu-badge">data-driven framework</span>
         </div>
         <!-- Headline: current slider value -->
         <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
@@ -2378,21 +2375,22 @@ function renderMacroContextPanel() {
                     </div>
                     <div style="font-size:15px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;">${r ? r.mean.toFixed(3) : '\u2014'} <span style="font-size:9px;font-weight:400;color:var(--text2);">mean</span></div>
                     <div style="font-size:9px;color:var(--text2);margin-top:2px;">med ${r ? r.median.toFixed(3) : '\u2014'} · p25 ${r ? r.p25.toFixed(3) : '\u2014'} · p75 ${r ? r.p75.toFixed(3) : '\u2014'}</div>
-                    <details style="margin-top:3px;">
-                        <summary style="font-size:9px;color:var(--text2);cursor:pointer;">\u24d8 definition</summary>
-                        <div style="font-size:9px;color:var(--text2);line-height:1.4;padding:3px 0 1px 0;">${defs[k]}</div>
+                    <details style="margin-top:4px;">
+                        <summary style="font-size:10px;color:#8a8f98;cursor:pointer;">\u24d8 definition</summary>
+                        <div style="font-size:10px;color:#c0c4cc;line-height:1.55;padding:4px 0 2px 0;">${defs[k]}</div>
                     </details>
                 </div>`;
             }).join('')}
-            <!-- Congestion uplift card -->
-            <div style="padding:7px 9px;background:#10131a;border:1px solid #1c2330;border-radius:6px;border-left:3px solid #5B8DEF;">
-                <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:#5B8DEF;font-family:var(--font-mono);font-weight:600;margin-bottom:2px;">Congestion uplift</div>
-                <div style="font-size:24px;font-weight:700;color:var(--text);font-family:var(--font-mono);line-height:1.1;">2&times;</div>
-                <div style="font-size:10px;color:var(--text2);margin-top:3px;font-family:var(--font-mono);">
-                    <span style="color:var(--text);">${s.extreme.mean.toFixed(3)}</span> &divide; <span style="color:var(--text);">${s.normal.mean.toFixed(3)}</span> = <span style="color:var(--text);">${ratio.toFixed(2)}&times;</span>
+            <!-- Congestion uplift card — styled as computed output -->
+            <div style="padding:7px 9px;background:#0c1020;border:1px solid #1a2540;border-radius:6px;text-align:center;">
+                <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:#5B8DEF;font-family:var(--font-mono);font-weight:600;margin-bottom:4px;">Congestion uplift</div>
+                <div style="font-size:28px;font-weight:700;color:#5B8DEF;font-family:var(--font-mono);line-height:1.0;">2&times;</div>
+                <div style="font-size:10px;color:#b0b8c8;margin-top:5px;font-family:var(--font-mono);line-height:1.3;">
+                    ${s.extreme.mean.toFixed(3)} &divide; ${s.normal.mean.toFixed(3)}<br>
+                    <span style="color:var(--text);font-weight:600;">= ${ratio.toFixed(2)}&times;</span>
                 </div>
-                <div style="font-size:9px;color:var(--text2);margin-top:2px;line-height:1.4;">
-                    Rounded to 2&times;. Extreme &divide; normal mean, 24mo.
+                <div style="font-size:9px;color:#707888;margin-top:3px;line-height:1.3;">
+                    Extreme &divide; normal mean, 24mo
                 </div>
             </div>
         </div>
@@ -2524,7 +2522,7 @@ function initEpochFeeChart() {
             plugins: {
                 legend: {
                     display: true,
-                    position: 'top',
+                    position: 'bottom',
                     labels: {
                         generateLabels: function() {
                             return [
@@ -2535,9 +2533,9 @@ function initEpochFeeChart() {
                         },
                         boxWidth: 12,
                         boxHeight: 12,
-                        padding: 10,
-                        font: { size: 11 },
-                        color: '#e0e0e0'
+                        padding: 12,
+                        font: { size: 11, weight: '500' },
+                        color: '#ffffff'
                     }
                 },
                 title: {
@@ -3703,13 +3701,20 @@ function update(){
 
 renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked();
 
-// Calibration source info popover toggle
+// Calibration source info popover toggle (position:fixed, placed via JS)
 (function() {
     var toggle = document.getElementById('ctx-info-toggle');
     var pop = document.getElementById('ctx-info-pop');
     var close = document.getElementById('ctx-info-close');
     if (toggle && pop) {
-        toggle.addEventListener('click', function(e) { e.stopPropagation(); pop.classList.toggle('show'); });
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (pop.classList.contains('show')) { pop.classList.remove('show'); return; }
+            var rect = toggle.getBoundingClientRect();
+            pop.style.top = (rect.bottom + 6) + 'px';
+            pop.style.left = Math.max(8, rect.left) + 'px';
+            pop.classList.add('show');
+        });
         if (close) close.addEventListener('click', function() { pop.classList.remove('show'); });
         document.addEventListener('click', function(e) { if (!pop.contains(e.target) && e.target !== toggle) pop.classList.remove('show'); });
     }
