@@ -625,6 +625,25 @@ details[open] summary::before { transform:rotate(90deg); }
 .bf-derived { font-size:11px; color:var(--text-mid); font-family:var(--font-mono); padding:5px 0 2px; line-height:1.55; border-top:1px solid #1a1c22; margin-top:2px; font-weight:500; }
 .bf-derived .bf-em { color:var(--text); font-weight:600; }
 .bf-derived .bf-sub { color:var(--text-mid); }
+
+/* Hybrid slider controls — stepper row below slider */
+.hybrid-stepper-row { display:flex; align-items:center; gap:4px; margin-top:3px; }
+.stepper-btn { width:22px; height:22px; border-radius:4px; border:1px solid #2a2d36; background:#111213; color:var(--text2); font-size:14px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; flex-shrink:0; transition:border-color 0.12s, color 0.12s, background 0.12s; font-family:var(--font-mono); user-select:none; }
+.stepper-btn:hover { border-color:var(--lime); color:var(--lime); background:#0f1a0a; }
+.stepper-btn:active { background:#162008; }
+.stepper-input { width:80px; height:22px; border-radius:4px; border:1px solid #2a2d36; background:#0d0f10; color:var(--text); font-family:var(--font-mono); font-size:11px; text-align:center; padding:0 4px; outline:none; transition:border-color 0.12s; -moz-appearance:textfield; }
+.stepper-input::-webkit-inner-spin-button, .stepper-input::-webkit-outer-spin-button { -webkit-appearance:none; }
+.stepper-input:focus { border-color:var(--lime); }
+.stepper-unit { font-size:10px; color:var(--text2); font-family:var(--font-mono); flex-shrink:0; }
+.stepper-input.wide { width:92px; }
+/* In param-col context: tighten stepper sizing */
+.param-col .hybrid-stepper-row { gap:3px; margin-top:2px; }
+.param-col .stepper-btn { width:18px; height:18px; font-size:12px; }
+.param-col .stepper-input { width:62px; height:18px; font-size:10px; }
+.param-col .stepper-input.wide { width:72px; }
+.param-col .stepper-unit { font-size:9px; }
+/* model-params-price (sl-price): slightly wider input */
+.model-params-price .stepper-input { width:72px; }
 </style>
 </head>
 <body>
@@ -1812,6 +1831,21 @@ const _fBaseTotalRef = +_fBullRaw.toFixed(2);
 const _fOptTotalRef = +_fOptRaw.toFixed(2);
 const _fBullTotalRef = +((Number(_scenarioActiveAgg.p75Total || 0) > 0 ? _scenarioActiveAgg.p75Total : (_fBull + _scenarioAgg.weightedBase))).toFixed(2);
 
+// ── Hybrid slider UI metadata (nudge steps, display config) ──────────────
+const SLIDER_META = {
+  'sl-price':      { nudge: 5,    largeNudge: 25,    decimals: 0, unit: '$',  prefix: true  },
+  'sl-comm-aot':   { nudge: 0.25, largeNudge: 1,     decimals: 2, unit: '%',  prefix: false },
+  'sl-rebate-aot': { nudge: 0.05, largeNudge: 0.1,   decimals: 2, unit: '%',  prefix: false },
+  'sl-val-bonus':  { nudge: 0.1,  largeNudge: 0.25,  decimals: 2, unit: '%',  prefix: false },
+  'sl-comm-jit':   { nudge: 0.25, largeNudge: 1,     decimals: 2, unit: '%',  prefix: false },
+  'sl-rebate-jit': { nudge: 0.05, largeNudge: 0.1,   decimals: 2, unit: '%',  prefix: false },
+  'sl-stake':      { nudge: 0.1,  largeNudge: 0.5,   decimals: 1, unit: '%',  prefix: false },
+  'sl-blk':        { nudge: 1,    largeNudge: 5,     decimals: 0, unit: '%',  prefix: false },
+  'sl-fcu':        { nudge: 0.05, largeNudge: 0.5,   decimals: 2, unit: '',   prefix: false },
+  'sl-jit-market': { nudge: 1000, largeNudge: 10000, decimals: 0, unit: '',   prefix: false },
+  'sl-jit':        { nudge: 1,    largeNudge: 5,     decimals: 0, unit: '%',  prefix: false },
+};
+
 const SC = {
     con:  {ca:5,cj:5,j:5,s:2,b:1,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:1_000_000,
            desc:"Conservative — low but practical non-base assumption from active fee-paying application programs, with a hard floor at 0.10 lam/CU."},
@@ -2014,6 +2048,7 @@ function applyScenario(n){
     const presetEl = document.getElementById('aot-active-preset');
     if (presetEl) presetEl.textContent = presetNames[n] || n;
     update();
+    if (typeof syncAllNumericInputs === 'function') syncAllNumericInputs();
 }
 
 ['sl-comm-aot','sl-comm-jit','sl-rebate-aot','sl-rebate-jit','sl-val-bonus','sl-jit-market','sl-jit','sl-stake','sl-blk','sl-fcu','sl-price'].forEach(id=>{
@@ -2083,6 +2118,8 @@ function setCalibrationContext(ctx) {
         slider.value = SC[_selectedScenario].f;
         const sliderLabel = document.getElementById('v-fcu');
         if (sliderLabel) sliderLabel.textContent = SC[_selectedScenario].f;
+        // Sync numeric stepper input for sl-fcu
+        if (typeof syncAllNumericInputs === 'function') syncAllNumericInputs();
     }
     // Update scenario cards + explain data for new source (C3+C4)
     updateAotScenarioCards();
@@ -3687,7 +3724,152 @@ function update(){
     if(typeof renderBlockBuilder==='function') renderBlockBuilder();
 }
 
-renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked();
+// ── Hybrid controls: numeric input + stepper buttons ─────────────────────
+function syncAllNumericInputs() {
+    Object.keys(SLIDER_META).forEach(function(id) {
+        var slider = document.getElementById(id);
+        if (!slider) return;
+        var row = slider.closest('.slider-row');
+        if (!row) return;
+        var stepperRow = row.nextElementSibling;
+        if (!stepperRow || !stepperRow.classList.contains('hybrid-stepper-row')) return;
+        var inp = stepperRow.querySelector('.stepper-input');
+        if (!inp) return;
+        var meta = SLIDER_META[id];
+        inp.value = parseFloat(slider.value).toFixed(meta.decimals);
+    });
+}
+
+function initHybridControls() {
+    Object.keys(SLIDER_META).forEach(function(id) {
+        var slider = document.getElementById(id);
+        if (!slider) return;
+        var meta = SLIDER_META[id];
+        var sliderRow = slider.closest('.slider-row');
+        if (!sliderRow) return;
+
+        // Build the stepper row
+        var stepperRow = document.createElement('div');
+        stepperRow.className = 'hybrid-stepper-row';
+
+        var btnMinus = document.createElement('button');
+        btnMinus.className = 'stepper-btn';
+        btnMinus.textContent = '\u2212';
+        btnMinus.type = 'button';
+        btnMinus.setAttribute('aria-label', 'Decrease');
+        btnMinus.setAttribute('tabindex', '-1');
+
+        var inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = id === 'sl-jit-market' ? 'stepper-input wide' : 'stepper-input';
+        inp.setAttribute('inputmode', 'decimal');
+        inp.setAttribute('data-slider-id', id);
+        inp.value = parseFloat(slider.value).toFixed(meta.decimals);
+
+        var btnPlus = document.createElement('button');
+        btnPlus.className = 'stepper-btn';
+        btnPlus.textContent = '+';
+        btnPlus.type = 'button';
+        btnPlus.setAttribute('aria-label', 'Increase');
+        btnPlus.setAttribute('tabindex', '-1');
+
+        stepperRow.appendChild(btnMinus);
+        stepperRow.appendChild(inp);
+        if (meta.unit) {
+            var unitEl = document.createElement('span');
+            unitEl.className = 'stepper-unit';
+            unitEl.textContent = meta.unit;
+            stepperRow.appendChild(unitEl);
+        }
+        stepperRow.appendChild(btnPlus);
+
+        // Insert immediately after the slider-row div
+        sliderRow.parentNode.insertBefore(stepperRow, sliderRow.nextSibling);
+
+        // Helper: clamp and round
+        function clamp(v) {
+            var mn = parseFloat(slider.min);
+            var mx = parseFloat(slider.max);
+            return Math.min(mx, Math.max(mn, v));
+        }
+        function round(v) {
+            var factor = Math.pow(10, meta.decimals);
+            return Math.round(v * factor) / factor;
+        }
+
+        // Helper: push value → slider → trigger existing update path
+        // _fromNumericInput prevents the slider's own listener from overwriting inp.value
+        // during programmatic dispatches originating from this control's numeric input.
+        var _fromNumericInput = false;
+        function applyValue(v) {
+            var clamped = round(clamp(v));
+            slider.value = clamped;
+            inp.value = clamped.toFixed(meta.decimals);
+            // Trigger the existing input event listener on the range element
+            _fromNumericInput = true;
+            slider.dispatchEvent(new Event('input', { bubbles: true }));
+            _fromNumericInput = false;
+        }
+
+        // Slider → numeric input sync (keep in lockstep while dragging)
+        slider.addEventListener('input', function() {
+            if (_fromNumericInput) return; // our own dispatch — preserve user's typed value
+            inp.value = parseFloat(slider.value).toFixed(meta.decimals);
+        });
+
+        // Minus / plus buttons
+        btnMinus.addEventListener('click', function() {
+            applyValue(parseFloat(slider.value) - meta.nudge);
+        });
+        btnPlus.addEventListener('click', function() {
+            applyValue(parseFloat(slider.value) + meta.nudge);
+        });
+
+        // Numeric input — allow partial typing, only commit on blur/Enter
+        var _typing = false;
+        inp.addEventListener('input', function() {
+            var v = inp.value;
+            // Protect partial states: empty, lone minus, trailing dot (e.g. '0.', '1.', '12.')
+            // These parse to valid numbers prematurely — wait for the user to finish typing.
+            if (v === '' || v === '-' || /^-?\d*\.$/.test(v)) {
+                _typing = true;
+                return;
+            }
+            var n = parseFloat(v);
+            if (isNaN(n)) { _typing = true; return; }
+            _typing = false;
+            // Live-sync slider while user types. Value may be clamped to [min, max] on the
+            // slider, but inp.value is intentionally left as-is — do not override typed text.
+            var clamped = round(clamp(n));
+            slider.value = clamped;
+            _fromNumericInput = true;
+            slider.dispatchEvent(new Event('input', { bubbles: true }));
+            _fromNumericInput = false;
+        });
+
+        inp.addEventListener('blur', function() {
+            var n = parseFloat(inp.value);
+            if (isNaN(n)) n = parseFloat(slider.value);
+            applyValue(n);
+            _typing = false;
+        });
+
+        inp.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                inp.blur();
+                return;
+            }
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                var dir = e.key === 'ArrowUp' ? 1 : -1;
+                var step = e.shiftKey ? meta.largeNudge : meta.nudge;
+                applyValue(parseFloat(slider.value) + dir * step);
+            }
+        });
+    });
+}
+
+renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls();
 
 // Calibration source info popover — moved to document.body to escape all stacking contexts
 (function() {
