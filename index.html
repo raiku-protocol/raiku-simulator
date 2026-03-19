@@ -1024,7 +1024,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <p style="margin:0 0 6px 0;">The <strong>Base Case</strong> uses the data-driven default computed from recent normal-activity epochs. The <strong>Conservative</strong> scenario assumes a lower-activity market (e.g. reduced MEV during quiet periods).</p>
             <p style="margin:0 0 6px 0;">The <strong>Optimistic</strong> and <strong>Bull Case</strong> assumptions are informed by historically stronger congestion and peak MEV periods &mdash; such as memecoin surges and high on-chain trading volume &mdash; that we identified in our research on Solana network activity.</p>
             <p style="margin:0;color:var(--text2);font-style:italic;">Note: Richer integration of peak-period data is still a work in progress. The optimistic and bullish values are already conceptually anchored to those higher-activity regimes, but may be refined as more granular data becomes available.</p>
-            <p style="margin:8px 0 0 0;font-size:11px;font-family:var(--font-mono);color:var(--text2);border-top:1px solid #2a2b2c;padding-top:6px;">Observed on-chain baselines (anchored to <span id="jw-ref-date">2026-03-01</span>): 6m&nbsp;=&nbsp;<span id="jw-ref-6m">&mdash;</span>&nbsp;SOL/yr &nbsp;&middot;&nbsp; 12m&nbsp;=&nbsp;<span id="jw-ref-12m">&mdash;</span>&nbsp;SOL/yr &nbsp;&middot;&nbsp; 24m&nbsp;=&nbsp;<span id="jw-ref-24m">&mdash;</span>&nbsp;SOL/yr</p>
+            <p style="margin:8px 0 0 0;font-size:11px;font-family:var(--font-mono);color:var(--text2);border-top:1px solid #2a2b2c;padding-top:6px;">Preset baselines (anchored to <span id="jw-ref-date">2026-03-01</span>): Conservative&nbsp;(6m)&nbsp;=&nbsp;<span id="jw-ref-6m">&mdash;</span>&nbsp;SOL/yr &nbsp;&middot;&nbsp; Base&nbsp;(12m)&nbsp;=&nbsp;<span id="jw-ref-12m">&mdash;</span>&nbsp;SOL/yr &nbsp;&middot;&nbsp; Optimistic&nbsp;(24m)&nbsp;=&nbsp;<span id="jw-ref-24m">&mdash;</span>&nbsp;SOL/yr &nbsp;&middot;&nbsp; Bull&nbsp;=&nbsp;5,000,000&nbsp;SOL/yr&nbsp;(manual)</p>
         </div>
 
         <!-- Historical chart — directly in this section -->
@@ -1857,11 +1857,11 @@ const SLIDER_META = {
 };
 
 const SC = {
-    con:  {ca:5,cj:5,j:4,s:5,b:2,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:1_000_000,
+    con:  {ca:5,cj:5,j:4,s:5,b:2,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:_jit6m,
            desc:"Conservative — low but practical non-base assumption from active fee-paying application programs, with a hard floor at 0.10 lam/CU."},
-    base: {ca:5,cj:5,j:8,s:10,b:8,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.10,vb:1.0,jm:_jitBaseline,
+    base: {ca:5,cj:5,j:8,s:10,b:8,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.10,vb:1.0,jm:_jit12m,
            desc:"Base — raw observed CU-weighted non-base fees across included application categories, without outlier clipping."},
-    opt:  {ca:5,cj:5,j:12,s:15,b:12,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:3_000_000,
+    opt:  {ca:5,cj:5,j:12,s:15,b:12,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:_jit24m,
            desc:"Optimistic — strong upside case using CU-weighted total fee/CU, displayed at 1.50 lam/CU."},
     bull: {ca:5,cj:5,j:20,s:25,b:15,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:5_000_000,
            desc:"Bull — high-payer stress case using active-payer P75 non-base fee/CU, displayed at 2.00 lam/CU."},
