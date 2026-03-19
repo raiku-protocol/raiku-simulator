@@ -1024,6 +1024,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <p style="margin:0 0 6px 0;">The <strong>Base Case</strong> uses the data-driven default computed from recent normal-activity epochs. The <strong>Conservative</strong> scenario assumes a lower-activity market (e.g. reduced MEV during quiet periods).</p>
             <p style="margin:0 0 6px 0;">The <strong>Optimistic</strong> and <strong>Bull Case</strong> assumptions are informed by historically stronger congestion and peak MEV periods &mdash; such as memecoin surges and high on-chain trading volume &mdash; that we identified in our research on Solana network activity.</p>
             <p style="margin:0;color:var(--text2);font-style:italic;">Note: Richer integration of peak-period data is still a work in progress. The optimistic and bullish values are already conceptually anchored to those higher-activity regimes, but may be refined as more granular data becomes available.</p>
+            <p style="margin:8px 0 0 0;font-size:11px;font-family:var(--font-mono);color:var(--text2);border-top:1px solid #2a2b2c;padding-top:6px;">Observed on-chain baselines (anchored to <span id="jw-ref-date">2026-03-01</span>): 6m&nbsp;=&nbsp;<span id="jw-ref-6m">&mdash;</span>&nbsp;SOL/yr &nbsp;&middot;&nbsp; 12m&nbsp;=&nbsp;<span id="jw-ref-12m">&mdash;</span>&nbsp;SOL/yr &nbsp;&middot;&nbsp; 24m&nbsp;=&nbsp;<span id="jw-ref-24m">&mdash;</span>&nbsp;SOL/yr</p>
         </div>
 
         <!-- Historical chart — directly in this section -->
@@ -1618,6 +1619,14 @@ const SY = 78_408_000, CB = 60_000_000, LS = 1_000_000_000;
 
 const _jitBaselineRaw = computeJitStats(100).annualized;
 const _jitBaseline = Math.round(_jitBaselineRaw / 1000) * 1000; // rounded to slider step (~813K SOL/yr)
+// Calendar-window baselines — anchored to last D_JITO data point (for reference display only)
+const _jitLastDate = D_JITO[D_JITO.length - 1][2];
+const _jit6mStats  = computeJitWindowByDate(_isoMonthsBack(_jitLastDate, 6));
+const _jit12mStats = computeJitWindowByDate(_isoMonthsBack(_jitLastDate, 12));
+const _jit24mStats = computeJitWindowByDate(_isoMonthsBack(_jitLastDate, 24));
+const _jit6m  = Math.round(_jit6mStats.annualized  / 1000) * 1000;
+const _jit12m = Math.round(_jit12mStats.annualized / 1000) * 1000;
+const _jit24m = Math.round(_jit24mStats.annualized / 1000) * 1000;
 const _EMPTY_AOT_ARTIFACT = {
     schema_version: 'aot_programs.v1',
     source_file: 'upstream:missing',
@@ -2185,6 +2194,29 @@ function computeJitStats(windowEpochs) {
         lastDate: recent[recent.length - 1][2],
         totalDays,
     };
+}
+function computeJitWindowByDate(cutoffISO) {
+    const data = D_JITO.filter(r => r[2] >= cutoffISO && r[1] > 0);
+    if (data.length === 0) return { annualized: 0, epochs: 0, totalSol: 0, totalDays: 0, firstDate: '', lastDate: '' };
+    const totalSol  = data.reduce((a, r) => a + r[1], 0);
+    const totalDays = data.reduce((a, r) => a + r[3], 0);
+    const annualized = totalDays > 0 ? (totalSol / totalDays) * 365.25 : 0;
+    return { annualized, epochs: data.length, totalSol, totalDays, firstDate: data[0][2], lastDate: data[data.length - 1][2] };
+}
+function _isoMonthsBack(isoDate, months) {
+    const d = new Date(isoDate); d.setMonth(d.getMonth() - months);
+    return d.toISOString().slice(0, 10);
+}
+function _populateJitWindowRef() {
+    const fmt = n => Math.round(n).toLocaleString('en-US');
+    const el6  = document.getElementById('jw-ref-6m');
+    const el12 = document.getElementById('jw-ref-12m');
+    const el24 = document.getElementById('jw-ref-24m');
+    const eld  = document.getElementById('jw-ref-date');
+    if (el6)  el6.textContent  = fmt(_jit6m);
+    if (el12) el12.textContent = fmt(_jit12m);
+    if (el24) el24.textContent = fmt(_jit24m);
+    if (eld)  eld.textContent  = _jitLastDate;
 }
 
 let _jitStats = null;
@@ -3903,7 +3935,7 @@ function initHybridControls() {
     });
 }
 
-renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls();
+renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls(); _populateJitWindowRef();
 
 // Calibration source info popover — moved to document.body to escape all stacking contexts
 (function() {
