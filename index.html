@@ -998,46 +998,9 @@ details[open] summary::before { transform:rotate(90deg); }
         <div style="font-size:13px;color:var(--text);line-height:1.7;padding:14px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid var(--lime-soft);">
             <div style="font-weight:600;color:var(--lime-soft);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Observed baseline computation</div>
             <p style="margin:0 0 8px 0;">The observed baseline is computed from on-chain data extracted via the <strong>Block Engine API</strong> (<code style="font-size:11px;">POST /api/v1/mev_rewards</code>). For each Solana epoch, the API returns <code style="font-size:11px;">total_network_mev_lamports</code>, which we convert to SOL.</p>
-            <p style="margin:0 0 8px 0;">JIT Total Market is set per scenario using three observed calendar windows, each anchored to the last data point in the dataset (<span id="jw-last-date">2026-03-01</span>):</p>
-<table class="jit-window-table" style="width:100%;border-collapse:collapse;font-size:0.82em;margin:8px 0 10px 0;">
-  <thead>
-    <tr style="border-bottom:1px solid #374151;">
-      <th style="text-align:left;padding:3px 8px;">Window</th>
-      <th style="text-align:left;padding:3px 8px;">Date range</th>
-      <th style="text-align:right;padding:3px 8px;">Epochs</th>
-      <th style="text-align:right;padding:3px 8px;">Total MEV</th>
-      <th style="text-align:right;padding:3px 8px;">Annualized</th>
-      <th style="text-align:left;padding:3px 8px;">Preset</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr id="jit-row-6m">
-      <td style="padding:3px 8px;">6 months</td>
-      <td style="padding:3px 8px;" id="jw-6m-range">&mdash;</td>
-      <td style="text-align:right;padding:3px 8px;" id="jw-6m-ep">&mdash;</td>
-      <td style="text-align:right;padding:3px 8px;" id="jw-6m-sol">&mdash;</td>
-      <td style="text-align:right;padding:3px 8px;" id="jw-6m-ann">&mdash;</td>
-      <td style="padding:3px 8px;color:#fb923c;">Conservative</td>
-    </tr>
-    <tr id="jit-row-12m">
-      <td style="padding:3px 8px;">12 months</td>
-      <td style="padding:3px 8px;" id="jw-12m-range">&mdash;</td>
-      <td style="text-align:right;padding:3px 8px;" id="jw-12m-ep">&mdash;</td>
-      <td style="text-align:right;padding:3px 8px;" id="jw-12m-sol">&mdash;</td>
-      <td style="text-align:right;padding:3px 8px;" id="jw-12m-ann">&mdash;</td>
-      <td style="padding:3px 8px;color:#38bdf8;">Base Case</td>
-    </tr>
-    <tr id="jit-row-24m">
-      <td style="padding:3px 8px;">24 months</td>
-      <td style="padding:3px 8px;" id="jw-24m-range">&mdash;</td>
-      <td style="text-align:right;padding:3px 8px;" id="jw-24m-ep">&mdash;</td>
-      <td style="text-align:right;padding:3px 8px;" id="jw-24m-sol">&mdash;</td>
-      <td style="text-align:right;padding:3px 8px;" id="jw-24m-ann">&mdash;</td>
-      <td style="padding:3px 8px;color:#818cf8;">Optimistic</td>
-    </tr>
-  </tbody>
-</table>
-<p style="font-size:0.8em;color:#9ca3af;margin:0;">Bull Case (5M SOL/yr) represents a hypothetical high-growth scenario not anchored to a historical window.</p>
+            <p style="margin:0 0 8px 0;" id="jit-methodology-window">We take the <strong>most recent 100 epochs</strong> with non-zero rewards and sum their MEV totals. This covers a period of approximately <span id="jit-m-duration">&mdash;</span>, from <span id="jit-m-period">&mdash;</span>.</p>
+            <p style="margin:0 0 8px 0;" id="jit-methodology-calc">The total MEV / JIT rewards in this window are <strong id="jit-ds-total-sol">&mdash;</strong> over <strong id="jit-ds-total-days">&mdash;</strong>. To annualize: <code style="font-size:11px;">(<span id="jit-m-method-num">&mdash;</span> / <span id="jit-m-method-days">&mdash;</span>) &times; 365.25 = <span id="jit-m-method-result">&mdash;</span></code>.</p>
+            <p style="margin:0;color:var(--text2);">This annualized value (<strong id="jit-m-method-result2">&mdash;</strong>) is the <strong>observed on-chain baseline</strong> and is used directly as the Base Case JIT total market. The slider starts at this value when the Base Case preset is active. Other scenarios use different market size assumptions.</p>
         </div>
 
         <!-- Source metadata grid — larger text -->
@@ -1067,7 +1030,7 @@ details[open] summary::before { transform:rotate(90deg); }
         <div style="margin-bottom:16px;">
             <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;">MEV / JIT Rewards — Historical Trend</div>
             <div style="height:220px;background:#0a0b0c;border-radius:6px;padding:8px;"><canvas id="chart-jit-history"></canvas></div>
-            <div style="font-size:11px;color:var(--text2);margin-top:6px;">Full history from epoch <span id="jit-chart-range">&mdash;</span>. Colored bands show the <span style="color:#818cf8;font-weight:600;">24m</span>, <span style="color:#38bdf8;font-weight:600;">12m</span>, and <span style="color:#fb923c;font-weight:600;">6m</span> calendar windows used as scenario baselines. Peaks reflect periods of high MEV activity (e.g., memecoin surges).</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:6px;">Full history from epoch <span id="jit-chart-range">&mdash;</span>. The <span style="color:#BDD970;font-weight:600;">highlighted section</span> shows the 100-epoch window used to compute the default. Peaks reflect periods of high MEV activity (e.g., memecoin surges).</div>
         </div>
 
         <!-- View source dataset button -->
@@ -1654,16 +1617,7 @@ D.dailyNet = [];
 const SY = 78_408_000, CB = 60_000_000, LS = 1_000_000_000;
 
 const _jitBaselineRaw = computeJitStats(100).annualized;
-const _jitBaseline = Math.round(_jitBaselineRaw / 1000) * 1000; // superseded by _jit6m/_jit12m/_jit24m
-
-// Calendar-window JIT baselines — anchored to last D_JITO entry
-const _jitLastDate = D_JITO[D_JITO.length - 1][2]; // "2026-03-01"
-const _jit6mStats  = computeJitWindowByDate(_isoMonthsBack(_jitLastDate, 6));
-const _jit12mStats = computeJitWindowByDate(_isoMonthsBack(_jitLastDate, 12));
-const _jit24mStats = computeJitWindowByDate(_isoMonthsBack(_jitLastDate, 24));
-const _jit6m  = Math.round(_jit6mStats.annualized  / 1000) * 1000;
-const _jit12m = Math.round(_jit12mStats.annualized / 1000) * 1000;
-const _jit24m = Math.round(_jit24mStats.annualized / 1000) * 1000;
+const _jitBaseline = Math.round(_jitBaselineRaw / 1000) * 1000; // rounded to slider step (~813K SOL/yr)
 const _EMPTY_AOT_ARTIFACT = {
     schema_version: 'aot_programs.v1',
     source_file: 'upstream:missing',
@@ -1894,11 +1848,11 @@ const SLIDER_META = {
 };
 
 const SC = {
-    con:  {ca:5,cj:5,j:4,s:5,b:2,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:_jit6m,
+    con:  {ca:5,cj:5,j:4,s:5,b:2,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:1_000_000,
            desc:"Conservative — low but practical non-base assumption from active fee-paying application programs, with a hard floor at 0.10 lam/CU."},
-    base: {ca:5,cj:5,j:8,s:10,b:8,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.10,vb:1.0,jm:_jit12m,
+    base: {ca:5,cj:5,j:8,s:10,b:8,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.10,vb:1.0,jm:_jitBaseline,
            desc:"Base — raw observed CU-weighted non-base fees across included application categories, without outlier clipping."},
-    opt:  {ca:5,cj:5,j:12,s:15,b:12,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:_jit24m,
+    opt:  {ca:5,cj:5,j:12,s:15,b:12,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:3_000_000,
            desc:"Optimistic — strong upside case using CU-weighted total fee/CU, displayed at 1.50 lam/CU."},
     bull: {ca:5,cj:5,j:20,s:25,b:15,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:5_000_000,
            desc:"Bull — high-payer stress case using active-payer P75 non-base fee/CU, displayed at 2.00 lam/CU."},
@@ -2237,40 +2191,6 @@ let _jitStats = null;
 function getJitStats() {
     if (!_jitStats) _jitStats = computeJitStats(100);
     return _jitStats;
-}
-
-function computeJitWindowByDate(cutoffISO) {
-    const data = D_JITO.filter(r => r[2] >= cutoffISO && r[1] > 0);
-    if (data.length === 0) return { annualized: 0, epochs: 0, totalSol: 0, totalDays: 0, firstDate: '', lastDate: '' };
-    const totalSol  = data.reduce((a, r) => a + r[1], 0);
-    const totalDays = data.reduce((a, r) => a + r[3], 0);
-    const annualized = totalDays > 0 ? (totalSol / totalDays) * 365.25 : 0;
-    return { annualized, epochs: data.length, totalSol, totalDays,
-             firstDate: data[0][2], lastDate: data[data.length - 1][2] };
-}
-
-function _isoMonthsBack(isoDate, months) {
-    const d = new Date(isoDate); d.setMonth(d.getMonth() - months);
-    return d.toISOString().slice(0, 10);
-}
-
-function _populateJitWindowTable() {
-    const fmt = n => Math.round(n).toLocaleString('en-US');
-    const rows = [
-        { sfx: '6m',  s: _jit6mStats,  ann: _jit6m  },
-        { sfx: '12m', s: _jit12mStats, ann: _jit12m },
-        { sfx: '24m', s: _jit24mStats, ann: _jit24m },
-    ];
-    rows.forEach(({sfx, s, ann}) => {
-        const el = id => document.getElementById(`jw-${sfx}-${id}`);
-        if (!el('range')) return;
-        el('range').textContent = `${s.firstDate} \u2192 ${s.lastDate}`;
-        el('ep').textContent    = s.epochs;
-        el('sol').textContent   = fmt(s.totalSol) + ' SOL';
-        el('ann').textContent   = fmt(ann) + ' SOL/yr';
-    });
-    const ld = document.getElementById('jw-last-date');
-    if (ld) ld.textContent = _jitLastDate;
 }
 
 function fmtTriple(usd, sol, pctOfGross) {
@@ -2786,6 +2706,8 @@ function renderSegmentBackdropCharts(baseOptions){
 let cJH;
 function initJitHistoryChart(){
     const jitAll = D_JITO.filter(r => r[1] > 10);
+    const jitNZ = D_JITO.filter(r => r[1] > 0);
+    const ws = jitNZ.length > 100 ? jitNZ[jitNZ.length - 100][0] : jitNZ[0]?.[0] || 0;
     // Date labels (line 1), epoch stored separately for tick callback (line 2)
     const dateLabels = jitAll.map(r => {
         const d = new Date(r[2]);
@@ -2794,16 +2716,10 @@ function initJitHistoryChart(){
         return m + " '" + y;
     });
     const epochNums = jitAll.map(r => r[0]);
-    // Calendar window cutoffs
-    const cut6m  = _isoMonthsBack(_jitLastDate, 6);
-    const cut12m = _isoMonthsBack(_jitLastDate, 12);
-    const cut24m = _isoMonthsBack(_jitLastDate, 24);
     const o2={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:10}},display:true},tooltip:{callbacks:{title:function(ctx){const i=ctx[0].dataIndex;return 'Epoch '+jitAll[i][0]+' — '+jitAll[i][2];}}}},scales:{x:{ticks:{color:'#555',font:{size:9},maxTicksLimit:18,maxRotation:0,callback:function(val,idx){const lbl=this.getLabelForValue(val);const ep=epochNums[val]!=null?epochNums[val]:'';return [lbl,'ep '+ep];}},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'},title:{display:true,color:'#A0A3A9',font:{size:10},text:'SOL / epoch'}}}};
     cJH=new Chart(document.getElementById('chart-jit-history'),{type:'line',data:{labels:dateLabels,datasets:[
-        {label:'All epochs',data:jitAll.map(r=>r[1]),borderColor:'rgba(255,255,255,0.25)',borderWidth:1,pointRadius:0,fill:false,spanGaps:false},
-        {label:'24m window (Optimistic)',data:jitAll.map(r=>r[2]>=cut24m?r[1]:null),borderColor:'#818cf8',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(129,140,248,0.08)',spanGaps:false},
-        {label:'12m window (Base Case)',data:jitAll.map(r=>r[2]>=cut12m?r[1]:null),borderColor:'#38bdf8',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(56,189,248,0.10)',spanGaps:false},
-        {label:'6m window (Conservative)',data:jitAll.map(r=>r[2]>=cut6m?r[1]:null),borderColor:'#fb923c',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(251,146,60,0.12)',spanGaps:false}
+        {label:'All epochs',data:jitAll.map(r=>r[1]),borderColor:'rgba(255,255,255,0.25)',borderWidth:1,pointRadius:0,fill:false},
+        {label:'Window (last 100)',data:jitAll.map(r=>r[0]>=ws?r[1]:null),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(189,217,112,0.1)'}
     ]},options:o2});
 }
 
@@ -3987,7 +3903,7 @@ function initHybridControls() {
     });
 }
 
-renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); _populateJitWindowTable(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls();
+renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls();
 
 // Calibration source info popover — moved to document.body to escape all stacking contexts
 (function() {
