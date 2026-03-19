@@ -225,7 +225,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .param-col { background:#111213; border-radius:5px; padding:5px 6px; border-top:2px solid #333; overflow:hidden; }
 .param-col.aot { border-top-color:var(--clr-aot, #6BF); }
 .param-col.jit { border-top-color:var(--clr-jit, #FFF); }
-.param-col .control { gap:2px; margin-bottom:8px; }
+.param-col .control { gap:2px; margin-bottom:12px; }
 .param-col .control:last-child { margin-bottom:0; }
 .param-col .control label { font-size:9px; }
 .param-col .control .slider-row { gap:6px; }
@@ -627,7 +627,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .bf-derived .bf-sub { color:var(--text-mid); }
 
 /* Hybrid slider controls — stepper row below slider */
-.hybrid-stepper-row { display:flex; align-items:center; gap:4px; margin-top:3px; }
+.hybrid-stepper-row { display:flex; align-items:center; justify-content:center; gap:4px; margin-top:3px; }
 .stepper-btn { width:22px; height:22px; border-radius:4px; border:1px solid #2a2d36; background:#111213; color:var(--text2); font-size:14px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; flex-shrink:0; transition:border-color 0.12s, color 0.12s, background 0.12s; font-family:var(--font-mono); user-select:none; }
 .stepper-btn:hover { border-color:var(--lime); color:var(--lime); background:#0f1a0a; }
 .stepper-btn:active { background:#162008; }
@@ -1841,8 +1841,8 @@ const SLIDER_META = {
   'sl-rebate-jit': { nudge: 0.05, largeNudge: 0.1,   decimals: 2, unit: '%',  prefix: false },
   'sl-stake':      { nudge: 0.1,  largeNudge: 0.5,   decimals: 1, unit: '%',  prefix: false },
   'sl-blk':        { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
-  'sl-fcu':        { nudge: 0.05, largeNudge: 0.5,   decimals: 2, unit: '',   prefix: false },
-  'sl-jit-market': { nudge: 1000, largeNudge: 10000, decimals: 0, unit: '',   prefix: false },
+  'sl-fcu':        { nudge: 0.05, largeNudge: 0.5,   decimals: 2, unit: 'lam/CU', prefix: false },
+  'sl-jit-market': { nudge: 1000, largeNudge: 10000, decimals: 0, unit: 'SOL/yr', prefix: false },
   'sl-jit':        { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
 };
 
@@ -3736,7 +3736,10 @@ function syncAllNumericInputs() {
         var inp = stepperRow.querySelector('.stepper-input');
         if (!inp) return;
         var meta = SLIDER_META[id];
-        inp.value = parseFloat(slider.value).toFixed(meta.decimals);
+        var v = parseFloat(slider.value);
+        inp.value = id === 'sl-jit-market'
+            ? Math.round(v).toLocaleString('en-US')
+            : v.toFixed(meta.decimals);
     });
 }
 
@@ -3747,6 +3750,12 @@ function initHybridControls() {
         var meta = SLIDER_META[id];
         var sliderRow = slider.closest('.slider-row');
         if (!sliderRow) return;
+
+        // Display formatter: thousands-separated for sl-jit-market, fixed decimals for others
+        function fmtDisplay(n) {
+            if (id === 'sl-jit-market') return Math.round(n).toLocaleString('en-US');
+            return n.toFixed(meta.decimals);
+        }
 
         // Build the stepper row
         var stepperRow = document.createElement('div');
@@ -3764,7 +3773,7 @@ function initHybridControls() {
         inp.className = id === 'sl-jit-market' ? 'stepper-input wide' : 'stepper-input';
         inp.setAttribute('inputmode', 'decimal');
         inp.setAttribute('data-slider-id', id);
-        inp.value = parseFloat(slider.value).toFixed(meta.decimals);
+        inp.value = fmtDisplay(parseFloat(slider.value));
 
         var btnPlus = document.createElement('button');
         btnPlus.className = 'stepper-btn';
@@ -3808,7 +3817,7 @@ function initHybridControls() {
         function applyValue(v) {
             var clamped = round(clamp(v));
             slider.value = clamped;
-            inp.value = clamped.toFixed(meta.decimals);
+            inp.value = fmtDisplay(clamped);
             // Trigger the existing input event listener on the range element
             _fromNumericInput = true;
             slider.dispatchEvent(new Event('input', { bubbles: true }));
@@ -3818,11 +3827,18 @@ function initHybridControls() {
         // Slider → numeric input sync (keep in lockstep while dragging)
         slider.addEventListener('input', function() {
             if (_fromNumericInput) return; // our own dispatch — preserve user's typed value
-            inp.value = parseFloat(slider.value).toFixed(meta.decimals);
+            inp.value = fmtDisplay(parseFloat(slider.value));
         });
 
-        // Minus / plus buttons
-        btnMinus.addEventListener('click', function() {
+          // For sl-jit-market: on focus switch to raw digits so editing works without commas
+          if (id === 'sl-jit-market') {
+              inp.addEventListener('focus', function() {
+                  inp.value = parseFloat(slider.value).toFixed(meta.decimals);
+              });
+          }
+
+          // Minus / plus buttons
+          btnMinus.addEventListener('click', function() {
             applyValue(parseFloat(slider.value) - meta.nudge);
         });
         btnPlus.addEventListener('click', function() {
