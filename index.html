@@ -727,7 +727,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="param-col-label">AOT</div>
                 <div class="control">
                     <label>AOT Protocol Take Rate (%)</label>
-                    <div class="slider-row"><input type="range" id="sl-comm-aot" min="0" max="10" step="0.5" value="5"><span class="val" id="v-comm-aot">5.0%</span></div>
+                    <div class="slider-row"><input type="range" id="sl-comm-aot" min="0" max="10" step="0.25" value="5"><span class="val" id="v-comm-aot">5.0%</span></div>
                 </div>
                 <div class="control">
                     <label>Customer Rebate (%)</label>
@@ -744,7 +744,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="param-col-label">JIT</div>
                 <div class="control">
                     <label>JIT Protocol Take Rate (%)</label>
-                    <div class="slider-row"><input type="range" id="sl-comm-jit" min="0" max="10" step="0.5" value="5"><span class="val" id="v-comm-jit">5.0%</span></div>
+                    <div class="slider-row"><input type="range" id="sl-comm-jit" min="0" max="10" step="0.25" value="5"><span class="val" id="v-comm-jit">5.0%</span></div>
                 </div>
                 <div class="control">
                     <label>Customer Rebate (%)</label>
@@ -1842,7 +1842,7 @@ const SLIDER_META = {
   'sl-stake':      { nudge: 0.1,  largeNudge: 0.5,   decimals: 1, unit: '%',  prefix: false },
   'sl-blk':        { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
   'sl-fcu':        { nudge: 0.05, largeNudge: 0.5,   decimals: 2, unit: 'lam/CU', prefix: false },
-  'sl-jit-market': { nudge: 1000, largeNudge: 10000, decimals: 0, unit: 'SOL/yr', prefix: false },
+  'sl-jit-market': { nudge: 100000, largeNudge: 500000, decimals: 0, unit: 'SOL/yr', prefix: false },
   'sl-jit':        { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
 };
 
