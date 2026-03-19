@@ -808,6 +808,7 @@ details[open] summary::before { transform:rotate(90deg); }
                     <label>Market Share %</label>
                     <div class="slider-row"><input type="range" id="sl-jit" min="0" max="30" step="0.1" value="5"><span class="val blue" id="v-jit">5%</span></div>
                     <div class="control-derivation" id="jit-captured-helper">Captured market: 40.7K SOL/yr</div>
+                    <div id="jit-stake-coherence-msg" style="display:none;font-size:9px;color:#F5A623;font-family:var(--font-mono);margin-top:3px;line-height:1.4;"></div>
                 </div>
                 <a href="#jit-data-section" class="method-link" onclick="document.getElementById('jit-data-section').scrollIntoView({behavior:'smooth'});return false;">&#x2197; Source &amp; Methodology</a>
             </div>
@@ -1847,13 +1848,13 @@ const SLIDER_META = {
 };
 
 const SC = {
-    con:  {ca:5,cj:5,j:5,s:2,b:1,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:1_000_000,
+    con:  {ca:5,cj:5,j:4,s:5,b:2,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:1_000_000,
            desc:"Conservative — low but practical non-base assumption from active fee-paying application programs, with a hard floor at 0.10 lam/CU."},
-    base: {ca:5,cj:5,j:13,s:10,b:5,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.25,vb:1.0,jm:2_350_000,
+    base: {ca:5,cj:5,j:8,s:10,b:8,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.10,vb:1.0,jm:2_350_000,
            desc:"Base — raw observed CU-weighted non-base fees across included application categories, without outlier clipping."},
-    opt:  {ca:5,cj:5,j:15,s:15,b:10,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:3_000_000,
+    opt:  {ca:5,cj:5,j:12,s:15,b:12,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:3_000_000,
            desc:"Optimistic — strong upside case using CU-weighted total fee/CU, displayed at 1.50 lam/CU."},
-    bull: {ca:5,cj:5,j:20,s:25,b:20,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:5_000_000,
+    bull: {ca:5,cj:5,j:20,s:25,b:15,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:5_000_000,
            desc:"Bull — high-payer stress case using active-payer P75 non-base fee/CU, displayed at 2.00 lam/CU."},
 };
 let _selectedScenario = 'base';
@@ -3634,6 +3635,19 @@ function update(){
     document.getElementById('blk-cu-helper').innerHTML = '<strong>Reserved CU:</strong> ' + fmt(reservedCu, 'i') + ' CU of ' + fmt(CB, 'i') + ' CU/block';
     document.getElementById('fcu-block-fee-helper').innerHTML = '<strong>Auction fees/block:</strong> ' + fmt(auctionFeesLamportsPerBlock, 'i') + ' lamports/block (~' + auctionFeesSolPerBlock.toFixed(6) + ' SOL/block)';
     document.getElementById('jit-captured-helper').innerHTML = '<strong>Captured market:</strong> ' + fmt(capturedJitSol, 'S') + '/yr from ' + fmt(p.jm, 'S') + '/yr total market';
+
+    // JIT / stake coherence warning (non-blocking)
+    var jitCoherenceMsg = document.getElementById('jit-stake-coherence-msg');
+    if (jitCoherenceMsg) {
+        var jitPct = p.j * 100;
+        var stakePct = p.s * 100;
+        if (stakePct > 0 && jitPct > 0.8 * stakePct) {
+            jitCoherenceMsg.textContent = '\u26a0 JIT share (' + jitPct.toFixed(1) + '%) exceeds 80% of Raiku stake (' + stakePct.toFixed(1) + '%). May be optimistic relative to validator coverage.';
+            jitCoherenceMsg.style.display = 'block';
+        } else {
+            jitCoherenceMsg.style.display = 'none';
+        }
+    }
 
     // === Revenue Sources (triple-cards) ===
     document.getElementById('tc-gross-usd').textContent=fmt(r.totalGrossUSD,'$');
