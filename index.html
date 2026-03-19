@@ -786,7 +786,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 </div>
                 <div class="control">
                     <label>Block Share (CU reserved %)</label>
-                    <div class="slider-row"><input type="range" id="sl-blk" min="0" max="100" step="1" value="10"><span class="val blue" id="v-blk">10%</span></div>
+                    <div class="slider-row"><input type="range" id="sl-blk" min="0" max="100" step="0.1" value="10"><span class="val blue" id="v-blk">10%</span></div>
                     <div class="control-derivation" id="blk-cu-helper">Reserved CU: 6,000,000 CU of 60,000,000 CU/block</div>
                 </div>
                 <div class="control">
@@ -806,7 +806,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 </div>
                 <div class="control">
                     <label>Market Share %</label>
-                    <div class="slider-row"><input type="range" id="sl-jit" min="0" max="30" step="1" value="5"><span class="val blue" id="v-jit">5%</span></div>
+                    <div class="slider-row"><input type="range" id="sl-jit" min="0" max="30" step="0.1" value="5"><span class="val blue" id="v-jit">5%</span></div>
                     <div class="control-derivation" id="jit-captured-helper">Captured market: 40.7K SOL/yr</div>
                 </div>
                 <a href="#jit-data-section" class="method-link" onclick="document.getElementById('jit-data-section').scrollIntoView({behavior:'smooth'});return false;">&#x2197; Source &amp; Methodology</a>
@@ -1840,10 +1840,10 @@ const SLIDER_META = {
   'sl-comm-jit':   { nudge: 0.25, largeNudge: 1,     decimals: 2, unit: '%',  prefix: false },
   'sl-rebate-jit': { nudge: 0.05, largeNudge: 0.1,   decimals: 2, unit: '%',  prefix: false },
   'sl-stake':      { nudge: 0.1,  largeNudge: 0.5,   decimals: 1, unit: '%',  prefix: false },
-  'sl-blk':        { nudge: 1,    largeNudge: 5,     decimals: 0, unit: '%',  prefix: false },
+  'sl-blk':        { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
   'sl-fcu':        { nudge: 0.05, largeNudge: 0.5,   decimals: 2, unit: '',   prefix: false },
   'sl-jit-market': { nudge: 1000, largeNudge: 10000, decimals: 0, unit: '',   prefix: false },
-  'sl-jit':        { nudge: 1,    largeNudge: 5,     decimals: 0, unit: '%',  prefix: false },
+  'sl-jit':        { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
 };
 
 const SC = {
@@ -3785,6 +3785,10 @@ function initHybridControls() {
 
         // Insert immediately after the slider-row div
         sliderRow.parentNode.insertBefore(stepperRow, sliderRow.nextSibling);
+
+          // Hide the legacy value span — numeric input is the single authoritative display
+          var legacyVal = sliderRow.querySelector('.val');
+          if (legacyVal) legacyVal.style.display = 'none';
 
         // Helper: clamp and round
         function clamp(v) {
