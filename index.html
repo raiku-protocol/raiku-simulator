@@ -1024,7 +1024,56 @@ details[open] summary::before { transform:rotate(90deg); }
             <p style="margin:0 0 6px 0;">The <strong>Base Case</strong> uses the data-driven default computed from recent normal-activity epochs. The <strong>Conservative</strong> scenario assumes a lower-activity market (e.g. reduced MEV during quiet periods).</p>
             <p style="margin:0 0 6px 0;">The <strong>Optimistic</strong> and <strong>Bull Case</strong> assumptions are informed by historically stronger congestion and peak MEV periods &mdash; such as memecoin surges and high on-chain trading volume &mdash; that we identified in our research on Solana network activity.</p>
             <p style="margin:0;color:var(--text2);font-style:italic;">Note: Richer integration of peak-period data is still a work in progress. The optimistic and bullish values are already conceptually anchored to those higher-activity regimes, but may be refined as more granular data becomes available.</p>
-            <p style="margin:8px 0 0 0;font-size:11px;font-family:var(--font-mono);color:var(--text2);border-top:1px solid #2a2b2c;padding-top:6px;">Preset baselines (anchored to <span id="jw-ref-date">2026-03-01</span>): Conservative&nbsp;(6m)&nbsp;=&nbsp;<span id="jw-ref-6m">&mdash;</span>&nbsp;SOL/yr &nbsp;&middot;&nbsp; Base&nbsp;(12m)&nbsp;=&nbsp;<span id="jw-ref-12m">&mdash;</span>&nbsp;SOL/yr &nbsp;&middot;&nbsp; Optimistic&nbsp;(24m)&nbsp;=&nbsp;<span id="jw-ref-24m">&mdash;</span>&nbsp;SOL/yr &nbsp;&middot;&nbsp; Bull&nbsp;=&nbsp;5,000,000&nbsp;SOL/yr&nbsp;(manual)</p>
+        </div>
+
+        <!-- Calendar-window preset summary table -->
+        <div style="margin-bottom:16px;background:#111213;border-radius:6px;padding:14px 16px;">
+            <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Calendar-window preset baselines &mdash; anchored to <span id="jw-tbl-date">&mdash;</span></div>
+            <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
+                    <thead>
+                        <tr style="border-bottom:1px solid #2a2b2c;">
+                            <th style="padding:5px 8px;text-align:left;color:var(--text2);font-size:10px;text-transform:uppercase;font-weight:600;white-space:nowrap;">Window</th>
+                            <th style="padding:5px 8px;text-align:left;color:var(--text2);font-size:10px;text-transform:uppercase;font-weight:600;white-space:nowrap;">Date range</th>
+                            <th style="padding:5px 8px;text-align:right;color:var(--text2);font-size:10px;text-transform:uppercase;font-weight:600;">Epochs</th>
+                            <th style="padding:5px 8px;text-align:right;color:var(--text2);font-size:10px;text-transform:uppercase;font-weight:600;white-space:nowrap;">Observed MEV</th>
+                            <th style="padding:5px 8px;text-align:right;color:var(--text2);font-size:10px;text-transform:uppercase;font-weight:600;">Days</th>
+                            <th style="padding:5px 8px;text-align:right;color:var(--text2);font-size:10px;text-transform:uppercase;font-weight:600;">Annualized</th>
+                            <th style="padding:5px 8px;text-align:left;color:var(--text2);font-size:10px;text-transform:uppercase;font-weight:600;">Preset</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid #1e1f20;">
+                            <td style="padding:7px 8px;color:var(--text);">6 months</td>
+                            <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-6m-range">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-6m-ep">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-6m-sol">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text2);" id="jw-tbl-6m-days">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);font-weight:500;" id="jw-tbl-6m-ann">&mdash;</td>
+                            <td style="padding:7px 8px;color:#6b7280;font-size:10px;">Conservative</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #1e1f20;">
+                            <td style="padding:7px 8px;color:var(--text);">12 months</td>
+                            <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-12m-range">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-12m-ep">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-12m-sol">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text2);" id="jw-tbl-12m-days">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);font-weight:500;" id="jw-tbl-12m-ann">&mdash;</td>
+                            <td style="padding:7px 8px;color:#6b7280;font-size:10px;">Base Case</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:7px 8px;color:var(--text);">24 months</td>
+                            <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-24m-range">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-24m-ep">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-24m-sol">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text2);" id="jw-tbl-24m-days">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);font-weight:500;" id="jw-tbl-24m-ann">&mdash;</td>
+                            <td style="padding:7px 8px;color:#6b7280;font-size:10px;">Optimistic</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="margin:10px 0 0 0;font-size:11px;color:var(--text2);font-style:italic;">Bull Case (5,000,000 SOL/yr) is kept as a manual high-growth scenario and is not directly derived from the historical windows.</p>
         </div>
 
         <!-- Historical chart — directly in this section -->
@@ -2208,15 +2257,23 @@ function _isoMonthsBack(isoDate, months) {
     return d.toISOString().slice(0, 10);
 }
 function _populateJitWindowRef() {
-    const fmt = n => Math.round(n).toLocaleString('en-US');
-    const el6  = document.getElementById('jw-ref-6m');
-    const el12 = document.getElementById('jw-ref-12m');
-    const el24 = document.getElementById('jw-ref-24m');
-    const eld  = document.getElementById('jw-ref-date');
-    if (el6)  el6.textContent  = fmt(_jit6m);
-    if (el12) el12.textContent = fmt(_jit12m);
-    if (el24) el24.textContent = fmt(_jit24m);
-    if (eld)  eld.textContent  = _jitLastDate;
+    const fmtN = n => Math.round(n).toLocaleString('en-US');
+    const fmtS = n => fmtN(n) + ' SOL';
+    const fmtA = n => fmtN(n) + ' SOL/yr';
+    const fmtR = s => s.firstDate + ' \u2192 ' + s.lastDate;
+    const set  = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('jw-tbl-date', _jitLastDate);
+    [
+        { sfx: '6m',  s: _jit6mStats,  ann: _jit6m  },
+        { sfx: '12m', s: _jit12mStats, ann: _jit12m },
+        { sfx: '24m', s: _jit24mStats, ann: _jit24m },
+    ].forEach(({ sfx, s, ann }) => {
+        set('jw-tbl-' + sfx + '-range', fmtR(s));
+        set('jw-tbl-' + sfx + '-ep',    s.epochs);
+        set('jw-tbl-' + sfx + '-sol',   fmtS(s.totalSol));
+        set('jw-tbl-' + sfx + '-days',  Math.round(s.totalDays));
+        set('jw-tbl-' + sfx + '-ann',   fmtA(ann));
+    });
 }
 
 let _jitStats = null;
