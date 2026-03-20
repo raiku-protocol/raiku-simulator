@@ -980,50 +980,48 @@ details[open] summary::before { transform:rotate(90deg); }
     </summary>
     <div id="jit-data-section" style="background:#0d0e0f;border:1px solid var(--card-border);border-radius:8px;padding:20px 24px;">
 
-        <!-- Header badge -->
-        <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:14px;">
-            <span style="font-size:11px;color:var(--text2);font-style:italic;" id="jit-ds-badge">data-driven default</span>
-        </div>
-
-        <!-- Headline: USD primary, SOL secondary -->
-        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
-            <span style="font-size:26px;font-weight:700;color:var(--text);font-family:var(--font-mono);" id="jit-m-usd">&mdash;</span>
-            <span style="font-size:14px;color:var(--text2);font-family:var(--font-mono);" id="jit-m-sol"></span>
+        <!-- Headline: SOL primary, USD secondary, badge inline -->
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;">
+            <span style="font-size:26px;font-weight:700;color:var(--text);font-family:var(--font-mono);" id="jit-m-sol">&mdash;</span>
+            <span style="font-size:13px;color:var(--text2);font-family:var(--font-mono);" id="jit-m-usd"></span>
+            <span style="font-size:11px;color:var(--text2);font-style:italic;margin-left:auto;" id="jit-ds-badge">data-driven default</span>
         </div>
         <div style="font-size:12px;color:var(--text2);margin-bottom:16px;">
-            Annualized JIT market size used as model input. Controlled by the <strong>JIT Total Market</strong> slider in the left panel.
+            Total JIT market size used as model baseline. Adjusted by the <strong>JIT Total Market</strong> slider.
         </div>
 
-        <!-- Methodology — plain English, larger text -->
+        <!-- Methodology -->
         <div style="font-size:13px;color:var(--text);line-height:1.7;padding:14px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid var(--lime-soft);">
-            <div style="font-weight:600;color:var(--lime-soft);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Observed baseline computation</div>
-            <p style="margin:0 0 8px 0;">The observed baseline is computed from on-chain data extracted via the <strong>Block Engine API</strong> (<code style="font-size:11px;">POST /api/v1/mev_rewards</code>). For each Solana epoch, the API returns <code style="font-size:11px;">total_network_mev_lamports</code>, which we convert to SOL.</p>
-            <p style="margin:0 0 8px 0;" id="jit-methodology-window">We take the <strong>most recent 100 epochs</strong> with non-zero rewards and sum their MEV totals. This covers a period of approximately <span id="jit-m-duration">&mdash;</span>, from <span id="jit-m-period">&mdash;</span>.</p>
-            <p style="margin:0 0 8px 0;" id="jit-methodology-calc">The total MEV / JIT rewards in this window are <strong id="jit-ds-total-sol">&mdash;</strong> over <strong id="jit-ds-total-days">&mdash;</strong>. To annualize: <code style="font-size:11px;">(<span id="jit-m-method-num">&mdash;</span> / <span id="jit-m-method-days">&mdash;</span>) &times; 365.25 = <span id="jit-m-method-result">&mdash;</span></code>.</p>
-            <p style="margin:0;color:var(--text2);">This annualized value (<strong id="jit-m-method-result2">&mdash;</strong>) is the <strong>observed on-chain baseline</strong> and is used directly as the Base Case JIT total market. The slider starts at this value when the Base Case preset is active. Other scenarios use different market size assumptions.</p>
+            <div style="font-weight:600;color:var(--lime-soft);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">How the baseline is computed</div>
+            <p style="margin:0 0 8px 0;">On-chain MEV tip data is sourced from the <strong><a href="https://www.jito.network" target="_blank" rel="noopener" style="color:var(--lime-soft);text-decoration:none;">Jito Foundation</a> MEV API</strong>. For each Solana epoch, the API returns the total network MEV tips, which we convert to SOL.</p>
+            <p style="margin:0 0 8px 0;" id="jit-methodology-window">We use the <strong>most recent 100 epochs</strong> with non-zero rewards — approximately <span id="jit-m-duration">&mdash;</span>, from <span id="jit-m-period">&mdash;</span>.</p>
+            <p style="margin:0;" id="jit-methodology-calc">Total in this window: <strong id="jit-ds-total-sol">&mdash;</strong> over <strong id="jit-ds-total-days">&mdash;</strong>. Annualized: <code style="font-size:11px;">(<span id="jit-m-method-num">&mdash;</span> / <span id="jit-m-method-days">&mdash;</span>) &times; 365.25 = <span id="jit-m-method-result">&mdash;</span></code>.</p>
+            <span id="jit-m-method-result2" style="display:none;"></span>
         </div>
 
-        <!-- Source metadata grid — larger text -->
+        <!-- Source metadata grid -->
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px 18px;font-size:12px;margin-bottom:16px;">
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Source</span><br><span style="color:var(--text);font-weight:500;">Block Engine API</span></div>
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Metric</span><br><span style="color:var(--text);font-weight:500;">total_network_mev_lamports</span></div>
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Source</span><br><span style="color:var(--text);font-weight:500;"><a href="https://www.jito.network" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;">Jito Foundation MEV API</a></span></div>
+            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Metric</span><br><span style="color:var(--text);font-weight:500;">Total network MEV tips (lamports → SOL)</span></div>
             <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Dataset</span><br><span style="color:var(--text);font-weight:500;"><span id="jit-ds-total-epochs">&mdash;</span> epochs (epoch <span id="jit-ds-first-epoch">&mdash;</span> &rarr; <span id="jit-ds-last-epoch">&mdash;</span>)</span></div>
             <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Computation window</span><br><span style="color:var(--text);font-weight:500;"><span id="jit-ds-window-n">&mdash;</span> most recent epochs</span></div>
         </div>
 
-        <!-- Inclusions / Exclusions — larger text -->
+        <!-- Inclusions / Exclusions -->
         <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;">
-            <div style="margin-bottom:6px;"><span style="color:#8ddb6a;font-size:14px;">&#9745;</span> <strong style="color:var(--text);">What this includes:</strong> Only MEV rewards observed through the MEV / JIT block engine &mdash; tips that validators and stakers receive via MEV / JIT's auction mechanism.</div>
-            <div style="margin-bottom:6px;"><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">What this excludes:</strong> This assumption does <em>not</em> include Solana's native priority fees (a separate fee market), nor MEV captured by other JIT providers such as Harmonic, private relay channels, or off-chain/private MEV flows that are not observable on-chain.</div>
-            <div style="color:var(--text2);font-style:italic;">In other words, this is a <strong>MEV / JIT-only</strong> view of the JIT market. The true addressable market is likely larger, since it would also include non-MEV / JIT sources.</div>
+            <div style="margin-bottom:6px;"><span style="color:#8ddb6a;font-size:14px;">&#9745;</span> <strong style="color:var(--text);">Includes:</strong> MEV / JIT tips flowing through Jito's block engine — the portion of tip revenue distributed to validators and stakers.</div>
+            <div><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">Excludes:</strong> Solana native priority fees, MEV captured through other block engines, private relay channels, and off-chain flows not visible on-chain. The true addressable JIT market is likely larger.</div>
         </div>
 
-        <!-- Scenario regime note -->
+        <!-- Scenario preset assumptions -->
         <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid #5B8DEF;">
-            <div style="font-weight:600;color:#5B8DEF;margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Scenario assumptions &mdash; market regimes</div>
-            <p style="margin:0 0 6px 0;">The <strong>Base Case</strong> uses the data-driven default computed from recent normal-activity epochs. The <strong>Conservative</strong> scenario assumes a lower-activity market (e.g. reduced MEV during quiet periods).</p>
-            <p style="margin:0 0 6px 0;">The <strong>Optimistic</strong> and <strong>Bull Case</strong> assumptions are informed by historically stronger congestion and peak MEV periods &mdash; such as memecoin surges and high on-chain trading volume &mdash; that we identified in our research on Solana network activity.</p>
-            <p style="margin:0;color:var(--text2);font-style:italic;">Note: Richer integration of peak-period data is still a work in progress. The optimistic and bullish values are already conceptually anchored to those higher-activity regimes, but may be refined as more granular data becomes available.</p>
+            <div style="font-weight:600;color:#5B8DEF;margin-bottom:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Scenario assumptions — how each preset sets the JIT market</div>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:11px;font-family:var(--font-mono);">
+                <span style="color:#6b7280;white-space:nowrap;">Conservative</span><span style="color:var(--text);">6-month observation window, annualized — lower-activity baseline</span>
+                <span style="color:var(--lime-soft);white-space:nowrap;">Base Case</span><span style="color:var(--text);">12-month observation window, annualized — data-driven default</span>
+                <span style="color:#BDD970;white-space:nowrap;">Optimistic</span><span style="color:var(--text);">24-month observation window, annualized — includes higher-activity periods</span>
+                <span style="color:#F5A623;white-space:nowrap;">Bull Case</span><span style="color:var(--text);">5,000,000 SOL/yr — manual high-growth scenario, not derived from historical windows</span>
+            </div>
         </div>
 
         <!-- Calendar-window preset summary table -->
