@@ -987,41 +987,55 @@ details[open] summary::before { transform:rotate(90deg); }
             <span style="font-size:11px;color:var(--text2);font-style:italic;margin-left:auto;" id="jit-ds-badge">data-driven default</span>
         </div>
         <div style="font-size:12px;color:var(--text2);margin-bottom:16px;">
-            Total JIT market size used as model baseline. Adjusted by the <strong>JIT Total Market</strong> slider.
+            Total JIT market size for the active preset. Adjusted by the <strong>JIT Total Market</strong> slider.
         </div>
 
-        <!-- Methodology -->
-        <div style="font-size:13px;color:var(--text);line-height:1.7;padding:14px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid var(--lime-soft);">
-            <div style="font-weight:600;color:var(--lime-soft);margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">How the baseline is computed</div>
-            <p style="margin:0 0 8px 0;">On-chain MEV tip data is sourced from the <strong><a href="https://www.jito.network" target="_blank" rel="noopener" style="color:var(--lime-soft);text-decoration:none;">Jito Foundation</a> MEV API</strong>. For each Solana epoch, the API returns the total network MEV tips, which we convert to SOL.</p>
-            <p style="margin:0 0 8px 0;" id="jit-methodology-window">We use the <strong>most recent 100 epochs</strong> with non-zero rewards — approximately <span id="jit-m-duration">&mdash;</span>, from <span id="jit-m-period">&mdash;</span>.</p>
-            <p style="margin:0;" id="jit-methodology-calc">Total in this window: <strong id="jit-ds-total-sol">&mdash;</strong> over <strong id="jit-ds-total-days">&mdash;</strong>. Annualized: <code style="font-size:11px;">(<span id="jit-m-method-num">&mdash;</span> / <span id="jit-m-method-days">&mdash;</span>) &times; 365.25 = <span id="jit-m-method-result">&mdash;</span></code>.</p>
-            <span id="jit-m-method-result2" style="display:none;"></span>
-        </div>
-
-        <!-- Source metadata grid -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px 18px;font-size:12px;margin-bottom:16px;">
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Source</span><br><span style="color:var(--text);font-weight:500;"><a href="https://www.jito.network" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;">Jito Foundation MEV API</a></span></div>
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Metric</span><br><span style="color:var(--text);font-weight:500;">Total network MEV tips (lamports → SOL)</span></div>
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Dataset</span><br><span style="color:var(--text);font-weight:500;"><span id="jit-ds-total-epochs">&mdash;</span> epochs (epoch <span id="jit-ds-first-epoch">&mdash;</span> &rarr; <span id="jit-ds-last-epoch">&mdash;</span>)</span></div>
-            <div><span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Computation window</span><br><span style="color:var(--text);font-weight:500;"><span id="jit-ds-window-n">&mdash;</span> most recent epochs</span></div>
-        </div>
-
-        <!-- Inclusions / Exclusions -->
-        <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;">
-            <div style="margin-bottom:6px;"><span style="color:#8ddb6a;font-size:14px;">&#9745;</span> <strong style="color:var(--text);">Includes:</strong> MEV / JIT tips flowing through Jito's block engine — the portion of tip revenue distributed to validators and stakers.</div>
-            <div><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">Excludes:</strong> Solana native priority fees, MEV captured through other block engines, private relay channels, and off-chain flows not visible on-chain. The true addressable JIT market is likely larger.</div>
-        </div>
-
-        <!-- Scenario preset assumptions -->
+        <!-- Block 1: Preset → market mapping -->
         <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid #5B8DEF;">
-            <div style="font-weight:600;color:#5B8DEF;margin-bottom:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Scenario assumptions — how each preset sets the JIT market</div>
+            <div style="font-weight:600;color:#5B8DEF;margin-bottom:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">How each preset sets the JIT market</div>
             <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:11px;font-family:var(--font-mono);">
                 <span style="color:#6b7280;white-space:nowrap;">Conservative</span><span style="color:var(--text);">6-month observation window, annualized — lower-activity baseline</span>
                 <span style="color:var(--lime-soft);white-space:nowrap;">Base Case</span><span style="color:var(--text);">12-month observation window, annualized — data-driven default</span>
                 <span style="color:#BDD970;white-space:nowrap;">Optimistic</span><span style="color:var(--text);">24-month observation window, annualized — includes higher-activity periods</span>
                 <span style="color:#F5A623;white-space:nowrap;">Bull Case</span><span style="color:var(--text);">5,000,000 SOL/yr — manual high-growth scenario, not derived from historical windows</span>
             </div>
+        </div>
+
+        <!-- Block 2: Source & cross-validation -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px 18px;font-size:12px;margin-bottom:16px;">
+            <div>
+                <span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Primary source</span><br>
+                <span style="color:var(--text);font-weight:500;"><a href="https://github.com/jito-foundation" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;">Jito Foundation</a> MEV API</span><br>
+                <code style="font-size:10px;color:var(--text2);">kobe.mainnet.jito.network/api/v1/mev_rewards</code>
+            </div>
+            <div>
+                <span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Dataset</span><br>
+                <span style="color:var(--text);font-weight:500;"><span id="jit-ds-total-epochs">&mdash;</span> epochs (epoch <span id="jit-ds-first-epoch">&mdash;</span> &rarr; <span id="jit-ds-last-epoch">&mdash;</span>)</span>
+            </div>
+            <div>
+                <span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Cross-check</span><br>
+                <span style="color:var(--text);font-weight:500;">Trillium epoch API &amp; Dune Analytics</span><br>
+                <span style="color:var(--text2);font-size:10px;">Jito / Trillium ratio: 1.000&times;</span>
+            </div>
+            <div>
+                <span style="color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Metric</span><br>
+                <span style="color:var(--text);font-weight:500;">Total network MEV tips (lamports &rarr; SOL)</span>
+            </div>
+        </div>
+
+        <!-- Block 3: Historical reference — 100-epoch raw baseline -->
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;border-left:3px solid #2e2f30;">
+            <div style="font-weight:600;color:#6b7280;margin-bottom:5px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Historical reference — 100-epoch raw baseline</div>
+            <div style="font-style:italic;color:#555;font-size:11px;margin-bottom:6px;">Reference only &mdash; not the active preset value. Presets use calendar-window annualization (above).</div>
+            <p style="margin:0 0 4px 0;" id="jit-methodology-window">Last <span id="jit-ds-window-n">&mdash;</span> non-zero epochs &mdash; approximately <span id="jit-m-duration">&mdash;</span>, from <span id="jit-m-period">&mdash;</span>.</p>
+            <p style="margin:0;" id="jit-methodology-calc">Total: <strong id="jit-ds-total-sol">&mdash;</strong> over <strong id="jit-ds-total-days">&mdash;</strong>. Annualized: <code style="font-size:10px;">(<span id="jit-m-method-num">&mdash;</span> / <span id="jit-m-method-days">&mdash;</span>) &times; 365.25 = <span id="jit-m-method-result">&mdash;</span></code>.</p>
+            <span id="jit-m-method-result2" style="display:none;"></span>
+        </div>
+
+        <!-- Block 4: Includes / Excludes -->
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;padding:12px 16px;background:#111213;border-radius:6px;margin-bottom:16px;">
+            <div style="margin-bottom:6px;"><span style="color:#8ddb6a;font-size:14px;">&#9745;</span> <strong style="color:var(--text);">Includes:</strong> MEV / JIT tips flowing through Jito's block engine — the portion of tip revenue distributed to validators and stakers.</div>
+            <div><span style="color:#e06c75;font-size:14px;">&#9744;</span> <strong style="color:var(--text);">Excludes:</strong> Solana native priority fees, MEV captured through other block engines, private relay channels, and off-chain flows not visible on-chain. The true addressable JIT market is likely larger.</div>
         </div>
 
         <!-- Calendar-window preset summary table -->
