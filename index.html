@@ -990,9 +990,9 @@ details[open] summary::before { transform:rotate(90deg); }
         <div style="background:#111213;border-radius:6px;padding:14px 16px;margin-bottom:12px;border-left:3px solid #5B8DEF;">
             <div style="font-size:10px;font-weight:600;color:#5B8DEF;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Scenario mapping &mdash; preset &rarr; window &rarr; market size</div>
             <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:11px;font-family:var(--font-mono);margin-bottom:14px;">
-                <span style="color:#6b7280;white-space:nowrap;">Conservative</span><span style="color:var(--text);">6-month window, annualized</span>
-                <span style="color:var(--lime-soft);white-space:nowrap;">Base Case</span><span style="color:var(--text);">12-month window, annualized &mdash; data-driven default</span>
-                <span style="color:#BDD970;white-space:nowrap;">Optimistic</span><span style="color:var(--text);">24-month window, annualized &mdash; includes higher-activity periods</span>
+                <span style="color:#E8A020;white-space:nowrap;">Conservative</span><span style="color:var(--text);">6-month window, annualized</span>
+                <span style="color:#BDD970;white-space:nowrap;">Base Case</span><span style="color:var(--text);">12-month window, annualized &mdash; data-driven default</span>
+                <span style="color:#4DC8E8;white-space:nowrap;">Optimistic</span><span style="color:var(--text);">24-month window, annualized &mdash; includes higher-activity periods</span>
                 <span style="color:#F5A623;white-space:nowrap;">Bull Case</span><span style="color:var(--text);">5,000,000 SOL/yr &mdash; manual, not derived from historical windows</span>
             </div>
             <div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Window detail &mdash; anchored to <span id="jw-tbl-date">&mdash;</span></div>
@@ -1011,7 +1011,7 @@ details[open] summary::before { transform:rotate(90deg); }
                     </thead>
                     <tbody>
                         <tr style="border-bottom:1px solid #1e1f20;">
-                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">6 months<br><span style="font-size:9px;color:#6b7280;">Conservative</span></td>
+                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">6 months<br><span style="font-size:9px;color:#E8A020;">Conservative</span></td>
                             <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-6m-range">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-6m-ep">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-6m-sol">&mdash;</td>
@@ -1029,7 +1029,7 @@ details[open] summary::before { transform:rotate(90deg); }
                             <td style="padding:7px 8px;text-align:right;color:var(--text);font-weight:500;" id="jw-tbl-12m-ann">&mdash;</td>
                         </tr>
                         <tr>
-                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">24 months<br><span style="font-size:9px;color:#BDD970;">Optimistic</span></td>
+                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">24 months<br><span style="font-size:9px;color:#4DC8E8;">Optimistic</span></td>
                             <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-24m-range">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-24m-ep">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-24m-sol">&mdash;</td>
@@ -1050,7 +1050,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <span style="color:var(--text2);padding-right:12px;padding-top:1px;">Source</span>
                 <span style="color:var(--text);"><a href="https://github.com/jito-foundation" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:2px;">Jito Foundation</a> MEV rewards API &mdash; <code style="font-size:10px;color:var(--text2);">kobe.mainnet.jito.network</code></span>
                 <span style="color:var(--text2);padding-right:12px;padding-top:1px;">Cross-check</span>
-                <span style="color:var(--text);"><a href="https://api.trillium.so" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:2px;">Trillium</a> epoch API and <a href="https://dune.com/queries/6773409" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:2px;">Dune Analytics</a>. Jito&thinsp;/&thinsp;Trillium MEV ratio&nbsp;=&nbsp;1.000&times; across 135+ epochs (perfect match). Dune is 3&ndash;5% higher due to different aggregation scope.</span>
+                <span style="color:var(--text);"><a href="https://api.trillium.so" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:2px;">Trillium</a> epoch API and <a href="https://dune.com/queries/6773409" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:2px;">Dune Analytics</a>. Jito Foundation API closely matches Trillium epoch data at a 1.000&times; ratio across 135+ epochs. Dune Analytics reports 3&ndash;5% higher totals than Trillium, likely due to a broader fee aggregation scope.</span>
                 <span style="color:var(--text2);padding-right:12px;padding-top:1px;">Metric</span>
                 <span style="color:var(--text);">Total network MEV tips per epoch (lamports &rarr; SOL)</span>
                 <span style="color:var(--text2);padding-right:12px;padding-top:1px;">Dataset</span>
@@ -1062,7 +1062,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <span style="color:#e06c75;padding-right:12px;padding-top:1px;">Excludes</span>
                 <span style="color:var(--text);">Native priority fees, other block engines, private relay channels, off-chain flows. True addressable market is likely larger.</span>
             </div>
-            <div style="margin-top:8px;padding-top:6px;border-top:1px solid #1e1f20;font-size:10px;color:#444;" id="jit-methodology-window"><span style="font-weight:600;color:#333;">Historical ref (100-epoch raw):</span> last <span id="jit-ds-window-n">&mdash;</span> non-zero epochs, <span id="jit-m-duration">&mdash;</span>. Not used as an active preset driver.<span id="jit-m-period" style="display:none;"></span><span id="jit-ds-total-sol" style="display:none;"></span><span id="jit-ds-total-days" style="display:none;"></span><span id="jit-m-method-num" style="display:none;"></span><span id="jit-m-method-days" style="display:none;"></span><span id="jit-m-method-result" style="display:none;"></span><span id="jit-m-method-result2" style="display:none;"></span><span id="jit-methodology-calc" style="display:none;"></span></div>
+            <span id="jit-ds-window-n" style="display:none;"></span><span id="jit-m-duration" style="display:none;"></span><span id="jit-m-period" style="display:none;"></span><span id="jit-ds-total-sol" style="display:none;"></span><span id="jit-ds-total-days" style="display:none;"></span><span id="jit-m-method-num" style="display:none;"></span><span id="jit-m-method-days" style="display:none;"></span><span id="jit-m-method-result" style="display:none;"></span><span id="jit-m-method-result2" style="display:none;"></span><span id="jit-methodology-calc" style="display:none;"></span>
         </div>
 
         <!-- Historical chart — directly in this section -->
@@ -1092,15 +1092,7 @@ details[open] summary::before { transform:rotate(90deg); }
             </table>
         </div>
 
-        <!-- Cross-validation note -->
-        <details style="margin-top:12px;">
-            <summary style="font-size:12px;color:var(--lime-soft);cursor:pointer;font-weight:600;padding:4px 0;">Cross-validation &amp; additional details</summary>
-            <div style="font-size:12px;color:var(--text2);padding:10px 0 4px 14px;line-height:1.7;">
-                <strong>Cross-source check:</strong> The Block Engine API values match Trillium API's <code>total_mev_earned</code> field at a 0.9997&times; ratio across 135+ epochs. Dune Analytics' <code>mev_reward</code> column is 3-5% higher (same order of magnitude, likely due to different aggregation scope).<br>
-                <strong>Avg SOL/epoch in window:</strong> <span id="jit-ds-avg-epoch">&mdash;</span><br>
-                <strong>Raw file:</strong> <code>mev_jit_rewards.csv</code> (extracted via <code>01_extract/extract_mev_jit.py</code>)
-            </div>
-        </details>
+        <span id="jit-ds-avg-epoch" style="display:none;"></span>
 
     </div>
     </details>
@@ -2851,18 +2843,19 @@ function _rebuildJitDrawer(presetKey) {
         noteTr.innerHTML = '<td colspan="5" style="padding:8px 10px;color:#F5A623;font-size:11px;font-style:italic;">Bull is a manual scenario \u2014 no historical window is active. All epochs shown as reference only.</td>';
         tbody.appendChild(noteTr);
     }
+    const _dc = _jitChartColors[presetKey] || _jitChartColors.base;
     const rows = [...jitNZ].reverse();
     rows.forEach(r => {
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #1a1a1a';
         const inW = !isBull && r[2] >= cutoffDate;
-        if (inW) tr.style.backgroundColor = 'rgba(189,217,112,0.04)';
+        if (inW) tr.style.backgroundColor = _dc.bg;
         tr.innerHTML =
             '<td style="padding:5px 10px;color:var(--text);">' + r[0] + '</td>' +
             '<td style="padding:5px 10px;color:var(--text2);">' + r[2] + '</td>' +
             '<td style="padding:5px 10px;text-align:right;color:var(--text);">' + r[1].toLocaleString('en', {maximumFractionDigits:0}) + '</td>' +
             '<td style="padding:5px 10px;text-align:right;color:var(--text2);">' + r[3].toFixed(2) + '</td>' +
-            '<td style="padding:5px 10px;text-align:center;color:' + (inW ? '#BDD970' : '#555') + ';">' + (inW ? '&#10003;' : '') + '</td>';
+            '<td style="padding:5px 10px;text-align:center;color:' + (inW ? _dc.border : '#555') + ';">' + (inW ? '&#10003;' : '') + '</td>';
         tbody.appendChild(tr);
     });
     _jitDrawerWindowKey = presetKey;
