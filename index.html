@@ -2454,7 +2454,9 @@ function _renderRegimeDetailTable() {
 
     let html = '';
     // 30d AOT row — expandable, shown only when 30d scope is active.
-    // Top-level: active payers (fpc_nb > 0), non-base fee/CU. Sub-rows: all programs with cu > 0.
+    // This source is program-level (30-day cross-sectional), not epoch-level.
+    // N column shows — throughout: program/payer counts are not comparable to epoch counts
+    // and are shown instead in the source metadata note inside the expanded block.
     if (_30dNbStats) {
         const show = _calibrationContext !== 'horizon';
         const vis = show ? '' : 'display:none;';
@@ -2463,22 +2465,24 @@ function _renderRegimeDetailTable() {
             const c = hl ? 'color:#4dd0e1;font-weight:600;' : 'color:var(--text2);';
             return '<td style="padding:6px 8px;text-align:right;' + c + '">' + f(v) + '</td>';
         };
+        const aotWin = (_aotArtifact.window_start_date || '?') + '\u2013' + (_aotArtifact.window_end_date || '?');
 
-        // Top-level 30d row (clickable toggle)
+        // Top-level 30d row (clickable toggle) — N column: — (source is not epoch-level)
         html += '<tr id="aot-30d-regime-row" style="' + vis + 'border-bottom:1px solid #1a3a3a;background:rgba(77,208,225,0.04);cursor:pointer;" data-regime-toggle="aot_30d">';
-        html += '<td style="padding:6px 8px;color:#4dd0e1;font-weight:600;white-space:nowrap;">';
+        html += '<td style="padding:6px 8px;color:#4dd0e1;font-weight:500;white-space:nowrap;">';
         html += '<span class="regime-expand-arrow" id="arrow-aot_30d" style="display:inline-block;width:12px;font-size:9px;color:var(--text2);">\u25b6</span> 30d AOT</td>';
-        html += '<td style="padding:6px 8px;text-align:right;color:#4dd0e1;font-size:11px;">' + _30dNbStats.n + '</td>';
+        html += '<td style="padding:6px 8px;text-align:right;color:var(--text3);">\u2014</td>';
         html += td30(_30dNbStats.p10) + td30(_30dNbStats.p25) + td30(_30dNbStats.mean, true) + td30(_30dNbStats.median) + td30(_30dNbStats.p75) + td30(_30dNbStats.p90) + td30(_30dNbStats.min) + td30(_30dNbStats.max);
         html += '</tr>';
 
         // Expanded sub-rows (hidden by default, revealed on toggle)
+        // N column shows — for all sub-rows (counts are in the metadata note at the bottom)
         var sub30dMetrics = [
-            { key: 'priority_fcu', label: 'Priority fee/CU',   hl: false },
-            { key: 'mev_fcu',      label: 'MEV / JIT fee/CU',  hl: false },
-            { key: 'nb_fcu',       label: 'Non-base fee/CU',   hl: true  },
-            { key: 'base_fcu',     label: 'Base fee/CU',       hl: false },
-            { key: 'total_fcu',    label: 'Total fee/CU',      hl: false }
+            { key: 'priority_fcu', label: 'Priority fee / CU',  hl: false },
+            { key: 'mev_fcu',      label: 'MEV / JIT fee / CU', hl: false },
+            { key: 'nb_fcu',       label: 'Non-base fee / CU',  hl: true  },
+            { key: 'base_fcu',     label: 'Base fee / CU',      hl: false },
+            { key: 'total_fcu',    label: 'Total fee / CU',     hl: false }
         ];
         sub30dMetrics.forEach(function(sm) {
             const dr = _30dNbStats.sub[sm.key];
@@ -2486,7 +2490,7 @@ function _renderRegimeDetailTable() {
             const lc = sm.hl ? 'color:#4dd0e1;font-weight:500;' : 'color:var(--text2);';
             html += '<tr style="display:none;' + bg + '" data-regime-detail="aot_30d">';
             html += '<td style="padding:4px 8px 4px 24px;' + lc + 'font-size:10px;white-space:nowrap;">\u21b3 ' + sm.label + '</td>';
-            html += '<td style="padding:4px 8px;text-align:right;color:var(--text3);font-size:10px;">' + (dr ? dr.n : '\u2014') + '</td>';
+            html += '<td style="padding:4px 8px;text-align:right;color:var(--text3);font-size:10px;">\u2014</td>';
             if (dr) {
                 html += td30(dr.p10) + td30(dr.p25) + td30(dr.mean, sm.hl) + td30(dr.median) + td30(dr.p75) + td30(dr.p90) + td30(dr.min) + td30(dr.max);
             } else {
@@ -2495,24 +2499,24 @@ function _renderRegimeDetailTable() {
             html += '</tr>';
         });
 
-        // Avg CU/block — not computable from 30d program data
+        // Avg CU/block — not available from 30-day program-level data
         html += '<tr style="display:none;" data-regime-detail="aot_30d">';
-        html += '<td style="padding:4px 8px 4px 24px;color:var(--text3);font-size:10px;white-space:nowrap;">\u21b3 Avg CU/block</td>';
+        html += '<td style="padding:4px 8px 4px 24px;color:var(--text3);font-size:10px;white-space:nowrap;">\u21b3 Avg CU / block</td>';
         html += '<td style="padding:4px 8px;text-align:right;color:var(--text3);font-size:10px;">\u2014</td>';
-        html += '<td colspan="8" style="padding:4px 8px;color:var(--text3);font-size:10px;font-style:italic;">N/A \u2013 blocks_touched_30d is double-counted across programs; not comparable to epoch-level metric</td>';
+        html += '<td colspan="8" style="padding:4px 8px;color:var(--text3);font-size:10px;font-style:italic;">Not available from 30-day program-level data. This source does not provide a network-level average compute units per block.</td>';
         html += '</tr>';
 
-        // Derived fee/block — not computable (requires Avg CU/block)
+        // Fee/block (derived) — depends on Avg CU/block
         html += '<tr style="display:none;" data-regime-detail="aot_30d">';
-        html += '<td style="padding:4px 8px 4px 24px;color:var(--text3);font-size:10px;white-space:nowrap;">\u21b3 Fee/block (derived)</td>';
+        html += '<td style="padding:4px 8px 4px 24px;color:var(--text3);font-size:10px;white-space:nowrap;">\u21b3 Fee / block (derived)</td>';
         html += '<td style="padding:4px 8px;text-align:right;color:var(--text3);font-size:10px;">\u2014</td>';
-        html += '<td colspan="8" style="padding:4px 8px;color:var(--text3);font-size:10px;font-style:italic;">N/A \u2013 derived from Avg CU/block (unavailable from 30d program data)</td>';
+        html += '<td colspan="8" style="padding:4px 8px;color:var(--text3);font-size:10px;font-style:italic;">Not available because average CU per block is not available in the 30-day source.</td>';
         html += '</tr>';
 
-        // Footnote
+        // Source metadata note — plain language, counts outside the N column
         html += '<tr style="display:none;border-bottom:2px solid rgba(77,208,225,0.4);" data-regime-detail="aot_30d">';
         html += '<td colspan="10" style="padding:3px 8px 6px 24px;color:var(--text3);font-size:9px;font-style:italic;">';
-        html += 'N (30d AOT row) = ' + _30dNbStats.n + ' active payers (fpc_nb\u2009>\u20090). N (sub-rows) = ' + _30dNbStats.nWithCu + ' programs with CU\u2009>\u20090 (includes zero-fee programs). Mean = CU-weighted.';
+        html += '30-day window: ' + aotWin + '. Active fee-paying programs: ' + _30dNbStats.n + '. Included programs with compute usage: ' + _30dNbStats.nWithCu + '. Mean = CU-weighted across included programs.';
         html += '</td></tr>';
     }
     subsets.forEach((sub, idx) => {
@@ -3724,7 +3728,7 @@ function updateAotScenarioCards() {
     if (kf) {
         kf.textContent = isHorizon
             ? 'Epoch-level stats. Mean and percentiles are unweighted across epochs. 24-month Trillium dataset.'
-            : '30d AOT row: ' + (_30dNbStats ? _30dNbStats.n : '?') + ' active payers (fpc_nb\u2009>\u20090). Sub-rows: ' + (_30dNbStats ? _30dNbStats.nWithCu : '?') + ' programs with CU\u2009>\u20090. Mean = CU-weighted. Epoch rows below are long-horizon context.';
+            : '30d AOT row: 30-day program-level source (' + (_aotArtifact.window_start_date || '?') + '\u2013' + (_aotArtifact.window_end_date || '?') + '). The N column is omitted for this row — program counts are not comparable to epoch counts. Expand for fee breakdown and source details. Epoch rows below are long-horizon context.';
     }
 
     // Update source detail line + per-preset rule attribution (C-detail + C-rule)
