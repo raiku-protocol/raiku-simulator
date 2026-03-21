@@ -1877,22 +1877,49 @@ const _fOptRaw = Number(_scenarioAgg.weightedTotal || 0);
 const _fOpt = 1.50;
 const _fBullRaw = Number(_scenarioP75Active || 0);
 const _fBull = 2.00;
-// 30d AOT calibration stats — computed once from active payer non-base fee/CU values.
-// n = active payers (fpc_nb > 0). Percentiles unweighted. Mean = CU-weighted (Base Case anchor).
+// 30d AOT calibration stats — computed once from the active 30d program dataset.
+// Top-level (non-base fee/CU): active payers (fpc_nb > 0) for percentiles.
+// Sub-metrics: all programs with cu > 0 for percentiles; CU-weighted means from _scenarioAgg.
 const _30dNbStats = (function() {
-    const vals = _scenarioActivePayers.map(function(p){ return Number(p.fpc_nb) || 0; }).sort(function(a,b){ return a-b; });
-    if (!vals.length) return null;
+    const pool   = _scenarioPool;
+    const active = _scenarioActivePayers;
+    if (!pool.length) return null;
+    const withCu = pool.filter(function(p){ return p.cu > 0; });
+    if (!withCu.length) return null;
+
+    function pcts(arr) {
+        if (!arr.length) return null;
+        const s = arr.slice().sort(function(a,b){ return a-b; });
+        return { n: arr.length,
+            p10: _quantile(s,0.10), p25: _quantile(s,0.25), median: _quantile(s,0.50),
+            p75: _quantile(s,0.75), p90: _quantile(s,0.90), min: s[0], max: s[s.length-1] };
+    }
+
+    const activeVals = active.map(function(p){ return Number(p.fpc_nb)||0; }).sort(function(a,b){ return a-b; });
+    const priP  = pcts(withCu.map(function(p){ return p.pf / p.cu; }));
+    const mevP  = pcts(withCu.map(function(p){ return p.jt / p.cu; }));
+    const nbP   = pcts(withCu.map(function(p){ return p.fpc_nb; }));
+    const baseP = pcts(withCu.map(function(p){ return p.bf / p.cu; }));
+    const totP  = pcts(withCu.map(function(p){ return p.fpc_tot; }));
+
     return {
-        n: _scenarioActivePayers.length,
-        nAll: _scenarioPool.length,
-        p10: _quantile(vals, 0.10),
-        p25: _quantile(vals, 0.25),
-        mean: _scenarioAgg.weightedNonBase,  // CU-weighted over all included programs
-        median: _quantile(vals, 0.50),
-        p75: _quantile(vals, 0.75),
-        p90: _quantile(vals, 0.90),
-        min: vals[0],
-        max: vals[vals.length - 1]
+        // Top-level row: active payer non-base fee/CU
+        n: active.length,
+        nWithCu: withCu.length,
+        nAll: pool.length,
+        p10: _quantile(activeVals,0.10), p25: _quantile(activeVals,0.25),
+        mean: _scenarioAgg.weightedNonBase,  // CU-weighted (= Base Case anchor)
+        median: _quantile(activeVals,0.50),
+        p75: _quantile(activeVals,0.75), p90: _quantile(activeVals,0.90),
+        min: activeVals[0]||0, max: activeVals[activeVals.length-1]||0,
+        // Sub-metric rows for expanded view (n = withCu, CU-weighted means)
+        sub: {
+            priority_fcu: Object.assign({}, priP,  { mean: _scenarioAgg.weightedPriority }),
+            mev_fcu:      Object.assign({}, mevP,  { mean: _scenarioAgg.weightedMevJit }),
+            nb_fcu:       Object.assign({}, nbP,   { mean: _scenarioAgg.weightedNonBase }),
+            base_fcu:     Object.assign({}, baseP, { mean: _scenarioAgg.weightedBase }),
+            total_fcu:    Object.assign({}, totP,  { mean: _scenarioAgg.weightedTotal })
+        }
     };
 })();
 const _fConTotalRef = +((Number(_scenarioActiveAgg.p25Total || 0) > 0 ? _scenarioActiveAgg.p25Total : (_fCon + _scenarioAgg.weightedBase))).toFixed(2);
@@ -2426,17 +2453,67 @@ function _renderRegimeDetailTable() {
     const td = (v, mk) => '<td style="padding:6px 8px;text-align:right;color:var(--text2);">' + fmt(v, mk) + '</td>';
 
     let html = '';
-    // 30d AOT row — shown only when 30d scope is active; hidden when Long-horizon is active.
-    // Stats: unweighted percentiles of active payer fpc_nb; CU-weighted mean (= Base Case anchor).
+    // 30d AOT row — expandable, shown only when 30d scope is active.
+    // Top-level: active payers (fpc_nb > 0), non-base fee/CU. Sub-rows: all programs with cu > 0.
     if (_30dNbStats) {
         const show = _calibrationContext !== 'horizon';
+        const vis = show ? '' : 'display:none;';
         const f = function(v) { return v != null ? v.toFixed(3) : '\u2014'; };
-        const td30 = function(v) { return '<td style="padding:6px 8px;text-align:right;color:var(--text2);">' + f(v) + '</td>'; };
-        html += '<tr id="aot-30d-regime-row" style="' + (show ? '' : 'display:none;') + 'border-bottom:2px solid #4dd0e1;background:rgba(77,208,225,0.04);">';
-        html += '<td style="padding:6px 8px;color:#4dd0e1;font-weight:600;white-space:nowrap;">30d AOT</td>';
-        html += '<td style="padding:6px 8px;text-align:right;color:#4dd0e1;font-size:10px;">' + _30dNbStats.n + 'p</td>';
-        html += td30(_30dNbStats.p10) + td30(_30dNbStats.p25) + td30(_30dNbStats.mean) + td30(_30dNbStats.median) + td30(_30dNbStats.p75) + td30(_30dNbStats.p90) + td30(_30dNbStats.min) + td30(_30dNbStats.max);
+        const td30 = function(v, hl) {
+            const c = hl ? 'color:#4dd0e1;font-weight:600;' : 'color:var(--text2);';
+            return '<td style="padding:6px 8px;text-align:right;' + c + '">' + f(v) + '</td>';
+        };
+
+        // Top-level 30d row (clickable toggle)
+        html += '<tr id="aot-30d-regime-row" style="' + vis + 'border-bottom:1px solid #1a3a3a;background:rgba(77,208,225,0.04);cursor:pointer;" data-regime-toggle="aot_30d">';
+        html += '<td style="padding:6px 8px;color:#4dd0e1;font-weight:600;white-space:nowrap;">';
+        html += '<span class="regime-expand-arrow" id="arrow-aot_30d" style="display:inline-block;width:12px;font-size:9px;color:var(--text2);">\u25b6</span> 30d AOT</td>';
+        html += '<td style="padding:6px 8px;text-align:right;color:#4dd0e1;font-size:11px;">' + _30dNbStats.n + '</td>';
+        html += td30(_30dNbStats.p10) + td30(_30dNbStats.p25) + td30(_30dNbStats.mean, true) + td30(_30dNbStats.median) + td30(_30dNbStats.p75) + td30(_30dNbStats.p90) + td30(_30dNbStats.min) + td30(_30dNbStats.max);
         html += '</tr>';
+
+        // Expanded sub-rows (hidden by default, revealed on toggle)
+        var sub30dMetrics = [
+            { key: 'priority_fcu', label: 'Priority fee/CU',   hl: false },
+            { key: 'mev_fcu',      label: 'MEV / JIT fee/CU',  hl: false },
+            { key: 'nb_fcu',       label: 'Non-base fee/CU',   hl: true  },
+            { key: 'base_fcu',     label: 'Base fee/CU',       hl: false },
+            { key: 'total_fcu',    label: 'Total fee/CU',      hl: false }
+        ];
+        sub30dMetrics.forEach(function(sm) {
+            const dr = _30dNbStats.sub[sm.key];
+            const bg = sm.hl ? 'background:rgba(77,208,225,0.03);' : '';
+            const lc = sm.hl ? 'color:#4dd0e1;font-weight:500;' : 'color:var(--text2);';
+            html += '<tr style="display:none;' + bg + '" data-regime-detail="aot_30d">';
+            html += '<td style="padding:4px 8px 4px 24px;' + lc + 'font-size:10px;white-space:nowrap;">\u21b3 ' + sm.label + '</td>';
+            html += '<td style="padding:4px 8px;text-align:right;color:var(--text3);font-size:10px;">' + (dr ? dr.n : '\u2014') + '</td>';
+            if (dr) {
+                html += td30(dr.p10) + td30(dr.p25) + td30(dr.mean, sm.hl) + td30(dr.median) + td30(dr.p75) + td30(dr.p90) + td30(dr.min) + td30(dr.max);
+            } else {
+                html += '<td colspan="8" style="padding:4px 8px;text-align:center;color:var(--text3);font-size:10px;">\u2014</td>';
+            }
+            html += '</tr>';
+        });
+
+        // Avg CU/block — not computable from 30d program data
+        html += '<tr style="display:none;" data-regime-detail="aot_30d">';
+        html += '<td style="padding:4px 8px 4px 24px;color:var(--text3);font-size:10px;white-space:nowrap;">\u21b3 Avg CU/block</td>';
+        html += '<td style="padding:4px 8px;text-align:right;color:var(--text3);font-size:10px;">\u2014</td>';
+        html += '<td colspan="8" style="padding:4px 8px;color:var(--text3);font-size:10px;font-style:italic;">N/A \u2013 blocks_touched_30d is double-counted across programs; not comparable to epoch-level metric</td>';
+        html += '</tr>';
+
+        // Derived fee/block — not computable (requires Avg CU/block)
+        html += '<tr style="display:none;" data-regime-detail="aot_30d">';
+        html += '<td style="padding:4px 8px 4px 24px;color:var(--text3);font-size:10px;white-space:nowrap;">\u21b3 Fee/block (derived)</td>';
+        html += '<td style="padding:4px 8px;text-align:right;color:var(--text3);font-size:10px;">\u2014</td>';
+        html += '<td colspan="8" style="padding:4px 8px;color:var(--text3);font-size:10px;font-style:italic;">N/A \u2013 derived from Avg CU/block (unavailable from 30d program data)</td>';
+        html += '</tr>';
+
+        // Footnote
+        html += '<tr style="display:none;border-bottom:2px solid rgba(77,208,225,0.4);" data-regime-detail="aot_30d">';
+        html += '<td colspan="10" style="padding:3px 8px 6px 24px;color:var(--text3);font-size:9px;font-style:italic;">';
+        html += 'N (30d AOT row) = ' + _30dNbStats.n + ' active payers (fpc_nb\u2009>\u20090). N (sub-rows) = ' + _30dNbStats.nWithCu + ' programs with CU\u2009>\u20090 (includes zero-fee programs). Mean = CU-weighted.';
+        html += '</td></tr>';
     }
     subsets.forEach((sub, idx) => {
         const r = s[sub.key];
@@ -3636,12 +3713,18 @@ function updateAotScenarioCards() {
     // Toggle 30d AOT row in regime stats table
     const r30d = document.getElementById('aot-30d-regime-row');
     if (r30d) r30d.style.display = isHorizon ? 'none' : '';
+    // When switching to horizon, collapse any expanded 30d detail rows and reset arrow
+    if (isHorizon) {
+        document.querySelectorAll('[data-regime-detail="aot_30d"]').forEach(function(el) { el.style.display = 'none'; });
+        var arrow30d = document.getElementById('arrow-aot_30d');
+        if (arrow30d) arrow30d.textContent = '\u25b6';
+    }
     // Update key-fact note below metric definitions
     const kf = document.getElementById('aot-tier-key-fact');
     if (kf) {
         kf.textContent = isHorizon
             ? 'Epoch-level stats. Mean and percentiles are unweighted across epochs. 24-month Trillium dataset.'
-            : '30d AOT row: CU-weighted mean (= Base Case), unweighted percentiles of active payers (n\u2009=\u2009' + (_30dNbStats ? _30dNbStats.n : '?') + ' programs with fpc_nb\u2009>\u20090). Epoch rows below are long-horizon context.';
+            : '30d AOT row: ' + (_30dNbStats ? _30dNbStats.n : '?') + ' active payers (fpc_nb\u2009>\u20090). Sub-rows: ' + (_30dNbStats ? _30dNbStats.nWithCu : '?') + ' programs with CU\u2009>\u20090. Mean = CU-weighted. Epoch rows below are long-horizon context.';
     }
 
     // Update source detail line + per-preset rule attribution (C-detail + C-rule)
