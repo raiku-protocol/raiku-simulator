@@ -1910,11 +1910,18 @@ const _30dNbStats = (function() {
         ? _macroCtx.epoch_rows.filter(function(r){ return r.date >= wStart && r.date <= wEnd; }).length
         : null;
 
+    // Arithmetic mean of active payer fpc_nb (for the dedicated active-payer sub-row).
+    // Distinct from _scenarioAgg.weightedNonBase which is CU-weighted across all included programs.
+    const activeMean = activeVals.length
+        ? activeVals.reduce(function(s, v) { return s + v; }, 0) / activeVals.length
+        : 0;
+
     return {
         epochCount: epochCount,      // N column value (epochs in 30d window, not program count)
         n: active.length,            // active fee-paying programs — for metadata note only
         nWithCu: withCu.length,      // included programs with compute usage — for metadata note only
         nAll: pool.length,
+        activeMean: activeMean,      // arithmetic mean of active payer non-base fee/CU
         p10: _quantile(activeVals,0.10), p25: _quantile(activeVals,0.25),
         mean: _scenarioAgg.weightedNonBase,
         median: _quantile(activeVals,0.50),
@@ -2505,6 +2512,15 @@ function _renderRegimeDetailTable() {
             }
             html += '</tr>';
         });
+
+        // Active fee-paying programs: non-base fee/CU — dedicated row for Conservative (P25) and Bull (P75) anchors.
+        // Included application programs with non-base fee/CU greater than zero over the 30-day window.
+        // P25 = Conservative pre-floor anchor. P75 = Bull anchor.
+        html += '<tr class="regime-detail-row" style="display:none;" data-regime-detail="aot_30d">';
+        html += '<td style="padding:4px 8px 4px 24px;font-size:10px;color:var(--text2);">Active fee-paying programs: non-base fee/CU</td>';
+        html += '<td style="padding:4px 8px;text-align:right;color:var(--text2);font-size:10px;">\u2014</td>';
+        html += td30(_30dNbStats.p10) + td30(_30dNbStats.p25) + td30(_30dNbStats.activeMean) + td30(_30dNbStats.median) + td30(_30dNbStats.p75) + td30(_30dNbStats.p90) + td30(_30dNbStats.min) + td30(_30dNbStats.max);
+        html += '</tr>';
 
         // Avg CU/block — not available from 30-day program-level data
         html += '<tr class="regime-detail-row" style="display:none;" data-regime-detail="aot_30d">';
