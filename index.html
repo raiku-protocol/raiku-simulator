@@ -1877,6 +1877,24 @@ const _fOptRaw = Number(_scenarioAgg.weightedTotal || 0);
 const _fOpt = 1.50;
 const _fBullRaw = Number(_scenarioP75Active || 0);
 const _fBull = 2.00;
+// 30d AOT calibration stats — computed once from active payer non-base fee/CU values.
+// n = active payers (fpc_nb > 0). Percentiles unweighted. Mean = CU-weighted (Base Case anchor).
+const _30dNbStats = (function() {
+    const vals = _scenarioActivePayers.map(function(p){ return Number(p.fpc_nb) || 0; }).sort(function(a,b){ return a-b; });
+    if (!vals.length) return null;
+    return {
+        n: _scenarioActivePayers.length,
+        nAll: _scenarioPool.length,
+        p10: _quantile(vals, 0.10),
+        p25: _quantile(vals, 0.25),
+        mean: _scenarioAgg.weightedNonBase,  // CU-weighted over all included programs
+        median: _quantile(vals, 0.50),
+        p75: _quantile(vals, 0.75),
+        p90: _quantile(vals, 0.90),
+        min: vals[0],
+        max: vals[vals.length - 1]
+    };
+})();
 const _fConTotalRef = +((Number(_scenarioActiveAgg.p25Total || 0) > 0 ? _scenarioActiveAgg.p25Total : (_fCon + _scenarioAgg.weightedBase))).toFixed(2);
 const _fBaseTotalRef = +_fBullRaw.toFixed(2);
 const _fOptTotalRef = +_fOptRaw.toFixed(2);
@@ -2408,6 +2426,18 @@ function _renderRegimeDetailTable() {
     const td = (v, mk) => '<td style="padding:6px 8px;text-align:right;color:var(--text2);">' + fmt(v, mk) + '</td>';
 
     let html = '';
+    // 30d AOT row — shown only when 30d scope is active; hidden when Long-horizon is active.
+    // Stats: unweighted percentiles of active payer fpc_nb; CU-weighted mean (= Base Case anchor).
+    if (_30dNbStats) {
+        const show = _calibrationContext !== 'horizon';
+        const f = function(v) { return v != null ? v.toFixed(3) : '\u2014'; };
+        const td30 = function(v) { return '<td style="padding:6px 8px;text-align:right;color:var(--text2);">' + f(v) + '</td>'; };
+        html += '<tr id="aot-30d-regime-row" style="' + (show ? '' : 'display:none;') + 'border-bottom:2px solid #4dd0e1;background:rgba(77,208,225,0.04);">';
+        html += '<td style="padding:6px 8px;color:#4dd0e1;font-weight:600;white-space:nowrap;">30d AOT</td>';
+        html += '<td style="padding:6px 8px;text-align:right;color:#4dd0e1;font-size:10px;">' + _30dNbStats.n + 'p</td>';
+        html += td30(_30dNbStats.p10) + td30(_30dNbStats.p25) + td30(_30dNbStats.mean) + td30(_30dNbStats.median) + td30(_30dNbStats.p75) + td30(_30dNbStats.p90) + td30(_30dNbStats.min) + td30(_30dNbStats.max);
+        html += '</tr>';
+    }
     subsets.forEach((sub, idx) => {
         const r = s[sub.key];
         const border = idx < subsets.length - 1 ? 'border-bottom:1px solid #1a1a1a;' : '';
@@ -3601,6 +3631,17 @@ function updateAotScenarioCards() {
         setS('aot-sc-base-sentence', 'Uses the raw observed non-base fees across the included application categories, without outlier clipping, as the new base anchor.');
         setS('aot-sc-opt-sentence', 'Uses the full observed fee burden across the included application categories, including base fees, and displays it as 1.50 lam/CU for the strong upside case.');
         setS('aot-sc-bull-sentence', 'Uses the P75 active payer non-base fee/CU anchor as the high-payer stress case, displayed at 2.00 lam/CU.');
+    }
+
+    // Toggle 30d AOT row in regime stats table
+    const r30d = document.getElementById('aot-30d-regime-row');
+    if (r30d) r30d.style.display = isHorizon ? 'none' : '';
+    // Update key-fact note below metric definitions
+    const kf = document.getElementById('aot-tier-key-fact');
+    if (kf) {
+        kf.textContent = isHorizon
+            ? 'Epoch-level stats. Mean and percentiles are unweighted across epochs. 24-month Trillium dataset.'
+            : '30d AOT row: CU-weighted mean (= Base Case), unweighted percentiles of active payers (n\u2009=\u2009' + (_30dNbStats ? _30dNbStats.n : '?') + ' programs with fpc_nb\u2009>\u20090). Epoch rows below are long-horizon context.';
     }
 
     // Update source detail line + per-preset rule attribution (C-detail + C-rule)
