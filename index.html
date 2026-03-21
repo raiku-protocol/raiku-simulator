@@ -990,9 +990,9 @@ details[open] summary::before { transform:rotate(90deg); }
         <div style="background:#111213;border-radius:6px;padding:14px 16px;margin-bottom:12px;border-left:3px solid #5B8DEF;">
             <div style="font-size:10px;font-weight:600;color:#5B8DEF;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Scenario mapping &mdash; preset &rarr; window &rarr; market size</div>
             <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:11px;font-family:var(--font-mono);margin-bottom:14px;">
-                <span style="color:#60A5FA;white-space:nowrap;">Conservative</span><span style="color:var(--text);">6-month window, annualized</span>
-                <span style="color:#BDD970;white-space:nowrap;">Base Case</span><span style="color:var(--text);">12-month window, annualized &mdash; data-driven default</span>
-                <span style="color:#4DC8E8;white-space:nowrap;">Optimistic</span><span style="color:var(--text);">24-month window, annualized &mdash; includes higher-activity periods</span>
+                <span style="color:#A3D977;white-space:nowrap;">Conservative</span><span style="color:var(--text);">6-month window, annualized</span>
+                <span style="color:#7BC96F;white-space:nowrap;">Base Case</span><span style="color:var(--text);">12-month window, annualized &mdash; data-driven default</span>
+                <span style="color:#2F8F5B;white-space:nowrap;">Optimistic</span><span style="color:var(--text);">24-month window, annualized &mdash; includes higher-activity periods</span>
                 <span style="color:#F5A623;white-space:nowrap;">Bull Case</span><span style="color:var(--text);">5,000,000 SOL/yr &mdash; manual, not derived from historical windows</span>
             </div>
             <div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Window detail &mdash; anchored to <span id="jw-tbl-date">&mdash;</span></div>
@@ -1011,7 +1011,7 @@ details[open] summary::before { transform:rotate(90deg); }
                     </thead>
                     <tbody>
                         <tr style="border-bottom:1px solid #1e1f20;">
-                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">6 months<br><span style="font-size:9px;color:#60A5FA;">Conservative</span></td>
+                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">6 months<br><span style="font-size:9px;color:#A3D977;">Conservative</span></td>
                             <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-6m-range">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-6m-ep">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-6m-sol">&mdash;</td>
@@ -1020,7 +1020,7 @@ details[open] summary::before { transform:rotate(90deg); }
                             <td style="padding:7px 8px;text-align:right;color:var(--text);font-weight:500;" id="jw-tbl-6m-ann">&mdash;</td>
                         </tr>
                         <tr style="border-bottom:1px solid #1e1f20;">
-                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">12 months<br><span style="font-size:9px;color:var(--lime-soft);">Base Case</span></td>
+                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">12 months<br><span style="font-size:9px;color:#7BC96F;">Base Case</span></td>
                             <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-12m-range">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-12m-ep">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-12m-sol">&mdash;</td>
@@ -1029,7 +1029,7 @@ details[open] summary::before { transform:rotate(90deg); }
                             <td style="padding:7px 8px;text-align:right;color:var(--text);font-weight:500;" id="jw-tbl-12m-ann">&mdash;</td>
                         </tr>
                         <tr>
-                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">24 months<br><span style="font-size:9px;color:#4DC8E8;">Optimistic</span></td>
+                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">24 months<br><span style="font-size:9px;color:#2F8F5B;">Optimistic</span></td>
                             <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-24m-range">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-24m-ep">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-24m-sol">&mdash;</td>
@@ -1069,7 +1069,7 @@ details[open] summary::before { transform:rotate(90deg); }
         <div style="margin-bottom:16px;">
             <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;">MEV / JIT Rewards — Historical Trend</div>
             <div style="height:220px;background:#0a0b0c;border-radius:6px;padding:8px;"><canvas id="chart-jit-history"></canvas></div>
-            <div style="font-size:11px;color:var(--text2);margin-top:6px;">Full history from epoch <span id="jit-chart-range">&mdash;</span>. The <span id="jit-chart-legend-color" style="color:#BDD970;font-weight:600;">highlighted section</span> shows the active preset window. <span id="jit-chart-bull-note" style="display:none;color:#F5A623;">Bull is a manual scenario &mdash; no historical window is highlighted.</span> Peaks reflect periods of high MEV activity (e.g., memecoin surges).</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:6px;">Full history from epoch <span id="jit-chart-range">&mdash;</span>. The <span id="jit-chart-legend-color" style="color:#7BC96F;font-weight:600;">highlighted section</span> shows the active preset window. <span id="jit-chart-bull-note" style="display:none;color:#F5A623;">Bull is a manual scenario &mdash; no historical window is highlighted.</span> Peaks reflect periods of high MEV activity (e.g., memecoin surges).</div>
         </div>
 
         <!-- View source dataset button -->
@@ -2791,15 +2791,15 @@ function initJitHistoryChart(){
     const o2={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:10}},display:true},tooltip:{callbacks:{title:function(ctx){const i=ctx[0].dataIndex;return 'Epoch '+jitAll[i][0]+' \u2014 '+jitAll[i][2];}}}},scales:{x:{ticks:{color:'#555',font:{size:9},maxTicksLimit:18,maxRotation:0,callback:function(val,idx){const lbl=this.getLabelForValue(val);const ep=epochNums[val]!=null?epochNums[val]:'';return [lbl,'ep '+ep];}},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'},title:{display:true,color:'#A0A3A9',font:{size:10},text:'SOL / epoch'}}}};
     cJH=new Chart(document.getElementById('chart-jit-history'),{type:'line',data:{labels:dateLabels,datasets:[
         {label:'All epochs',data:jitAll.map(r=>r[1]),borderColor:'rgba(255,255,255,0.25)',borderWidth:1,pointRadius:0,fill:false},
-        {label:'Window (12m \u2014 Base Case)',data:jitAll.map(r=>r[2]>=_initCutoff?r[1]:null),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(189,217,112,0.1)'}
+        {label:'Window (12m \u2014 Base Case)',data:jitAll.map(r=>r[2]>=_initCutoff?r[1]:null),borderColor:'#7BC96F',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(123,201,111,0.10)'}
     ]},options:o2});
 }
 
 // JIT history chart preset colors
 const _jitChartColors = {
-    con:  { border: '#60A5FA', bg: 'rgba(96,165,250,0.12)' },
-    base: { border: '#BDD970', bg: 'rgba(189,217,112,0.10)' },
-    opt:  { border: '#4DC8E8', bg: 'rgba(77,200,232,0.10)' },
+    con:  { border: '#A3D977', bg: 'rgba(163,217,119,0.12)' },
+    base: { border: '#7BC96F', bg: 'rgba(123,201,111,0.10)' },
+    opt:  { border: '#2F8F5B', bg: 'rgba(47,143,91,0.10)' },
 };
 const _jitWindowMonths = { con: 6, base: 12, opt: 24 };
 const _jitWindowLabels = { con: '6m \u2014 Conservative', base: '12m \u2014 Base Case', opt: '24m \u2014 Optimistic' };
@@ -2821,7 +2821,7 @@ function updateJitHistoryChart(presetKey) {
         ds1.label = 'Window (' + _jitWindowLabels[presetKey] + ')';
     }
     const legEl = document.getElementById('jit-chart-legend-color');
-    if (legEl) legEl.style.color = isBull ? '#F5A623' : _jitChartColors[presetKey] ? _jitChartColors[presetKey].border : '#BDD970';
+    if (legEl) legEl.style.color = isBull ? '#F5A623' : _jitChartColors[presetKey] ? _jitChartColors[presetKey].border : '#7BC96F';
     const noteEl = document.getElementById('jit-chart-bull-note');
     if (noteEl) noteEl.style.display = isBull ? 'inline' : 'none';
     cJH.update('none');
