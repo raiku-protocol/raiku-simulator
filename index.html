@@ -90,7 +90,7 @@ body { font-family: var(--font-display); background:var(--bg); color:var(--text)
 .scenario-btns { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
 .scenario-btn { background:#141516; border:2px solid #333; border-radius:8px; padding:8px 18px; cursor:pointer; color:var(--text); font-size:12px; font-weight:600; transition:all 0.15s; }
 .scenario-btn:hover { border-color:#555; color:var(--text); }
-.scenario-btn.active { border-color:var(--text); background:#ffffff08; color:var(--text); }
+.scenario-btn.active { background:var(--lime-dim); border-color:var(--lime); color:var(--lime); }
 .scenario-desc { font-size:11px; color:var(--text-mid); padding:8px 12px; background:#141516; border-radius:6px; line-height:1.4; }
 
 
@@ -171,7 +171,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .tab-layout { display:flex; gap:var(--gap); align-items:flex-start; min-height:0; }
 .sidebar {
     width:430px; min-width:430px; position:sticky; top:10px;
-    max-height:none; overflow:visible; align-self:flex-start;
+    max-height:calc(100vh - 20px); overflow-y:auto; overflow-x:visible; align-self:flex-start;
 }
 .main-content {
     flex:1; min-width:0; min-height:0;
@@ -191,8 +191,8 @@ details[open] summary::before { transform:rotate(90deg); }
 .model-params-price { justify-self:end; width:100%; max-width:228px; padding:6px 8px; background:#111213; border:1px solid #1e2028; border-radius:6px; }
 .model-params-price label { font-size:9px; color:var(--text2); }
 .model-params-price .slider-row { gap:8px; }
-.sidebar .scenario-btns { gap:3px; margin-bottom:4px; }
-.sidebar .scenario-btn { padding:3px 8px; font-size:10px; border-radius:4px; border-width:1px; }
+.sidebar .scenario-btns { display:grid; grid-template-columns:repeat(4, 1fr); gap:5px; margin-bottom:6px; flex-wrap:unset; }
+.sidebar .scenario-btn { padding:8px 4px; font-size:11px; border-radius:5px; border-width:1.5px; text-align:center; width:100%; }
 .sidebar .scenario-desc { font-size:11px; padding:4px 8px; line-height:1.4; color:var(--text-mid); }
 .sidebar .controls-grid { grid-template-columns:1fr; gap:4px; }
 .sidebar .control { gap:1px; margin-bottom:3px; }
@@ -698,8 +698,8 @@ details[open] summary::before { transform:rotate(90deg); }
             </span>
         </div>
         <div style="display:flex;gap:6px;">
-            <button class="regime-btn active" id="ctx-30d" onclick="setCalibrationContext('30d')" style="font-size:10px;padding:4px 10px;">30d AOT scope</button>
-            <button class="regime-btn" id="ctx-horizon" onclick="setCalibrationContext('horizon')" style="font-size:10px;padding:4px 10px;">Long-horizon</button>
+            <button class="regime-btn" id="ctx-30d" onclick="setCalibrationContext('30d')" style="font-size:10px;padding:4px 10px;">30d AOT scope</button>
+            <button class="regime-btn active" id="ctx-horizon" onclick="setCalibrationContext('horizon')" style="font-size:10px;padding:4px 10px;">Long-horizon</button>
         </div>
         <div id="ctx-source-label" style="font-size:10px;color:var(--text2);margin-top:5px;line-height:1.4;">AOT fee/CU calibrated from 30-day program-level data (arb-bot excluded).</div>
     </div>
@@ -2171,7 +2171,7 @@ function applyScenario(n){
 });
 
 // ── Data context selector — switches AOT fee/CU calibration source ────
-let _calibrationContext = '30d';  // '30d' or 'horizon'
+let _calibrationContext = 'horizon';  // '30d' or 'horizon'
 const _feeDefaults30d = { con: _fCon, base: _fBase, opt: _fOpt, bull: _fBull };
 // Long-horizon presets: all 4 anchored to the Normal regime distribution
 // of non_base_fee_per_cu_lamports (24-month window).
@@ -4236,7 +4236,7 @@ function initHybridControls() {
     });
 }
 
-renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls(); _populateJitWindowRef();
+renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); setCalibrationContext('horizon'); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls(); _populateJitWindowRef();
 
 // Calibration source info popover — moved to document.body to escape all stacking contexts
 (function() {
