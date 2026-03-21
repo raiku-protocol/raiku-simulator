@@ -175,13 +175,8 @@ details[open] summary::before { transform:rotate(90deg); }
 }
 .main-content {
     flex:1; min-width:0; min-height:0;
-    max-height:calc(100vh - 100px); overflow-y:auto; overflow-x:visible;
-    overscroll-behavior:contain; padding-right:4px;
-    scrollbar-width:thin; scrollbar-color:#333 transparent;
+    overflow-x:visible; padding-right:4px;
 }
-.main-content::-webkit-scrollbar { width:4px; }
-.main-content::-webkit-scrollbar-track { background:transparent; }
-.main-content::-webkit-scrollbar-thumb { background:#333; border-radius:2px; }
 
 /* Compact sidebar controls */
 .sidebar .controls-section { padding:8px 8px; margin-bottom:0; border-radius:0; border-bottom:none; }
