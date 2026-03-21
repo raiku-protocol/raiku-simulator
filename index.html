@@ -376,6 +376,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .aot-sc-sentence { margin:0 0 8px 0; font-size:12px; line-height:1.45; color:var(--text); }
 .aot-sc-open { border:1px solid #2b2d2f; border-radius:6px; background:#0f1011; color:var(--lime-soft); padding:7px 10px; font-size:11px; font-weight:600; cursor:pointer; transition:border-color .15s ease, background .15s ease; }
 .aot-sc-open:hover { border-color:#3a3d40; background:#151719; }
+.aot-sc-rule { font-size:10px; color:var(--text2); line-height:1.4; margin:4px 0 6px; padding:4px 7px; background:#0a0b0c; border-radius:3px; font-family:var(--font-mono); }
 .aot-sc-modal-backdrop { position:fixed; inset:0; z-index:2000; background:rgba(5,6,7,.76); display:none; padding:18px; box-sizing:border-box; }
 .aot-sc-modal-backdrop.show { display:grid; place-items:center; }
 .aot-sc-modal { width:min(860px, calc(100vw - 36px)); max-height:88vh; max-height:calc(100dvh - 36px); overflow:auto; overscroll-behavior:contain; border:1px solid #2e3135; background:#0f1012; border-radius:10px; box-shadow:0 24px 80px rgba(0,0,0,.55); padding:16px 18px; margin:0; }
@@ -1109,12 +1110,14 @@ details[open] summary::before { transform:rotate(90deg); }
     <div id="aot-fcu-data-section" style="background:#0d0e0f;border:1px solid var(--card-border);border-radius:8px;padding:20px 24px;">
 
         <!-- Header line: active preset + source badge + framework label -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
             <span style="font-size:12px;font-weight:600;color:var(--text);" id="aot-active-preset">Base Case</span>
             <span id="aot-active-source-badge" style="display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:0.3px;padding:3px 8px;border-radius:3px;background:#0d3b3b;color:#4dd0e1;">30d AOT scope</span>
             <span style="flex:1;"></span>
             <span style="font-size:10px;color:var(--text2);font-style:italic;" id="aot-fcu-badge">data-driven framework</span>
         </div>
+        <!-- Source stats line (dynamic — updates with calibration toggle) -->
+        <div id="aot-source-detail-line" style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:14px;padding:7px 10px;background:#111213;border-radius:4px;border-left:2px solid #4dd0e1;font-family:var(--font-mono);"></div>
         <!-- Headline: current slider value -->
         <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
             <span style="font-size:26px;font-weight:700;color:var(--text);font-family:var(--font-mono);" id="aot-fcu-headline">&mdash;</span>
@@ -1140,24 +1143,28 @@ details[open] summary::before { transform:rotate(90deg); }
                     <h3>Conservative</h3>
                     <div class="sc-val" id="aot-sc-con-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-con-sentence">&mdash;</p>
+                    <div class="aot-sc-rule" id="aot-sc-con-rule"></div>
                     <button type="button" class="aot-sc-open" data-aot-scenario="con">Show calculation</button>
                 </div>
                 <div class="scenario-card aot-scenario-card" id="aot-sc-card-base">
                     <h3>Base</h3>
                     <div class="sc-val" id="aot-sc-base-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-base-sentence">&mdash;</p>
+                    <div class="aot-sc-rule" id="aot-sc-base-rule"></div>
                     <button type="button" class="aot-sc-open" data-aot-scenario="base">Show calculation</button>
                 </div>
                 <div class="scenario-card aot-scenario-card" id="aot-sc-card-opt">
                     <h3>Optimistic</h3>
                     <div class="sc-val" id="aot-sc-opt-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-opt-sentence">&mdash;</p>
+                    <div class="aot-sc-rule" id="aot-sc-opt-rule"></div>
                     <button type="button" class="aot-sc-open" data-aot-scenario="opt">Show calculation</button>
                 </div>
                 <div class="scenario-card aot-scenario-card" id="aot-sc-card-bull">
                     <h3>Bull</h3>
                     <div class="sc-val" id="aot-sc-bull-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-bull-sentence">&mdash;</p>
+                    <div class="aot-sc-rule" id="aot-sc-bull-rule"></div>
                     <button type="button" class="aot-sc-open" data-aot-scenario="bull">Show calculation</button>
                 </div>
             </div>
@@ -3594,6 +3601,31 @@ function updateAotScenarioCards() {
         setS('aot-sc-base-sentence', 'Uses the raw observed non-base fees across the included application categories, without outlier clipping, as the new base anchor.');
         setS('aot-sc-opt-sentence', 'Uses the full observed fee burden across the included application categories, including base fees, and displays it as 1.50 lam/CU for the strong upside case.');
         setS('aot-sc-bull-sentence', 'Uses the P75 active payer non-base fee/CU anchor as the high-payer stress case, displayed at 2.00 lam/CU.');
+    }
+
+    // Update source detail line + per-preset rule attribution (C-detail + C-rule)
+    const sdl = document.getElementById('aot-source-detail-line');
+    const setR = function(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
+    if (isHorizon) {
+        const sH = _macroCtx.summary_by_metric?.non_base_fee_per_cu_lamports;
+        const nH = sH?.normal?.n || '?';
+        if (sdl) {
+            sdl.textContent = 'data/macro_context.v1.js \u00b7 24-month epoch-level \u00b7 ' + (_macroCtx.row_count || '?') + ' epochs (' + (_macroCtx.start_date || '?') + ' \u2013 ' + (_macroCtx.end_date || '?') + ') \u00b7 Trillium API \u00b7 all network fees';
+            sdl.style.borderLeftColor = '#ffd54f';
+        }
+        setR('aot-sc-con-rule',  '24mo epochs \u00b7 non-base fee/CU \u00b7 Normal P25 (n=' + nH + ')');
+        setR('aot-sc-base-rule', '24mo epochs \u00b7 non-base fee/CU \u00b7 Normal median (n=' + nH + ')');
+        setR('aot-sc-opt-rule',  '24mo epochs \u00b7 non-base fee/CU \u00b7 Normal P75 (n=' + nH + ')');
+        setR('aot-sc-bull-rule', '24mo epochs \u00b7 non-base fee/CU \u00b7 Normal P90 (n=' + nH + ')');
+    } else {
+        if (sdl) {
+            sdl.textContent = 'data/aot_programs.v1.js \u00b7 30-day program-level \u00b7 ' + _scenarioPool.length + ' programs (' + _scenarioActivePayers.length + ' active payers) \u00b7 CU-weighted \u00b7 arb-bot excluded';
+            sdl.style.borderLeftColor = '#4dd0e1';
+        }
+        setR('aot-sc-con-rule',  '30d \u00b7 non-base fee/CU \u00b7 P25 active payers + 0.10 floor (n=' + _scenarioActivePayers.length + ')');
+        setR('aot-sc-base-rule', '30d \u00b7 CU-weighted non-base fee/CU \u00b7 raw mean (n=' + _scenarioPool.length + ')');
+        setR('aot-sc-opt-rule',  '30d \u00b7 CU-weighted total fee/CU \u00b7 raw mean (n=' + _scenarioPool.length + ')');
+        setR('aot-sc-bull-rule', '30d \u00b7 non-base fee/CU \u00b7 P75 active payers (n=' + _scenarioActivePayers.length + ')');
     }
 
     // Rebuild explain data (C4)
