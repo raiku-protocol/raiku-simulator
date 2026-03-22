@@ -812,7 +812,7 @@ details[open] summary::before { transform:rotate(90deg); }
                         <span id="v-jit-other" style="font-size:14px;font-weight:600;font-family:var(--font-mono);color:#6B9EBC;">0%</span>
                         <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);">= max(Stake % &minus; Raiku JIT share, 0)</span>
                     </div>
-                    <div class="control-derivation" id="ojit-helper" style="color:#6B9EBC;opacity:0.8;">Bypasses Raiku, goes direct to validators</div>
+                    <div class="control-derivation" id="ojit-helper" style="color:#6B9EBC;opacity:0.8;">Direct to validators — outside protocol take</div>
                 </div>
                 <a href="#jit-data-section" class="method-link" onclick="document.getElementById('jit-data-section').scrollIntoView({behavior:'smooth'});return false;">&#x2197; Source &amp; Methodology</a>
             </div>
@@ -832,10 +832,10 @@ details[open] summary::before { transform:rotate(90deg); }
     <div style="display:flex;gap:0;margin-bottom:10px;align-items:stretch;">
         <!-- Other JIT — validator bypass, separate from protocol gross -->
         <div style="flex:0 0 auto;width:175px;margin-right:10px;padding-right:12px;border-right:1px solid #26282C;display:flex;flex-direction:column;gap:4px;">
-            <div style="font-size:9px;color:#6B9EBC;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;font-family:var(--font-mono);">Validator bypass</div>
+            <div style="font-size:9px;color:#6B9EBC;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;font-family:var(--font-mono);">Direct to validators</div>
             <div class="triple-card" style="border-left-color:#6B9EBC;flex:1;">
                 <div class="tc-header"><span class="tc-label" style="color:#6B9EBC;">Other JIT</span><span class="tc-badge" style="border-color:#6B9EBC30;color:#6B9EBC;">Annual</span></div>
-                <div style="font-size:9px;color:#6B9EBC;font-family:var(--font-mono);margin-bottom:4px;opacity:0.7;">bypasses protocol</div>
+                <div style="font-size:9px;color:#6B9EBC;font-family:var(--font-mono);margin-bottom:4px;opacity:0.7;">outside protocol take</div>
                 <div class="tc-usd" style="color:#6B9EBC;" id="tc-ojit-usd">&mdash;</div>
                 <div class="tc-secondary" id="tc-ojit-sol">&mdash;</div>
                 <div class="tc-monthly" id="tc-ojit-mo">&mdash;</div>
@@ -867,10 +867,10 @@ details[open] summary::before { transform:rotate(90deg); }
     <div style="display:flex;gap:0;margin-bottom:10px;align-items:stretch;">
         <!-- Validator Other JIT — bypass, left-most separate -->
         <div style="flex:0 0 auto;width:175px;margin-right:10px;padding-right:12px;border-right:1px solid #26282C;display:flex;flex-direction:column;gap:4px;">
-            <div style="font-size:9px;color:#6B9EBC;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;font-family:var(--font-mono);">Validator bypass</div>
+            <div style="font-size:9px;color:#6B9EBC;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;font-family:var(--font-mono);">Direct to validators</div>
             <div class="triple-card" style="border-left-color:#6B9EBC;flex:1;">
                 <div class="tc-header"><span class="tc-label" style="color:#6B9EBC;">Validator Other JIT</span><span class="tc-badge" style="border-color:#6B9EBC30;color:#6B9EBC;">Annual</span></div>
-                <div style="font-size:9px;color:#6B9EBC;font-family:var(--font-mono);margin-bottom:4px;opacity:0.7;">bypasses protocol take</div>
+                <div style="font-size:9px;color:#6B9EBC;font-family:var(--font-mono);margin-bottom:4px;opacity:0.7;">outside protocol take</div>
                 <div class="tc-usd" style="color:#6B9EBC;" id="tc-dist-ojit-usd">&mdash;</div>
                 <div class="tc-secondary" id="tc-dist-ojit-sol">&mdash;</div>
                 <div class="tc-monthly" id="tc-dist-ojit-mo">&mdash;</div>
@@ -3173,8 +3173,8 @@ function updFlow(p,r){
     const jH=Math.max(minH, jU/raikuTotal*leftAvail*0.85);
     const aH=Math.max(minH, aU/raikuTotal*leftAvail*0.85);
 
-    // Other JIT at top of left side
-    const ojY=svgTop+5;
+    // Other JIT at top of left side — extra top margin gives label headroom above arc
+    const ojY=svgTop+28;
     // Raiku sources start below Other JIT + gap
     const jY=ojY+ojH+22;
     const aY=jY+jH+22;
@@ -3186,10 +3186,10 @@ function updFlow(p,r){
     const aotRect=document.getElementById('fk-aot');
     if(aotRect){aotRect.setAttribute('y',aY);aotRect.setAttribute('height',aH);}
 
-    document.getElementById('fk-other-jit-label').setAttribute('y',ojY+ojH/2-6);
-    document.getElementById('fk-other-jit-v').setAttribute('y',ojY+ojH/2+12);
+    document.getElementById('fk-other-jit-label').setAttribute('y',ojY-12);
+    document.getElementById('fk-other-jit-v').setAttribute('y',ojY-2);
     const ojitNoteEl=document.getElementById('fk-other-jit-note');
-    if(ojitNoteEl) ojitNoteEl.setAttribute('y',ojY+ojH+4);
+    if(ojitNoteEl) ojitNoteEl.setAttribute('opacity','0');
     document.getElementById('fk-jit-label').setAttribute('y',jY+jH/2-6);
     document.getElementById('fk-jit-v').setAttribute('y',jY+jH/2+14);
     document.getElementById('fk-aot-label').setAttribute('y',aY+aH/2-6);
