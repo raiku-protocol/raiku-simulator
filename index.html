@@ -402,7 +402,7 @@ details[open] summary::before { transform:rotate(90deg); }
 
 /* Revenue grid layouts */
 .rev-sources-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:10px; }
-.rev-dist-grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin-bottom:10px; }
+.rev-dist-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px; margin-bottom:10px; }
 @media(max-width:900px) {
     .rev-sources-grid { grid-template-columns:1fr; }
     .rev-dist-grid { grid-template-columns:1fr; }
@@ -801,10 +801,16 @@ details[open] summary::before { transform:rotate(90deg); }
                     <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);margin-top:2px;" id="v-jit-market-usd">&mdash;</div>
                 </div>
                 <div class="control">
-                    <label>Market Share %</label>
+                    <label>Raiku JIT Market Share %</label>
                     <div class="slider-row"><input type="range" id="sl-jit" min="0" max="30" step="0.1" value="5"><span class="val blue" id="v-jit">5%</span></div>
                     <div class="control-derivation" id="jit-captured-helper">Captured market: 40.7K SOL/yr</div>
                     <div id="jit-stake-coherence-msg" style="display:none;font-size:9px;color:#F5A623;font-family:var(--font-mono);margin-top:3px;line-height:1.4;"></div>
+                </div>
+                <div class="control" style="margin-top:6px;border-top:1px solid #2a2b2c;padding-top:6px;">
+                    <label style="color:#6B9EBC;">Other non-Raiku JIT Share %</label>
+                    <div class="slider-row"><input type="range" id="sl-jit-other" min="0" max="30" step="0.1" value="0"><span class="val blue" id="v-jit-other">0%</span></div>
+                    <div class="control-derivation" id="ojit-helper">Other JIT: bypasses Raiku, goes direct to validators</div>
+                    <div id="jit-double-count-msg" style="display:none;font-size:9px;color:#F5A623;font-family:var(--font-mono);margin-top:3px;line-height:1.4;"></div>
                 </div>
                 <a href="#jit-data-section" class="method-link" onclick="document.getElementById('jit-data-section').scrollIntoView({behavior:'smooth'});return false;">&#x2197; Source &amp; Methodology</a>
             </div>
@@ -829,7 +835,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <div class="tc-monthly" id="tc-gross-mo">&mdash;</div>
         </div>
         <div class="triple-card" style="border-left-color:var(--clr-jit);">
-            <div class="tc-header"><span class="tc-label">JIT Revenue (tips)</span><span class="tc-badge">Annual</span></div>
+            <div class="tc-header"><span class="tc-label">Raiku JIT (tips)</span><span class="tc-badge">Annual</span></div>
             <div class="tc-usd" style="color:var(--clr-jit);" id="tc-jit-usd">&mdash;</div>
             <div class="tc-secondary" id="tc-jit-sol">&mdash;</div>
             <div class="tc-monthly" id="tc-jit-mo">&mdash;</div>
@@ -849,6 +855,14 @@ details[open] summary::before { transform:rotate(90deg); }
             <div class="tc-usd" style="color:var(--clr-validator);" id="vg-base-usd">&mdash;</div>
             <div class="tc-secondary" id="vg-base-sol">&mdash;</div>
             <div class="tc-monthly" id="vg-base-mo">&mdash;</div>
+        </div>
+        <!-- Other non-Raiku JIT — bypass, goes direct to validators -->
+        <div class="triple-card" style="border-left-color:#6B9EBC;">
+            <div class="tc-header"><span class="tc-label">Other JIT → Validators</span><span class="tc-badge">Annual</span></div>
+            <div style="font-size:9px;color:#6B9EBC;font-family:var(--font-mono);margin-bottom:4px;">bypasses protocol take</div>
+            <div class="tc-usd" style="color:#6B9EBC;" id="tc-ojit-usd">&mdash;</div>
+            <div class="tc-secondary" id="tc-ojit-sol">&mdash;</div>
+            <div class="tc-monthly" id="tc-ojit-mo">&mdash;</div>
         </div>
         <!-- AOT Validator Bonus -->
         <div class="triple-card" style="border-left-color:var(--clr-val-bonus);">
@@ -881,39 +895,49 @@ details[open] summary::before { transform:rotate(90deg); }
     </div>
 
     <!-- Sankey Flow Chart — clean, tall, readable -->
-    <div class="chart-box" style="min-height:420px;padding:16px 24px;">
-        <h3 style="font-size:13px;margin-bottom:10px;color:var(--text2);">Revenue Flow — JIT + AOT → Distribution</h3>
-        <svg id="flow-sankey" viewBox="0 0 1000 420" style="width:100%;height:400px;font-family:var(--font-mono);">
+    <div class="chart-box" style="min-height:460px;padding:16px 24px;">
+        <h3 style="font-size:13px;margin-bottom:10px;color:var(--text2);">Revenue Flow — Raiku JIT + Other JIT + AOT → Distribution</h3>
+        <svg id="flow-sankey" viewBox="0 0 1000 500" style="width:100%;height:460px;font-family:var(--font-mono);">
             <!-- Left: Sources -->
-            <rect id="fk-jit" x="0" y="40" width="20" height="140" rx="3" fill="#FFFFFF" opacity="0.9"/>
-            <text id="fk-jit-label" x="30" y="100" fill="#FFFFFF" font-size="15" font-weight="700">JIT Revenue</text>
-            <text id="fk-jit-v" x="30" y="122" fill="#A0A3A9" font-size="13">—</text>
-            <rect id="fk-aot" x="0" y="240" width="20" height="140" rx="3" fill="#FFFFFF" opacity="0.9"/>
-            <text id="fk-aot-label" x="30" y="300" fill="#FFFFFF" font-size="15" font-weight="700">AOT Revenue</text>
-            <text id="fk-aot-v" x="30" y="322" fill="#A0A3A9" font-size="13">—</text>
-            <!-- Center: Total Revenue -->
+            <rect id="fk-jit" x="0" y="40" width="20" height="100" rx="3" fill="#FFFFFF" opacity="0.9"/>
+            <text id="fk-jit-label" x="30" y="85" fill="#FFFFFF" font-size="14" font-weight="700">Raiku JIT</text>
+            <text id="fk-jit-v" x="30" y="105" fill="#A0A3A9" font-size="12">—</text>
+            <!-- Other non-Raiku JIT — bypass source -->
+            <rect id="fk-other-jit" x="0" y="175" width="20" height="80" rx="3" fill="#6B9EBC" opacity="0.85"/>
+            <text id="fk-other-jit-label" x="30" y="210" fill="#6B9EBC" font-size="13" font-weight="700">Other JIT</text>
+            <text id="fk-other-jit-v" x="30" y="228" fill="#A0A3A9" font-size="12">—</text>
+            <text x="30" y="244" fill="#6B9EBC" font-size="10" opacity="0.8">→ validators direct</text>
+            <rect id="fk-aot" x="0" y="295" width="20" height="120" rx="3" fill="#FFFFFF" opacity="0.9"/>
+            <text id="fk-aot-label" x="30" y="350" fill="#FFFFFF" font-size="14" font-weight="700">AOT Revenue</text>
+            <text id="fk-aot-v" x="30" y="370" fill="#A0A3A9" font-size="12">—</text>
+            <!-- Center: Raiku Gross Revenue -->
             <rect id="fk-total" x="370" y="20" width="20" height="440" rx="3" fill="#d4e8a0" opacity="0.85"/>
-            <text x="400" y="230" fill="#d4e8a0" font-size="15" font-weight="700">Total Revenue</text>
-            <text id="fk-total-v" x="400" y="252" fill="#A0A3A9" font-size="13">—</text>
-            <!-- Right: 5 Distribution outputs — evenly spaced, large -->
-            <rect id="fk-valbase" x="720" y="20" width="18" height="80" rx="3" fill="#5B8DEF"/>
-            <text id="fk-valbase-label" x="746" y="52" fill="#5B8DEF" font-size="15" font-weight="700">Validator Base</text>
-            <text id="fk-valbase-v" x="746" y="74" fill="#A0A3A9" font-size="13">—</text>
-            <rect id="fk-vb" x="720" y="115" width="18" height="60" rx="3" fill="#4178DE"/>
-            <text id="fk-vb-label" x="746" y="140" fill="#4178DE" font-size="14" font-weight="600">AOT Val. Bonus</text>
-            <text id="fk-vb-paren" x="882" y="140" fill="#4178DE" font-size="10" opacity="0.7">(AOT only)</text>
-            <text id="fk-vb-v" x="746" y="160" fill="#A0A3A9" font-size="13">—</text>
-            <rect id="fk-reb-aot" x="720" y="200" width="18" height="60" rx="3" fill="#8BAF8B"/>
-            <text id="fk-reb-aot-label" x="746" y="225" fill="#8BAF8B" font-size="14" font-weight="600">AOT Rebate</text>
-            <text id="fk-reb-aot-v" x="746" y="245" fill="#A0A3A9" font-size="13">—</text>
-            <rect id="fk-reb-jit" x="720" y="285" width="18" height="60" rx="3" fill="#9BBF9B"/>
-            <text id="fk-reb-jit-label" x="746" y="310" fill="#9BBF9B" font-size="14" font-weight="600">JIT Rebate</text>
-            <text id="fk-reb-jit-v" x="746" y="330" fill="#A0A3A9" font-size="13">—</text>
-            <rect id="fk-proto" x="720" y="370" width="18" height="80" rx="3" fill="#C0FF38"/>
-            <text id="fk-proto-label" x="746" y="402" fill="#C0FF38" font-size="15" font-weight="700">Protocol Treasury</text>
-            <text id="fk-proto-v" x="746" y="424" fill="#C0FF38" font-size="13">—</text>
+            <text x="400" y="230" fill="#d4e8a0" font-size="14" font-weight="700">Raiku Gross</text>
+            <text id="fk-total-v" x="400" y="250" fill="#A0A3A9" font-size="12">—</text>
+            <!-- Right: 6 Distribution outputs -->
+            <rect id="fk-valbase" x="720" y="20" width="18" height="70" rx="3" fill="#5B8DEF"/>
+            <text id="fk-valbase-label" x="746" y="50" fill="#5B8DEF" font-size="14" font-weight="700">Validator Base</text>
+            <text id="fk-valbase-v" x="746" y="70" fill="#A0A3A9" font-size="12">—</text>
+            <rect id="fk-ojit" x="720" y="105" width="18" height="55" rx="3" fill="#6B9EBC"/>
+            <text id="fk-ojit-label" x="746" y="128" fill="#6B9EBC" font-size="13" font-weight="600">Other JIT → Validators</text>
+            <text id="fk-ojit-v" x="746" y="148" fill="#A0A3A9" font-size="12">—</text>
+            <rect id="fk-vb" x="720" y="175" width="18" height="55" rx="3" fill="#4178DE"/>
+            <text id="fk-vb-label" x="746" y="198" fill="#4178DE" font-size="13" font-weight="600">AOT Val. Bonus</text>
+            <text id="fk-vb-paren" x="886" y="198" fill="#4178DE" font-size="10" opacity="0.7">(AOT only)</text>
+            <text id="fk-vb-v" x="746" y="218" fill="#A0A3A9" font-size="12">—</text>
+            <rect id="fk-reb-aot" x="720" y="245" width="18" height="55" rx="3" fill="#8BAF8B"/>
+            <text id="fk-reb-aot-label" x="746" y="268" fill="#8BAF8B" font-size="13" font-weight="600">AOT Rebate</text>
+            <text id="fk-reb-aot-v" x="746" y="288" fill="#A0A3A9" font-size="12">—</text>
+            <rect id="fk-reb-jit" x="720" y="315" width="18" height="55" rx="3" fill="#9BBF9B"/>
+            <text id="fk-reb-jit-label" x="746" y="338" fill="#9BBF9B" font-size="13" font-weight="600">Raiku JIT Rebate</text>
+            <text id="fk-reb-jit-v" x="746" y="358" fill="#A0A3A9" font-size="12">—</text>
+            <rect id="fk-proto" x="720" y="385" width="18" height="75" rx="3" fill="#C0FF38"/>
+            <text id="fk-proto-label" x="746" y="416" fill="#C0FF38" font-size="14" font-weight="700">Protocol Treasury</text>
+            <text id="fk-proto-v" x="746" y="436" fill="#C0FF38" font-size="12">—</text>
             <!-- Flow paths (drawn dynamically) -->
             <g id="fk-paths" opacity="0.3"></g>
+            <!-- Bypass paths drawn separately with higher opacity -->
+            <g id="fk-bypass-paths"></g>
         </svg>
     </div>
 </div>
@@ -985,6 +1009,15 @@ details[open] summary::before { transform:rotate(90deg); }
                 <span style="font-size:11px;color:var(--text2);font-style:italic;margin-left:auto;" id="jit-ds-badge">data-driven default</span>
             </div>
             <div style="font-size:11px;color:var(--text2);">Annualized JIT tip market used as model input. Set by the active preset or the <strong>JIT Total Market</strong> slider.</div>
+            <div style="margin-top:10px;padding:10px 12px;background:#111520;border-radius:6px;border-left:3px solid #6B9EBC;">
+                <div style="font-size:10px;font-weight:600;color:#6B9EBC;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Other non-Raiku JIT — treatment in this model</div>
+                <div style="font-size:11px;color:var(--text2);line-height:1.6;">
+                    The total JIT market includes two distinct flows on covered stake:
+                    <br>&bull; <strong style="color:var(--text);">Raiku JIT</strong> — tips routed through Raiku's ordering protocol. Subject to protocol take rate, customer rebate, and treasury split.
+                    <br>&bull; <strong style="color:#6B9EBC;">Other non-Raiku JIT</strong> — tips from competing ordering services (e.g. direct Jito bundles) that bypass Raiku protocol take entirely and flow straight to validators.
+                    <br><br>Other non-Raiku JIT is included in validator total revenue but excluded from Raiku gross and protocol treasury. It does not create double-counting as long as <em>Raiku JIT share + Other JIT share &le; 100%</em> of the total market. A coherence warning appears if this constraint is violated.
+                </div>
+            </div>
         </div>
 
         <!-- Block 2: Scenario Mapping -->
@@ -1954,16 +1987,17 @@ const SLIDER_META = {
   'sl-fcu':        { nudge: 0.05, largeNudge: 0.5,   decimals: 2, unit: 'lam/CU', prefix: false },
   'sl-jit-market': { nudge: 100000, largeNudge: 500000, decimals: 0, unit: 'SOL/yr', prefix: false },
   'sl-jit':        { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
+  'sl-jit-other':  { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
 };
 
 const SC = {
-    con:  {ca:5,cj:5,j:4,s:5,b:2,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:_jit6m,
+    con:  {ca:5,cj:5,j:4,oj:0,s:5,b:2,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:_jit6m,
            desc:"Conservative — low but practical non-base assumption from active fee-paying application programs, with a hard floor at 0.10 lam/CU."},
-    base: {ca:5,cj:5,j:8,s:10,b:8,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.10,vb:1.0,jm:_jit12m,
+    base: {ca:5,cj:5,j:8,oj:0,s:10,b:8,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.10,vb:1.0,jm:_jit12m,
            desc:"Base — raw observed CU-weighted non-base fees across included application categories, without outlier clipping."},
-    opt:  {ca:5,cj:5,j:12,s:15,b:12,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:_jit24m,
+    opt:  {ca:5,cj:5,j:12,oj:0,s:15,b:12,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:_jit24m,
            desc:"Optimistic — strong upside case using CU-weighted total fee/CU, displayed at 1.50 lam/CU."},
-    bull: {ca:5,cj:5,j:20,s:25,b:15,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:5_000_000,
+    bull: {ca:5,cj:5,j:20,oj:0,s:25,b:15,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:5_000_000,
            desc:"Bull — high-payer stress case using active-payer P75 non-base fee/CU, displayed at 2.00 lam/CU."},
 };
 let _selectedScenario = 'base';
@@ -2141,6 +2175,7 @@ function applyScenario(n){
     document.getElementById('sl-val-bonus').value=s.vb;
     document.getElementById('sl-jit-market').value=s.jm;
     document.getElementById('sl-jit').value=s.j;
+    document.getElementById('sl-jit-other').value=s.oj||0;
     document.getElementById('sl-stake').value=s.s;
     document.getElementById('sl-blk').value=s.b;
     document.getElementById('sl-fcu').value=s.f;
@@ -2163,7 +2198,7 @@ function applyScenario(n){
     updateJitDatasetViewer(n);
 }
 
-['sl-comm-aot','sl-comm-jit','sl-rebate-aot','sl-rebate-jit','sl-val-bonus','sl-jit-market','sl-jit','sl-stake','sl-blk','sl-fcu','sl-price'].forEach(id=>{
+['sl-comm-aot','sl-comm-jit','sl-rebate-aot','sl-rebate-jit','sl-val-bonus','sl-jit-market','sl-jit','sl-jit-other','sl-stake','sl-blk','sl-fcu','sl-price'].forEach(id=>{
     document.getElementById(id).addEventListener('input',()=>{
         document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.remove('active'));
         update();
@@ -2275,6 +2310,7 @@ function gp(){return{
     vb:+document.getElementById('sl-val-bonus').value,  // AOT validator bonus % (raw, e.g. 1.0)
     jm:+document.getElementById('sl-jit-market').value, // JIT total market (SOL/yr)
     j:+document.getElementById('sl-jit').value/100,
+    oj:+document.getElementById('sl-jit-other').value/100, // Other non-Raiku JIT share
     s:+document.getElementById('sl-stake').value/100,
     b:+document.getElementById('sl-blk').value/100,
     f:+document.getElementById('sl-fcu').value,
@@ -2378,6 +2414,9 @@ function calc(p){
     const jitValBonus      = 0;
     const jitProtocol      = jitGross * jitTakeRate - jitRebate;
 
+    // Other non-Raiku JIT — bypasses Raiku protocol, goes directly to validators
+    const otherJitRev      = jitMarket * (p.oj || 0);
+
     // AOT waterfall
     const ls       = p.s * SY, cu = p.b * CB;
     const aotGross         = (ls * cu * p.f) / LS;
@@ -2386,21 +2425,23 @@ function calc(p){
     const aotValBonus      = aotGross * aotBonusRate;
     const aotProtocol      = aotGross * aotTakeRate - aotRebate - aotValBonus;
 
-    // Aggregated
+    // Aggregated (Raiku gross = only Raiku-captured flows; otherJitRev bypasses)
     const totalGross     = jitGross + aotGross;
     const totalValBase   = jitValidatorBase + aotValidatorBase;
-    const totalValRev    = totalValBase + aotValBonus;
+    const totalValRev    = totalValBase + aotValBonus;  // Raiku-tracked validator revenue (for APR calc)
     const totalRebates   = jitRebate + aotRebate;
     const totalProtocol  = jitProtocol + aotProtocol;
 
     return {
         jitGross, jitValidatorBase, jitRebate, jitValBonus, jitProtocol, jitMarket,
+        otherJitRev,
         aotGross, aotValidatorBase, aotRebate, aotValBonus, aotProtocol,
         ls, cu,
         totalGross, totalValBase, totalValRev, totalRebates, totalProtocol,
         totalProtocolUSD: totalProtocol * p.p,
         jitGrossUSD: jitGross * p.p, aotGrossUSD: aotGross * p.p,
         totalGrossUSD: totalGross * p.p,
+        otherJitRevUSD: otherJitRev * p.p,
     };
 }
 
@@ -3051,28 +3092,30 @@ function fmtShort(v){return v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+Math.ro
 function fmtPct(v){return v.toFixed(2)+'%';}
 
 function updFlow(p,r){
-    const jU=r.jitGrossUSD, aU=r.aotGrossUSD, totalU=r.totalGrossUSD||1;
+    const jU=r.jitGrossUSD, ojU=r.otherJitRevUSD||0, aU=r.aotGrossUSD, totalU=r.totalGrossUSD||1;
     const vbU=r.totalValBase*p.p, abU=r.aotValBonus*p.p;
     const raU=r.aotRebate*p.p, rjU=r.jitRebate*p.p, prU=r.totalProtocolUSD;
 
-    // Update value labels
+    // Update value labels (left sources)
     document.getElementById('fk-jit-v').textContent=fmtShort(jU);
+    document.getElementById('fk-other-jit-v').textContent=ojU>0?fmtShort(ojU):'—';
     document.getElementById('fk-aot-v').textContent=fmtShort(aU);
-    document.getElementById('fk-total-v').textContent=fmtShort(totalU)+' (100%)';
+    document.getElementById('fk-total-v').textContent=fmtShort(totalU)+' (Raiku)';
 
-    // Right outputs — capped proportional sizing (prevents dominant item from crushing others)
+    // Right outputs — 6 items (ojit is bypass, positioned separately but in the same layout)
     const outputs=[
-        {id:'valbase', v:vbU, color:'#5B8DEF'},
-        {id:'vb',      v:abU, color:'#4178DE'},
-        {id:'reb-aot', v:raU, color:'#8BAF8B'},
-        {id:'reb-jit', v:rjU, color:'#9BBF9B'},
-        {id:'proto',   v:prU, color:'#C0FF38'},
+        {id:'valbase', v:vbU, color:'#5B8DEF', bypass:false},
+        {id:'ojit',    v:ojU, color:'#6B9EBC', bypass:true},
+        {id:'vb',      v:abU, color:'#4178DE', bypass:false},
+        {id:'reb-aot', v:raU, color:'#8BAF8B', bypass:false},
+        {id:'reb-jit', v:rjU, color:'#9BBF9B', bypass:false},
+        {id:'proto',   v:prU, color:'#C0FF38', bypass:false},
     ];
     const totalOut=outputs.reduce((a,o)=>a+o.v,0)||1;
-    const svgH=400, svgTop=10, minBarH=30, barGap=8;
+    const svgH=460, svgTop=10, minBarH=28, barGap=8;
     const totalGapH=barGap*(outputs.length-1);
     const availH=svgH-svgTop*2-totalGapH;
-    const maxBarFrac=0.42;
+    const maxBarFrac=0.40;
     // Pass 1: proportional with min/max clamps
     outputs.forEach(o=>{
         o.frac=o.v/totalOut;
@@ -3082,7 +3125,7 @@ function updFlow(p,r){
     const usedH=outputs.reduce((a,o)=>a+o.h,0);
     const scale=availH/usedH;
     outputs.forEach(o=>{ o.h=Math.max(minBarH, o.h*scale); });
-    // Position bars
+    // Position right bars
     let yPos=svgTop;
     outputs.forEach(o=>{
         const el=document.getElementById('fk-'+o.id);
@@ -3097,20 +3140,33 @@ function updFlow(p,r){
         yPos+=o.h+barGap;
     });
 
-    // Left inputs — proportional, generous min
-    const leftH=svgH-svgTop*2-40, minH=50;
-    const jH=Math.max(minH, jU/totalU*leftH), aH=Math.max(minH, aU/totalU*leftH);
-    const jY=svgTop+5, aY=jY+jH+30;
+    // Left inputs — 3 sources: Raiku JIT, Other JIT, AOT
+    const leftH=svgH-svgTop*2-60, minH=40;
+    const raikuTotal = jU + aU + 1;
+    const jH=Math.max(minH, jU/raikuTotal*leftH*0.85);
+    const ojH=Math.max(minH, ojU>0?Math.max(40,ojU/totalOut*(leftH*0.4)):40);
+    const aH=Math.max(minH, aU/raikuTotal*leftH*0.85);
+    const jY=svgTop+5;
+    const ojY=jY+jH+20;
+    const aY=ojY+ojH+20;
+
+    // Position left source bars
     const jitRect=document.getElementById('fk-jit');
-    jitRect.setAttribute('height',jH); jitRect.setAttribute('y',jY);
+    if(jitRect){jitRect.setAttribute('height',jH); jitRect.setAttribute('y',jY);}
+    const ojitRect=document.getElementById('fk-other-jit');
+    if(ojitRect){ojitRect.setAttribute('height',ojH); ojitRect.setAttribute('y',ojY); ojitRect.setAttribute('opacity', ojU>0?'0.85':'0.3');}
     const aotRect=document.getElementById('fk-aot');
-    aotRect.setAttribute('y',aY); aotRect.setAttribute('height',aH);
+    if(aotRect){aotRect.setAttribute('y',aY); aotRect.setAttribute('height',aH);}
     document.getElementById('fk-jit-label').setAttribute('y',jY+jH/2-6);
     document.getElementById('fk-jit-v').setAttribute('y',jY+jH/2+14);
+    document.getElementById('fk-other-jit-label').setAttribute('y',ojY+ojH/2-8);
+    document.getElementById('fk-other-jit-v').setAttribute('y',ojY+ojH/2+8);
+    const ojitNote=document.querySelector('#flow-sankey text[y="244"]');
+    if(ojitNote) ojitNote.setAttribute('y',ojY+ojH+4);
     document.getElementById('fk-aot-label').setAttribute('y',aY+aH/2-6);
     document.getElementById('fk-aot-v').setAttribute('y',aY+aH/2+14);
 
-    // Center bar
+    // Center bar (Raiku gross only — not including Other JIT)
     const totalEl=document.getElementById('fk-total');
     totalEl.setAttribute('y',svgTop);
     totalEl.setAttribute('height',yPos-svgTop-barGap);
@@ -3121,17 +3177,28 @@ function updFlow(p,r){
     const cVal=document.getElementById('fk-total-v');
     if(cVal) cVal.setAttribute('y',cMid+12);
 
-    // Flow paths — thin, elegant curves
+    // Regular flow paths (Raiku JIT + AOT → center → outputs)
     const paths=document.getElementById('fk-paths');
     let svg='';
     const sw1=Math.max(3,jH/5), sw2=Math.max(3,aH/5);
     svg+=`<path d="M20,${jY+jH/2} C190,${jY+jH/2} 280,${cMid} 370,${cMid}" stroke="#FFFFFF" stroke-width="${sw1}" fill="none" opacity="0.5"/>`;
     svg+=`<path d="M20,${aY+aH/2} C190,${aY+aH/2} 280,${cMid} 370,${cMid}" stroke="#FFFFFF" stroke-width="${sw2}" fill="none" opacity="0.5"/>`;
-    outputs.forEach(o=>{
-        const w=Math.max(3, o.h*0.55);
+    // Non-bypass outputs flow from center
+    outputs.filter(o=>!o.bypass).forEach(o=>{
+        const w=Math.max(3, o.h*0.5);
         svg+=`<path d="M390,${cMid} C550,${cMid} 640,${o.yMid} 720,${o.yMid}" stroke="${o.color}" stroke-width="${w}" fill="none" opacity="0.45"/>`;
     });
     paths.innerHTML=svg;
+
+    // Bypass paths (Other JIT → direct to ojit output, dashed)
+    const bypassPaths=document.getElementById('fk-bypass-paths');
+    let bsvg='';
+    const ojitOut=outputs.find(o=>o.id==='ojit');
+    if(ojitOut && ojU>0){
+        const bw=Math.max(3, ojH*0.45);
+        bsvg+=`<path d="M20,${ojY+ojH/2} C190,${ojY+ojH/2} 600,${ojitOut.yMid} 720,${ojitOut.yMid}" stroke="#6B9EBC" stroke-width="${bw}" fill="none" opacity="0.6" stroke-dasharray="8,4"/>`;
+    }
+    bypassPaths.innerHTML=bsvg;
 }
 
 function updCharts(p,r){
@@ -3919,6 +3986,7 @@ function update(){
     document.getElementById('v-jit-market').textContent=fmt(p.jm,'S');
     document.getElementById('v-jit-market-usd').textContent='\u2248 '+fmt(p.jm*p.p,'$')+' USD/yr';
     document.getElementById('v-jit').textContent=Math.round(p.j*100)+'%';
+    document.getElementById('v-jit-other').textContent=(p.oj*100).toFixed(1)+'%';
     document.getElementById('v-stake').textContent=(p.s*100).toFixed(1)+'%';
     document.getElementById('v-blk').textContent=Math.round(p.b*100)+'%';
     document.getElementById('v-fcu').textContent=p.f<0.1?p.f.toFixed(3):p.f>=10?p.f.toFixed(1):p.f.toFixed(2);
@@ -3967,7 +4035,9 @@ function update(){
     document.getElementById('stake-sol-helper').innerHTML = '<strong>Implied stake:</strong> ' + fmt(raikuStakeSol, 'S') + ' of ' + fmt(totalStakedSol, 'S') + ' total staked';
     document.getElementById('blk-cu-helper').innerHTML = '<strong>Reserved CU:</strong> ' + fmt(reservedCu, 'i') + ' CU of ' + fmt(CB, 'i') + ' CU/block';
     document.getElementById('fcu-block-fee-helper').innerHTML = '<strong>Auction fees/block:</strong> ' + fmt(auctionFeesLamportsPerBlock, 'i') + ' lamports/block (~' + auctionFeesSolPerBlock.toFixed(6) + ' SOL/block)';
-    document.getElementById('jit-captured-helper').innerHTML = '<strong>Captured market:</strong> ' + fmt(capturedJitSol, 'S') + '/yr from ' + fmt(p.jm, 'S') + '/yr total market';
+    document.getElementById('jit-captured-helper').innerHTML = '<strong>Raiku JIT captured:</strong> ' + fmt(capturedJitSol, 'S') + '/yr from ' + fmt(p.jm, 'S') + '/yr total market';
+    const otherJitSol = p.jm * p.oj;
+    document.getElementById('ojit-helper').innerHTML = '<strong>Other non-Raiku JIT:</strong> ' + fmt(otherJitSol, 'S') + '/yr &rarr; direct to validators (bypasses protocol)';
 
     // JIT / stake coherence warning (non-blocking)
     var jitCoherenceMsg = document.getElementById('jit-stake-coherence-msg');
@@ -3975,10 +4045,21 @@ function update(){
         var jitPct = p.j * 100;
         var stakePct = p.s * 100;
         if (stakePct > 0 && jitPct > stakePct) {
-            jitCoherenceMsg.textContent = '\u26a0 JIT share (' + jitPct.toFixed(1) + '%) exceeds Raiku stake (' + stakePct.toFixed(1) + '%). May be inconsistent with validator coverage.';
+            jitCoherenceMsg.textContent = '\u26a0 Raiku JIT share (' + jitPct.toFixed(1) + '%) exceeds Raiku stake (' + stakePct.toFixed(1) + '%). May be inconsistent with validator coverage.';
             jitCoherenceMsg.style.display = 'block';
         } else {
             jitCoherenceMsg.style.display = 'none';
+        }
+    }
+    // Other JIT double-count warning
+    var jitDcMsg = document.getElementById('jit-double-count-msg');
+    if (jitDcMsg) {
+        var totalJitPct = (p.j + (p.oj||0)) * 100;
+        if (totalJitPct > 100) {
+            jitDcMsg.textContent = '\u26a0 Raiku JIT (' + (p.j*100).toFixed(1) + '%) + Other JIT (' + ((p.oj||0)*100).toFixed(1) + '%) = ' + totalJitPct.toFixed(1) + '% exceeds 100% of the JIT market. Potential double-counting.';
+            jitDcMsg.style.display = 'block';
+        } else {
+            jitDcMsg.style.display = 'none';
         }
     }
 
@@ -3992,6 +4073,10 @@ function update(){
     document.getElementById('tc-aot-usd').textContent=fmt(r.aotGrossUSD,'$');
     document.getElementById('tc-aot-sol').textContent=fmt(r.aotGross,'S')+' \u00b7 '+fmtPct(r.aotGross/tg*100);
     document.getElementById('tc-aot-mo').textContent=fmt(r.aotGrossUSD/12,'$')+'/mo';
+    // Other JIT card (distribution section)
+    document.getElementById('tc-ojit-usd').textContent=fmt(r.otherJitRevUSD,'$');
+    document.getElementById('tc-ojit-sol').textContent=fmt(r.otherJitRev,'S')+' \u00b7 bypass (direct)';
+    document.getElementById('tc-ojit-mo').textContent=fmt(r.otherJitRevUSD/12,'$')+'/mo';
 
     // === Revenue Distribution ===
     document.getElementById('vg-base-usd').textContent=fmt(r.totalValBase*p.p,'$');
@@ -4054,7 +4139,7 @@ function update(){
     ['con','base','opt','bull'].forEach(n=>{
         const s=SC[n];
         const isLiveCard = n === _selectedScenario;
-        const sp={ca:s.ca, cj:s.cj, ra:s.ra, rj:s.rj, vb:s.vb, jm:s.jm, j:s.j/100, s:s.s/100, b:s.b/100, f:s.f, p:s.p};
+        const sp={ca:s.ca, cj:s.cj, ra:s.ra, rj:s.rj, vb:s.vb, jm:s.jm, j:s.j/100, oj:(s.oj||0)/100, s:s.s/100, b:s.b/100, f:s.f, p:s.p};
         const sr=isLiveCard ? r : calc(sp);
         const price = isLiveCard ? p.p : s.p;
         document.getElementById('sc-'+n+'-v').textContent=fmt(sr.totalProtocolUSD,'$')+'/yr';
