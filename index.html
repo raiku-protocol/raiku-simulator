@@ -3289,7 +3289,7 @@ function updCharts(p,r){
 
 function buildMatrix(p){
     const aotTakeRate = p.ca / 100;
-    const sr=[0.01,0.02,0.05,0.10,0.15,0.20,0.25,0.30,0.50], fc=[0.10,0.20,0.50,1.00,1.50,2.00,5.00,10.00,20.00];
+    const sr=[0.01,0.02,0.05,0.10,0.15,0.20,0.25,0.30,0.50], fc=[0.10,0.20,0.50,1.00,1.50,2.00,3.50,5.00,10.00,20.00];
     const activeStakeIdx = nearestIdx(sr, p.s);
     const activeFeeIdx = nearestIdx(fc, p.f);
     let h='<table class="matrix-table"><thead><tr><th>Stake \\ Fee/CU</th>';

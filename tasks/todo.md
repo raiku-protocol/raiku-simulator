@@ -2,11 +2,15 @@
 
 ## IN PROGRESS
 
+---
+
+## DONE
+
 ### Task 5 — Revenue flow: Other non-Raiku JIT
-Status: IN PROGRESS
+Status: DONE
 Last updated: 2026-03-23
 
-Implemented so far:
+Implemented:
 - Other non-Raiku JIT is a derived read-only value: `max(Raiku Stake % - Raiku JIT Share, 0)`
 - No free slider — updates live as stake or JIT share changes
 - Source cards: Other JIT in separate left "Direct to validators" column, Raiku gross trio to the right
@@ -22,12 +26,18 @@ Implemented so far:
 - Right side vertical span matches left source stack span (top-to-bottom alignment)
 - viewBox: 0 0 1060 540, svgH=520, barGap=12, minBarH=30
 
-Still pending:
-- Sign-off from user on all acceptance criteria
-
 ---
 
-## DONE
+### Task 5.bis — Add 3.5L fee/CU bucket to AOT sensitivity chart and table
+Status: DONE
+Last updated: 2026-03-23
+
+Implemented:
+- Added `3.50` between `2.00` and `5.00` in the `fc` array inside `buildMatrix()`
+- `fc` is now: `[0.10, 0.20, 0.50, 1.00, 1.50, 2.00, 3.50, 5.00, 10.00, 20.00]`
+- Label format `f.toFixed(1)` renders it as `3.5L` automatically
+- `nearestIdx(fc, p.f)` now resolves to the `3.5L` bucket when Bull Case is active
+- No change to revenue flow logic, validator splits, or any other tab
 
 ---
 
@@ -47,3 +57,4 @@ Still pending:
 2026-03-23 — Task 5 brace direction: reversed brace to open left, $X (Y%) format, Validator Base sub-label.
 2026-03-23 — Task 5 spacing: viewBox 540 tall, svgH=520, barGap=12, minBarH=30.
 2026-03-23 — Task 5 alignment: rightTop=svgTop+28 aligns right stack top with left stack; Validator Base 3-line block with parens and clear gaps.
+2026-03-23 — Task 5 sign-off. Task 5.bis: added 3.5L bucket to sensitivity table fc array.
