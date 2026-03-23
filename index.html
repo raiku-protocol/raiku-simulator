@@ -919,15 +919,15 @@ details[open] summary::before { transform:rotate(90deg); }
     <!-- Sankey Flow Chart — clean, tall, readable -->
     <div class="chart-box" style="min-height:460px;padding:16px 24px;">
         <h3 style="font-size:13px;margin-bottom:10px;color:var(--text2);">Revenue Flow — Other JIT bypass + Raiku JIT + AOT → Distribution</h3>
-        <svg id="flow-sankey" viewBox="0 0 1000 500" style="width:100%;height:460px;font-family:var(--font-mono);">
+        <svg id="flow-sankey" viewBox="0 0 1060 500" style="width:100%;height:460px;font-family:var(--font-mono);">
             <!-- Left: Other JIT at TOP (bypass), then Raiku sources below -->
             <rect id="fk-other-jit" x="0" y="10" width="20" height="50" rx="3" fill="#6B9EBC" opacity="0.85"/>
-            <text id="fk-other-jit-label" x="30" y="32" fill="#6B9EBC" font-size="14" font-weight="700">Other JIT</text>
+            <text id="fk-other-jit-label" x="30" y="32" fill="#6B9EBC" font-size="14" font-weight="700">Other JIT Revenue</text>
             <text id="fk-other-jit-v" x="30" y="50" fill="#A0A3A9" font-size="12">—</text>
             <text id="fk-other-jit-note" x="30" y="68" fill="#6B9EBC" font-size="10" opacity="0.7">bypass →</text>
             <!-- Raiku sources below -->
             <rect id="fk-jit" x="0" y="110" width="20" height="100" rx="3" fill="#FFFFFF" opacity="0.9"/>
-            <text id="fk-jit-label" x="30" y="155" fill="#FFFFFF" font-size="14" font-weight="700">Raiku JIT</text>
+            <text id="fk-jit-label" x="30" y="155" fill="#FFFFFF" font-size="14" font-weight="700">Raiku JIT Revenue</text>
             <text id="fk-jit-v" x="30" y="175" fill="#A0A3A9" font-size="12">—</text>
             <rect id="fk-aot" x="0" y="255" width="20" height="120" rx="3" fill="#FFFFFF" opacity="0.9"/>
             <text id="fk-aot-label" x="30" y="310" fill="#FFFFFF" font-size="14" font-weight="700">AOT Revenue</text>
@@ -958,9 +958,10 @@ details[open] summary::before { transform:rotate(90deg); }
             <text id="fk-proto-v" x="746" y="426" fill="#C0FF38" font-size="12">—</text>
             <!-- Validator total grouping — brace + callout (positioned dynamically) -->
             <path id="fk-val-brace" d="" stroke="#5B8DEF" stroke-width="1.5" fill="none" opacity="0.5"/>
-            <text id="fk-val-total-label" x="902" y="100" fill="#5B8DEF" font-size="11" font-weight="700">Total Validator</text>
-            <text id="fk-val-total-label2" x="902" y="114" fill="#5B8DEF" font-size="11" font-weight="700">Revenue</text>
-            <text id="fk-val-total-v" x="902" y="130" fill="#A0A3A9" font-size="11">—</text>
+            <text id="fk-val-total-label" x="942" y="100" fill="#5B8DEF" font-size="11" font-weight="700">Total Validator</text>
+            <text id="fk-val-total-label2" x="942" y="114" fill="#5B8DEF" font-size="11" font-weight="700">Revenue</text>
+            <text id="fk-val-total-v" x="942" y="130" fill="#A0A3A9" font-size="11">—</text>
+            <text id="fk-val-total-pct" x="942" y="144" fill="#A0A3A9" font-size="10" opacity="0.75">—</text>
             <!-- Flow paths (drawn dynamically) -->
             <g id="fk-paths" opacity="0.3"></g>
             <!-- Bypass paths drawn separately with higher opacity -->
@@ -3176,13 +3177,16 @@ function updFlow(p,r){
     const braceMid=(braceTop+braceBot)/2;
     const totalValRevUSD=ojU+vbU+abU;
     const bracePath=document.getElementById('fk-val-brace');
-    if(bracePath) bracePath.setAttribute('d',`M895,${braceTop} L890,${braceTop} L890,${braceBot} L895,${braceBot} M890,${braceMid} L900,${braceMid}`);
+    if(bracePath) bracePath.setAttribute('d',`M935,${braceTop} L930,${braceTop} L930,${braceBot} L935,${braceBot} M930,${braceMid} L940,${braceMid}`);
+    const totalValFrac=totalValRevUSD/totalOut;
     const vtLbl=document.getElementById('fk-val-total-label');
     const vtLbl2=document.getElementById('fk-val-total-label2');
     const vtV=document.getElementById('fk-val-total-v');
-    if(vtLbl) vtLbl.setAttribute('y',braceMid-8);
-    if(vtLbl2) vtLbl2.setAttribute('y',braceMid+6);
-    if(vtV){vtV.textContent=fmtShort(totalValRevUSD);vtV.setAttribute('y',braceMid+20);}
+    const vtPct=document.getElementById('fk-val-total-pct');
+    if(vtLbl) vtLbl.setAttribute('y',braceMid-10);
+    if(vtLbl2) vtLbl2.setAttribute('y',braceMid+4);
+    if(vtV){vtV.textContent=fmtShort(totalValRevUSD);vtV.setAttribute('y',braceMid+18);}
+    if(vtPct){vtPct.textContent=fmtPct(totalValFrac*100)+' of dist.';vtPct.setAttribute('y',braceMid+32);}
 
     // LEFT SOURCES — Other JIT FIRST (top), then Raiku JIT, then AOT
     const raikuTotal=jU+aU+1;
@@ -3205,8 +3209,8 @@ function updFlow(p,r){
     const aotRect=document.getElementById('fk-aot');
     if(aotRect){aotRect.setAttribute('y',aY);aotRect.setAttribute('height',aH);}
 
-    document.getElementById('fk-other-jit-label').setAttribute('y',ojY-20);
-    document.getElementById('fk-other-jit-v').setAttribute('y',ojY-4);
+    document.getElementById('fk-other-jit-label').setAttribute('y',ojY-22);
+    document.getElementById('fk-other-jit-v').setAttribute('y',ojY-2);
     const ojitNoteEl=document.getElementById('fk-other-jit-note');
     if(ojitNoteEl) ojitNoteEl.setAttribute('opacity','0');
     document.getElementById('fk-jit-label').setAttribute('y',jY+jH/2-6);
