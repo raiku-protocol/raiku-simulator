@@ -1509,12 +1509,12 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-kpi-sub" id="validator-ojit-sol">0 SOL/yr · bypass</div>
             </div>
             <div class="validator-kpi">
-                <div class="validator-kpi-label">AOT Base</div>
+                <div class="validator-kpi-label" style="color:#7BBBAF;">AOT Base</div>
                 <div class="validator-kpi-value" id="validator-aot-usd">$0</div>
                 <div class="validator-kpi-sub" id="validator-aot-sol">0 SOL/yr</div>
             </div>
             <div class="validator-kpi">
-                <div class="validator-kpi-label" style="color:#4178DE;">AOT Bonus</div>
+                <div class="validator-kpi-label" style="color:#4178DE;">Validator Bonus</div>
                 <div class="validator-kpi-value" id="validator-bonus-usd">$0</div>
                 <div class="validator-kpi-sub" id="validator-bonus-sol">0 SOL/yr</div>
             </div>
@@ -4267,8 +4267,9 @@ function update(){
     document.getElementById('validator-jit-sol').textContent = fmtValidatorSol(r.jitValidatorBase) + '/yr';
     document.getElementById('validator-aot-usd').textContent = fmtValidatorUsd(r.aotValidatorBase * p.p);
     document.getElementById('validator-aot-sol').textContent = fmtValidatorSol(r.aotValidatorBase) + '/yr';
-    document.getElementById('validator-bonus-usd').textContent = fmtValidatorUsd(r.aotValBonus * p.p);
-    document.getElementById('validator-bonus-sol').textContent = fmtValidatorSol(r.aotValBonus) + '/yr';
+    const totalValBonusKpi = r.aotValBonus + (r.jitValBonus || 0);
+    document.getElementById('validator-bonus-usd').textContent = fmtValidatorUsd(totalValBonusKpi * p.p);
+    document.getElementById('validator-bonus-sol').textContent = fmtValidatorSol(totalValBonusKpi) + '/yr';
     document.getElementById('validator-ojit-usd').textContent = fmtValidatorUsd(r.otherJitRevUSD);
     document.getElementById('validator-ojit-sol').textContent = fmtValidatorSol(r.otherJitRev) + '/yr · bypass';
     document.getElementById('validator-total-usd').textContent = fmtValidatorUsd(totalValidatorRevenueUsd);
@@ -4278,7 +4279,7 @@ function update(){
     document.getElementById('validator-total-apr').textContent = fmtValidatorRate(totalApr);
     document.getElementById('validator-total-apy').textContent = fmtValidatorRate(totalApy);
     document.getElementById('validator-apr-formula-line').innerHTML = 'Incremental APR uplift = Total validator revenue (SOL/yr) / Connected stake (SOL) = <span class="em">' + fmtValidatorSol(totalValidatorRevenueSol) + '</span> / <span class="em">' + fmtValidatorSol(connectedStakeSol) + '</span> = <span class="em">' + fmtValidatorRate(incrementalAprUplift) + '</span>';
-    document.getElementById('validator-apr-formula-note').textContent = 'Total APR = base staking APR + priority fees APR + Raiku APR uplift (Raiku JIT + Other JIT + AOT base + AOT bonus). APY uses epoch-based compounding (n ≈ ' + EPOCHS_PER_YEAR + ' epochs/yr).';
+    document.getElementById('validator-apr-formula-note').textContent = 'Total APR = base staking APR + priority fees APR + Raiku APR uplift (Raiku JIT + Other JIT + AOT base + Validator bonus). APY uses epoch-based compounding (n ≈ ' + EPOCHS_PER_YEAR + ' epochs/yr).';
     document.getElementById('validator-decomp-base-apr').textContent = fmtValidatorRate(baseApr);
     document.getElementById('validator-decomp-base-apy').textContent = fmtValidatorRate(baseApy) + ' APY';
     document.getElementById('validator-decomp-priority-apr').textContent = fmtValidatorRate(priorityFeesApr);
