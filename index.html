@@ -943,6 +943,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <!-- Raiku outputs below -->
             <rect id="fk-valbase" x="720" y="80" width="18" height="70" rx="3" fill="#5B8DEF"/>
             <text id="fk-valbase-label" x="746" y="112" fill="#5B8DEF" font-size="14" font-weight="700">Validator Base</text>
+            <text id="fk-valbase-sub" x="746" y="124" fill="#5B8DEF" font-size="10" opacity="0.6">(Raiku JIT + AOT base)</text>
             <text id="fk-valbase-v" x="746" y="132" fill="#A0A3A9" font-size="12">—</text>
             <rect id="fk-vb" x="720" y="165" width="18" height="55" rx="3" fill="#4178DE"/>
             <text id="fk-vb-label" x="746" y="188" fill="#4178DE" font-size="13" font-weight="600">Validator AOT Bonus</text>
@@ -958,10 +959,9 @@ details[open] summary::before { transform:rotate(90deg); }
             <text id="fk-proto-v" x="746" y="426" fill="#C0FF38" font-size="12">—</text>
             <!-- Validator total grouping — brace + callout (positioned dynamically) -->
             <path id="fk-val-brace" d="" stroke="#5B8DEF" stroke-width="1.5" fill="none" opacity="0.5"/>
-            <text id="fk-val-total-label" x="942" y="100" fill="#5B8DEF" font-size="11" font-weight="700">Total Validator</text>
-            <text id="fk-val-total-label2" x="942" y="114" fill="#5B8DEF" font-size="11" font-weight="700">Revenue</text>
-            <text id="fk-val-total-v" x="942" y="130" fill="#A0A3A9" font-size="11">—</text>
-            <text id="fk-val-total-pct" x="942" y="144" fill="#A0A3A9" font-size="10" opacity="0.75">—</text>
+            <text id="fk-val-total-label" x="952" y="100" fill="#5B8DEF" font-size="11" font-weight="700">Total Validator</text>
+            <text id="fk-val-total-label2" x="952" y="114" fill="#5B8DEF" font-size="11" font-weight="700">Revenue</text>
+            <text id="fk-val-total-v" x="952" y="130" fill="#A0A3A9" font-size="11">—</text>
             <!-- Flow paths (drawn dynamically) -->
             <g id="fk-paths" opacity="0.3"></g>
             <!-- Bypass paths drawn separately with higher opacity -->
@@ -3163,6 +3163,10 @@ function updFlow(p,r){
         if(val){val.textContent=fmtShort(o.v)+' ('+fmtPct(o.frac*100)+')';val.setAttribute('y',yPos+o.h/2+14);}
         const paren=document.getElementById('fk-'+o.id+'-paren');
         if(paren) paren.setAttribute('y',yPos+o.h/2-4);
+        if(o.id==='valbase'){
+            const sub=document.getElementById('fk-valbase-sub');
+            if(sub) sub.setAttribute('y',yPos+o.h/2+6);
+        }
         o.yTop=yPos;
         o.yMid=yPos+o.h/2;
         yPos+=o.h+barGap;
@@ -3177,16 +3181,15 @@ function updFlow(p,r){
     const braceMid=(braceTop+braceBot)/2;
     const totalValRevUSD=ojU+vbU+abU;
     const bracePath=document.getElementById('fk-val-brace');
-    if(bracePath) bracePath.setAttribute('d',`M935,${braceTop} L930,${braceTop} L930,${braceBot} L935,${braceBot} M930,${braceMid} L940,${braceMid}`);
+    // Brace opens LEFT toward the three validator outputs; pointer extends right to text
+    if(bracePath) bracePath.setAttribute('d',`M922,${braceTop} L930,${braceTop} L930,${braceBot} L922,${braceBot} M930,${braceMid} L950,${braceMid}`);
     const totalValFrac=totalValRevUSD/totalOut;
     const vtLbl=document.getElementById('fk-val-total-label');
     const vtLbl2=document.getElementById('fk-val-total-label2');
     const vtV=document.getElementById('fk-val-total-v');
-    const vtPct=document.getElementById('fk-val-total-pct');
-    if(vtLbl) vtLbl.setAttribute('y',braceMid-10);
-    if(vtLbl2) vtLbl2.setAttribute('y',braceMid+4);
-    if(vtV){vtV.textContent=fmtShort(totalValRevUSD);vtV.setAttribute('y',braceMid+18);}
-    if(vtPct){vtPct.textContent=fmtPct(totalValFrac*100)+' of dist.';vtPct.setAttribute('y',braceMid+32);}
+    if(vtLbl) vtLbl.setAttribute('y',braceMid-14);
+    if(vtLbl2) vtLbl2.setAttribute('y',braceMid);
+    if(vtV){vtV.textContent=fmtShort(totalValRevUSD)+' ('+fmtPct(totalValFrac*100)+')';vtV.setAttribute('y',braceMid+14);}
 
     // LEFT SOURCES — Other JIT FIRST (top), then Raiku JIT, then AOT
     const raikuTotal=jU+aU+1;

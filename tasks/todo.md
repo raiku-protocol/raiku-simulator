@@ -14,10 +14,10 @@ Implemented so far:
 - Flow diagram: Other JIT at top-left, label above bypass arc, bypass arc above center node
 - "Direct to validators" / "outside protocol take" wording throughout
 - Consistent validator naming: `Validator Other JIT`, `Validator Base`, `Validator AOT Bonus`
-- Validator total brace on right side, clear of labels (viewBox extended to 1060, brace at x=930)
-- `Total Validator Revenue` callout with value + percentage of distributed revenue
+- Validator total brace opens LEFT (toward outputs), pointer goes right to callout at x=952
+- `Total Validator Revenue` shows `$X (Y%)` — same format as other flow outputs
+- `Validator Base` clarified with `(Raiku JIT + AOT base)` sub-label
 - Left sources labeled consistently: `Other JIT Revenue`, `Raiku JIT Revenue`, `AOT Revenue`
-- Left Other JIT spacing: 20px gap (matches Raiku JIT / AOT treatment)
 
 Still pending:
 - Sign-off from user on all acceptance criteria
@@ -41,3 +41,4 @@ Still pending:
 2026-03-22 — Task 5 final: fixed label overlap (ojY svgTop+28, labels above arc), replaced "bypass" wording with "Direct to validators" / "outside protocol take".
 2026-03-23 — Task 5 polish: validator naming consistency, total validator brace callout, left label naming + spacing.
 2026-03-23 — Task 5 brace fix: extended viewBox to 1060, pushed brace to x=930, added percentage line, left source labels renamed with "Revenue" suffix.
+2026-03-23 — Task 5 brace direction: reversed brace to open left, merged value+pct to $X (Y%), added Validator Base sub-label.
