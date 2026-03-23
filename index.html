@@ -932,24 +932,25 @@ details[open] summary::before { transform:rotate(90deg); }
         </div>
     </div>
     <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;font-family:var(--font-mono);">Revenue Distribution</div>
-    <div style="display:flex;gap:0;margin-bottom:10px;align-items:flex-start;">
+    <div style="display:flex;gap:0;margin-bottom:10px;align-items:stretch;">
         <!-- Validator Other JIT — bypass, left-most separate -->
         <div style="flex:0 0 auto;width:175px;margin-right:10px;padding-right:12px;border-right:1px solid #26282C;display:flex;flex-direction:column;gap:4px;">
             <div style="font-size:9px;color:#6B9EBC;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;font-family:var(--font-mono);">Direct to validators</div>
-            <div class="triple-card" style="border-left-color:#6B9EBC;flex:1;">
-                <div class="tc-header"><span class="tc-label" style="color:#6B9EBC;">Validator Other JIT</span><span class="tc-badge" style="border-color:#6B9EBC30;color:#6B9EBC;">Annual</span></div>
+            <div class="triple-card" style="border-left-color:#6B9EBC;flex:1;display:flex;flex-direction:column;">
+                <div class="tc-header"><span class="tc-label" style="color:#6B9EBC;">Validator Other JIT</span></div>
                 <div style="font-size:9px;color:#6B9EBC;font-family:var(--font-mono);margin-bottom:4px;opacity:0.7;">outside protocol take</div>
                 <div class="tc-usd" style="color:#6B9EBC;" id="tc-dist-ojit-usd">&mdash;</div>
                 <div class="tc-secondary" id="tc-dist-ojit-sol">&mdash;</div>
                 <div class="tc-monthly" id="tc-dist-ojit-mo">&mdash;</div>
+                <div style="font-size:10px;color:var(--text2);margin-top:4px;">Bypasses protocol take</div>
             </div>
         </div>
         <!-- Main distribution: Validator Base + Protocol Take family -->
-        <div style="flex:1;display:flex;gap:8px;align-items:flex-start;min-width:0;">
+        <div style="flex:1;display:flex;gap:8px;align-items:stretch;min-width:0;">
             <!-- Validator Base — standalone column -->
-            <div style="flex:1;min-width:120px;">
-                <div class="triple-card" style="border-left-color:var(--clr-validator);">
-                    <div class="tc-header"><span class="tc-label">Validator Base</span><span class="tc-badge">Annual</span></div>
+            <div style="flex:1;min-width:120px;display:flex;flex-direction:column;">
+                <div class="triple-card" style="border-left-color:var(--clr-validator);flex:1;display:flex;flex-direction:column;position:relative;">
+                    <div class="tc-header"><span class="tc-label">Validator Base</span><span class="tc-badge" style="position:absolute;top:6px;right:6px;">Annual</span></div>
                     <div class="tc-usd" style="color:var(--clr-validator);" id="vg-base-usd">&mdash;</div>
                     <div class="tc-secondary" id="vg-base-sol">&mdash;</div>
                     <div class="tc-monthly" id="vg-base-mo">&mdash;</div>
@@ -961,45 +962,45 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#0d120a;border:1px solid #C0FF3840;border-left:3px solid #C0FF38;border-radius:4px;margin-bottom:8px;">
                     <span style="font-size:10px;color:#C0FF38;text-transform:uppercase;letter-spacing:0.8px;font-family:var(--font-mono);font-weight:700;">Raiku Protocol Take</span>
                     <div style="display:flex;align-items:baseline;gap:10px;">
-                        <span style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:#C0FF38;" id="tc-proto-take-usd">&mdash;</span>
-                        <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);" id="tc-proto-take-sol">&mdash;</span>
-                        <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);" id="tc-proto-take-mo">&mdash;</span>
+                        <span style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:#E8EBF0;" id="tc-proto-take-usd">&mdash;</span>
+                        <span style="font-size:12px;color:var(--text2);font-family:var(--font-mono);" id="tc-proto-take-sol">&mdash;</span>
+                        <span style="font-size:11px;color:var(--text2);font-family:var(--font-mono);" id="tc-proto-take-mo">&mdash;</span>
                     </div>
                     <span style="font-size:8px;border:1px solid #C0FF3860;color:#C0FF38;padding:1px 5px;border-radius:3px;font-family:var(--font-mono);">Annual</span>
                 </div>
                 <!-- 5 protocol-take subcards -->
                 <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
                     <!-- Validator AOT Bonus -->
-                    <div class="triple-card" style="border-left-color:var(--clr-val-bonus);">
-                        <div class="tc-header"><span class="tc-label">Validator Bonus</span><span class="tc-badge">Annual</span></div>
+                    <div class="triple-card" style="border-left-color:var(--clr-val-bonus);position:relative;">
+                        <div class="tc-header"><span class="tc-label">Validator Bonus</span><span class="tc-badge" style="position:absolute;top:6px;right:6px;">Annual</span></div>
                         <div class="tc-usd" style="color:var(--clr-val-bonus);" id="vg-bonus-usd">&mdash;</div>
                         <div class="tc-secondary" id="vg-bonus-sol">&mdash;</div>
                         <div class="tc-monthly" id="vg-bonus-mo">&mdash;</div>
                     </div>
                     <!-- AOT Customer Rebate -->
-                    <div class="triple-card" style="border-left-color:var(--clr-rebate);">
-                        <div class="tc-header"><span class="tc-label">AOT Rebate</span><span class="tc-badge">Annual</span></div>
+                    <div class="triple-card" style="border-left-color:var(--clr-rebate);position:relative;">
+                        <div class="tc-header"><span class="tc-label">AOT Rebate</span><span class="tc-badge" style="position:absolute;top:6px;right:6px;">Annual</span></div>
                         <div class="tc-usd" style="color:var(--clr-rebate);" id="tc-reb-aot-usd">&mdash;</div>
                         <div class="tc-secondary" id="tc-reb-aot-sol">&mdash;</div>
                         <div class="tc-monthly" id="tc-reb-aot-mo">&mdash;</div>
                     </div>
                     <!-- JIT Customer Rebate -->
-                    <div class="triple-card" style="border-left-color:var(--clr-rebate-jit);">
-                        <div class="tc-header"><span class="tc-label">Raiku JIT Rebate</span><span class="tc-badge">Annual</span></div>
+                    <div class="triple-card" style="border-left-color:var(--clr-rebate-jit);position:relative;">
+                        <div class="tc-header"><span class="tc-label">Raiku JIT Rebate</span><span class="tc-badge" style="position:absolute;top:6px;right:6px;">Annual</span></div>
                         <div class="tc-usd" style="color:var(--clr-rebate-jit);" id="tc-reb-jit-usd">&mdash;</div>
                         <div class="tc-secondary" id="tc-reb-jit-sol">&mdash;</div>
                         <div class="tc-monthly" id="tc-reb-jit-mo">&mdash;</div>
                     </div>
                     <!-- Growth + Buyback -->
-                    <div class="triple-card" style="border-left-color:#A0C878;">
-                        <div class="tc-header"><span class="tc-label" style="color:#A0C878;">Growth + Buyback</span><span class="tc-badge" style="border-color:#A0C87830;color:#A0C878;">Annual</span></div>
+                    <div class="triple-card" style="border-left-color:#A0C878;position:relative;">
+                        <div class="tc-header"><span class="tc-label" style="color:#A0C878;">Growth + Buyback</span><span class="tc-badge" style="position:absolute;top:6px;right:6px;border-color:#A0C87830;color:#A0C878;">Annual</span></div>
                         <div class="tc-usd" style="color:#A0C878;" id="tc-gb-usd">&mdash;</div>
                         <div class="tc-secondary" id="tc-gb-sol">&mdash;</div>
                         <div class="tc-monthly" id="tc-gb-mo">&mdash;</div>
                     </div>
                     <!-- Remaining Treasury Pool -->
-                    <div class="triple-card" style="border-left-color:#9EBF6A;">
-                        <div class="tc-header"><span class="tc-label" style="color:#9EBF6A;">Remaining Treasury</span><span class="tc-badge" style="border-color:#9EBF6A30;color:#9EBF6A;">Annual</span></div>
+                    <div class="triple-card" style="border-left-color:#9EBF6A;position:relative;">
+                        <div class="tc-header"><span class="tc-label" style="color:#9EBF6A;">Remaining Treasury</span><span class="tc-badge" style="position:absolute;top:6px;right:6px;border-color:#9EBF6A30;color:#9EBF6A;">Annual</span></div>
                         <div class="tc-usd" style="color:#9EBF6A;" id="tc-proto-usd">&mdash;</div>
                         <div class="tc-secondary" id="tc-proto-sol">&mdash;</div>
                         <div class="tc-monthly" id="tc-proto-mo">&mdash;</div>
@@ -1063,13 +1064,13 @@ details[open] summary::before { transform:rotate(90deg); }
             <!-- Bypass paths drawn separately with higher opacity -->
             <g id="fk-bypass-paths"></g>
             <!-- Separator between Other JIT bypass zone and main Raiku flow -->
-            <line id="fk-bypass-sep" x1="0" y1="90" x2="720" y2="90" stroke="#2a2d36" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
-            <text id="fk-raiku-flow-label" x="0" y="90" fill="#444" font-size="9" font-family="monospace" opacity="0.8" text-anchor="start">Revenue Flow — Raiku Protocol Revenue Distribution</text>
+            <line id="fk-bypass-sep" x1="0" y1="90" x2="720" y2="90" stroke="#3a3f4a" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.85"/>
+            <text id="fk-raiku-flow-label" x="0" y="90" fill="#6b7280" font-size="11" font-family="monospace" opacity="0.8" text-anchor="start">Revenue Flow — Raiku Protocol Revenue Distribution</text>
             <!-- Protocol take brace — groups vb+reb-aot+reb-jit+gb+proto (positioned dynamically) -->
             <path id="fk-proto-brace" d="" stroke="#C0FF38" stroke-width="1.5" fill="none" opacity="0.6"/>
             <text id="fk-proto-take-lbl" x="988" y="0" fill="#C0FF38" font-size="12" font-weight="700">Raiku</text>
             <text id="fk-proto-take-lbl2" x="988" y="0" fill="#C0FF38" font-size="12" font-weight="700">Protocol Take</text>
-            <text id="fk-proto-take-v" x="988" y="0" fill="#C0FF38" font-size="13" font-weight="700">—</text>
+            <text id="fk-proto-take-v" x="988" y="0" fill="#E8EBF0" font-size="13" font-weight="700">—</text>
         </svg>
     </div>
 </div>
@@ -3266,6 +3267,7 @@ function updFlow(p,r){
     document.getElementById('fk-total-v').textContent=fmtShort(totalU)+' (Raiku)';
 
     const svgH=520, svgTop=10, minBarH=30, barGap=12;
+    const raikuTopGap=40; // visual separation gap between Other JIT and Raiku-tracked outputs
     // rightTop aligns the right output stack top with the left source stack top (= ojY = svgTop+28)
     const rightTop=svgTop+28;
 
@@ -3282,7 +3284,8 @@ function updFlow(p,r){
     const totalOut=outputs.reduce((a,o)=>a+o.v,0)||1;
     const raikuDenom=totalU; // percentage denominator = Raiku gross (for right-side bars only)
     const totalGapH=barGap*(outputs.length-1);
-    const availH=svgH-rightTop-svgTop-totalGapH;
+    // Reduce available height by raikuTopGap so bars don't overflow SVG
+    const availH=svgH-rightTop-svgTop-totalGapH-raikuTopGap;
     const maxBarFrac=0.40;
     outputs.forEach(o=>{
         o.frac=o.v/totalOut;
@@ -3293,6 +3296,7 @@ function updFlow(p,r){
     outputs.forEach(o=>{ o.h=Math.max(minBarH, o.h*scale); });
 
     // Position right bars — start at rightTop to align with left source stack
+    // After the bypass (ojit) bar, add raikuTopGap offset before non-bypass bars
     let yPos=rightTop;
     outputs.forEach(o=>{
         const el=document.getElementById('fk-'+o.id);
@@ -3315,6 +3319,8 @@ function updFlow(p,r){
         o.yTop=yPos;
         o.yMid=yPos+o.h/2;
         yPos+=o.h+barGap;
+        // After the bypass bar, insert the visual separation gap before Raiku-tracked outputs
+        if(o.bypass) yPos+=raikuTopGap;
     });
 
     // The right ojit output
@@ -3359,8 +3365,8 @@ function updFlow(p,r){
 
     // Other JIT at top of left side — extra top margin gives label headroom above arc
     const ojY=svgTop+28;
-    // Raiku sources start below Other JIT + gap
-    const jY=ojY+ojH+22;
+    // Raiku sources start below Other JIT + gap (increased gap for visual separation)
+    const jY=ojY+ojH+55;
     const aY=jY+jH+22;
 
     const ojitRect=document.getElementById('fk-other-jit');
@@ -3374,8 +3380,8 @@ function updFlow(p,r){
     document.getElementById('fk-other-jit-v').setAttribute('y',ojY-2);
     const ojitNoteEl=document.getElementById('fk-other-jit-note');
     if(ojitNoteEl) ojitNoteEl.setAttribute('opacity','0');
-    // Separator between Other JIT bypass zone and main Raiku flow
-    const sepY = ojY + ojH + 10;
+    // Separator between Other JIT bypass zone and main Raiku flow (centered in new gap)
+    const sepY = ojY + ojH + 28;
     const sepEl = document.getElementById('fk-bypass-sep');
     if (sepEl) { sepEl.setAttribute('y1', sepY); sepEl.setAttribute('y2', sepY); }
     const sepLblEl = document.getElementById('fk-raiku-flow-label');
