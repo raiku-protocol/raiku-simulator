@@ -638,6 +638,23 @@ details[open] summary::before { transform:rotate(90deg); }
 .param-col .stepper-input { width:62px; height:18px; font-size:10px; }
 .param-col .stepper-input.wide { width:72px; }
 .param-col .stepper-unit { font-size:9px; }
+/* Protocol Pool Distribution: CSS-grid rows for guaranteed cross-column alignment */
+.ppc-section { display:grid; grid-template-columns:1fr 1fr; gap:0 5px; margin-top:4px; }
+.ppc-cell { background:#111213; padding:4px 6px 0; }
+.ppc-cell.aot-top { border-top:2px solid var(--clr-aot,#6BF); border-radius:5px 5px 0 0; padding-top:5px; }
+.ppc-cell.jit-top { border-top:2px solid var(--clr-jit,#FFF); border-radius:5px 5px 0 0; padding-top:5px; }
+.ppc-cell.row-bot { border-radius:0 0 5px 5px; padding-bottom:6px; }
+.ppc-cell .control { gap:2px; margin-bottom:10px; }
+.ppc-cell .control:last-child, .ppc-cell .control:only-child { margin-bottom:0; }
+.ppc-cell .control label { font-size:9px; color:var(--text2); display:block; margin-bottom:1px; }
+.ppc-cell .control .slider-row { gap:6px; }
+.ppc-cell .control .val { font-size:11px; min-width:36px; }
+.ppc-cell .control input[type=range] { height:3px; }
+.ppc-cell .hybrid-stepper-row { gap:3px; margin-top:2px; }
+.ppc-cell .stepper-btn { width:18px; height:18px; font-size:12px; }
+.ppc-cell .stepper-input { width:62px; height:18px; font-size:10px; }
+.ppc-cell .stepper-unit { font-size:9px; }
+.ppc-cell .pool-usage { font-size:9px; color:var(--text2); margin-top:2px; line-height:1.3; }
 /* model-params-price (sl-price): slightly wider input */
 .model-params-price .stepper-input { width:72px; }
 </style>
@@ -718,49 +735,57 @@ details[open] summary::before { transform:rotate(90deg); }
 
         <!-- ─── SECTION 2: PROTOCOL POOL DISTRIBUTION ─── -->
         <div class="section-label">Protocol Pool Distribution</div>
-        <div class="param-columns" style="grid-column:1/-1;">
-            <div class="param-col aot">
-                <div class="param-col-label">AOT</div>
+        <div class="ppc-section" style="grid-column:1/-1;">
+            <!-- Column headers (row 1) -->
+            <div class="ppc-cell aot-top"><div class="param-col-label">AOT</div></div>
+            <div class="ppc-cell jit-top"><div class="param-col-label">JIT</div></div>
+            <!-- Protocol Take Rate (row 2) -->
+            <div class="ppc-cell">
                 <div class="control">
                     <label>AOT Protocol Take Rate (%)</label>
                     <div class="slider-row"><input type="range" id="sl-comm-aot" min="0" max="10" step="0.25" value="5"><span class="val" id="v-comm-aot">5.0%</span></div>
                 </div>
+            </div>
+            <div class="ppc-cell">
+                <div class="control">
+                    <label>JIT Protocol Take Rate (%)</label>
+                    <div class="slider-row"><input type="range" id="sl-comm-jit" min="0" max="10" step="0.25" value="5"><span class="val" id="v-comm-jit">5.0%</span></div>
+                </div>
+            </div>
+            <!-- Customer Rebate (row 3) -->
+            <div class="ppc-cell">
                 <div class="control">
                     <label>AOT Customer Rebate (%)</label>
                     <div class="slider-row"><input type="range" id="sl-rebate-aot" min="0" max="1" step="0.05" value="0.25"><span class="val" id="v-rebate-aot">0.25%</span></div>
                     <div class="pool-usage" id="ratio-rebate-aot"></div>
                 </div>
-                <div class="control" style="margin-top:4px;">
-                    <label>AOT Validator Bonus (%)</label>
-                    <div class="slider-row"><input type="range" id="sl-val-bonus" min="0" max="2" step="0.1" value="1"><span class="val" id="v-val-bonus">1.0%</span></div>
-                    <div class="pool-usage" id="ratio-val-bonus"></div>
-                </div>
-                <div class="control" style="margin-top:4px;">
-                    <label>AOT Growth + Buyback (%)</label>
-                    <div class="slider-row"><input type="range" id="sl-gb-aot" min="0" max="10" step="0.1" value="2.5"><span class="val" id="v-gb-aot">2.50%</span></div>
-                    <div class="pool-usage" id="ratio-gb-aot"></div>
-                </div>
             </div>
-            <div class="param-col jit">
-                <div class="param-col-label">JIT</div>
-                <div class="control">
-                    <label>JIT Protocol Take Rate (%)</label>
-                    <div class="slider-row"><input type="range" id="sl-comm-jit" min="0" max="10" step="0.25" value="5"><span class="val" id="v-comm-jit">5.0%</span></div>
-                </div>
+            <div class="ppc-cell">
                 <div class="control">
                     <label>JIT Customer Rebate (%)</label>
                     <div class="slider-row"><input type="range" id="sl-rebate-jit" min="0" max="0.5" step="0.05" value="0.25"><span class="val" id="v-rebate-jit">0.25%</span></div>
                     <div class="pool-usage" id="ratio-rebate-jit"></div>
                 </div>
-                <!-- Spacer to align JIT Growth+Buyback with AOT Growth+Buyback (row 3).
-                     Height mirrors AOT Validator Bonus: label + slider-row + stepper-row + pool-usage. -->
-                <div class="control" style="margin-top:4px;visibility:hidden;" aria-hidden="true">
-                    <label>&nbsp;</label>
-                    <div class="slider-row" style="height:3px;"></div>
-                    <div class="hybrid-stepper-row" style="margin-top:2px;"><span style="height:18px;display:block;"></span></div>
-                    <div class="pool-usage">&nbsp;</div>
+            </div>
+            <!-- Validator Bonus AOT only (row 4) -->
+            <div class="ppc-cell">
+                <div class="control">
+                    <label>AOT Validator Bonus (%)</label>
+                    <div class="slider-row"><input type="range" id="sl-val-bonus" min="0" max="2" step="0.1" value="1"><span class="val" id="v-val-bonus">1.0%</span></div>
+                    <div class="pool-usage" id="ratio-val-bonus"></div>
                 </div>
-                <div class="control" style="margin-top:4px;">
+            </div>
+            <div class="ppc-cell"></div>
+            <!-- Growth + Buyback (row 5) — both columns share the same grid row = guaranteed alignment -->
+            <div class="ppc-cell row-bot">
+                <div class="control">
+                    <label>AOT Growth + Buyback (%)</label>
+                    <div class="slider-row"><input type="range" id="sl-gb-aot" min="0" max="10" step="0.1" value="2.5"><span class="val" id="v-gb-aot">2.50%</span></div>
+                    <div class="pool-usage" id="ratio-gb-aot"></div>
+                </div>
+            </div>
+            <div class="ppc-cell row-bot">
+                <div class="control">
                     <label>JIT Growth + Buyback (%)</label>
                     <div class="slider-row"><input type="range" id="sl-gb-jit" min="0" max="10" step="0.1" value="2.5"><span class="val" id="v-gb-jit">2.50%</span></div>
                     <div class="pool-usage" id="ratio-gb-jit"></div>
@@ -4088,6 +4113,12 @@ function update(){
     document.getElementById('v-val-bonus').textContent=p.vb.toFixed(1)+'%';
     document.getElementById('v-gb-aot').textContent=(p.gba||0).toFixed(2)+'%';
     document.getElementById('v-gb-jit').textContent=(p.gbj||0).toFixed(2)+'%';
+
+    // Dynamic max: G+B cannot exceed the corresponding protocol take rate
+    var gbAotEl = document.getElementById('sl-gb-aot');
+    var gbJitEl = document.getElementById('sl-gb-jit');
+    if (gbAotEl) { gbAotEl.max = p.ca; gbAotEl.value = Math.min(parseFloat(gbAotEl.value)||0, p.ca); }
+    if (gbJitEl) { gbJitEl.max = p.cj; gbJitEl.value = Math.min(parseFloat(gbJitEl.value)||0, p.cj); }
 
     // Show pool usage under each redistribution slider
     var treasSummary = document.getElementById('treasury-summary');
