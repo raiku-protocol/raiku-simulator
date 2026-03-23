@@ -957,18 +957,21 @@ details[open] summary::before { transform:rotate(90deg); }
             </div>
             <!-- Protocol Take family column -->
             <div style="flex:4;min-width:0;display:flex;flex-direction:column;gap:6px;">
-                <!-- Protocol Take summary card -->
-                <div class="triple-card" style="border-left-color:#C0FF38;border-color:#C0FF38;background:#0d120a;">
-                    <div class="tc-header"><span class="tc-label" style="color:#C0FF38;">Protocol Take</span><span class="tc-badge" style="border-color:#C0FF3860;color:#C0FF38;">Annual</span></div>
-                    <div class="tc-usd" style="color:#C0FF38;font-size:22px;" id="tc-proto-take-usd">&mdash;</div>
-                    <div class="tc-secondary" id="tc-proto-take-sol">&mdash;</div>
-                    <div class="tc-monthly" id="tc-proto-take-mo">&mdash;</div>
+                <!-- Protocol Take summary banner -->
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#0d120a;border:1px solid #C0FF3840;border-left:3px solid #C0FF38;border-radius:4px;margin-bottom:8px;">
+                    <span style="font-size:10px;color:#C0FF38;text-transform:uppercase;letter-spacing:0.8px;font-family:var(--font-mono);font-weight:700;">Raiku Protocol Take</span>
+                    <div style="display:flex;align-items:baseline;gap:10px;">
+                        <span style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:#C0FF38;" id="tc-proto-take-usd">&mdash;</span>
+                        <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);" id="tc-proto-take-sol">&mdash;</span>
+                        <span style="font-size:9px;color:var(--text2);font-family:var(--font-mono);" id="tc-proto-take-mo">&mdash;</span>
+                    </div>
+                    <span style="font-size:8px;border:1px solid #C0FF3860;color:#C0FF38;padding:1px 5px;border-radius:3px;font-family:var(--font-mono);">Annual</span>
                 </div>
                 <!-- 5 protocol-take subcards -->
                 <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
                     <!-- Validator AOT Bonus -->
                     <div class="triple-card" style="border-left-color:var(--clr-val-bonus);">
-                        <div class="tc-header"><span class="tc-label">Validator AOT Bonus</span><span class="tc-badge">Annual</span></div>
+                        <div class="tc-header"><span class="tc-label">Validator Bonus</span><span class="tc-badge">Annual</span></div>
                         <div class="tc-usd" style="color:var(--clr-val-bonus);" id="vg-bonus-usd">&mdash;</div>
                         <div class="tc-secondary" id="vg-bonus-sol">&mdash;</div>
                         <div class="tc-monthly" id="vg-bonus-mo">&mdash;</div>
@@ -1036,7 +1039,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <text id="fk-valbase-sub" x="746" y="124" fill="#5B8DEF" font-size="11" opacity="0.8">(Raiku JIT + AOT)</text>
             <text id="fk-valbase-v" x="746" y="132" fill="#A0A3A9" font-size="12">—</text>
             <rect id="fk-vb" x="720" y="165" width="18" height="55" rx="3" fill="#4178DE"/>
-            <text id="fk-vb-label" x="746" y="188" fill="#4178DE" font-size="13" font-weight="600">Validator AOT Bonus</text>
+            <text id="fk-vb-label" x="746" y="188" fill="#4178DE" font-size="13" font-weight="600">Validator Bonus</text>
             <text id="fk-vb-v" x="746" y="208" fill="#A0A3A9" font-size="12">—</text>
             <rect id="fk-reb-aot" x="720" y="235" width="18" height="55" rx="3" fill="#8BAF8B"/>
             <text id="fk-reb-aot-label" x="746" y="258" fill="#8BAF8B" font-size="13" font-weight="600">AOT Rebate</text>
@@ -1048,7 +1051,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <text id="fk-gb-label" x="746" y="375" fill="#A0C878" font-size="13" font-weight="600">Growth + Buyback</text>
             <text id="fk-gb-v" x="746" y="391" fill="#A0A3A9" font-size="12">—</text>
             <rect id="fk-proto" x="720" y="375" width="18" height="75" rx="3" fill="#9EBF6A"/>
-            <text id="fk-proto-label" x="746" y="406" fill="#9EBF6A" font-size="14" font-weight="700">Treasury Pool</text>
+            <text id="fk-proto-label" x="746" y="406" fill="#9EBF6A" font-size="14" font-weight="700">Remaining Treasury</text>
             <text id="fk-proto-v" x="746" y="426" fill="#9EBF6A" font-size="12">—</text>
             <!-- Validator total grouping — brace + callout (positioned dynamically) -->
             <path id="fk-val-brace" d="" stroke="#5B8DEF" stroke-width="1.5" fill="none" opacity="0.5"/>
@@ -1059,11 +1062,14 @@ details[open] summary::before { transform:rotate(90deg); }
             <g id="fk-paths" opacity="0.3"></g>
             <!-- Bypass paths drawn separately with higher opacity -->
             <g id="fk-bypass-paths"></g>
+            <!-- Separator between Other JIT bypass zone and main Raiku flow -->
+            <line id="fk-bypass-sep" x1="0" y1="90" x2="720" y2="90" stroke="#2a2d36" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+            <text id="fk-raiku-flow-label" x="0" y="90" fill="#444" font-size="9" font-family="monospace" opacity="0.8" text-anchor="start">Revenue Flow — Raiku Protocol Revenue Distribution</text>
             <!-- Protocol take brace — groups vb+reb-aot+reb-jit+gb+proto (positioned dynamically) -->
             <path id="fk-proto-brace" d="" stroke="#C0FF38" stroke-width="1.5" fill="none" opacity="0.6"/>
-            <text id="fk-proto-take-lbl" x="988" y="0" fill="#C0FF38" font-size="11" font-weight="700">Protocol</text>
-            <text id="fk-proto-take-lbl2" x="988" y="0" fill="#C0FF38" font-size="11" font-weight="700">Take</text>
-            <text id="fk-proto-take-v" x="988" y="0" fill="#A0A3A9" font-size="11">—</text>
+            <text id="fk-proto-take-lbl" x="988" y="0" fill="#C0FF38" font-size="12" font-weight="700">Raiku</text>
+            <text id="fk-proto-take-lbl2" x="988" y="0" fill="#C0FF38" font-size="12" font-weight="700">Protocol Take</text>
+            <text id="fk-proto-take-v" x="988" y="0" fill="#C0FF38" font-size="13" font-weight="700">—</text>
         </svg>
     </div>
 </div>
@@ -3247,7 +3253,7 @@ function fmtPct(v){return v.toFixed(2)+'%';}
 
 function updFlow(p,r){
     const jU=r.jitGrossUSD, ojU=r.otherJitRevUSD||0, aU=r.aotGrossUSD, totalU=r.totalGrossUSD||1;
-    const vbU=r.totalValBase*p.p, abU=r.aotValBonus*p.p;
+    const vbU=r.totalValBase*p.p, abU=(r.aotValBonus+(r.jitValBonus||0))*p.p;
     const raU=r.aotRebate*p.p, rjU=r.jitRebate*p.p;
     const gbU=(r.growthBuyback||0)*p.p;
     const tpU=(r.treasuryPool!==undefined?r.treasuryPool:r.totalProtocol)*p.p;
@@ -3314,7 +3320,7 @@ function updFlow(p,r){
     // The right ojit output
     const ojitRightOut=outputs[0]; // first = ojit
 
-    // Validator total brace — groups outputs[0..2]: Validator Other JIT, Validator Base, Validator AOT Bonus
+    // Validator total brace — groups outputs[0..2]: Validator Other JIT, Validator Base, Validator Bonus
     const braceTop=outputs[0].yTop;
     const braceBot=outputs[2].yTop+outputs[2].h;
     const braceMid=(braceTop+braceBot)/2;
@@ -3341,7 +3347,7 @@ function updFlow(p,r){
     const ptV = document.getElementById('fk-proto-take-v');
     if(ptL1) ptL1.setAttribute('y', ptBraceMid - 14);
     if(ptL2) ptL2.setAttribute('y', ptBraceMid);
-    if(ptV){ ptV.textContent = fmtShort(totalProtocolTakeUSD); ptV.setAttribute('y', ptBraceMid + 14); }
+    if(ptV){ ptV.textContent = fmtShort(totalProtocolTakeUSD) + ' (' + fmtPct(totalProtocolTakeUSD/totalU*100) + ')'; ptV.setAttribute('y', ptBraceMid + 14); }
 
     // LEFT SOURCES — Other JIT FIRST (top), then Raiku JIT, then AOT
     const raikuTotal=jU+aU+1;
@@ -3368,6 +3374,12 @@ function updFlow(p,r){
     document.getElementById('fk-other-jit-v').setAttribute('y',ojY-2);
     const ojitNoteEl=document.getElementById('fk-other-jit-note');
     if(ojitNoteEl) ojitNoteEl.setAttribute('opacity','0');
+    // Separator between Other JIT bypass zone and main Raiku flow
+    const sepY = ojY + ojH + 10;
+    const sepEl = document.getElementById('fk-bypass-sep');
+    if (sepEl) { sepEl.setAttribute('y1', sepY); sepEl.setAttribute('y2', sepY); }
+    const sepLblEl = document.getElementById('fk-raiku-flow-label');
+    if (sepLblEl) { sepLblEl.setAttribute('y', sepY + 11); }
     document.getElementById('fk-jit-label').setAttribute('y',jY+jH/2-6);
     document.getElementById('fk-jit-v').setAttribute('y',jY+jH/2+14);
     document.getElementById('fk-aot-label').setAttribute('y',aY+aH/2-6);
@@ -4312,9 +4324,10 @@ function update(){
     document.getElementById('vg-base-usd').textContent=fmt(r.totalValBase*p.p,'$');
     document.getElementById('vg-base-sol').textContent=fmt(r.totalValBase,'S')+' \u00b7 '+fmtPct(r.totalValBase/tg*100);
     document.getElementById('vg-base-mo').textContent=fmt(r.totalValBase*p.p/12,'$')+'/mo';
-    document.getElementById('vg-bonus-usd').textContent=fmt(r.aotValBonus*p.p,'$');
-    document.getElementById('vg-bonus-sol').textContent=fmt(r.aotValBonus,'S')+' \u00b7 '+fmtPct(r.aotValBonus/tg*100);
-    document.getElementById('vg-bonus-mo').textContent=fmt(r.aotValBonus*p.p/12,'$')+'/mo';
+    const totalValBonus=r.aotValBonus+(r.jitValBonus||0);
+    document.getElementById('vg-bonus-usd').textContent=fmt(totalValBonus*p.p,'$');
+    document.getElementById('vg-bonus-sol').textContent=fmt(totalValBonus,'S')+' \u00b7 '+fmtPct(totalValBonus/tg*100);
+    document.getElementById('vg-bonus-mo').textContent=fmt(totalValBonus*p.p/12,'$')+'/mo';
 
     document.getElementById('tc-reb-aot-usd').textContent=fmt(r.aotRebate*p.p,'$');
     document.getElementById('tc-reb-aot-sol').textContent=fmt(r.aotRebate,'S')+' \u00b7 '+fmtPct(r.aotRebate/tg*100);
