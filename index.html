@@ -726,17 +726,17 @@ details[open] summary::before { transform:rotate(90deg); }
                     <div class="slider-row"><input type="range" id="sl-comm-aot" min="0" max="10" step="0.25" value="5"><span class="val" id="v-comm-aot">5.0%</span></div>
                 </div>
                 <div class="control">
-                    <label>Customer Rebate (%)</label>
+                    <label>AOT Customer Rebate (%)</label>
                     <div class="slider-row"><input type="range" id="sl-rebate-aot" min="0" max="1" step="0.05" value="0.25"><span class="val" id="v-rebate-aot">0.25%</span></div>
                     <div class="pool-usage" id="ratio-rebate-aot"></div>
                 </div>
                 <div class="control" style="margin-top:4px;">
-                    <label>Validator Bonus (%)</label>
+                    <label>AOT Validator Bonus (%)</label>
                     <div class="slider-row"><input type="range" id="sl-val-bonus" min="0" max="2" step="0.1" value="1"><span class="val" id="v-val-bonus">1.0%</span></div>
                     <div class="pool-usage" id="ratio-val-bonus"></div>
                 </div>
                 <div class="control" style="margin-top:4px;">
-                    <label>Growth + Buyback (%)</label>
+                    <label>AOT Growth + Buyback (%)</label>
                     <div class="slider-row"><input type="range" id="sl-gb-aot" min="0" max="10" step="0.1" value="2.5"><span class="val" id="v-gb-aot">2.50%</span></div>
                     <div class="pool-usage" id="ratio-gb-aot"></div>
                 </div>
@@ -748,12 +748,20 @@ details[open] summary::before { transform:rotate(90deg); }
                     <div class="slider-row"><input type="range" id="sl-comm-jit" min="0" max="10" step="0.25" value="5"><span class="val" id="v-comm-jit">5.0%</span></div>
                 </div>
                 <div class="control">
-                    <label>Customer Rebate (%)</label>
+                    <label>JIT Customer Rebate (%)</label>
                     <div class="slider-row"><input type="range" id="sl-rebate-jit" min="0" max="0.5" step="0.05" value="0.25"><span class="val" id="v-rebate-jit">0.25%</span></div>
                     <div class="pool-usage" id="ratio-rebate-jit"></div>
                 </div>
+                <!-- Spacer to align JIT Growth+Buyback with AOT Growth+Buyback (row 3).
+                     Height mirrors AOT Validator Bonus: label + slider-row + stepper-row + pool-usage. -->
+                <div class="control" style="margin-top:4px;visibility:hidden;" aria-hidden="true">
+                    <label>&nbsp;</label>
+                    <div class="slider-row" style="height:3px;"></div>
+                    <div class="hybrid-stepper-row" style="margin-top:2px;"><span style="height:18px;display:block;"></span></div>
+                    <div class="pool-usage">&nbsp;</div>
+                </div>
                 <div class="control" style="margin-top:4px;">
-                    <label>Growth + Buyback (%)</label>
+                    <label>JIT Growth + Buyback (%)</label>
                     <div class="slider-row"><input type="range" id="sl-gb-jit" min="0" max="10" step="0.1" value="2.5"><span class="val" id="v-gb-jit">2.50%</span></div>
                     <div class="pool-usage" id="ratio-gb-jit"></div>
                 </div>
@@ -2056,6 +2064,8 @@ const SLIDER_META = {
   'sl-val-bonus':  { nudge: 0.1,  largeNudge: 0.25,  decimals: 2, unit: '%',  prefix: false },
   'sl-comm-jit':   { nudge: 0.25, largeNudge: 1,     decimals: 2, unit: '%',  prefix: false },
   'sl-rebate-jit': { nudge: 0.05, largeNudge: 0.1,   decimals: 2, unit: '%',  prefix: false },
+  'sl-gb-aot':     { nudge: 0.1,  largeNudge: 0.5,   decimals: 2, unit: '%',  prefix: false },
+  'sl-gb-jit':     { nudge: 0.1,  largeNudge: 0.5,   decimals: 2, unit: '%',  prefix: false },
   'sl-stake':      { nudge: 0.1,  largeNudge: 0.5,   decimals: 1, unit: '%',  prefix: false },
   'sl-blk':        { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
   'sl-fcu':        { nudge: 0.05, largeNudge: 0.5,   decimals: 2, unit: 'lam/CU', prefix: false },
@@ -2246,6 +2256,8 @@ function applyScenario(n){
     document.getElementById('sl-rebate-aot').value=s.ra;
     document.getElementById('sl-rebate-jit').value=s.rj;
     document.getElementById('sl-val-bonus').value=s.vb;
+    document.getElementById('sl-gb-aot').value=2.5;
+    document.getElementById('sl-gb-jit').value=2.5;
     document.getElementById('sl-jit-market').value=s.jm;
     document.getElementById('sl-jit').value=s.j;
     document.getElementById('sl-stake').value=s.s;
@@ -2380,8 +2392,8 @@ function gp(){return{
     ra:+document.getElementById('sl-rebate-aot').value, // AOT rebate % (raw, e.g. 0.25)
     rj:+document.getElementById('sl-rebate-jit').value, // JIT rebate % (raw, e.g. 0.25)
     vb:+document.getElementById('sl-val-bonus').value,  // AOT validator bonus % (raw, e.g. 1.0)
-    gba:+document.getElementById('sl-gb-aot').value,    // AOT G+B % of gross
-    gbj:+document.getElementById('sl-gb-jit').value,    // JIT G+B % of gross
+    gba:Math.min(+document.getElementById('sl-gb-aot').value, +document.getElementById('sl-comm-aot').value),    // AOT G+B % of gross, clamped to take rate
+    gbj:Math.min(+document.getElementById('sl-gb-jit').value, +document.getElementById('sl-comm-jit').value),    // JIT G+B % of gross, clamped to take rate
     jm:+document.getElementById('sl-jit-market').value, // JIT total market (SOL/yr)
     j:+document.getElementById('sl-jit').value/100,
     s:+document.getElementById('sl-stake').value/100,
@@ -4080,25 +4092,25 @@ function update(){
     // Show pool usage under each redistribution slider
     var treasSummary = document.getElementById('treasury-summary');
     if (p.ca > 0) {
-        var poolPctRA = (p.ra / p.ca * 100).toFixed(0);
-        var poolPctVB = (p.vb / p.ca * 100).toFixed(0);
+        var poolPctRA = Math.min(100, (p.ra / p.ca * 100)).toFixed(0);
+        var poolPctVB = Math.min(100, (p.vb / p.ca * 100)).toFixed(0);
         document.getElementById('ratio-rebate-aot').textContent = '\u21b3 uses ' + poolPctRA + '% of AOT pool (' + p.ra.toFixed(2) + '% of ' + p.ca.toFixed(1) + '% take rate)';
         document.getElementById('ratio-val-bonus').textContent = '\u21b3 uses ' + poolPctVB + '% of AOT pool (' + p.vb.toFixed(1) + '% of ' + p.ca.toFixed(1) + '% take rate)';
-        var poolPctGBA = ((p.gba||0) / p.ca * 100).toFixed(0);
-        document.getElementById('ratio-gb-aot').textContent = '\u21b3 uses ' + poolPctGBA + '% of AOT pool (' + (p.gba||0).toFixed(2) + '% of ' + p.ca.toFixed(1) + '% take rate)';
+        var poolPctGBA = Math.min(100, ((p.gba||0) / p.ca * 100)).toFixed(0);
+        document.getElementById('ratio-gb-aot').textContent = '\u21b3 uses ' + (p.gba||0).toFixed(2) + '% of AOT pool (' + poolPctGBA + '% of ' + p.ca.toFixed(1) + '% take rate)';
     } else {
-        document.getElementById('ratio-rebate-aot').textContent = '';
-        document.getElementById('ratio-val-bonus').textContent = '';
-        document.getElementById('ratio-gb-aot').textContent = '';
+        document.getElementById('ratio-rebate-aot').textContent = 'inactive (0%)';
+        document.getElementById('ratio-val-bonus').textContent = 'inactive (0%)';
+        document.getElementById('ratio-gb-aot').textContent = 'inactive (0%)';
     }
     if (p.cj > 0) {
-        var poolPctRJ = (p.rj / p.cj * 100).toFixed(0);
-        document.getElementById('ratio-rebate-jit').textContent = '\u21b3 uses ' + poolPctRJ + '% of JIT pool (' + p.rj.toFixed(2) + '% of ' + p.cj.toFixed(1) + '% take rate)';
-        var poolPctGBJ = ((p.gbj||0) / p.cj * 100).toFixed(0);
-        document.getElementById('ratio-gb-jit').textContent = '\u21b3 uses ' + poolPctGBJ + '% of JIT pool (' + (p.gbj||0).toFixed(2) + '% of ' + p.cj.toFixed(1) + '% take rate)';
+        var poolPctRJ = Math.min(100, (p.rj / p.cj * 100)).toFixed(0);
+        document.getElementById('ratio-rebate-jit').textContent = '\u21b3 uses ' + p.rj.toFixed(2) + '% of JIT pool (' + poolPctRJ + '% of ' + p.cj.toFixed(1) + '% take rate)';
+        var poolPctGBJ = Math.min(100, ((p.gbj||0) / p.cj * 100)).toFixed(0);
+        document.getElementById('ratio-gb-jit').textContent = '\u21b3 uses ' + (p.gbj||0).toFixed(2) + '% of JIT pool (' + poolPctGBJ + '% of ' + p.cj.toFixed(1) + '% take rate)';
     } else {
-        document.getElementById('ratio-rebate-jit').textContent = '';
-        document.getElementById('ratio-gb-jit').textContent = '';
+        document.getElementById('ratio-rebate-jit').textContent = 'inactive (0%)';
+        document.getElementById('ratio-gb-jit').textContent = 'inactive (0%)';
     }
     if (p.ca > 0 || p.cj > 0) {
         var aotPoolRemaining = p.ca > 0 ? Math.max(0, 100 - (p.ra / p.ca * 100) - (p.vb / p.ca * 100) - ((p.gba||0) / p.ca * 100)) : 0;
