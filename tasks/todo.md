@@ -1,18 +1,19 @@
 # raiku-simulator task tracker
 
-## IN PROGRESS
+## DONE
 
 ### Revenue Model follow-up — protocol take split and presentation cleanup
-Status: IN PROGRESS
+Status: DONE
+Last updated: 2026-03-23
 
-Scope:
-- Part A: Separate AOT and JIT Growth+Buyback controls in the setup panel (% of gross grammar, same as rebates)
-- Part B: Flow diagram — proper protocol-take brace on right, Treasury Pool softened color, remove old separator+label, adjust viewBox
-- Part C: Cards — nested Protocol Take family (summary + 5 subcards), Validator Base standalone
+Implemented:
+- Part A: Removed shared sl-gb; added sl-gb-aot (AOT, default 2.5%) and sl-gb-jit (JIT, default 2.5%) using % of gross grammar with pool-share helper text
+- Part B: viewBox 0 0 1100 540; Treasury Pool color #9EBF6A (muted); old separator/label removed; fk-proto-brace + fk-proto-take-lbl/lbl2/v spanning outputs[2..6]
+- Part C: Nested distribution cards — Other JIT separate left, Validator Base standalone, Protocol Take family column (summary card + 5 subcards grid: AOT Bonus, AOT Rebate, JIT Rebate, G+B, Treasury)
+- calc(): separate aotGBRate/jitGBRate clamped to available pool; totalProtocol = treasury residual; totalProtocolTake + totalProtocolTakeUSD returned
+- Commit: 6dedb30
 
 ---
-
-## DONE
 
 ### Task 5 — Revenue flow: Other non-Raiku JIT
 Status: DONE
