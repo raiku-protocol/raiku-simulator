@@ -1362,7 +1362,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <div class="validator-support-item">
                 <div class="validator-support-label">Base Staking APR</div>
                 <div class="validator-support-value" id="validator-base-apr">4.38%</div>
-                <div class="validator-support-sub">Derived from the sourced APY using daily compounding inverse.</div>
+                <div class="validator-support-sub">Derived from the sourced APY using epoch-based compounding inverse.</div>
             </div>
             <div class="validator-support-item">
                 <div class="validator-support-label">Base Staking APY</div>
@@ -1378,12 +1378,12 @@ details[open] summary::before { transform:rotate(90deg); }
                     </div>
                     <div>
                         <div class="validator-support-value" id="validator-priority-apy">0.40%</div>
-                        <div class="validator-support-sub">APY equivalent under daily compounding</div>
+                        <div class="validator-support-sub">APY equivalent under epoch-based compounding</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="validator-source-note">APY convention for this tab: daily compounding (`n = 365`).</div>
+        <div class="validator-source-note">APY convention for this tab: epoch-based compounding (n ≈ 182 epochs/yr).</div>
     </div>
 </div>
 <div class="validator-main">
@@ -1391,23 +1391,28 @@ details[open] summary::before { transform:rotate(90deg); }
         <h2>Raiku Validator Revenue Pool</h2>
         <div class="validator-kpi-grid">
             <div class="validator-kpi">
-                <div class="validator-kpi-label">JIT Validator Revenue</div>
+                <div class="validator-kpi-label" style="color:#5B8DEF;">Raiku JIT</div>
                 <div class="validator-kpi-value" id="validator-jit-usd">$0</div>
                 <div class="validator-kpi-sub" id="validator-jit-sol">0 SOL/yr</div>
             </div>
             <div class="validator-kpi">
-                <div class="validator-kpi-label">AOT Validator Revenue</div>
+                <div class="validator-kpi-label" style="color:#6B9EBC;">Other JIT (direct)</div>
+                <div class="validator-kpi-value" id="validator-ojit-usd" style="color:#6B9EBC;">$0</div>
+                <div class="validator-kpi-sub" id="validator-ojit-sol">0 SOL/yr · bypass</div>
+            </div>
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">AOT Base</div>
                 <div class="validator-kpi-value" id="validator-aot-usd">$0</div>
                 <div class="validator-kpi-sub" id="validator-aot-sol">0 SOL/yr</div>
             </div>
             <div class="validator-kpi">
-                <div class="validator-kpi-label">AOT Validator Bonus</div>
+                <div class="validator-kpi-label" style="color:#4178DE;">AOT Bonus</div>
                 <div class="validator-kpi-value" id="validator-bonus-usd">$0</div>
                 <div class="validator-kpi-sub" id="validator-bonus-sol">0 SOL/yr</div>
             </div>
-            <div class="validator-kpi">
-                <div class="validator-kpi-label">Total Validator Revenue</div>
-                <div class="validator-kpi-value" id="validator-total-usd">$0</div>
+            <div class="validator-kpi" style="border-top:1px solid rgba(255,255,255,0.12);margin-top:4px;padding-top:8px;">
+                <div class="validator-kpi-label" style="font-weight:700;">Total Validator Revenue</div>
+                <div class="validator-kpi-value" id="validator-total-usd" style="font-weight:700;">$0</div>
                 <div class="validator-kpi-sub" id="validator-total-sol">0 SOL/yr</div>
             </div>
         </div>
@@ -1423,7 +1428,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <div class="validator-kpi">
                 <div class="validator-kpi-label">Incremental APY Uplift</div>
                 <div class="validator-kpi-value" id="validator-uplift-apy">0.00%</div>
-                <div class="validator-kpi-sub">Derived from APR using daily compounding</div>
+                <div class="validator-kpi-sub">Derived from APR using epoch-based compounding</div>
             </div>
             <div class="validator-kpi">
                 <div class="validator-kpi-label">Total APR After Uplift</div>
@@ -1718,6 +1723,7 @@ D.daily = [];
 D.dailyNet = [];
 
 const SY = 78_408_000, CB = 60_000_000, LS = 1_000_000_000;
+const EPOCHS_PER_YEAR = Math.round(SY / 432_000); // ≈ 182 epochs/yr (432k slots per epoch)
 
 const _jitBaselineRaw = computeJitStats(100).annualized;
 const _jitBaseline = Math.round(_jitBaselineRaw / 1000) * 1000; // rounded to slider step (~813K SOL/yr)
@@ -2035,7 +2041,7 @@ let _solanaStakeState = {
     mode: 'reference'
 };
 const BASE_STAKING_APY = 0.0448;
-const APY_COMPOUNDING_PERIODS = 365;
+const APY_COMPOUNDING_PERIODS = EPOCHS_PER_YEAR; // epoch-based compounding (≈ 182 epochs/yr)
 const PRIORITY_FEES_APR_UPLIFT = 0.0040;
 const BASE_YIELD_SOURCE_HTML = 'Source: <a href="https://explorer.rated.network/network?network=solana&timeWindow=30d&page=1&pageSize=15" target="_blank" rel="noopener noreferrer">Rated Network Overview (30d Delegator APY)</a>';
 const SCENARIO_LABELS = { con:'Conservative', base:'Base Case', opt:'Optimistic', bull:'Bull Case' };
@@ -2131,7 +2137,7 @@ function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, p
         const p = getScenarioParams(key);
         const r = calc(p);
         const connectedStakeSol = totalStakedSol * p.s;
-        const raikuApr = connectedStakeSol > 0 ? r.totalValRev / connectedStakeSol : 0;
+        const raikuApr = connectedStakeSol > 0 ? (r.totalValRev + r.otherJitRev) / connectedStakeSol : 0;
         const totalApr = baseApr + priorityApr + raikuApr;
         const totalApy = aprToApy(totalApr, APY_COMPOUNDING_PERIODS);
         const baseWidth = totalApr > 0 ? (baseApr / totalApr) * 100 : 0;
@@ -3981,7 +3987,7 @@ function update(){
     const baseApr = apyToApr(baseApy, APY_COMPOUNDING_PERIODS);
     const priorityFeesApr = PRIORITY_FEES_APR_UPLIFT;
     const priorityFeesApy = aprToApy(priorityFeesApr, APY_COMPOUNDING_PERIODS);
-    const totalValidatorRevenueSol = r.totalValRev;
+    const totalValidatorRevenueSol = r.totalValRev + r.otherJitRev; // Raiku JIT + Other JIT + AOT base + AOT bonus
     const totalValidatorRevenueUsd = totalValidatorRevenueSol * p.p;
     const incrementalAprUplift = connectedStakeSol > 0 ? totalValidatorRevenueSol / connectedStakeSol : 0;
     const totalApr = baseApr + priorityFeesApr + incrementalAprUplift;
@@ -4078,6 +4084,8 @@ function update(){
     document.getElementById('validator-aot-sol').textContent = fmtValidatorSol(r.aotValidatorBase) + '/yr';
     document.getElementById('validator-bonus-usd').textContent = fmtValidatorUsd(r.aotValBonus * p.p);
     document.getElementById('validator-bonus-sol').textContent = fmtValidatorSol(r.aotValBonus) + '/yr';
+    document.getElementById('validator-ojit-usd').textContent = fmtValidatorUsd(r.otherJitRevUSD);
+    document.getElementById('validator-ojit-sol').textContent = fmtValidatorSol(r.otherJitRev) + '/yr · bypass';
     document.getElementById('validator-total-usd').textContent = fmtValidatorUsd(totalValidatorRevenueUsd);
     document.getElementById('validator-total-sol').textContent = fmtValidatorSol(totalValidatorRevenueSol) + '/yr';
     document.getElementById('validator-uplift-apr').textContent = fmtValidatorRate(incrementalAprUplift);
@@ -4085,7 +4093,7 @@ function update(){
     document.getElementById('validator-total-apr').textContent = fmtValidatorRate(totalApr);
     document.getElementById('validator-total-apy').textContent = fmtValidatorRate(totalApy);
     document.getElementById('validator-apr-formula-line').innerHTML = 'Incremental APR uplift = Total validator revenue (SOL/yr) / Connected stake (SOL) = <span class="em">' + fmtValidatorSol(totalValidatorRevenueSol) + '</span> / <span class="em">' + fmtValidatorSol(connectedStakeSol) + '</span> = <span class="em">' + fmtValidatorRate(incrementalAprUplift) + '</span>';
-    document.getElementById('validator-apr-formula-note').textContent = 'Total APR = base staking APR + fixed priority fees APR uplift + Raiku APR uplift. APY uses the same daily compounding convention.';
+    document.getElementById('validator-apr-formula-note').textContent = 'Total APR = base staking APR + priority fees APR + Raiku APR uplift (Raiku JIT + Other JIT + AOT base + AOT bonus). APY uses epoch-based compounding (n ≈ ' + EPOCHS_PER_YEAR + ' epochs/yr).';
     document.getElementById('validator-decomp-base-apr').textContent = fmtValidatorRate(baseApr);
     document.getElementById('validator-decomp-base-apy').textContent = fmtValidatorRate(baseApy) + ' APY';
     document.getElementById('validator-decomp-priority-apr').textContent = fmtValidatorRate(priorityFeesApr);

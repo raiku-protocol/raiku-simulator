@@ -43,7 +43,21 @@ Implemented:
 
 ## BACKLOG
 
-### Task 6 — (to be defined in next session)
+### Task 6 — Annual Revenue Overview update
+Status: DONE (implemented separately)
+
+### Task 7 — Validator Revenue logic cleanup
+Status: DONE
+Last updated: 2026-03-23
+
+Implemented:
+- Epoch-based compounding: `EPOCHS_PER_YEAR = Math.round(SY / 432_000)` ≈ 182; `APY_COMPOUNDING_PERIODS` now uses this constant instead of 365
+- Added "Other JIT (direct)" KPI card in Validator Revenue Pool (color #6B9EBC)
+- Renamed "JIT Validator Revenue" → "Raiku JIT" (color #5B8DEF), "AOT Validator Revenue" → "AOT Base", "AOT Validator Bonus" → "AOT Bonus" (color #4178DE); Total visually bold
+- `totalValidatorRevenueSol = r.totalValRev + r.otherJitRev` — all 4 components included
+- `renderValidatorYieldScenarioComparison` APR calc also includes `r.otherJitRev`
+- All "daily compounding" static text strings updated to "epoch-based compounding"
+- Formula note updated: lists all 4 components + epoch-based convention
 
 ---
 
