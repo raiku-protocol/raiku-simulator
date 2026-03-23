@@ -922,7 +922,7 @@ details[open] summary::before { transform:rotate(90deg); }
         <svg id="flow-sankey" viewBox="0 0 1000 500" style="width:100%;height:460px;font-family:var(--font-mono);">
             <!-- Left: Other JIT at TOP (bypass), then Raiku sources below -->
             <rect id="fk-other-jit" x="0" y="10" width="20" height="50" rx="3" fill="#6B9EBC" opacity="0.85"/>
-            <text id="fk-other-jit-label" x="30" y="32" fill="#6B9EBC" font-size="13" font-weight="700">Other JIT</text>
+            <text id="fk-other-jit-label" x="30" y="32" fill="#6B9EBC" font-size="14" font-weight="700">Other JIT</text>
             <text id="fk-other-jit-v" x="30" y="50" fill="#A0A3A9" font-size="12">—</text>
             <text id="fk-other-jit-note" x="30" y="68" fill="#6B9EBC" font-size="10" opacity="0.7">bypass →</text>
             <!-- Raiku sources below -->
@@ -938,15 +938,14 @@ details[open] summary::before { transform:rotate(90deg); }
             <text id="fk-total-v" x="400" y="310" fill="#A0A3A9" font-size="12">—</text>
             <!-- Right: Other JIT Validators at TOP, then Raiku outputs below -->
             <rect id="fk-ojit" x="720" y="10" width="18" height="50" rx="3" fill="#6B9EBC"/>
-            <text id="fk-ojit-label" x="746" y="32" fill="#6B9EBC" font-size="13" font-weight="600">Other JIT Validators</text>
+            <text id="fk-ojit-label" x="746" y="32" fill="#6B9EBC" font-size="13" font-weight="600">Validator Other JIT</text>
             <text id="fk-ojit-v" x="746" y="50" fill="#A0A3A9" font-size="12">—</text>
             <!-- Raiku outputs below -->
             <rect id="fk-valbase" x="720" y="80" width="18" height="70" rx="3" fill="#5B8DEF"/>
             <text id="fk-valbase-label" x="746" y="112" fill="#5B8DEF" font-size="14" font-weight="700">Validator Base</text>
             <text id="fk-valbase-v" x="746" y="132" fill="#A0A3A9" font-size="12">—</text>
             <rect id="fk-vb" x="720" y="165" width="18" height="55" rx="3" fill="#4178DE"/>
-            <text id="fk-vb-label" x="746" y="188" fill="#4178DE" font-size="13" font-weight="600">AOT Val. Bonus</text>
-            <text id="fk-vb-paren" x="886" y="188" fill="#4178DE" font-size="10" opacity="0.7">(AOT only)</text>
+            <text id="fk-vb-label" x="746" y="188" fill="#4178DE" font-size="13" font-weight="600">Validator AOT Bonus</text>
             <text id="fk-vb-v" x="746" y="208" fill="#A0A3A9" font-size="12">—</text>
             <rect id="fk-reb-aot" x="720" y="235" width="18" height="55" rx="3" fill="#8BAF8B"/>
             <text id="fk-reb-aot-label" x="746" y="258" fill="#8BAF8B" font-size="13" font-weight="600">AOT Rebate</text>
@@ -957,6 +956,11 @@ details[open] summary::before { transform:rotate(90deg); }
             <rect id="fk-proto" x="720" y="375" width="18" height="75" rx="3" fill="#C0FF38"/>
             <text id="fk-proto-label" x="746" y="406" fill="#C0FF38" font-size="14" font-weight="700">Protocol Treasury</text>
             <text id="fk-proto-v" x="746" y="426" fill="#C0FF38" font-size="12">—</text>
+            <!-- Validator total grouping — brace + callout (positioned dynamically) -->
+            <path id="fk-val-brace" d="" stroke="#5B8DEF" stroke-width="1.5" fill="none" opacity="0.5"/>
+            <text id="fk-val-total-label" x="902" y="100" fill="#5B8DEF" font-size="11" font-weight="700">Total Validator</text>
+            <text id="fk-val-total-label2" x="902" y="114" fill="#5B8DEF" font-size="11" font-weight="700">Revenue</text>
+            <text id="fk-val-total-v" x="902" y="130" fill="#A0A3A9" font-size="11">—</text>
             <!-- Flow paths (drawn dynamically) -->
             <g id="fk-paths" opacity="0.3"></g>
             <!-- Bypass paths drawn separately with higher opacity -->
@@ -3158,12 +3162,27 @@ function updFlow(p,r){
         if(val){val.textContent=fmtShort(o.v)+' ('+fmtPct(o.frac*100)+')';val.setAttribute('y',yPos+o.h/2+14);}
         const paren=document.getElementById('fk-'+o.id+'-paren');
         if(paren) paren.setAttribute('y',yPos+o.h/2-4);
+        o.yTop=yPos;
         o.yMid=yPos+o.h/2;
         yPos+=o.h+barGap;
     });
 
     // The right ojit output
     const ojitRightOut=outputs[0]; // first = ojit
+
+    // Validator total brace — groups outputs[0..2]: Validator Other JIT, Validator Base, Validator AOT Bonus
+    const braceTop=outputs[0].yTop;
+    const braceBot=outputs[2].yTop+outputs[2].h;
+    const braceMid=(braceTop+braceBot)/2;
+    const totalValRevUSD=ojU+vbU+abU;
+    const bracePath=document.getElementById('fk-val-brace');
+    if(bracePath) bracePath.setAttribute('d',`M895,${braceTop} L890,${braceTop} L890,${braceBot} L895,${braceBot} M890,${braceMid} L900,${braceMid}`);
+    const vtLbl=document.getElementById('fk-val-total-label');
+    const vtLbl2=document.getElementById('fk-val-total-label2');
+    const vtV=document.getElementById('fk-val-total-v');
+    if(vtLbl) vtLbl.setAttribute('y',braceMid-8);
+    if(vtLbl2) vtLbl2.setAttribute('y',braceMid+6);
+    if(vtV){vtV.textContent=fmtShort(totalValRevUSD);vtV.setAttribute('y',braceMid+20);}
 
     // LEFT SOURCES — Other JIT FIRST (top), then Raiku JIT, then AOT
     const raikuTotal=jU+aU+1;
@@ -3186,8 +3205,8 @@ function updFlow(p,r){
     const aotRect=document.getElementById('fk-aot');
     if(aotRect){aotRect.setAttribute('y',aY);aotRect.setAttribute('height',aH);}
 
-    document.getElementById('fk-other-jit-label').setAttribute('y',ojY-12);
-    document.getElementById('fk-other-jit-v').setAttribute('y',ojY-2);
+    document.getElementById('fk-other-jit-label').setAttribute('y',ojY-20);
+    document.getElementById('fk-other-jit-v').setAttribute('y',ojY-4);
     const ojitNoteEl=document.getElementById('fk-other-jit-note');
     if(ojitNoteEl) ojitNoteEl.setAttribute('opacity','0');
     document.getElementById('fk-jit-label').setAttribute('y',jY+jH/2-6);
