@@ -355,7 +355,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .triple-card:hover { box-shadow:0 4px 20px rgba(0,0,0,0.25); transform:translateY(-1px); }
 .triple-card .tc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
 .triple-card .tc-label { font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; font-weight:500; }
-.triple-card .tc-badge { font-size:8px; color:var(--text2); text-transform:uppercase; letter-spacing:1px; background:#ffffff08; border:1px solid #333; border-radius:3px; padding:1px 5px; }
+.triple-card .tc-badge { font-size:8px; color:#5a6070; border:1px solid #3a3f4a; border-radius:3px; padding:1px 5px; white-space:nowrap; align-self:flex-start; margin-top:1px; flex-shrink:0; }
 .triple-card .tc-usd { font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; font-family:var(--font-mono); line-height:1.2; }
 .triple-card .tc-secondary { font-size:11px; color:var(--text2); margin-top:4px; font-family:var(--font-mono); }
 .triple-card .tc-monthly { font-size:10px; color:var(--text2); margin-top:2px; opacity:0.7; }
@@ -902,7 +902,7 @@ details[open] summary::before { transform:rotate(90deg); }
         <div style="flex:0 0 auto;width:175px;margin-right:10px;padding-right:12px;border-right:1px solid #26282C;display:flex;flex-direction:column;gap:4px;">
             <div style="font-size:9px;color:#6B9EBC;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:3px;font-family:var(--font-mono);">Direct to validators</div>
             <div class="triple-card" style="border-left-color:#6B9EBC;flex:1;">
-                <div class="tc-header"><span class="tc-label" style="color:#6B9EBC;">Other JIT</span><span class="tc-badge" style="border-color:#6B9EBC30;color:#6B9EBC;">Annual</span></div>
+                <div class="tc-header"><span class="tc-label" style="color:#6B9EBC;">Other JIT</span><span class="tc-badge" style="font-size:8px; color:#5a6070; border:1px solid #3a3f4a; border-radius:3px; padding:1px 5px; white-space:nowrap; align-self:flex-start; margin-top:1px; flex-shrink:0">Annual</span></div>
                 <div style="font-size:9px;color:#6B9EBC;font-family:var(--font-mono);margin-bottom:4px;opacity:0.7;">outside protocol take</div>
                 <div class="tc-usd" style="color:#6B9EBC;" id="tc-ojit-usd">&mdash;</div>
                 <div class="tc-secondary" id="tc-ojit-sol">&mdash;</div>
@@ -949,12 +949,14 @@ details[open] summary::before { transform:rotate(90deg); }
         <div style="flex:1;display:flex;gap:8px;align-items:stretch;min-width:0;">
             <!-- Validator Base — standalone column -->
             <div style="flex:1;min-width:120px;display:flex;flex-direction:column;">
-                <div class="triple-card" style="border-left-color:var(--clr-validator);flex:1;display:flex;flex-direction:column;">
-                    <div class="tc-header"><span class="tc-label" style="color:#5B8DEF;">Validator Base</span><span class="tc-badge" style="color:#5B8DEF;border-color:#5B8DEF;">Annual</span></div>
-                    <div style="font-size:10px;color:#5B8DEF;opacity:0.7;margin-top:2px;margin-bottom:4px;">(Raiku JIT + AOT)</div>
-                    <div class="tc-usd" style="color:var(--clr-validator);" id="vg-base-usd">&mdash;</div>
-                    <div class="tc-secondary" id="vg-base-sol">&mdash;</div>
-                    <div class="tc-monthly" id="vg-base-mo">&mdash;</div>
+                <div class="triple-card" style="border-left-color:var(--clr-validator);flex:1;display:flex;flex-direction:column;justify-content:center;">
+                    <div style="padding-top:8px;padding-bottom:8px;">
+                        <div class="tc-header"><span class="tc-label" style="color:#5B8DEF;">Validator Base</span><span class="tc-badge" style="font-size:8px; color:#5a6070; border:1px solid #3a3f4a; border-radius:3px; padding:1px 5px; white-space:nowrap; align-self:flex-start; margin-top:1px; flex-shrink:0">Annual</span></div>
+                        <div style="font-size:10px;color:#5B8DEF;opacity:0.7;margin-top:2px;margin-bottom:4px;">(Raiku JIT + AOT)</div>
+                        <div class="tc-usd" style="color:var(--clr-validator);" id="vg-base-usd">&mdash;</div>
+                        <div class="tc-secondary" id="vg-base-sol">&mdash;</div>
+                        <div class="tc-monthly" id="vg-base-mo">&mdash;</div>
+                    </div>
                 </div>
             </div>
             <!-- Protocol Take family column -->
@@ -963,45 +965,45 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#0d120a;border:1.5px solid #C0FF38;border-radius:4px;margin-bottom:8px;">
                     <span style="font-size:10px;color:#C0FF38;text-transform:uppercase;letter-spacing:0.8px;font-family:var(--font-mono);font-weight:700;">Raiku Protocol Take</span>
                     <div style="display:flex;align-items:baseline;gap:10px;">
-                        <span style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:#E8EBF0;" id="tc-proto-take-usd">&mdash;</span>
+                        <span style="font-size:18px;font-weight:700;font-family:var(--font-mono);color:#C0FF38;" id="tc-proto-take-usd">&mdash;</span>
                         <span style="font-size:12px;color:var(--text2);font-family:var(--font-mono);" id="tc-proto-take-sol">&mdash;</span>
                         <span style="font-size:11px;color:var(--text2);font-family:var(--font-mono);" id="tc-proto-take-mo">&mdash;</span>
                     </div>
-                    <span style="font-size:8px;border:1px solid #C0FF38;color:#C0FF38;padding:1px 5px;border-radius:3px;font-family:var(--font-mono);align-self:center;">Annual</span>
+                    <span style="font-size:8px; color:#5a6070; border:1px solid #3a3f4a; border-radius:3px; padding:1px 5px; white-space:nowrap; align-self:center; flex-shrink:0">Annual</span>
                 </div>
                 <!-- 5 protocol-take subcards -->
                 <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
                     <!-- Validator AOT Bonus -->
                     <div class="triple-card" style="border-left-color:var(--clr-val-bonus);">
-                        <div class="tc-header"><span class="tc-label" style="color:#4178DE;">Validator Bonus</span><span class="tc-badge" style="color:#4178DE;border-color:#4178DE;">Annual</span></div>
+                        <div class="tc-header"><span class="tc-label" style="color:#4178DE;">Validator Bonus</span><span class="tc-badge" style="font-size:8px; color:#5a6070; border:1px solid #3a3f4a; border-radius:3px; padding:1px 5px; white-space:nowrap; align-self:flex-start; margin-top:1px; flex-shrink:0">Annual</span></div>
                         <div class="tc-usd" style="color:var(--clr-val-bonus);" id="vg-bonus-usd">&mdash;</div>
                         <div class="tc-secondary" id="vg-bonus-sol">&mdash;</div>
                         <div class="tc-monthly" id="vg-bonus-mo">&mdash;</div>
                     </div>
                     <!-- AOT Customer Rebate -->
                     <div class="triple-card" style="border-left-color:var(--clr-rebate);">
-                        <div class="tc-header"><span class="tc-label" style="color:#8BAF8B;">AOT Rebate</span><span class="tc-badge" style="color:#8BAF8B;border-color:#8BAF8B;">Annual</span></div>
+                        <div class="tc-header"><span class="tc-label" style="color:#8BAF8B;">AOT Rebate</span><span class="tc-badge" style="font-size:8px; color:#5a6070; border:1px solid #3a3f4a; border-radius:3px; padding:1px 5px; white-space:nowrap; align-self:flex-start; margin-top:1px; flex-shrink:0">Annual</span></div>
                         <div class="tc-usd" style="color:var(--clr-rebate);" id="tc-reb-aot-usd">&mdash;</div>
                         <div class="tc-secondary" id="tc-reb-aot-sol">&mdash;</div>
                         <div class="tc-monthly" id="tc-reb-aot-mo">&mdash;</div>
                     </div>
                     <!-- JIT Customer Rebate -->
                     <div class="triple-card" style="border-left-color:var(--clr-rebate-jit);">
-                        <div class="tc-header"><span class="tc-label" style="color:#9BBF9B;">Raiku JIT Rebate</span><span class="tc-badge" style="color:#9BBF9B;border-color:#9BBF9B;">Annual</span></div>
+                        <div class="tc-header"><span class="tc-label" style="color:#9BBF9B;">Raiku JIT Rebate</span><span class="tc-badge" style="font-size:8px; color:#5a6070; border:1px solid #3a3f4a; border-radius:3px; padding:1px 5px; white-space:nowrap; align-self:flex-start; margin-top:1px; flex-shrink:0">Annual</span></div>
                         <div class="tc-usd" style="color:var(--clr-rebate-jit);" id="tc-reb-jit-usd">&mdash;</div>
                         <div class="tc-secondary" id="tc-reb-jit-sol">&mdash;</div>
                         <div class="tc-monthly" id="tc-reb-jit-mo">&mdash;</div>
                     </div>
                     <!-- Growth + Buyback -->
                     <div class="triple-card" style="border-left-color:#A0C878;">
-                        <div class="tc-header"><span class="tc-label" style="color:#A0C878;">Growth + Buyback</span><span class="tc-badge" style="border-color:#A0C878;color:#A0C878;">Annual</span></div>
+                        <div class="tc-header"><span class="tc-label" style="color:#A0C878;">Growth + Buyback</span><span class="tc-badge" style="font-size:8px; color:#5a6070; border:1px solid #3a3f4a; border-radius:3px; padding:1px 5px; white-space:nowrap; align-self:flex-start; margin-top:1px; flex-shrink:0">Annual</span></div>
                         <div class="tc-usd" style="color:#A0C878;" id="tc-gb-usd">&mdash;</div>
                         <div class="tc-secondary" id="tc-gb-sol">&mdash;</div>
                         <div class="tc-monthly" id="tc-gb-mo">&mdash;</div>
                     </div>
                     <!-- Remaining Treasury Pool -->
                     <div class="triple-card" style="border-left-color:#9EBF6A;">
-                        <div class="tc-header"><span class="tc-label" style="color:#9EBF6A;">Remaining Treasury</span><span class="tc-badge" style="border-color:#9EBF6A;color:#9EBF6A;">Annual</span></div>
+                        <div class="tc-header"><span class="tc-label" style="color:#9EBF6A;">Remaining Treasury</span><span class="tc-badge" style="font-size:8px; color:#5a6070; border:1px solid #3a3f4a; border-radius:3px; padding:1px 5px; white-space:nowrap; align-self:flex-start; margin-top:1px; flex-shrink:0">Annual</span></div>
                         <div class="tc-usd" style="color:#9EBF6A;" id="tc-proto-usd">&mdash;</div>
                         <div class="tc-secondary" id="tc-proto-sol">&mdash;</div>
                         <div class="tc-monthly" id="tc-proto-mo">&mdash;</div>
@@ -1066,7 +1068,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <g id="fk-bypass-paths"></g>
             <!-- Separator between Other JIT bypass zone and main Raiku flow -->
             <line id="fk-bypass-sep" x1="0" y1="90" x2="720" y2="90" stroke="#565d6b" stroke-width="1.5" stroke-dasharray="6 3" opacity="1"/>
-            <text id="fk-raiku-flow-label" x="0" y="90" fill="#9ca3af" font-size="12" font-weight="500" font-family="monospace" opacity="0.8" text-anchor="start">Raiku Protocol Revenue Distribution</text>
+            <text id="fk-raiku-flow-label" x="0" y="90" fill="#b0b8c8" font-size="13" font-weight="600" font-family="monospace" opacity="0.8" text-anchor="start">Raiku Protocol Revenue Distribution</text>
             <!-- Protocol take brace — groups vb+reb-aot+reb-jit+gb+proto (positioned dynamically) -->
             <path id="fk-proto-brace" d="" stroke="#C0FF38" stroke-width="1.5" fill="none" opacity="0.6"/>
             <text id="fk-proto-take-lbl" x="988" y="0" fill="#C0FF38" font-size="12" font-weight="700">Raiku</text>
