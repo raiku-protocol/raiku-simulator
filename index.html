@@ -266,7 +266,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .validator-context-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .validator-note { font-size:10px; color:var(--text-mid); line-height:1.5; margin-top:10px; }
 .validator-support.section { padding:14px 16px; }
-.validator-support h2 { font-size:10px; margin-bottom:10px; color:var(--text-mid); }
+.validator-support h2 { font-size:12px; margin-bottom:10px; color:var(--text-mid); }
 .validator-support-grid { display:grid; gap:8px; }
 .validator-support-item { background:#111213; border:1px solid #1e2028; border-radius:6px; padding:8px 10px; }
 .validator-support-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.55px; margin-bottom:3px; }
@@ -1417,7 +1417,7 @@ details[open] summary::before { transform:rotate(90deg); }
 <div class="validator-side">
     <div class="section fade-in fade-in-1">
         <h2>Scenario Context</h2>
-        <div class="scenario-btns" style="margin-bottom:10px;">
+        <div class="scenario-btns" style="margin-bottom:10px; display:grid; grid-template-columns:1fr 1fr; gap:6px;">
             <button class="scenario-btn" id="validator-btn-con" onclick="applyScenario('con')">Conservative</button>
             <button class="scenario-btn active" id="validator-btn-base" onclick="applyScenario('base')">Base Case</button>
             <button class="scenario-btn" id="validator-btn-opt" onclick="applyScenario('opt')">Optimistic</button>
@@ -1499,14 +1499,14 @@ details[open] summary::before { transform:rotate(90deg); }
         <h2>Raiku Validator Revenue Pool</h2>
         <div class="validator-kpi-grid">
             <div class="validator-kpi">
+                <div class="validator-kpi-label" style="color:#6B9EBC;">Other JIT (direct)</div>
+                <div class="validator-kpi-value" id="validator-ojit-usd">$0</div>
+                <div class="validator-kpi-sub" id="validator-ojit-sol">0 SOL/yr · bypass</div>
+            </div>
+            <div class="validator-kpi">
                 <div class="validator-kpi-label" style="color:#5B8DEF;">Raiku JIT</div>
                 <div class="validator-kpi-value" id="validator-jit-usd">$0</div>
                 <div class="validator-kpi-sub" id="validator-jit-sol">0 SOL/yr</div>
-            </div>
-            <div class="validator-kpi">
-                <div class="validator-kpi-label" style="color:#6B9EBC;">Other JIT (direct)</div>
-                <div class="validator-kpi-value" id="validator-ojit-usd" style="color:#6B9EBC;">$0</div>
-                <div class="validator-kpi-sub" id="validator-ojit-sol">0 SOL/yr · bypass</div>
             </div>
             <div class="validator-kpi">
                 <div class="validator-kpi-label" style="color:#7BBBAF;">AOT Base</div>
@@ -1518,8 +1518,8 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-kpi-value" id="validator-bonus-usd">$0</div>
                 <div class="validator-kpi-sub" id="validator-bonus-sol">0 SOL/yr</div>
             </div>
-            <div class="validator-kpi" style="border-top:1px solid rgba(255,255,255,0.12);margin-top:4px;padding-top:8px;">
-                <div class="validator-kpi-label" style="font-weight:700;">Total Validator Revenue</div>
+            <div class="validator-kpi" style="background:#0e1510; border:1px solid rgba(192,255,56,0.25); border-left:3px solid #C0FF38; border-radius:6px; padding:10px 12px; margin-top:10px;">
+                <div class="validator-kpi-label" style="color:#C0FF38; font-weight:700;">Total Validator Revenue</div>
                 <div class="validator-kpi-value" id="validator-total-usd" style="font-weight:700;">$0</div>
                 <div class="validator-kpi-sub" id="validator-total-sol">0 SOL/yr</div>
             </div>
@@ -1529,29 +1529,32 @@ details[open] summary::before { transform:rotate(90deg); }
         <h2>Yield Uplift</h2>
         <div class="validator-yield-grid">
             <div class="validator-kpi">
-                <div class="validator-kpi-label">Incremental APR Uplift</div>
-                <div class="validator-kpi-value" id="validator-uplift-apr">0.00%</div>
-                <div class="validator-kpi-sub">Total validator revenue / connected stake</div>
-            </div>
-            <div class="validator-kpi">
                 <div class="validator-kpi-label">Incremental APY Uplift</div>
-                <div class="validator-kpi-value" id="validator-uplift-apy">0.00%</div>
+                <div class="validator-kpi-value" id="validator-uplift-apy" style="font-size:22px; font-weight:700;">0.00%</div>
                 <div class="validator-kpi-sub">Derived from APR using epoch-based compounding</div>
             </div>
             <div class="validator-kpi">
-                <div class="validator-kpi-label">Total APR After Uplift</div>
-                <div class="validator-kpi-value" id="validator-total-apr">0.00%</div>
-                <div class="validator-kpi-sub">Base APR + priority fees APR + Raiku APR uplift</div>
+                <div class="validator-kpi-label">Total APY After Uplift</div>
+                <div class="validator-kpi-value" id="validator-total-apy" style="font-size:22px; font-weight:700;">0.00%</div>
+                <div class="validator-kpi-sub">Total APY after stacking base yield, priority fees, and Raiku</div>
             </div>
             <div class="validator-kpi">
-                <div class="validator-kpi-label">Total APY After Uplift</div>
-                <div class="validator-kpi-value" id="validator-total-apy">0.00%</div>
-                <div class="validator-kpi-sub">Total APY after stacking base yield, priority fees, and Raiku</div>
+                <div class="validator-kpi-label">Incremental APR Uplift</div>
+                <div class="validator-kpi-value" id="validator-uplift-apr" style="font-size:15px; color:var(--text-mid);">0.00%</div>
+                <div class="validator-kpi-sub">Total validator revenue / connected stake</div>
+            </div>
+            <div class="validator-kpi">
+                <div class="validator-kpi-label">Total APR After Uplift</div>
+                <div class="validator-kpi-value" id="validator-total-apr" style="font-size:15px; color:var(--text-mid);">0.00%</div>
+                <div class="validator-kpi-sub">Base APR + priority fees APR + Raiku APR uplift</div>
             </div>
         </div>
         <div class="validator-audit-line">
             <div class="validator-audit-formula" id="validator-apr-formula-line">Incremental APR uplift = Total validator revenue (SOL/yr) / Connected stake (SOL) = 0 SOL / 0 SOL = 0.000%</div>
             <div class="validator-audit-note" id="validator-apr-formula-note">Using validator revenue pool in SOL and connected stake in SOL.</div>
+            <div id="validator-apy-formula" style="margin-top:8px; font-family:var(--font-mono); font-size:11px; color:#9ca3af; line-height:1.6;">
+                APY = (1 + APR / n)<sup>n</sup> &minus; 1 &nbsp;&middot;&nbsp; n &asymp; 182 epochs/yr
+            </div>
         </div>
         <div class="validator-decomp-card">
             <div class="validator-decomp-title">APR Decomposition</div>
@@ -1563,23 +1566,23 @@ details[open] summary::before { transform:rotate(90deg); }
             <div class="validator-decomp-legend">
                 <div class="validator-decomp-item">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot base"></span>Base Staking</div>
-                    <div class="validator-decomp-value" id="validator-decomp-base-apr">0.00%</div>
-                    <div class="validator-decomp-sub" id="validator-decomp-base-apy">0.00% APY</div>
+                    <div class="validator-decomp-value" id="validator-decomp-base-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-base-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot priority"></span>Priority Fees</div>
-                    <div class="validator-decomp-value" id="validator-decomp-priority-apr">0.00%</div>
-                    <div class="validator-decomp-sub" id="validator-decomp-priority-apy">0.00% APY equivalent</div>
+                    <div class="validator-decomp-value" id="validator-decomp-priority-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-priority-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot raiku"></span>Raiku Uplift</div>
-                    <div class="validator-decomp-value" id="validator-decomp-raiku-apr">0.00%</div>
-                    <div class="validator-decomp-sub" id="validator-decomp-raiku-apy">0.00% APY uplift</div>
+                    <div class="validator-decomp-value" id="validator-decomp-raiku-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-raiku-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot total"></span>Total Yield</div>
-                    <div class="validator-decomp-value" id="validator-decomp-total-apr">0.00%</div>
-                    <div class="validator-decomp-sub" id="validator-decomp-total-apy">0.00% APY</div>
+                    <div class="validator-decomp-value" id="validator-decomp-total-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-total-apr">0.00% APR</div>
                 </div>
             </div>
         </div>
@@ -1589,8 +1592,8 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-scenario-yield-card">
                     <div class="validator-scenario-yield-name">Conservative</div>
                     <div class="validator-scenario-yield-bar"><div class="validator-decomp-seg base" style="width:0%"></div><div class="validator-decomp-seg priority" style="width:0%"></div><div class="validator-decomp-seg raiku" style="width:0%"></div></div>
-                    <div class="validator-scenario-yield-total">0.00% APR</div>
-                    <div class="validator-scenario-yield-sub">0.00% APY</div>
+                    <div class="validator-scenario-yield-total">0.00% APY</div>
+                    <div class="validator-scenario-yield-sub">0.00% APR</div>
                 </div>
             </div>
         </div>
@@ -2273,8 +2276,8 @@ function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, p
                     '<div class="validator-decomp-seg priority" style="width:' + row.priorityWidth.toFixed(2) + '%"></div>' +
                     '<div class="validator-decomp-seg raiku" style="width:' + row.raikuWidth.toFixed(2) + '%"></div>' +
                 '</div>' +
-                '<div class="validator-scenario-yield-total">' + fmtValidatorRate(row.totalApr) + ' APR</div>' +
-                '<div class="validator-scenario-yield-sub">' + fmtValidatorRate(row.totalApy) + ' APY · Raiku ' + fmtValidatorRate(row.raikuApr) + '</div>' +
+                '<div class="validator-scenario-yield-total">' + fmtValidatorRate(row.totalApy) + ' APY</div>' +
+                '<div class="validator-scenario-yield-sub">' + fmtValidatorRate(row.totalApr) + ' APR · Raiku ' + fmtValidatorRate(row.raikuApr) + '</div>' +
             '</div>';
     }).join('');
 }
@@ -4280,14 +4283,16 @@ function update(){
     document.getElementById('validator-total-apy').textContent = fmtValidatorRate(totalApy);
     document.getElementById('validator-apr-formula-line').innerHTML = 'Incremental APR uplift = Total validator revenue (SOL/yr) / Connected stake (SOL) = <span class="em">' + fmtValidatorSol(totalValidatorRevenueSol) + '</span> / <span class="em">' + fmtValidatorSol(connectedStakeSol) + '</span> = <span class="em">' + fmtValidatorRate(incrementalAprUplift) + '</span>';
     document.getElementById('validator-apr-formula-note').textContent = 'Total APR = base staking APR + priority fees APR + Raiku APR uplift (Raiku JIT + Other JIT + AOT base + Validator bonus). APY uses epoch-based compounding (n ≈ ' + EPOCHS_PER_YEAR + ' epochs/yr).';
-    document.getElementById('validator-decomp-base-apr').textContent = fmtValidatorRate(baseApr);
+    const apyFmlEl = document.getElementById('validator-apy-formula');
+    if (apyFmlEl) apyFmlEl.innerHTML = 'APY = (1 + APR / n)<sup>n</sup> &minus; 1 &nbsp;&middot;&nbsp; n = <strong>' + EPOCHS_PER_YEAR + '</strong> epochs/yr';
     document.getElementById('validator-decomp-base-apy').textContent = fmtValidatorRate(baseApy) + ' APY';
-    document.getElementById('validator-decomp-priority-apr').textContent = fmtValidatorRate(priorityFeesApr);
-    document.getElementById('validator-decomp-priority-apy').textContent = fmtValidatorRate(priorityFeesApy) + ' APY equivalent';
-    document.getElementById('validator-decomp-raiku-apr').textContent = fmtValidatorRate(incrementalAprUplift);
-    document.getElementById('validator-decomp-raiku-apy').textContent = fmtValidatorRate(incrementalApyUplift) + ' APY uplift';
-    document.getElementById('validator-decomp-total-apr').textContent = fmtValidatorRate(totalApr);
+    document.getElementById('validator-decomp-base-apr').textContent = fmtValidatorRate(baseApr) + ' APR';
+    document.getElementById('validator-decomp-priority-apy').textContent = fmtValidatorRate(priorityFeesApy) + ' APY';
+    document.getElementById('validator-decomp-priority-apr').textContent = fmtValidatorRate(priorityFeesApr) + ' APR';
+    document.getElementById('validator-decomp-raiku-apy').textContent = fmtValidatorRate(incrementalApyUplift) + ' APY';
+    document.getElementById('validator-decomp-raiku-apr').textContent = fmtValidatorRate(incrementalAprUplift) + ' APR';
     document.getElementById('validator-decomp-total-apy').textContent = fmtValidatorRate(totalApy) + ' APY';
+    document.getElementById('validator-decomp-total-apr').textContent = fmtValidatorRate(totalApr) + ' APR';
     document.getElementById('validator-yield-base-seg').style.width = (totalApr > 0 ? (baseApr / totalApr) * 100 : 0).toFixed(2) + '%';
     document.getElementById('validator-yield-priority-seg').style.width = (totalApr > 0 ? (priorityFeesApr / totalApr) * 100 : 0).toFixed(2) + '%';
     document.getElementById('validator-yield-raiku-seg').style.width = (totalApr > 0 ? (incrementalAprUplift / totalApr) * 100 : 0).toFixed(2) + '%';
