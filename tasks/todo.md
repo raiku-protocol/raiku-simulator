@@ -2,6 +2,14 @@
 
 ## IN PROGRESS
 
+### Revenue Model follow-up — protocol take split and presentation cleanup
+Status: IN PROGRESS
+
+Scope:
+- Part A: Separate AOT and JIT Growth+Buyback controls in the setup panel (% of gross grammar, same as rebates)
+- Part B: Flow diagram — proper protocol-take brace on right, Treasury Pool softened color, remove old separator+label, adjust viewBox
+- Part C: Cards — nested Protocol Take family (summary + 5 subcards), Validator Base standalone
+
 ---
 
 ## DONE
@@ -61,6 +69,30 @@ Implemented:
 
 ---
 
+### Task 8 — Revenue flow: denominator fix + Protocol Revenue rename + Growth+Buyback + visual grouping
+Status: DONE
+Last updated: 2026-03-23
+
+Implemented:
+- Right-side flow diagram bars use `r.totalGrossUSD` (Raiku gross) as denominator — not polluted by Other JIT bypass
+- Other JIT bypass bar shows dollar value only, no percentage
+- Total Validator Revenue brace callout shows dollar value only, no percentage
+- Central node renamed from "Raiku Gross" → "Protocol Revenue"
+- Added Growth + Buyback slider (`sl-gb`, 0–100% of protocol pool, default 0%)
+- `calc()` splits `totalProtocol` into `growthBuyback` + `treasuryPool`
+- New `fk-gb` bar in flow diagram (color #A0C878)
+- `fk-proto-label` renamed to "Treasury Pool"
+- `sl-gb` wired to event listener array and `gp()`
+- Dynamic horizontal separator line (`fk-proto-group-sep`) between validator outputs and protocol-take allocation group
+- "Protocol Take ▾" group label (`fk-proto-group-label`) positioned at separator by `updFlow()`
+- `ratio-gb` pool-usage indicator under G+B slider: "N% of protocol pool → $X/yr" or "inactive (0%)"
+
+Protocol-take reconciliation (cleanly verifiable):
+  `jitGross × jitTakeRate + aotGross × aotTakeRate`
+  `= AOT Rebate + JIT Rebate + Validator AOT Bonus + Growth+Buyback + Treasury Pool`
+
+---
+
 ## Session notes
 
 2026-03-22 — Task 5 first pass: added Other JIT as free slider, separate flow paths, renamed labels.
@@ -72,3 +104,4 @@ Implemented:
 2026-03-23 — Task 5 spacing: viewBox 540 tall, svgH=520, barGap=12, minBarH=30.
 2026-03-23 — Task 5 alignment: rightTop=svgTop+28 aligns right stack top with left stack; Validator Base 3-line block with parens and clear gaps.
 2026-03-23 — Task 5 sign-off. Task 5.bis: added 3.5L bucket to sensitivity table fc array.
+2026-03-23 — Task 8: denominator fix, Protocol Revenue rename, Growth+Buyback allocation. Commit 26721dd.
