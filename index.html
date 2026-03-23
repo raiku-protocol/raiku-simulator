@@ -735,6 +735,11 @@ details[open] summary::before { transform:rotate(90deg); }
                     <div class="slider-row"><input type="range" id="sl-val-bonus" min="0" max="2" step="0.1" value="1"><span class="val" id="v-val-bonus">1.0%</span></div>
                     <div class="pool-usage" id="ratio-val-bonus"></div>
                 </div>
+                <div class="control" style="margin-top:4px;">
+                    <label>Growth + Buyback</label>
+                    <div style="font-size:11px;color:var(--text2);margin-bottom:2px;">% of protocol pool</div>
+                    <div class="slider-row"><input type="range" id="sl-gb" min="0" max="100" step="5" value="0"><span class="val" id="v-gb">0%</span></div>
+                </div>
             </div>
             <div class="param-col jit">
                 <div class="param-col-label">JIT</div>
@@ -934,7 +939,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <text id="fk-aot-v" x="30" y="330" fill="#A0A3A9" font-size="12">—</text>
             <!-- Center: Raiku Gross (below the Other JIT bypass zone) -->
             <rect id="fk-total" x="370" y="100" width="20" height="380" rx="3" fill="#d4e8a0" opacity="0.85"/>
-            <text x="400" y="290" fill="#d4e8a0" font-size="14" font-weight="700">Raiku Gross</text>
+            <text x="400" y="290" fill="#d4e8a0" font-size="14" font-weight="700">Protocol Revenue</text>
             <text id="fk-total-v" x="400" y="310" fill="#A0A3A9" font-size="12">—</text>
             <!-- Right: Other JIT Validators at TOP, then Raiku outputs below -->
             <rect id="fk-ojit" x="720" y="10" width="18" height="50" rx="3" fill="#6B9EBC"/>
@@ -954,8 +959,11 @@ details[open] summary::before { transform:rotate(90deg); }
             <rect id="fk-reb-jit" x="720" y="305" width="18" height="55" rx="3" fill="#9BBF9B"/>
             <text id="fk-reb-jit-label" x="746" y="328" fill="#9BBF9B" font-size="13" font-weight="600">Raiku JIT Rebate</text>
             <text id="fk-reb-jit-v" x="746" y="348" fill="#A0A3A9" font-size="12">—</text>
+            <rect id="fk-gb" x="720" y="360" width="18" height="30" rx="3" fill="#A0C878"/>
+            <text id="fk-gb-label" x="746" y="375" fill="#A0C878" font-size="13" font-weight="600">Growth + Buyback</text>
+            <text id="fk-gb-v" x="746" y="391" fill="#A0A3A9" font-size="12">—</text>
             <rect id="fk-proto" x="720" y="375" width="18" height="75" rx="3" fill="#C0FF38"/>
-            <text id="fk-proto-label" x="746" y="406" fill="#C0FF38" font-size="14" font-weight="700">Protocol Treasury</text>
+            <text id="fk-proto-label" x="746" y="406" fill="#C0FF38" font-size="14" font-weight="700">Treasury Pool</text>
             <text id="fk-proto-v" x="746" y="426" fill="#C0FF38" font-size="12">—</text>
             <!-- Validator total grouping — brace + callout (positioned dynamically) -->
             <path id="fk-val-brace" d="" stroke="#5B8DEF" stroke-width="1.5" fill="none" opacity="0.5"/>
@@ -2230,7 +2238,7 @@ function applyScenario(n){
     updateJitDatasetViewer(n);
 }
 
-['sl-comm-aot','sl-comm-jit','sl-rebate-aot','sl-rebate-jit','sl-val-bonus','sl-jit-market','sl-jit','sl-stake','sl-blk','sl-fcu','sl-price'].forEach(id=>{
+['sl-comm-aot','sl-comm-jit','sl-rebate-aot','sl-rebate-jit','sl-val-bonus','sl-gb','sl-jit-market','sl-jit','sl-stake','sl-blk','sl-fcu','sl-price'].forEach(id=>{
     document.getElementById(id).addEventListener('input',()=>{
         document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.remove('active'));
         update();
@@ -2340,6 +2348,7 @@ function gp(){return{
     ra:+document.getElementById('sl-rebate-aot').value, // AOT rebate % (raw, e.g. 0.25)
     rj:+document.getElementById('sl-rebate-jit').value, // JIT rebate % (raw, e.g. 0.25)
     vb:+document.getElementById('sl-val-bonus').value,  // AOT validator bonus % (raw, e.g. 1.0)
+    gb:+document.getElementById('sl-gb').value,          // Growth + Buyback % of protocol pool
     jm:+document.getElementById('sl-jit-market').value, // JIT total market (SOL/yr)
     j:+document.getElementById('sl-jit').value/100,
     s:+document.getElementById('sl-stake').value/100,
@@ -2465,12 +2474,18 @@ function calc(p){
     const totalRebates   = jitRebate + aotRebate;
     const totalProtocol  = jitProtocol + aotProtocol;
 
+    // Growth + Buyback split from protocol pool
+    const gbRate         = (p.gb || 0) / 100;
+    const growthBuyback  = totalProtocol * gbRate;
+    const treasuryPool   = totalProtocol - growthBuyback;
+
     return {
         jitGross, jitValidatorBase, jitRebate, jitValBonus, jitProtocol, jitMarket,
         otherJitRev,
         aotGross, aotValidatorBase, aotRebate, aotValBonus, aotProtocol,
         ls, cu,
         totalGross, totalValBase, totalValRev, totalRebates, totalProtocol,
+        growthBuyback, treasuryPool,
         totalProtocolUSD: totalProtocol * p.p,
         jitGrossUSD: jitGross * p.p, aotGrossUSD: aotGross * p.p,
         totalGrossUSD: totalGross * p.p,
@@ -3127,7 +3142,10 @@ function fmtPct(v){return v.toFixed(2)+'%';}
 function updFlow(p,r){
     const jU=r.jitGrossUSD, ojU=r.otherJitRevUSD||0, aU=r.aotGrossUSD, totalU=r.totalGrossUSD||1;
     const vbU=r.totalValBase*p.p, abU=r.aotValBonus*p.p;
-    const raU=r.aotRebate*p.p, rjU=r.jitRebate*p.p, prU=r.totalProtocolUSD;
+    const raU=r.aotRebate*p.p, rjU=r.jitRebate*p.p;
+    const gbU=(r.growthBuyback||0)*p.p;
+    const tpU=(r.treasuryPool!==undefined?r.treasuryPool:r.totalProtocol)*p.p;
+    const prU=tpU;
 
     // Value labels
     document.getElementById('fk-jit-v').textContent=fmtShort(jU);
@@ -3146,9 +3164,11 @@ function updFlow(p,r){
         {id:'vb',      v:abU, color:'#4178DE', bypass:false},
         {id:'reb-aot', v:raU, color:'#8BAF8B', bypass:false},
         {id:'reb-jit', v:rjU, color:'#9BBF9B', bypass:false},
+        {id:'gb',      v:gbU, color:'#A0C878', bypass:false},
         {id:'proto',   v:prU, color:'#C0FF38', bypass:false},
     ];
     const totalOut=outputs.reduce((a,o)=>a+o.v,0)||1;
+    const raikuDenom=totalU; // percentage denominator = Raiku gross (for right-side bars only)
     const totalGapH=barGap*(outputs.length-1);
     const availH=svgH-rightTop-svgTop-totalGapH;
     const maxBarFrac=0.40;
@@ -3168,7 +3188,7 @@ function updFlow(p,r){
         const lbl=document.getElementById('fk-'+o.id+'-label');
         if(lbl) lbl.setAttribute('y',yPos+o.h/2-4);
         const val=document.getElementById('fk-'+o.id+'-v');
-        if(val){val.textContent=fmtShort(o.v)+' ('+fmtPct(o.frac*100)+')';val.setAttribute('y',yPos+o.h/2+14);}
+        if(val){val.textContent=o.bypass?fmtShort(o.v):fmtShort(o.v)+' ('+fmtPct(o.v/raikuDenom*100)+')';val.setAttribute('y',yPos+o.h/2+14);}
         const paren=document.getElementById('fk-'+o.id+'-paren');
         if(paren) paren.setAttribute('y',yPos+o.h/2-4);
         if(o.id==='valbase'){
@@ -3196,13 +3216,12 @@ function updFlow(p,r){
     const bracePath=document.getElementById('fk-val-brace');
     // Brace opens LEFT toward the three validator outputs; pointer extends right to text
     if(bracePath) bracePath.setAttribute('d',`M922,${braceTop} L930,${braceTop} L930,${braceBot} L922,${braceBot} M930,${braceMid} L950,${braceMid}`);
-    const totalValFrac=totalValRevUSD/totalOut;
     const vtLbl=document.getElementById('fk-val-total-label');
     const vtLbl2=document.getElementById('fk-val-total-label2');
     const vtV=document.getElementById('fk-val-total-v');
     if(vtLbl) vtLbl.setAttribute('y',braceMid-14);
     if(vtLbl2) vtLbl2.setAttribute('y',braceMid);
-    if(vtV){vtV.textContent=fmtShort(totalValRevUSD)+' ('+fmtPct(totalValFrac*100)+')';vtV.setAttribute('y',braceMid+14);}
+    if(vtV){vtV.textContent=fmtShort(totalValRevUSD);vtV.setAttribute('y',braceMid+14);}
 
     // LEFT SOURCES — Other JIT FIRST (top), then Raiku JIT, then AOT
     const raikuTotal=jU+aU+1;
@@ -4001,6 +4020,7 @@ function update(){
     document.getElementById('v-rebate-aot').textContent=p.ra.toFixed(2)+'%';
     document.getElementById('v-rebate-jit').textContent=p.rj.toFixed(2)+'%';
     document.getElementById('v-val-bonus').textContent=p.vb.toFixed(1)+'%';
+    document.getElementById('v-gb').textContent=(p.gb||0).toFixed(0)+'%';
 
     // Show pool usage under each redistribution slider
     var treasSummary = document.getElementById('treasury-summary');
