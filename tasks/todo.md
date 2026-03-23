@@ -16,9 +16,11 @@ Implemented so far:
 - Consistent validator naming: `Validator Other JIT`, `Validator Base`, `Validator AOT Bonus`
 - Validator total brace opens LEFT toward outputs, pointer to callout at x=952
 - `Total Validator Revenue` shows `$X (Y%)` — same format as other flow outputs
-- `Validator Base` sub-label: `Raiku JIT + AOT`, font-size 11 / opacity 0.8, placed via dynamic y override
-- Left sources labeled consistently: `Other JIT Revenue`, `Raiku JIT Revenue`, `AOT Revenue`
-- Right side spacing: svgH=520, barGap=12, minBarH=30, viewBox 0 0 1060 540
+- `Validator Base` 3-line block: label / `(Raiku JIT + AOT)` / `$X (Y%)` — 16px gaps, no overlap
+- Left sources: `Other JIT Revenue`, `Raiku JIT Revenue`, `AOT Revenue`
+- Right side top aligned with left side top: `rightTop = svgTop+28`, `availH = svgH-rightTop-svgTop-totalGapH`
+- Right side vertical span matches left source stack span (top-to-bottom alignment)
+- viewBox: 0 0 1060 540, svgH=520, barGap=12, minBarH=30
 
 Still pending:
 - Sign-off from user on all acceptance criteria
@@ -39,8 +41,9 @@ Still pending:
 
 2026-03-22 — Task 5 first pass: added Other JIT as free slider, separate flow paths, renamed labels.
 2026-03-22 — Task 5 corrections: converted to derived value, reordered cards and SVG, removed double-count guard.
-2026-03-22 — Task 5 final: fixed label overlap (ojY svgTop+28, labels above arc), replaced "bypass" wording with "Direct to validators" / "outside protocol take".
-2026-03-23 — Task 5 polish: validator naming consistency, total validator brace callout, left label naming + spacing.
-2026-03-23 — Task 5 brace fix: extended viewBox to 1060, pushed brace to x=930, added percentage line, left source labels renamed with "Revenue" suffix.
-2026-03-23 — Task 5 brace direction: reversed brace to open left, merged value+pct to $X (Y%), added Validator Base sub-label.
-2026-03-23 — Task 5 spacing: viewBox 540 tall, svgH=520, barGap=12, minBarH=30; Validator Base sub-label repositioned and restyled.
+2026-03-22 — Task 5 final: fixed label overlap (ojY svgTop+28, labels above arc), wording polish.
+2026-03-23 — Task 5 polish: validator naming, brace callout, left label naming and spacing.
+2026-03-23 — Task 5 brace fix: viewBox 1060, brace x=930, percentage line, source label "Revenue" suffix.
+2026-03-23 — Task 5 brace direction: reversed brace to open left, $X (Y%) format, Validator Base sub-label.
+2026-03-23 — Task 5 spacing: viewBox 540 tall, svgH=520, barGap=12, minBarH=30.
+2026-03-23 — Task 5 alignment: rightTop=svgTop+28 aligns right stack top with left stack; Validator Base 3-line block with parens and clear gaps.
