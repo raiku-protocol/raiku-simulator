@@ -644,6 +644,11 @@ details[open] summary::before { transform:rotate(90deg); }
 .ppc-cell.aot-top { border-top:2px solid var(--clr-aot,#6BF); border-radius:5px 5px 0 0; padding-top:5px; }
 .ppc-cell.jit-top { border-top:2px solid var(--clr-jit,#FFF); border-radius:5px 5px 0 0; padding-top:5px; }
 .ppc-cell.row-bot { border-radius:0 0 5px 5px; padding-bottom:6px; }
+.ppc-cell.row-takerate { border-bottom:1px solid #222428; padding-bottom:8px; margin-bottom:0; }
+.ppc-residual-treasury { margin-top:6px; padding-top:6px; border-top:1px dashed #2a2d36; }
+.ppc-residual-treasury .rt-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; }
+.ppc-residual-treasury .rt-value { font-size:12px; font-weight:600; color:var(--lime-soft); margin-top:2px; }
+.ppc-residual-treasury .rt-sub { font-size:9px; color:var(--text2); margin-top:1px; }
 .ppc-cell .control { gap:2px; margin-bottom:10px; }
 .ppc-cell .control:last-child, .ppc-cell .control:only-child { margin-bottom:0; }
 .ppc-cell .control label { font-size:9px; color:var(--text2); display:block; margin-bottom:1px; }
@@ -736,23 +741,23 @@ details[open] summary::before { transform:rotate(90deg); }
         <!-- ─── SECTION 2: PROTOCOL POOL DISTRIBUTION ─── -->
         <div class="section-label">Protocol Pool Distribution</div>
         <div class="ppc-section" style="grid-column:1/-1;">
-            <!-- Column headers (row 1) -->
+            <!-- Row 1: Column headers -->
             <div class="ppc-cell aot-top"><div class="param-col-label">AOT</div></div>
             <div class="ppc-cell jit-top"><div class="param-col-label">JIT</div></div>
-            <!-- Protocol Take Rate (row 2) -->
-            <div class="ppc-cell">
+            <!-- Row 2: Protocol Take Rate — visual separator below marks end of "total pool" -->
+            <div class="ppc-cell row-takerate">
                 <div class="control">
                     <label>AOT Protocol Take Rate (%)</label>
                     <div class="slider-row"><input type="range" id="sl-comm-aot" min="0" max="10" step="0.25" value="5"><span class="val" id="v-comm-aot">5.0%</span></div>
                 </div>
             </div>
-            <div class="ppc-cell">
+            <div class="ppc-cell row-takerate">
                 <div class="control">
                     <label>JIT Protocol Take Rate (%)</label>
                     <div class="slider-row"><input type="range" id="sl-comm-jit" min="0" max="10" step="0.25" value="5"><span class="val" id="v-comm-jit">5.0%</span></div>
                 </div>
             </div>
-            <!-- Customer Rebate (row 3) -->
+            <!-- Row 3: Customer Rebate -->
             <div class="ppc-cell">
                 <div class="control">
                     <label>AOT Customer Rebate (%)</label>
@@ -767,7 +772,7 @@ details[open] summary::before { transform:rotate(90deg); }
                     <div class="pool-usage" id="ratio-rebate-jit"></div>
                 </div>
             </div>
-            <!-- Validator Bonus AOT only (row 4) -->
+            <!-- Row 4: Validator Bonus — both sides now have a control -->
             <div class="ppc-cell">
                 <div class="control">
                     <label>AOT Validator Bonus (%)</label>
@@ -775,26 +780,46 @@ details[open] summary::before { transform:rotate(90deg); }
                     <div class="pool-usage" id="ratio-val-bonus"></div>
                 </div>
             </div>
-            <div class="ppc-cell"></div>
-            <!-- Growth + Buyback (row 5) — both columns share the same grid row = guaranteed alignment -->
-            <div class="ppc-cell row-bot">
+            <div class="ppc-cell">
+                <div class="control">
+                    <label>JIT Validator Bonus (%)</label>
+                    <div class="slider-row"><input type="range" id="sl-val-bonus-jit" min="0" max="2" step="0.1" value="0"><span class="val" id="v-val-bonus-jit">0.00%</span></div>
+                    <div class="pool-usage" id="ratio-val-bonus-jit"></div>
+                </div>
+            </div>
+            <!-- Row 5: Growth + Buyback -->
+            <div class="ppc-cell">
                 <div class="control">
                     <label>AOT Growth + Buyback (%)</label>
-                    <div class="slider-row"><input type="range" id="sl-gb-aot" min="0" max="10" step="0.1" value="2.5"><span class="val" id="v-gb-aot">2.50%</span></div>
+                    <div class="slider-row"><input type="range" id="sl-gb-aot" min="0" max="10" step="0.1" value="1.875"><span class="val" id="v-gb-aot">1.88%</span></div>
                     <div class="pool-usage" id="ratio-gb-aot"></div>
                 </div>
             </div>
-            <div class="ppc-cell row-bot">
+            <div class="ppc-cell">
                 <div class="control">
                     <label>JIT Growth + Buyback (%)</label>
-                    <div class="slider-row"><input type="range" id="sl-gb-jit" min="0" max="10" step="0.1" value="2.5"><span class="val" id="v-gb-jit">2.50%</span></div>
+                    <div class="slider-row"><input type="range" id="sl-gb-jit" min="0" max="10" step="0.1" value="2.45"><span class="val" id="v-gb-jit">2.45%</span></div>
                     <div class="pool-usage" id="ratio-gb-jit"></div>
+                </div>
+            </div>
+            <!-- Row 6: Residual treasury display — last row, rounded bottom corners -->
+            <div class="ppc-cell row-bot">
+                <div class="ppc-residual-treasury" id="aot-treasury-residual">
+                    <div class="rt-label">AOT Remaining Treasury</div>
+                    <div class="rt-value" id="aot-treas-value">—</div>
+                    <div class="rt-sub" id="aot-treas-sub">—</div>
+                </div>
+            </div>
+            <div class="ppc-cell row-bot">
+                <div class="ppc-residual-treasury" id="jit-treasury-residual">
+                    <div class="rt-label">JIT Remaining Treasury</div>
+                    <div class="rt-value" id="jit-treas-value">—</div>
+                    <div class="rt-sub" id="jit-treas-sub">—</div>
                 </div>
             </div>
         </div>
 
-        <!-- Treasury summary + guard -->
-        <div id="treasury-summary" class="treasury-summary" style="grid-column:1/-1;"></div>
+        <!-- Guard message (treasury-summary removed; in-column displays replace it) -->
         <div id="waterfall-guard-msg" style="font-size:10px;color:#F5A623;font-weight:600;display:none;margin-top:-6px;grid-column:1/-1;line-height:1.4;"></div>
 
         <!-- ─── SECTION 3: REVENUE ESTIMATION ─── -->
@@ -2087,6 +2112,7 @@ const SLIDER_META = {
   'sl-comm-aot':   { nudge: 0.25, largeNudge: 1,     decimals: 2, unit: '%',  prefix: false },
   'sl-rebate-aot': { nudge: 0.05, largeNudge: 0.1,   decimals: 2, unit: '%',  prefix: false },
   'sl-val-bonus':  { nudge: 0.1,  largeNudge: 0.25,  decimals: 2, unit: '%',  prefix: false },
+  'sl-val-bonus-jit': { nudge: 0.1,  largeNudge: 0.25,  decimals: 2, unit: '%',  prefix: false },
   'sl-comm-jit':   { nudge: 0.25, largeNudge: 1,     decimals: 2, unit: '%',  prefix: false },
   'sl-rebate-jit': { nudge: 0.05, largeNudge: 0.1,   decimals: 2, unit: '%',  prefix: false },
   'sl-gb-aot':     { nudge: 0.1,  largeNudge: 0.5,   decimals: 2, unit: '%',  prefix: false },
@@ -2281,8 +2307,9 @@ function applyScenario(n){
     document.getElementById('sl-rebate-aot').value=s.ra;
     document.getElementById('sl-rebate-jit').value=s.rj;
     document.getElementById('sl-val-bonus').value=s.vb;
-    document.getElementById('sl-gb-aot').value=2.5;
-    document.getElementById('sl-gb-jit').value=2.5;
+    document.getElementById('sl-val-bonus-jit').value=0;
+    document.getElementById('sl-gb-aot').value=Math.max((s.ca - s.ra - s.vb) / 2, 0);
+    document.getElementById('sl-gb-jit').value=Math.max((s.cj - s.rj) / 2, 0);
     document.getElementById('sl-jit-market').value=s.jm;
     document.getElementById('sl-jit').value=s.j;
     document.getElementById('sl-stake').value=s.s;
@@ -2307,7 +2334,7 @@ function applyScenario(n){
     updateJitDatasetViewer(n);
 }
 
-['sl-comm-aot','sl-comm-jit','sl-rebate-aot','sl-rebate-jit','sl-val-bonus','sl-gb-aot','sl-gb-jit','sl-jit-market','sl-jit','sl-stake','sl-blk','sl-fcu','sl-price'].forEach(id=>{
+['sl-comm-aot','sl-comm-jit','sl-rebate-aot','sl-rebate-jit','sl-val-bonus','sl-val-bonus-jit','sl-gb-aot','sl-gb-jit','sl-jit-market','sl-jit','sl-stake','sl-blk','sl-fcu','sl-price'].forEach(id=>{
     document.getElementById(id).addEventListener('input',()=>{
         document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.remove('active'));
         update();
@@ -2417,8 +2444,9 @@ function gp(){return{
     ra:+document.getElementById('sl-rebate-aot').value, // AOT rebate % (raw, e.g. 0.25)
     rj:+document.getElementById('sl-rebate-jit').value, // JIT rebate % (raw, e.g. 0.25)
     vb:+document.getElementById('sl-val-bonus').value,  // AOT validator bonus % (raw, e.g. 1.0)
-    gba:Math.min(+document.getElementById('sl-gb-aot').value, +document.getElementById('sl-comm-aot').value),    // AOT G+B % of gross, clamped to take rate
-    gbj:Math.min(+document.getElementById('sl-gb-jit').value, +document.getElementById('sl-comm-jit').value),    // JIT G+B % of gross, clamped to take rate
+    jvb:+(document.getElementById('sl-val-bonus-jit')||{value:0}).value,  // JIT validator bonus %
+    gba:(function(){ var ca=+document.getElementById('sl-comm-aot').value, ra=+document.getElementById('sl-rebate-aot').value, vb=+document.getElementById('sl-val-bonus').value; return Math.min(+document.getElementById('sl-gb-aot').value, Math.max(0, ca-ra-vb)); })(),
+    gbj:(function(){ var cj=+document.getElementById('sl-comm-jit').value, rj=+document.getElementById('sl-rebate-jit').value, jvb=+(document.getElementById('sl-val-bonus-jit')||{value:0}).value; return Math.min(+document.getElementById('sl-gb-jit').value, Math.max(0, cj-rj-jvb)); })(),
     jm:+document.getElementById('sl-jit-market').value, // JIT total market (SOL/yr)
     j:+document.getElementById('sl-jit').value/100,
     s:+document.getElementById('sl-stake').value/100,
@@ -2513,19 +2541,20 @@ function calc(p){
 
     // Guard: rebates and bonus are funded from protocol pool — clamp to take rate
     const jitRebateRate = jitTakeRate > 0 ? Math.min(p.rj / 100, jitTakeRate) : 0;
+    const jitBonusRate  = jitTakeRate > 0 ? Math.min((p.jvb||0)/100, Math.max(0, jitTakeRate - jitRebateRate)) : 0;
     const aotRebateRate = aotTakeRate > 0 ? Math.min(p.ra / 100, aotTakeRate) : 0;
     const aotBonusRate  = aotTakeRate > 0 ? Math.min(p.vb / 100, Math.max(0, aotTakeRate - aotRebateRate)) : 0;
     const aotGBRate     = aotTakeRate > 0 ? Math.min((p.gba||0)/100, Math.max(0, aotTakeRate - aotRebateRate - aotBonusRate)) : 0;
-    const jitGBRate     = jitTakeRate > 0 ? Math.min((p.gbj||0)/100, Math.max(0, jitTakeRate - jitRebateRate))               : 0;
+    const jitGBRate     = jitTakeRate > 0 ? Math.min((p.gbj||0)/100, Math.max(0, jitTakeRate - jitRebateRate - jitBonusRate)) : 0;
 
     // JIT waterfall (jitMarket comes from the JIT total market slider)
     const jitMarket        = p.jm;
     const jitGross         = jitMarket * p.j;
     const jitValidatorBase = jitGross * jitValidatorRate;
     const jitRebate        = jitGross * jitRebateRate;
-    const jitValBonus      = 0;
+    const jitValBonus      = jitGross * jitBonusRate;
     const jitGrowthBuyback = jitGross * jitGBRate;
-    const jitProtocol      = jitGross * jitTakeRate - jitRebate - jitGrowthBuyback;
+    const jitProtocol      = jitGross * jitTakeRate - jitRebate - jitValBonus - jitGrowthBuyback;
 
     // Other non-Raiku JIT — derived: max(stake share − Raiku JIT share, 0)
     // bypasses Raiku protocol, goes directly to validators
@@ -2544,7 +2573,7 @@ function calc(p){
     // Aggregated (Raiku gross = only Raiku-captured flows; otherJitRev bypasses)
     const totalGross     = jitGross + aotGross;
     const totalValBase   = jitValidatorBase + aotValidatorBase;
-    const totalValRev    = totalValBase + aotValBonus;  // Raiku-tracked validator revenue (for APR calc)
+    const totalValRev    = totalValBase + aotValBonus + jitValBonus;  // Raiku-tracked validator revenue (for APR calc)
     const totalRebates   = jitRebate + aotRebate;
     const totalProtocol  = jitProtocol + aotProtocol;
 
@@ -4111,24 +4140,27 @@ function update(){
     document.getElementById('v-rebate-aot').textContent=p.ra.toFixed(2)+'%';
     document.getElementById('v-rebate-jit').textContent=p.rj.toFixed(2)+'%';
     document.getElementById('v-val-bonus').textContent=p.vb.toFixed(1)+'%';
+    var vbJitEl = document.getElementById('v-val-bonus-jit');
+    if (vbJitEl) vbJitEl.textContent = (p.jvb||0).toFixed(2)+'%';
     document.getElementById('v-gb-aot').textContent=(p.gba||0).toFixed(2)+'%';
     document.getElementById('v-gb-jit').textContent=(p.gbj||0).toFixed(2)+'%';
 
-    // Dynamic max: G+B cannot exceed the corresponding protocol take rate
+    // Dynamic max: G+B cannot exceed the remaining pool after rebate + bonus
     var gbAotEl = document.getElementById('sl-gb-aot');
     var gbJitEl = document.getElementById('sl-gb-jit');
-    if (gbAotEl) { gbAotEl.max = p.ca; gbAotEl.value = Math.min(parseFloat(gbAotEl.value)||0, p.ca); }
-    if (gbJitEl) { gbJitEl.max = p.cj; gbJitEl.value = Math.min(parseFloat(gbJitEl.value)||0, p.cj); }
+    var gbAotMax = Math.max(0, p.ca - p.ra - p.vb);
+    var gbJitMax = Math.max(0, p.cj - p.rj - (p.jvb||0));
+    if (gbAotEl) { gbAotEl.max = gbAotMax; gbAotEl.value = Math.min(parseFloat(gbAotEl.value)||0, gbAotMax); }
+    if (gbJitEl) { gbJitEl.max = gbJitMax; gbJitEl.value = Math.min(parseFloat(gbJitEl.value)||0, gbJitMax); }
 
     // Show pool usage under each redistribution slider
-    var treasSummary = document.getElementById('treasury-summary');
     if (p.ca > 0) {
         var poolPctRA = Math.min(100, (p.ra / p.ca * 100)).toFixed(0);
         var poolPctVB = Math.min(100, (p.vb / p.ca * 100)).toFixed(0);
         document.getElementById('ratio-rebate-aot').textContent = '\u21b3 uses ' + poolPctRA + '% of AOT pool (' + p.ra.toFixed(2) + '% of ' + p.ca.toFixed(1) + '% take rate)';
         document.getElementById('ratio-val-bonus').textContent = '\u21b3 uses ' + poolPctVB + '% of AOT pool (' + p.vb.toFixed(1) + '% of ' + p.ca.toFixed(1) + '% take rate)';
-        var poolPctGBA = Math.min(100, ((p.gba||0) / p.ca * 100)).toFixed(0);
-        document.getElementById('ratio-gb-aot').textContent = '\u21b3 uses ' + (p.gba||0).toFixed(2) + '% of AOT pool (' + poolPctGBA + '% of ' + p.ca.toFixed(1) + '% take rate)';
+        var poolPctGBA = gbAotMax > 0 ? Math.min(100, ((p.gba||0) / gbAotMax * 100)).toFixed(0) : '0';
+        document.getElementById('ratio-gb-aot').textContent = '\u21b3 uses ' + (p.gba||0).toFixed(2) + '% of gross (' + poolPctGBA + '% of available pool)';
     } else {
         document.getElementById('ratio-rebate-aot').textContent = 'inactive (0%)';
         document.getElementById('ratio-val-bonus').textContent = 'inactive (0%)';
@@ -4137,22 +4169,27 @@ function update(){
     if (p.cj > 0) {
         var poolPctRJ = Math.min(100, (p.rj / p.cj * 100)).toFixed(0);
         document.getElementById('ratio-rebate-jit').textContent = '\u21b3 uses ' + p.rj.toFixed(2) + '% of JIT pool (' + poolPctRJ + '% of ' + p.cj.toFixed(1) + '% take rate)';
-        var poolPctGBJ = Math.min(100, ((p.gbj||0) / p.cj * 100)).toFixed(0);
-        document.getElementById('ratio-gb-jit').textContent = '\u21b3 uses ' + (p.gbj||0).toFixed(2) + '% of JIT pool (' + poolPctGBJ + '% of ' + p.cj.toFixed(1) + '% take rate)';
+        var poolPctJVB = Math.min(100, ((p.jvb||0) / p.cj * 100)).toFixed(0);
+        document.getElementById('ratio-val-bonus-jit').textContent = '\u21b3 uses ' + poolPctJVB + '% of JIT pool (' + (p.jvb||0).toFixed(2) + '% of ' + p.cj.toFixed(1) + '% take rate)';
+        var poolPctGBJ = gbJitMax > 0 ? Math.min(100, ((p.gbj||0) / gbJitMax * 100)).toFixed(0) : '0';
+        document.getElementById('ratio-gb-jit').textContent = '\u21b3 uses ' + (p.gbj||0).toFixed(2) + '% of gross (' + poolPctGBJ + '% of available pool)';
     } else {
         document.getElementById('ratio-rebate-jit').textContent = 'inactive (0%)';
+        document.getElementById('ratio-val-bonus-jit').textContent = 'inactive (0%)';
         document.getElementById('ratio-gb-jit').textContent = 'inactive (0%)';
     }
-    if (p.ca > 0 || p.cj > 0) {
-        var aotPoolRemaining = p.ca > 0 ? Math.max(0, 100 - (p.ra / p.ca * 100) - (p.vb / p.ca * 100) - ((p.gba||0) / p.ca * 100)) : 0;
-        var jitPoolRemaining = p.cj > 0 ? Math.max(0, 100 - (p.rj / p.cj * 100) - ((p.gbj||0) / p.cj * 100)) : 0;
-        var aotTreasPct = (p.ca * aotPoolRemaining / 100).toFixed(2);
-        var jitTreasPct = (p.cj * jitPoolRemaining / 100).toFixed(2);
-        treasSummary.textContent = 'AOT treasury: ' + aotTreasPct + '% of gross (' + aotPoolRemaining.toFixed(0) + '% of AOT pool left) · JIT treasury: ' + jitTreasPct + '% of gross (' + jitPoolRemaining.toFixed(0) + '% of JIT pool left)';
-        treasSummary.style.display = 'block';
-    } else {
-        treasSummary.style.display = 'none';
-    }
+    var aotPoolRemaining = p.ca > 0 ? Math.max(0, 100 - (p.ra / p.ca * 100) - (p.vb / p.ca * 100) - ((p.gba||0) / p.ca * 100)) : 0;
+    var jitPoolRemaining = p.cj > 0 ? Math.max(0, 100 - (p.rj / p.cj * 100) - ((p.jvb||0) / p.cj * 100) - ((p.gbj||0) / p.cj * 100)) : 0;
+    var aotTreasPct = (p.ca * aotPoolRemaining / 100).toFixed(2);
+    var jitTreasPct = (p.cj * jitPoolRemaining / 100).toFixed(2);
+    var aotTreasVal = document.getElementById('aot-treas-value');
+    var aotTreasSub = document.getElementById('aot-treas-sub');
+    var jitTreasVal = document.getElementById('jit-treas-value');
+    var jitTreasSub = document.getElementById('jit-treas-sub');
+    if (aotTreasVal) aotTreasVal.textContent = aotTreasPct + '% of gross';
+    if (aotTreasSub) aotTreasSub.textContent = aotPoolRemaining.toFixed(0) + '% of AOT pool left';
+    if (jitTreasVal) jitTreasVal.textContent = jitTreasPct + '% of gross';
+    if (jitTreasSub) jitTreasSub.textContent = jitPoolRemaining.toFixed(0) + '% of JIT pool left';
 
     // Waterfall guard info
     const guardMsg = document.getElementById('waterfall-guard-msg');
@@ -4163,11 +4200,14 @@ function update(){
     if (p.cj === 0 && p.rj > 0) {
         guardNotes.push('JIT take rate = 0%: rebate forced to 0.');
     }
+    if (p.cj === 0 && (p.jvb||0) > 0) {
+        guardNotes.push('JIT take rate = 0%: validator bonus forced to 0.');
+    }
     if (p.ca > 0 && (p.ra + p.vb + (p.gba||0)) > p.ca) {
         guardNotes.push('AOT rebate + bonus + G+B (' + (p.ra + p.vb + (p.gba||0)).toFixed(2) + '%) exceed the AOT take rate (' + p.ca.toFixed(1) + '%). Values clamped.');
     }
-    if (p.cj > 0 && (p.rj + (p.gbj||0)) > p.cj) {
-        guardNotes.push('JIT rebate + G+B (' + (p.rj + (p.gbj||0)).toFixed(2) + '%) exceed the JIT take rate (' + p.cj.toFixed(1) + '%). Value clamped.');
+    if (p.cj > 0 && (p.rj + (p.jvb||0) + (p.gbj||0)) > p.cj) {
+        guardNotes.push('JIT rebate + bonus + G+B (' + (p.rj + (p.jvb||0) + (p.gbj||0)).toFixed(2) + '%) exceed the JIT take rate (' + p.cj.toFixed(1) + '%). Values clamped.');
     }
     if (guardNotes.length) {
         guardMsg.style.display = 'block';
