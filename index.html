@@ -263,15 +263,15 @@ details[open] summary::before { transform:rotate(90deg); }
 .validator-main > .section { margin-bottom:0; }
 .validator-context-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px 12px; }
 .validator-context-item { min-width:0; }
-.validator-context-label { font-size:9px; color:#8a8f99; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px; text-align:center; }
-.validator-context-value { font-size:14px; color:var(--text); font-family:var(--font-mono); font-weight:700; background:#060809; border:1px solid #20252c; border-radius:5px; padding:7px 8px; margin-top:0; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
+.validator-context-label { font-size:10px; color:#a8aebf; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px; text-align:center; }
+.validator-context-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:700; background:#060809; border:1px solid #20252c; border-radius:5px; padding:7px 8px; margin-top:0; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
 .validator-note { font-size:10px; color:var(--text-mid); line-height:1.5; }
 .validator-global-row { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px 8px; }
 .validator-proto-table { display:grid; grid-template-columns:auto 1fr 1fr; gap:5px 8px; }
-.validator-proto-col-header { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.7px; text-align:center; padding:3px 0 5px; }
+.validator-proto-col-header { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.7px; text-align:center; padding:3px 0 6px; }
 .validator-proto-col-header.aot { color:#8eccc0; border-bottom:2px solid rgba(142,204,192,0.3); }
 .validator-proto-col-header.jit { color:#7aabf5; border-bottom:2px solid rgba(122,171,245,0.3); }
-.validator-proto-row-label { font-size:9px; color:#8a8f99; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; padding-right:12px; white-space:nowrap; }
+.validator-proto-row-label { font-size:10px; color:#a8aebf; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; padding-right:8px; white-space:nowrap; }
 .validator-proto-cell { font-size:12px; font-family:var(--font-mono); font-weight:600; color:var(--text); background:#060809; border:1px solid #20252c; border-radius:4px; padding:5px 6px; text-align:center; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .validator-proto-cell.dim { background:transparent; border:1px solid #181b20; color:#3a3f4a; font-size:10px; }
 .validator-proto-cell.editable { cursor:text; }
@@ -1450,50 +1450,55 @@ details[open] summary::before { transform:rotate(90deg); }
 <div class="tab-content" id="tab-validator">
 <div class="validator-layout">
 <div class="validator-side">
-    <div class="section fade-in fade-in-1" style="flex:1; margin-bottom:0; box-sizing:border-box; display:flex; flex-direction:column; justify-content:space-between;">
-        <!-- Top group: heading + scenario presets + global values -->
+    <div class="section fade-in fade-in-1" style="flex:1; margin-bottom:0; box-sizing:border-box; display:flex; flex-direction:column;">
+        <!-- Scenario presets (top) -->
         <div>
             <h2>Protocol Level Setup</h2>
-            <div class="validator-btns-2x2">
+            <div class="validator-btns-2x2" style="margin-top:10px;">
                 <button class="scenario-btn" id="validator-btn-con" onclick="applyScenario('con')">Conservative</button>
                 <button class="scenario-btn active" id="validator-btn-base" onclick="applyScenario('base')">Base Case</button>
                 <button class="scenario-btn" id="validator-btn-opt" onclick="applyScenario('opt')">Optimistic</button>
                 <button class="scenario-btn" id="validator-btn-bull" onclick="applyScenario('bull')">Bull Case</button>
             </div>
-            <div class="validator-global-row" style="margin-top:12px;">
-                <div class="validator-context-item">
-                    <div class="validator-context-label">SOL Price</div>
-                    <div class="validator-context-value" id="validator-context-price">$100</div>
-                </div>
-                <div class="validator-context-item">
-                    <div class="validator-context-label">Raiku Stake</div>
-                    <div class="validator-context-value" id="validator-context-stake">10.0%</div>
-                </div>
-                <div class="validator-context-item">
-                    <div class="validator-context-label">Validator Stake</div>
-                    <div class="validator-context-value readonly" id="validator-context-connected" title="Derived — read only">42.39M SOL</div>
-                </div>
+        </div>
+        <!-- Market setup: SOL Price + Raiku Stake (2-col) -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:20px;">
+            <div class="validator-context-item">
+                <div class="validator-context-label">SOL Price</div>
+                <div class="validator-context-value" id="validator-context-price">$100</div>
+            </div>
+            <div class="validator-context-item">
+                <div class="validator-context-label">Raiku Stake</div>
+                <div class="validator-context-value" id="validator-context-stake">10.0%</div>
             </div>
         </div>
-        <!-- Middle group: AOT vs JIT protocol parameters (3 editable rows) -->
-        <div>
+        <!-- Protocol parameters: AOT vs JIT -->
+        <div style="margin-top:20px;">
             <div class="validator-proto-table">
                 <div></div>
                 <div class="validator-proto-col-header aot">AOT</div>
                 <div class="validator-proto-col-header jit">JIT</div>
-                <div class="validator-proto-row-label">Take Rate</div>
+                <div class="validator-proto-row-label">Protocol Take Rate</div>
                 <div class="validator-proto-cell" id="validator-context-aot-take">5.0%</div>
                 <div class="validator-proto-cell" id="validator-context-jit-take">5.0%</div>
-                <div class="validator-proto-row-label">Share</div>
+                <div class="validator-proto-row-label">Block / JIT Share</div>
                 <div class="validator-proto-cell" id="validator-context-block">8%</div>
                 <div class="validator-proto-cell" id="validator-context-jit-share">—</div>
-                <div class="validator-proto-row-label">Avg Fee / CU</div>
+                <div class="validator-proto-row-label">Avg Fee / CU (L)</div>
                 <div class="validator-proto-cell" id="validator-context-fee">0.50 L</div>
                 <div class="validator-proto-cell" id="validator-context-jit-fee">—</div>
             </div>
         </div>
-        <!-- Bottom: protocol note -->
-        <div class="validator-note">Protocol-level setup. These parameters define Raiku's operating conditions — take rates, block allocation, fee levels, and market exposure. Validator yield is computed from this configuration applied to the stake above.</div>
+        <!-- Spacer: absorbs excess card height, pins footer to bottom -->
+        <div style="flex:1; min-height:16px;"></div>
+        <!-- Footer: derived stake readout + note -->
+        <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-top:1px solid rgba(255,255,255,0.05); margin-bottom:10px;">
+                <span style="font-size:9px; color:#525866; text-transform:uppercase; letter-spacing:0.5px;">Connected Validator Stake</span>
+                <span style="font-size:10px; font-family:var(--font-mono); color:#5a6070;" id="validator-context-connected">42.39M SOL</span>
+            </div>
+            <div class="validator-note">Protocol-level assumptions for the selected scenario. These values set global operating conditions — take rates, block allocation, and fee levels. Validator yield is derived from this setup. Individual validator configuration (stake input, per-validator revenue) will be available as a separate module.</div>
+        </div>
     </div>
     <!-- Hidden: removed table rows — IDs still written by update() -->
     <span id="validator-context-jit-market" style="display:none;"></span>
