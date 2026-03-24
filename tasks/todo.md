@@ -120,6 +120,23 @@ Implemented:
 
 ---
 
+### Validator Revenue redesign — Patch 2: protocol composition card
+Status: DONE
+Last updated: 2026-03-24
+
+Implemented:
+- New top composition card (vc-*): Total APY headline / Raiku APY Uplift / Total APR / 6-seg bar / 6 component rows
+- 6 component rows: Issuance / Network Block Fees / Raiku AOT / Validator Bonus / Raiku JIT / Other JIT
+- APY primary, APR secondary, SOL/yr per component row (uses existing fmtValidatorSol + '/yr')
+- Old "Yield Uplift" 4-card block removed; section renamed "Yield Details"
+- "Validator audit line" removed (redundant with top card)
+- "Base Network Yield" sidebar section hidden; sl-staking-ratio slider kept in DOM as hidden input
+- Hidden spans preserve all IDs still written to by update(): validator-uplift-apy/apr, validator-total-apy/apr, validator-apr-formula-line/note, validator-apy-formula, validator-staked-value/source, validator-inflation-rate, validator-staking-ratio-display, validator-base-apr/sub/apy, validator-priority-apr/apy
+- CSS: added .vc-row, .vc-row-left, .vc-row-name, .vc-row-right, .vc-row-apy, .vc-row-apr, .vc-row-sol
+- No math changed; all values from existing update() computation (issApy2/blkApy2/aotApy2/bonusApy2/jitApy2/ojitApy2 to avoid name collision with aprToApy calls already in scope)
+
+---
+
 ## Session notes
 
 2026-03-22 — Task 5 first pass: added Other JIT as free slider, separate flow paths, renamed labels.
@@ -133,3 +150,4 @@ Implemented:
 2026-03-23 — Task 5 sign-off. Task 5.bis: added 3.5L bucket to sensitivity table fc array.
 2026-03-23 — Task 8: denominator fix, Protocol Revenue rename, Growth+Buyback allocation. Commit 26721dd.
 2026-03-24 — Patch 1: 6-segment decomp bar expansion, APY primary/APR secondary, 6 new colors.
+2026-03-24 — Patch 2: top composition card, removed Yield Uplift 4-cards + audit line, hidden Base Network Yield sidebar.
