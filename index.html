@@ -351,6 +351,13 @@ details[open] summary::before { transform:rotate(90deg); }
 .vpr-cadence-val { font-family:var(--font-mono); font-size:13px; font-weight:600; color:var(--text); }
 .vpr-cadence-sub { font-size:9px; color:var(--text2); margin-top:2px; }
 .vpr-cadence-sep { color:var(--text2); opacity:0.3; font-size:12px; flex-shrink:0; }
+.vpr-band { display:flex; align-items:stretch; background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow:hidden; }
+.vpr-band-item { display:flex; flex-direction:column; justify-content:center; padding:10px 14px; flex:1; min-width:0; }
+.vpr-band-item + .vpr-band-item { border-left:1px solid #1a1e27; }
+.vpr-band-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px; }
+.vpr-band-desc { font-size:8px; color:var(--text2); margin-bottom:4px; line-height:1.4; }
+.vpr-band-sol { font-family:var(--font-mono); font-size:14px; font-weight:700; color:var(--text); }
+.vpr-band-usd { font-family:var(--font-mono); font-size:11px; color:var(--text-mid); margin-top:2px; }
 
 /* Validator Yield Composition top card — component rows */
 .vc-row { display:flex; align-items:center; justify-content:space-between; padding:5px 8px; background:#111213; border:1px solid #1e2028; border-radius:5px; }
@@ -1541,7 +1548,7 @@ details[open] summary::before { transform:rotate(90deg); }
 </div>
 <div class="validator-main">
     <div class="section fade-in fade-in-1">
-        <h2>Protocol Level Output</h2>
+        <h2>Protocol Level Yield</h2>
         <div class="validator-decomp-card" style="margin-top:0;">
             <!-- Top summary band: APY headline · APR · annual totals · per block -->
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:5px;">
@@ -1621,6 +1628,8 @@ details[open] summary::before { transform:rotate(90deg); }
             <span id="validator-decomp-total-apy" style="display:none;"></span>
             <span id="validator-decomp-total-apr" style="display:none;"></span>
         </div><!-- end decomp-card -->
+        <!-- Scenario comparison — 4 mini cards below the selected-scenario yield summary -->
+        <div class="validator-scenario-yield-grid" id="validator-scenario-yield-grid" style="margin-top:12px;"></div>
     </div>
     <!-- Hidden spans: KPI IDs still written to by update() -->
     <span id="validator-ojit-usd" style="display:none;"></span>
@@ -1642,57 +1651,36 @@ details[open] summary::before { transform:rotate(90deg); }
     <span id="validator-apr-formula-note" style="display:none;"></span>
     <span id="validator-apy-formula" style="display:none;"></span>
     <div class="section fade-in fade-in-2">
-        <h2>Protocol Results</h2>
-        <div class="validator-decomp-card" style="margin-top:0;">
-            <!-- Annual + Per Block -->
-            <div class="vpr-grid">
-                <div class="vpr-tile">
-                    <div class="vpr-tile-label">Annual · Raiku validator set</div>
-                    <div class="vpr-tile-sol" id="vc-annual-sol">—</div>
-                    <div class="vpr-tile-usd" id="vc-annual-usd">—</div>
-                </div>
-                <div class="vpr-tile">
-                    <div class="vpr-tile-label">Per block · annual ÷ slots/yr</div>
-                    <div class="vpr-tile-sol" id="vc-perblock-sol">—</div>
-                    <div class="vpr-tile-usd" id="vc-perblock-usd">—</div>
-                </div>
+        <h2>Protocol Level SOL</h2>
+        <div class="vpr-band">
+            <div class="vpr-band-item">
+                <div class="vpr-band-label">Annual · Raiku validator set</div>
+                <div class="vpr-band-sol" id="vc-annual-sol">—</div>
+                <div class="vpr-band-usd" id="vc-annual-usd">—</div>
             </div>
-            <!-- Block / slot cadence -->
-            <div class="vpr-cadence-row">
-                <span class="vpr-cadence-key">Cadence</span>
-                <div class="vpr-cadence-item">
-                    <div class="vpr-cadence-val" id="vc-cadence-yr">—</div>
-                    <div class="vpr-cadence-sub">slots/yr</div>
-                </div>
-                <span class="vpr-cadence-sep">·</span>
-                <div class="vpr-cadence-item">
-                    <div class="vpr-cadence-val" id="vc-cadence-mo">—</div>
-                    <div class="vpr-cadence-sub">slots/mo</div>
-                </div>
-                <span class="vpr-cadence-sep">·</span>
-                <div class="vpr-cadence-item">
-                    <div class="vpr-cadence-val">432K</div>
-                    <div class="vpr-cadence-sub">slots/epoch (~2.5 days)</div>
-                </div>
+            <div class="vpr-band-item">
+                <div class="vpr-band-label">Per block · annual ÷ slots/yr</div>
+                <div class="vpr-band-sol" id="vc-perblock-sol">—</div>
+                <div class="vpr-band-usd" id="vc-perblock-usd">—</div>
             </div>
-            <!-- Block Rewards vs Raiku MEV split -->
-            <div class="vpr-grid" style="margin-bottom:0;">
-                <div class="vpr-tile">
-                    <div class="vpr-tile-label">Block Rewards</div>
-                    <div class="vpr-tile-desc">Issuance + Network Block Fees</div>
-                    <div class="vpr-tile-sol" id="vc-blockrewards-sol">—</div>
-                    <div class="vpr-tile-usd" id="vc-blockrewards-usd">—</div>
-                </div>
-                <div class="vpr-tile">
-                    <div class="vpr-tile-label">Raiku MEV</div>
-                    <div class="vpr-tile-desc">AOT + Validator Bonus + JIT + Other JIT</div>
-                    <div class="vpr-tile-sol" id="vc-raikumev-sol">—</div>
-                    <div class="vpr-tile-usd" id="vc-raikumev-usd">—</div>
-                </div>
+            <div class="vpr-band-item">
+                <div class="vpr-band-label">Block Rewards</div>
+                <div class="vpr-band-desc">Issuance + Network Block Fees</div>
+                <div class="vpr-band-sol" id="vc-blockrewards-sol">—</div>
+                <div class="vpr-band-usd" id="vc-blockrewards-usd">—</div>
+            </div>
+            <div class="vpr-band-item">
+                <div class="vpr-band-label">Raiku MEV</div>
+                <div class="vpr-band-desc">AOT + Validator Bonus + JIT + Other JIT</div>
+                <div class="vpr-band-sol" id="vc-raikumev-sol">—</div>
+                <div class="vpr-band-usd" id="vc-raikumev-usd">—</div>
+            </div>
+            <div class="vpr-band-item">
+                <div class="vpr-band-label">Cadence · slots</div>
+                <div class="vpr-band-sol" id="vc-cadence-yr" style="font-size:12px;">—</div>
+                <div class="vpr-band-usd"><span id="vc-cadence-mo">—</span>/mo · 432K/epoch</div>
             </div>
         </div>
-        <!-- Hidden: preserved for renderValidatorYieldScenarioComparison which may still be called -->
-        <div id="validator-scenario-yield-grid" style="display:none;"></div>
     </div>
 </div>
 </div>
@@ -4515,6 +4503,7 @@ function update(){
     _vcEl = document.getElementById('vc-blockrewards-usd'); if(_vcEl) _vcEl.textContent = fmtValidatorUsd(_vcBlockRewSol * p.p);
     _vcEl = document.getElementById('vc-raikumev-sol');     if(_vcEl) _vcEl.textContent = fmtValidatorSol(_vcMevSol);
     _vcEl = document.getElementById('vc-raikumev-usd');     if(_vcEl) _vcEl.textContent = fmtValidatorUsd(_vcMevSol * p.p);
+    renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityFeesApr, priorityFeesApy, totalStakedSol);
     document.getElementById('stake-sol-helper').innerHTML = '<strong>Implied stake:</strong> ' + fmt(raikuStakeSol, 'S') + ' of ' + fmt(totalStakedSol, 'S') + ' total staked';
     document.getElementById('blk-cu-helper').innerHTML = '<strong>Reserved CU:</strong> ' + fmt(reservedCu, 'i') + ' CU of ' + fmt(CB, 'i') + ' CU/block';
     document.getElementById('fcu-block-fee-helper').innerHTML = '<strong>Auction fees/block:</strong> ' + fmt(auctionFeesLamportsPerBlock, 'i') + ' lamports/block (~' + auctionFeesSolPerBlock.toFixed(6) + ' SOL/block)';
