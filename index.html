@@ -1468,30 +1468,50 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-support-sub" id="validator-staked-source">Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a></div>
             </div>
             <div class="validator-support-item">
+                <div class="validator-support-label">Solana Inflation Rate</div>
+                <div class="validator-support-value" id="validator-inflation-rate">3.94%</div>
+                <div class="validator-support-sub">Current Solana protocol inflation. Schedule: 8% initial &rarr; 1.5% terminal, &minus;15%/yr. Fixed model assumption. Source: <a href="https://solanacompass.com/statistics/inflation" target="_blank" rel="noopener noreferrer">Solana Compass</a> / <a href="https://solana.com/docs/economics/inflation/inflation-schedule" target="_blank" rel="noopener noreferrer">Solana Docs</a>.</div>
+            </div>
+            <div class="validator-support-item">
+                <div class="validator-support-label">Active Staking Ratio</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+                    <button class="stepper-btn" type="button" onclick="adjStakingRatio(-1)" aria-label="Decrease">&#8722;</button>
+                    <span id="validator-staking-ratio-display" style="font-family:var(--font-mono);font-size:14px;font-weight:600;min-width:40px;text-align:center;">67%</span>
+                    <button class="stepper-btn" type="button" onclick="adjStakingRatio(1)" aria-label="Increase">+</button>
+                    <input type="range" id="sl-staking-ratio" min="50" max="85" step="1" value="67" style="display:none;" oninput="update()">
+                </div>
+                <div class="validator-support-sub">% of total SOL supply currently staked. Adjusts gross issuance APR. Source: <a href="https://solanacompass.com/statistics/staking" target="_blank" rel="noopener noreferrer">Solana Compass</a> (Feb 2026 &asymp; 67%).</div>
+            </div>
+            <div class="validator-support-item">
+                <div class="validator-support-label">Avg Validator Commission</div>
+                <div class="validator-support-value">7.0%</div>
+                <div class="validator-support-sub">Network-average validator commission, reducing staker yield from gross issuance APR. Fixed model assumption. Source: Trillium validator data.</div>
+            </div>
+            <div class="validator-support-item">
                 <div class="validator-support-label">Base Staking APR</div>
-                <div class="validator-support-value" id="validator-base-apr">4.38%</div>
-                <div class="validator-support-sub">APR back-computed from the sourced Delegator APY using epoch-based compounding inverse: APR = n &times; ((1 + APY)<sup>1/n</sup> &minus; 1), n &asymp; 182.</div>
+                <div class="validator-support-value" id="validator-base-apr">5.47%</div>
+                <div class="validator-support-sub" id="validator-base-apr-sub">Issuance APR = inflation &divide; staking ratio &times; (1 &minus; commission) = 3.94% &divide; 67% &times; 93% &asymp; 5.47%</div>
             </div>
             <div class="validator-support-item">
                 <div class="validator-support-label">Base Staking APY</div>
-                <div class="validator-support-value" id="validator-base-apy">4.48%</div>
-                <div class="validator-support-sub" id="validator-base-yield-source">Source: <a href="https://explorer.rated.network/network?network=solana&timeWindow=30d&page=1&pageSize=15" target="_blank" rel="noopener noreferrer">Rated Network (30d Delegator APY)</a>. Empirical figure — already embeds Solana&rsquo;s current inflation schedule, active staking ratio (~71% of circulating supply), and average validator commission. No manual inflation adjustment needed.</div>
+                <div class="validator-support-value" id="validator-base-apy">5.62%</div>
+                <div class="validator-support-sub">APY = (1 + APR/n)<sup>n</sup> &minus; 1, n &asymp; 182 epochs/yr. Parity: Rated Network 30d Delegator APY &asymp; 4.48% (lower; sourced from older window with higher staking ratio ~71%).</div>
             </div>
             <div class="validator-support-item">
-                <div class="validator-support-label">Priority Fees Yield Uplift</div>
+                <div class="validator-support-label">Non-Raiku Block Fees</div>
                 <div class="validator-support-stack">
                     <div>
-                        <div class="validator-support-value" id="validator-priority-apr">0.40%</div>
-                        <div class="validator-support-sub">Network-average priority fee yield, distributed to block producers proportionally to stake weight. Solana base tx fees are burned and are not validator revenue. Fixed model assumption.</div>
+                        <div class="validator-support-value" id="validator-priority-apr">0.37%</div>
+                        <div class="validator-support-sub">Network-average priority fee yield on residual block production (outside Raiku AOT/JIT modeled share). Scaled by (1 &minus; block%). Solana base tx fees are burned. Fixed assumption: 0.40% network APR.</div>
                     </div>
                     <div>
-                        <div class="validator-support-value" id="validator-priority-apy">0.40%</div>
+                        <div class="validator-support-value" id="validator-priority-apy">0.37%</div>
                         <div class="validator-support-sub">APY equivalent under epoch-based compounding (n &asymp; 182).</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="validator-source-note">Yield stack: <strong>Issuance</strong> (empirical Delegator APY from Rated, staking ratio &amp; commission already embedded) + <strong>Priority fees</strong> (block producer revenue, proportional to stake; base tx fees burned) + <strong>Raiku uplift</strong> (MEV ordering revenue from the Revenue Pool above). APY = (1 + APR / n)<sup>n</sup> &minus; 1, n = EPOCHS_PER_YEAR &asymp; 182 epochs/yr. External parity: Jito / Marinade show ~6.5–7.5% total APY — the difference vs the ~4.9% base here is MEV distribution, captured as Raiku uplift in this model.</div>
+        <div class="validator-source-note">Yield stack: <strong>Issuance</strong> (inflation &divide; staking ratio &times; (1 &minus; commission) &rarr; APR &rarr; epoch-compounded APY) + <strong>Non-Raiku block fees</strong> (priority fees on residual block share; base fees burned) + <strong>Raiku uplift</strong> (MEV/ordering revenue from the Revenue Pool above). APY = (1 + APR/n)<sup>n</sup> &minus; 1, n = EPOCHS_PER_YEAR &asymp; 182 epochs/yr. External parity: JitoSOL &asymp; 7.5% total APY (staking + MEV) &mdash; the MEV component is Raiku uplift in this model. Rated Delegator APY &asymp; 4.48% (30d, older staking ratio).</div>
     </div>
 </div>
 <div class="validator-main">
@@ -2154,10 +2174,15 @@ let _solanaStakeState = {
     sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a>',
     mode: 'reference'
 };
-const BASE_STAKING_APY = 0.0448;
+// Issuance methodology — first principles
+const SOLANA_INFLATION_RATE          = 0.0394;  // Current Solana inflation; source: Solana protocol schedule / getInflationRate RPC
+const ACTIVE_STAKING_RATIO_DEFAULT   = 0.67;    // Default: Solana Compass Feb 2026 (383M / ~570M SOL)
+const AVG_VALIDATOR_COMMISSION       = 0.07;    // Network-average validator commission; source: Trillium validator data
+// Priority fees applied to residual block share only (Raiku block share already captured in AOT/JIT revenue)
+const PRIORITY_FEES_NETWORK_APR      = 0.0040;  // Network-avg priority fee yield; scaled by (1 − blockShare) in update()
+// Parity reference — NOT used as model input
+const RATED_DELEGATOR_APY_REFERENCE  = 0.0448;  // Rated Network 30d Delegator APY; external parity check only
 const APY_COMPOUNDING_PERIODS = EPOCHS_PER_YEAR; // epoch-based compounding (≈ 182 epochs/yr)
-const PRIORITY_FEES_APR_UPLIFT = 0.0040;
-const BASE_YIELD_SOURCE_HTML = 'Source: <a href="https://explorer.rated.network/network?network=solana&timeWindow=30d&page=1&pageSize=15" target="_blank" rel="noopener noreferrer">Rated Network Overview (30d Delegator APY)</a>';
 const SCENARIO_LABELS = { con:'Conservative', base:'Base Case', opt:'Optimistic', bull:'Bull Case' };
 
 function fmt(v,t){
@@ -4136,6 +4161,13 @@ function initAotFcuSection(){
     _renderAotCategoryChart();
 }
 
+function adjStakingRatio(delta) {
+    var el = document.getElementById('sl-staking-ratio');
+    if (!el) return;
+    el.value = Math.min(85, Math.max(50, (+(el.value) || 67) + delta));
+    update();
+}
+
 function update(){
     const p=gp(),r=calc(p);
     const tg = r.totalGross || 1;
@@ -4146,9 +4178,15 @@ function update(){
     const auctionFeesLamportsPerBlock = reservedCu * p.f;
     const auctionFeesSolPerBlock = auctionFeesLamportsPerBlock / LS;
     const capturedJitSol = p.jm * p.j;
-    const baseApy = BASE_STAKING_APY;
-    const baseApr = apyToApr(baseApy, APY_COMPOUNDING_PERIODS);
-    const priorityFeesApr = PRIORITY_FEES_APR_UPLIFT;
+    const stakingRatioSlider = document.getElementById('sl-staking-ratio');
+    const stakingRatio = stakingRatioSlider ? (+(stakingRatioSlider.value) / 100 || ACTIVE_STAKING_RATIO_DEFAULT) : ACTIVE_STAKING_RATIO_DEFAULT;
+    const issuanceAPRgross = SOLANA_INFLATION_RATE / stakingRatio;
+    const issuanceAPR = issuanceAPRgross * (1 - AVG_VALIDATOR_COMMISSION);
+    const issuanceAPY = aprToApy(issuanceAPR, APY_COMPOUNDING_PERIODS);
+    const baseApr = issuanceAPR;
+    const baseApy = issuanceAPY;
+    const residualBlockShare = Math.max(0, 1 - p.b);
+    const priorityFeesApr = PRIORITY_FEES_NETWORK_APR * residualBlockShare;
     const priorityFeesApy = aprToApy(priorityFeesApr, APY_COMPOUNDING_PERIODS);
     const totalValidatorRevenueSol = r.totalValRev + r.otherJitRev; // Raiku JIT + Other JIT + AOT base + AOT bonus
     const totalValidatorRevenueUsd = totalValidatorRevenueSol * p.p;
@@ -4265,7 +4303,10 @@ function update(){
     document.getElementById('validator-base-apy').textContent = fmtValidatorRate(baseApy);
     document.getElementById('validator-priority-apr').textContent = fmtValidatorRate(priorityFeesApr);
     document.getElementById('validator-priority-apy').textContent = fmtValidatorRate(priorityFeesApy);
-    document.getElementById('validator-base-yield-source').innerHTML = BASE_YIELD_SOURCE_HTML;
+    const srDisp = document.getElementById('validator-staking-ratio-display');
+    if (srDisp) srDisp.textContent = (stakingRatio * 100).toFixed(0) + '%';
+    const aprSubEl = document.getElementById('validator-base-apr-sub');
+    if (aprSubEl) aprSubEl.textContent = 'Issuance APR = inflation \u00f7 staking ratio \u00d7 (1 \u2212 commission) = ' + (SOLANA_INFLATION_RATE*100).toFixed(2) + '% \u00f7 ' + (stakingRatio*100).toFixed(0) + '% \u00d7 ' + ((1-AVG_VALIDATOR_COMMISSION)*100).toFixed(0) + '% \u2248 ' + fmtValidatorRate(issuanceAPR);
     document.getElementById('validator-jit-usd').textContent = fmtValidatorUsd(r.jitValidatorBase * p.p);
     document.getElementById('validator-jit-sol').textContent = fmtValidatorSol(r.jitValidatorBase) + '/yr';
     document.getElementById('validator-aot-usd').textContent = fmtValidatorUsd(r.aotValidatorBase * p.p);
@@ -4282,7 +4323,7 @@ function update(){
     document.getElementById('validator-total-apr').textContent = fmtValidatorRate(totalApr);
     document.getElementById('validator-total-apy').textContent = fmtValidatorRate(totalApy);
     document.getElementById('validator-apr-formula-line').innerHTML = 'Incremental APR uplift = Total validator revenue (SOL/yr) / Connected stake (SOL) = <span class="em">' + fmtValidatorSol(totalValidatorRevenueSol) + '</span> / <span class="em">' + fmtValidatorSol(connectedStakeSol) + '</span> = <span class="em">' + fmtValidatorRate(incrementalAprUplift) + '</span>';
-    document.getElementById('validator-apr-formula-note').textContent = 'Total APR = issuance APR (from empirical Delegator APY, staking ratio embedded) + priority fees APR (block producer, proportional to stake; base fees burned) + Raiku uplift APR (Raiku JIT + Other JIT + AOT base + Validator bonus). APY = (1 + APR/n)^n − 1, n = ' + EPOCHS_PER_YEAR + ' epochs/yr.';
+    document.getElementById('validator-apr-formula-note').textContent = 'Total APR = issuance APR (' + (SOLANA_INFLATION_RATE*100).toFixed(2) + '% inflation \u00f7 ' + (stakingRatio*100).toFixed(0) + '% staking ratio \u00d7 (1\u2212' + (AVG_VALIDATOR_COMMISSION*100).toFixed(0) + '% commission) = ' + fmtValidatorRate(issuanceAPR) + ') + non-Raiku block fees APR (' + fmtValidatorRate(priorityFeesApr) + ', residual ' + (residualBlockShare*100).toFixed(0) + '% block share) + Raiku uplift APR. APY = (1 + APR/n)^n \u2212 1, n = ' + EPOCHS_PER_YEAR + ' epochs/yr.';
     const apyFmlEl = document.getElementById('validator-apy-formula');
     if (apyFmlEl) apyFmlEl.innerHTML = 'APY = (1 + APR / n)<sup>n</sup> &minus; 1 &nbsp;&middot;&nbsp; n = <strong>' + EPOCHS_PER_YEAR + '</strong> epochs/yr';
     document.getElementById('validator-decomp-base-apy').textContent = fmtValidatorRate(baseApy) + ' APY';
