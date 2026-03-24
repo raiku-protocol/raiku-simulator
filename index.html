@@ -257,7 +257,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .sidebar-yield-sub a { color:var(--lime-soft); text-decoration:none; }
 .sidebar-yield-sub a:hover { text-decoration:underline; }
 
-.validator-layout { display:grid; grid-template-columns:340px 1fr; gap:var(--gap); }
+.validator-layout { display:grid; grid-template-columns:340px 1fr; column-gap:var(--gap); row-gap:6px; }
 .validator-side { width:340px; min-width:340px; grid-column:1; grid-row:1 / span 2; position:sticky; top:10px; display:flex; flex-direction:column; }
 .validator-main { display:contents; }
 .validator-main > .section { margin-bottom:0; }
@@ -1574,8 +1574,11 @@ details[open] summary::before { transform:rotate(90deg); }
     <span id="validator-scenario-name" style="display:none;">Base Case</span>
 </div>
 <div class="validator-main">
-    <div class="section fade-in fade-in-1">
-        <h2>Protocol Level Yield</h2>
+    <div class="section fade-in fade-in-1" style="padding-bottom:12px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+            <h2 style="margin-bottom:0;">Protocol Level Yield</h2>
+            <button id="vc-iss-toggle-btn" onclick="vcToggleIssuance()" style="font-size:10px; font-family:var(--font-mono); color:var(--text2); background:transparent; border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:3px 8px; cursor:pointer; opacity:0.55; letter-spacing:0.3px;">Hide Issuance</button>
+        </div>
         <div class="validator-decomp-card" style="margin-top:0;">
             <!-- Top summary band: APY headline · APR · annual totals · per block -->
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
@@ -1662,7 +1665,7 @@ details[open] summary::before { transform:rotate(90deg); }
     <span id="validator-apr-formula-line" style="display:none;"></span>
     <span id="validator-apr-formula-note" style="display:none;"></span>
     <span id="validator-apy-formula" style="display:none;"></span>
-    <div class="section fade-in fade-in-2">
+    <div class="section fade-in fade-in-2" style="padding-top:12px;">
         <h2>Protocol Level SOL</h2>
         <div class="vpr-band">
             <div class="vpr-band-item">
@@ -2309,6 +2312,8 @@ function fmtMatrixUsd(v){
     return '$' + Math.round(v);
 }
 
+var vcHideIssuance = false; // visual-only: hide issuance bar segment for readability
+
 // ── Component explainer modal ──────────────────────────────────────────
 function vcOpenExplainer(id) {
     var el = document.getElementById(id);
@@ -2392,6 +2397,18 @@ function vcOpenExplainer(id) {
 function vcCloseExplainer(id) {
     var el = document.getElementById(id);
     if (el) el.classList.remove('open');
+}
+
+function vcToggleIssuance() {
+    vcHideIssuance = !vcHideIssuance;
+    var btn = document.getElementById('vc-iss-toggle-btn');
+    if (btn) {
+        btn.textContent = vcHideIssuance ? 'Show Issuance' : 'Hide Issuance';
+        btn.style.opacity = vcHideIssuance ? '1' : '0.55';
+        btn.style.borderColor = vcHideIssuance ? 'rgba(192,255,56,0.4)' : 'rgba(255,255,255,0.1)';
+        btn.style.color = vcHideIssuance ? '#C0FF38' : 'var(--text2)';
+    }
+    update();
 }
 
 function aprToApy(apr, periods){
@@ -2482,7 +2499,7 @@ function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, p
             '<div class="validator-scenario-yield-card">' +
                 '<div class="validator-scenario-yield-name">' + row.name + '</div>' +
                 '<div class="validator-scenario-yield-bar">' +
-                    '<div class="validator-decomp-seg base"      style="width:' + row.issWidth.toFixed(2)   + '%"></div>' +
+                    '<div class="validator-decomp-seg base"      style="width:' + (vcHideIssuance ? 0 : row.issWidth).toFixed(2) + '%"></div>' +
                     '<div class="validator-decomp-seg priority"  style="width:' + row.blkWidth.toFixed(2)   + '%"></div>' +
                     '<div class="validator-decomp-seg aot"       style="width:' + row.aotWidth.toFixed(2)   + '%"></div>' +
                     '<div class="validator-decomp-seg bonus"     style="width:' + row.bonusWidth.toFixed(2) + '%"></div>' +
@@ -4546,7 +4563,7 @@ function update(){
     const ojitApr  = connectedStakeSol > 0 ? r.otherJitRev / connectedStakeSol : 0;
     // Bar widths (APR basis)
     const totalAprForBar = totalApr > 0 ? totalApr : 1;
-    document.getElementById('validator-yield-iss-seg').style.width   = (issuanceAPR     / totalAprForBar * 100).toFixed(2) + '%';
+    document.getElementById('validator-yield-iss-seg').style.width   = vcHideIssuance ? '0%' : (issuanceAPR / totalAprForBar * 100).toFixed(2) + '%';
     document.getElementById('validator-yield-blk-seg').style.width   = (priorityFeesApr / totalAprForBar * 100).toFixed(2) + '%';
     document.getElementById('validator-yield-aot-seg').style.width   = (aotApr          / totalAprForBar * 100).toFixed(2) + '%';
     document.getElementById('validator-yield-bonus-seg').style.width = (bonusApr        / totalAprForBar * 100).toFixed(2) + '%';
@@ -4555,6 +4572,8 @@ function update(){
     // Legend values (APY primary, APR secondary)
     document.getElementById('validator-decomp-iss-apy').textContent   = fmtValidatorRate(aprToApy(issuanceAPR,     APY_COMPOUNDING_PERIODS)) + ' APY';
     document.getElementById('validator-decomp-iss-apr').textContent   = fmtValidatorRate(issuanceAPR)     + ' APR';
+    var _issLegItem = document.querySelector('[data-component="iss"]');
+    if (_issLegItem) _issLegItem.style.opacity = vcHideIssuance ? '0.3' : '';
     // ── Issuance explainer live values ────────────────────────────────────
     (function() {
         var _e;
