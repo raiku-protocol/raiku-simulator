@@ -2402,9 +2402,9 @@ function vcToggleIssuance() {
     var btn = document.getElementById('vc-iss-toggle-btn');
     if (btn) {
         btn.textContent = vcHideIssuance ? 'Show Issuance' : 'Hide Issuance';
-        btn.style.borderColor = vcHideIssuance ? 'rgba(192,255,56,0.5)' : 'rgba(255,255,255,0.18)';
-        btn.style.color = vcHideIssuance ? '#C0FF38' : 'var(--text-mid)';
-        btn.style.background = vcHideIssuance ? 'rgba(192,255,56,0.07)' : 'rgba(255,255,255,0.04)';
+        btn.style.borderColor = vcHideIssuance ? 'rgba(160,200,120,0.5)' : 'rgba(255,255,255,0.18)';
+        btn.style.color = vcHideIssuance ? '#A0C878' : 'var(--text-mid)';
+        btn.style.background = vcHideIssuance ? 'rgba(160,200,120,0.07)' : 'rgba(255,255,255,0.04)';
     }
     update();
 }
@@ -2479,7 +2479,7 @@ function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, p
         const totalApr = baseApr + cardPriorityApr + raikuApr;
         const totalApy = aprToApy(totalApr, APY_COMPOUNDING_PERIODS);
         const raikuApyUplift = totalApy - basePlusPriorityApy;
-        const totalAprForBar = totalApr > 0 ? totalApr : 1;
+        const totalAprForBar = vcHideIssuance ? (totalApr - baseApr > 0 ? totalApr - baseApr : 1) : (totalApr > 0 ? totalApr : 1);
         return {
             name: SCENARIO_LABELS[key] || key,
             totalApr: totalApr,
@@ -4560,8 +4560,8 @@ function update(){
     const bonusApr = connectedStakeSol > 0 ? (r.aotValBonus + (r.jitValBonus || 0)) / connectedStakeSol : 0;
     const jitApr   = connectedStakeSol > 0 ? r.jitValidatorBase / connectedStakeSol : 0;
     const ojitApr  = connectedStakeSol > 0 ? r.otherJitRev / connectedStakeSol : 0;
-    // Bar widths (APR basis)
-    const totalAprForBar = totalApr > 0 ? totalApr : 1;
+    // Bar widths (APR basis) — rescale to non-issuance sum when issuance is hidden
+    const totalAprForBar = vcHideIssuance ? (totalApr - issuanceAPR > 0 ? totalApr - issuanceAPR : 1) : (totalApr > 0 ? totalApr : 1);
     document.getElementById('validator-yield-iss-seg').style.width   = vcHideIssuance ? '0%' : (issuanceAPR / totalAprForBar * 100).toFixed(2) + '%';
     document.getElementById('validator-yield-blk-seg').style.width   = (priorityFeesApr / totalAprForBar * 100).toFixed(2) + '%';
     document.getElementById('validator-yield-aot-seg').style.width   = (aotApr          / totalAprForBar * 100).toFixed(2) + '%';
