@@ -94,6 +94,32 @@ Protocol-take reconciliation (cleanly verifiable):
 
 ---
 
+### Task 8.bis — Validator Revenue methodology
+Status: DONE
+Last updated: 2026-03-24
+
+Implemented (methodology already in code, confirmed):
+- `issuanceAPR = SOLANA_INFLATION_RATE / stakingRatio` (validator-level gross, no commission)
+- `priorityFeesApr = PRIORITY_FEES_NETWORK_APR * residualBlockShare`
+- `incrementalAprUplift = totalValidatorRevenueSol / connectedStakeSol`
+
+---
+
+### Validator Revenue redesign — Patch 1: decomposition bar expansion
+Status: DONE
+Last updated: 2026-03-24
+
+Implemented:
+- Part A: Expanded decomp bar from 3 segments to 6 segments (Issuance / Residual Block Fees / Raiku AOT / Validator Bonus / Raiku JIT / Other JIT)
+- Part B: APY primary (large), APR secondary (small) in all 6 legend entries; Total row keeps `totalApy = aprToApy(totalApr, n)`
+- Part C: New CSS colors — base #A0C878, priority #6B9EBC, aot #7BBBAF, bonus #4178DE, jit #5B8DEF, other-jit #8E77C7. Added `.validator-decomp-seg` and `.validator-decomp-dot` classes for all 4 new types.
+- Part D: HTML decomp bar replaced (6 seg IDs: iss/blk/aot/bonus/jit/ojit); legend replaced (7 entries: 6 components + Total)
+- Part E: `update()` wired — per-component APR vars `aotApr/bonusApr/jitApr/ojitApr` computed from `r.*`; bar widths and legend values set for all 6 segments. Old 3-seg lines removed.
+- Part F: `renderValidatorYieldScenarioComparison` updated to 6-segment bars per scenario card; same APR decomp logic applied.
+- bonus component uses `r.aotValBonus + (r.jitValBonus || 0)` (not `r.validatorBonus` which does not exist in calc())
+
+---
+
 ## Session notes
 
 2026-03-22 — Task 5 first pass: added Other JIT as free slider, separate flow paths, renamed labels.
@@ -106,3 +132,4 @@ Protocol-take reconciliation (cleanly verifiable):
 2026-03-23 — Task 5 alignment: rightTop=svgTop+28 aligns right stack top with left stack; Validator Base 3-line block with parens and clear gaps.
 2026-03-23 — Task 5 sign-off. Task 5.bis: added 3.5L bucket to sensitivity table fc array.
 2026-03-23 — Task 8: denominator fix, Protocol Revenue rename, Growth+Buyback allocation. Commit 26721dd.
+2026-03-24 — Patch 1: 6-segment decomp bar expansion, APY primary/APR secondary, 6 new colors.
