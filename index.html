@@ -1478,7 +1478,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <span style="font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.6px;">Raiku Validator Stake</span>
                 <span style="font-size:12px; font-family:var(--font-mono); font-weight:600; color:#8a93a8;" id="validator-context-connected">—</span>
             </div>
-            <div style="font-size:9px; color:#404755; margin-top:3px; line-height:1.4;">Active stake × Raiku Stake% · <a href="https://trillium.so/pages/trillium-api-documentation.html" target="_blank" style="color:#4d5566; text-decoration:none; border-bottom:1px solid rgba(77,85,102,0.4);">Trillium</a></div>
+            <div id="validator-stake-formula" style="font-size:10px; color:#5a6272; margin-top:4px; line-height:1.5; font-family:var(--font-mono);">—</div>
         </div>
         <!-- Protocol parameters: AOT vs JIT -->
         <div style="margin-top:14px;">
@@ -1489,22 +1489,25 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-proto-row-label">Protocol Take Rate</div>
                 <div class="validator-proto-cell" id="validator-context-aot-take">5.0%</div>
                 <div class="validator-proto-cell" id="validator-context-jit-take">5.0%</div>
-                <div class="validator-proto-row-label">Stake Share</div>
+                <div class="validator-proto-row-label">Stake / Market Share</div>
                 <div class="validator-proto-cell" id="validator-context-aot-stake">—</div>
                 <div class="validator-proto-cell" id="validator-context-jit-share">—</div>
-                <div class="validator-proto-row-label">Block Share</div>
+                <div class="validator-proto-row-label">Block Alloc (%)</div>
                 <div class="validator-proto-cell" id="validator-context-block">8%</div>
                 <div class="validator-proto-cell dim">N/A</div>
-                <div class="validator-proto-row-label">Avg Fee / CU (lam)</div>
+                <div class="validator-proto-row-label">Avg Fee / CU (Lamports)</div>
                 <div class="validator-proto-cell" id="validator-context-fee">0.50 L</div>
-                <div class="validator-proto-cell" id="validator-context-jit-fee">—</div>
+                <div class="validator-proto-cell" style="display:flex; flex-direction:column; align-items:center; gap:2px; white-space:normal; overflow:visible; text-overflow:clip; padding:4px 5px;">
+                    <span id="validator-context-jit-fee">—</span>
+                    <span id="validator-context-jit-fee-note" style="font-size:8px; font-weight:400; color:#404755; letter-spacing:0; text-transform:none; line-height:1.2;">—</span>
+                </div>
             </div>
         </div>
         <!-- Spacer: absorbs excess card height, pins footer to bottom -->
         <div style="flex:1; min-height:16px;"></div>
         <!-- Footer: note -->
         <div>
-            <div class="validator-note">Protocol-level aggregated setup for Raiku. For individual validator inputs and revenue outputs, use the validator module below.</div>
+            <div class="validator-note" style="font-size:11px; color:#6a7080; line-height:1.6;">Protocol-level aggregated setup for Raiku.<br>For individual validator inputs and outputs, use the validator module below.</div>
         </div>
     </div>
     <!-- Hidden: removed table rows — IDs still written by update() -->
@@ -4342,17 +4345,21 @@ function update(){
     _vcSet('validator-context-stake', (p.s * 100).toFixed(1) + '%');
     _vcSet('validator-context-aot-stake', (p.s * 100).toFixed(1) + '%');
     document.getElementById('validator-context-connected').textContent = fmt(connectedStakeSol, 'S');
+    (function(){ var fEl=document.getElementById('validator-stake-formula'); if(!fEl) return;
+        fEl.innerHTML = fmt(totalStakedSol,'S') + ' \u00d7 ' + (p.s*100).toFixed(1) + '% = ' + fmt(connectedStakeSol,'S') + ' \u00b7 <a href="https://solanacompass.com/tokenomics#staked" target="_blank" style="color:#4d5566;text-decoration:none;border-bottom:1px solid rgba(77,85,102,0.4);">Solana Compass</a>'; }());
     _vcSet('validator-context-block', Math.round(p.b * 100) + '%');
     _vcSet('validator-context-fee', (p.f < 0.1 ? p.f.toFixed(3) : p.f >= 10 ? p.f.toFixed(1) : p.f.toFixed(2)) + ' L');
     _vcSet('validator-context-aot-take', p.ca.toFixed(1) + '%');
     _vcSet('validator-context-jit-take', p.cj.toFixed(1) + '%');
     document.getElementById('validator-context-jit-market').textContent = fmt(p.jm,'S') + '/yr';
-    document.getElementById('validator-context-jit-share').textContent = (p.j * 100).toFixed(1) + '%';
+    _vcSet('validator-context-jit-share', (p.j * 100).toFixed(1) + '%');
     document.getElementById('validator-context-ojit').textContent = fmt(p.jm * Math.max(p.s - p.j, 0),'S') + '/yr';
     // JIT avg fee/CU: window-matched to scenario; Bull uses AOT p.f as display proxy
     (function(){ var jfEl=document.getElementById('validator-context-jit-fee'); if(!jfEl||jfEl.querySelector('input')) return;
         var jfcu = _selectedScenario==='con'?_jitFcuWindows['6m'] : _selectedScenario==='base'?_jitFcuWindows['12m'] : _selectedScenario==='opt'?_jitFcuWindows['24m'] : null;
-        jfEl.textContent = jfcu!=null ? jfcu.toFixed(3)+' L' : p.f.toFixed(2)+' L'; }());
+        jfEl.textContent = jfcu!=null ? jfcu.toFixed(3)+' L' : p.f.toFixed(2)+' L';
+        var jfNoteEl=document.getElementById('validator-context-jit-fee-note');
+        if(jfNoteEl) jfNoteEl.textContent = jfcu!=null ? 'Trillium '+({con:'6m',base:'12m',opt:'24m'}[_selectedScenario]||'')+' hist.' : 'AOT proxy (Bull)'; }());
     document.getElementById('validator-base-apr').textContent = fmtValidatorRate(baseApr);
     document.getElementById('validator-base-apy').textContent = fmtValidatorRate(baseApy);
     document.getElementById('validator-priority-apr').textContent = fmtValidatorRate(priorityFeesApr);
@@ -6480,6 +6487,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     }
     makeEditable('validator-context-price',    'sl-price',    10, 400, 5,    function(v){ return '$'+Math.round(v); });
     makeEditable('validator-context-stake',    'sl-stake',    0,  50,  0.1,  function(v){ return v.toFixed(1)+'%'; });
+    makeEditable('validator-context-aot-stake','sl-stake',    0,  50,  0.1,  function(v){ return v.toFixed(1)+'%'; });
+    makeEditable('validator-context-jit-share','sl-jit',      0,  30,  0.1,  function(v){ return v.toFixed(1)+'%'; });
     makeEditable('validator-context-aot-take', 'sl-comm-aot', 0,  10,  0.25, function(v){ return v.toFixed(1)+'%'; });
     makeEditable('validator-context-jit-take', 'sl-comm-jit', 0,  10,  0.25, function(v){ return v.toFixed(1)+'%'; });
     makeEditable('validator-context-block',    'sl-blk',      0, 100,  0.1,  function(v){ return Math.round(v)+'%'; });
