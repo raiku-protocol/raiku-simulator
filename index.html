@@ -407,6 +407,19 @@ details[open] summary::before { transform:rotate(90deg); }
 .vpr-usd { font-family:var(--font-mono); font-size:10px; color:var(--text2); margin-left:5px; }
 .vpr-cnt { font-family:var(--font-mono); color:var(--text-mid); font-size:11px; }
 
+/* ── Validation / QC panel ──────────────────────────────────────────── */
+.qcp-table { width:100%; border-collapse:collapse; font-size:10.5px; }
+.qcp-table th { font-size:9.5px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; padding:7px 10px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.08); background:#0a0c0f; font-weight:600; white-space:nowrap; }
+.qcp-table td { padding:5px 10px; border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:middle; font-size:10.5px; color:var(--text2); }
+.qcp-table tr:last-child td { border-bottom:none; }
+.qcp-sa { font-size:10px; font-weight:600; color:#4CAF50; }
+.qcp-sc { font-size:10px; font-weight:600; color:#8BC34A; }
+.qcp-sr { font-size:10px; font-weight:600; color:#FF9800; }
+.qcp-sn { font-size:10px; color:var(--text-mid); font-style:italic; }
+.qcp-go { font-family:var(--font-mono); font-size:10px; color:#8BC34A; }
+.qcp-gw { font-family:var(--font-mono); font-size:10px; color:#FF9800; }
+.qcp-nm { color:var(--text-mid); font-style:italic; font-size:10px; }
+
 /* Validator Yield Composition top card — component rows */
 .vc-row { display:flex; align-items:center; justify-content:space-between; padding:5px 8px; background:#111213; border:1px solid #1e2028; border-radius:5px; }
 .vc-row-left { display:flex; align-items:center; gap:7px; }
@@ -1774,6 +1787,50 @@ details[open] summary::before { transform:rotate(90deg); }
     </div>
 </div>
 </div>
+<!-- ── Validation / QC Panel ─────────────────────────────────────────── -->
+<div class="section fade-in fade-in-3" style="margin-top:4px;">
+    <h2 style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        Validation / QC
+        <span id="qcp-epoch-lbl" style="font-size:11px; color:var(--text-mid); font-weight:400; letter-spacing:0; text-transform:none;"></span>
+    </h2>
+    <div style="font-size:11px; color:var(--text2); margin-bottom:10px; line-height:1.5;">
+        Per-block metrics: simulator values (annual ÷ expected leader slots = annual ÷ SY × stake%) vs. live network references from Trillium. Perimeters must match for comparison to be meaningful.
+    </div>
+    <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow:hidden; padding:0 14px;">
+        <table class="qcp-table">
+            <thead>
+                <tr>
+                    <th style="width:14%;">Source</th>
+                    <th style="width:12%;">Validator / Scope</th>
+                    <th style="width:9%;">Window</th>
+                    <th style="width:14%;">Perimeter</th>
+                    <th style="width:14%;">Metric</th>
+                    <th style="width:10%;">Reference</th>
+                    <th style="width:10%;">Simulator</th>
+                    <th style="width:9%;">Gap</th>
+                    <th style="width:8%;">Status</th>
+                </tr>
+            </thead>
+            <tbody id="qcp-tbody">
+                <tr><td colspan="9" class="qcp-nm" style="padding:12px 10px;">Fetching Trillium reference data…</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div style="font-size:9.5px; color:var(--text-mid); margin-top:8px; line-height:1.7;">
+        <strong style="color:var(--text2);">Live source tried:</strong>
+        <a href="https://api.trillium.so/" target="_blank" style="color:var(--text-mid);">Trillium API</a>
+        &nbsp;—&nbsp;
+        <strong style="color:var(--text2);">Manual sources:</strong>
+        <a href="https://dashboards.validblocks.com/api-docs" target="_blank" style="color:var(--text-mid);">ValidBlocks</a> ·
+        <a href="https://schedulerwar.vercel.app/rewards-leaderboard" target="_blank" style="color:var(--text-mid);">Scheduler War</a> ·
+        <a href="https://blog.syndica.io/deep-dive-solana-onchain-activity-january-2026/" target="_blank" style="color:var(--text-mid);">Syndica Jan 2026</a> ·
+        <a href="https://www.figment.io/insights/figment-upgrades-solana-infrastructure-with-rakurai-client/" target="_blank" style="color:var(--text-mid);">Figment</a> ·
+        <a href="https://api.rakurai.io:3000/dashboard" target="_blank" style="color:var(--text-mid);">Rakurai</a>
+        <br>
+        <strong style="color:var(--text2);">Perimeter:</strong>
+        "Inflation only" = total epoch inflation ÷ produced blocks. "Fees only" = validator priority fees ÷ blocks. "MEV only" = Jito MEV earned ÷ blocks. "Total incl. inflation" = sum of all three. Simulator values = annual SOL ÷ (SY × stake%). Trillium: <code>total_total_inflation_reward</code>, <code>total_validator_priority_fees</code>, <code>total_mev_earned</code>, <code>total_blocks_produced</code>.
+    </div>
+</div>
 </div><!-- end tab-validator -->
 
 <!-- ═══ TAB 2: BLOCK SIMULATION ═══ -->
@@ -2482,6 +2539,102 @@ function vprToggle(group) {
         children[i].style.display = expanded ? 'none' : '';
     }
     if (chev) chev.textContent = expanded ? '▾' : '▴';
+}
+
+// ── Validation / QC panel ────────────────────────────────────────────
+window.QCP = { ref: null, sim: {} };
+
+function qcpFetch() {
+    var probe = 960;
+    function tryEpoch(e) {
+        if (e < 920) { qcpFallback('No valid epoch found in range 920–960'); return; }
+        fetch('https://api.trillium.so/epoch_data/' + e)
+            .then(function(r) {
+                if (r.status === 404) { tryEpoch(e - 1); return null; }
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(function(d) {
+                if (!d) return;
+                var blocks = d.total_blocks_produced || 1;
+                window.QCP.ref = {
+                    epoch: e,
+                    blocks: blocks,
+                    iss:   (d.total_total_inflation_reward  || 0) / blocks,
+                    fees:  (d.total_validator_priority_fees || 0) / blocks,
+                    mev:   (d.total_mev_earned              || 0) / blocks,
+                    total: ((d.total_total_inflation_reward || 0) + (d.total_validator_priority_fees || 0) + (d.total_mev_earned || 0)) / blocks,
+                    px:    d.sol_price_usd || 0
+                };
+                qcpRender();
+            })
+            .catch(function() {
+                qcpFallback('Trillium fetch failed (CORS or network) — open DevTools > Network to inspect');
+            });
+    }
+    tryEpoch(probe);
+}
+
+function qcpFallback(msg) {
+    var tb = document.getElementById('qcp-tbody');
+    if (tb) tb.innerHTML = '<tr><td colspan="9" class="qcp-nm" style="padding:12px 10px;">Live fetch failed: ' + msg + '. Use manual source links below.</td></tr>';
+}
+
+function qcpRender() {
+    var tb = document.getElementById('qcp-tbody');
+    if (!tb) return;
+    var ref = window.QCP.ref;
+    var sim = window.QCP.sim || {};
+    if (!ref || !ref.epoch) { qcpFallback('Reference not yet loaded'); return; }
+
+    function fSol(v) {
+        if (v == null || isNaN(v)) return '—';
+        return v < 0.001 ? v.toFixed(6) : v.toFixed(5);
+    }
+    function fGap(sv, rv) {
+        if (sv == null || !rv) return '<span class="qcp-nm">—</span>';
+        var g = (sv - rv) / rv * 100;
+        var cls = Math.abs(g) < 15 ? 'qcp-go' : 'qcp-gw';
+        return '<span class="' + cls + '">' + (g >= 0 ? '+' : '') + g.toFixed(1) + '%</span>';
+    }
+    function fStat(sv, rv) {
+        if (sv == null || !rv) return '<span class="qcp-sn">—</span>';
+        var g = Math.abs((sv - rv) / rv * 100);
+        if (g < 5)  return '<span class="qcp-sa">Aligned</span>';
+        if (g < 15) return '<span class="qcp-sc">Close</span>';
+        return '<span class="qcp-sr">Needs review</span>';
+    }
+    function row(src, scope, win, per, met, rv, sv) {
+        var rvFmt = '<span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text);">' + fSol(rv) + ' SOL</span>';
+        var svFmt = '<span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text);">' + fSol(sv) + ' SOL</span>';
+        return '<tr><td>' + src + '</td><td>' + scope + '</td><td>' + win + '</td><td>' + per + '</td><td>' + met + '</td>'
+            + '<td>' + rvFmt + '</td><td>' + svFmt + '</td><td>' + fGap(sv, rv) + '</td><td>' + fStat(sv, rv) + '</td></tr>';
+    }
+    function rowNc(src, scope, win, per, met, note) {
+        return '<tr><td>' + src + '</td><td>' + scope + '</td><td>' + win + '</td><td>' + per + '</td><td>' + met + '</td>'
+            + '<td colspan="4"><span class="qcp-nm">' + note + '</span></td></tr>';
+    }
+
+    var ep  = 'Epoch ' + ref.epoch;
+    var trl = '<a href="https://api.trillium.so/" target="_blank" style="color:var(--text2);">Trillium</a>';
+    var vbl = '<a href="https://dashboards.validblocks.com/api-docs" target="_blank" style="color:var(--text2);">ValidBlocks</a>';
+    var swl = '<a href="https://schedulerwar.vercel.app/rewards-leaderboard" target="_blank" style="color:var(--text2);">Scheduler War</a>';
+    var syl = '<a href="https://blog.syndica.io/deep-dive-solana-onchain-activity-january-2026/" target="_blank" style="color:var(--text2);">Syndica</a>';
+    var rkl = '<a href="https://api.rakurai.io:3000/dashboard" target="_blank" style="color:var(--text2);">Rakurai</a>';
+
+    var html = ''
+        + row(trl,  'Network avg', ep, 'Inflation only',        'Issuance / block',       ref.iss,   sim.iss)
+        + row(trl,  'Network avg', ep, 'Fees only',             'Priority fees / block',  ref.fees,  sim.blk)
+        + row(trl,  'Network avg', ep, 'MEV only',              'Jito MEV / block',       ref.mev,   sim.mev)
+        + row(trl,  'Network avg', ep, 'Total incl. inflation', 'REV / block',            ref.total, sim.total)
+        + rowNc(vbl, 'Per-validator', 'Multi-epoch',  'Block rewards + MEV', 'avgRewardsPerBlock', 'Live via /api/epochs/{epoch} — manual lookup; use /api/rewards-stats for 30-epoch view')
+        + rowNc(swl, 'Network',       ep,             'Fees + tips only',    'Avg / block (no inflation)', 'Manual — leaderboard shows per-validator blocks + tips; no direct CORS API')
+        + rowNc(syl, 'Network',       'Jan 2026 art.',  'Distributional ref',  'Block reward distribution',  'Short sample article — perimeter differs from full REV; use for context only')
+        + rowNc(rkl, 'Dashboard',     '—',            '—',                   '—',                         'Unavailable live (CORS / port 3000)');
+
+    var lbl = document.getElementById('qcp-epoch-lbl');
+    if (lbl) lbl.textContent = '— ref: epoch ' + ref.epoch + ' (' + Math.round(ref.blocks).toLocaleString() + ' blocks)';
+    tb.innerHTML = html;
 }
 
 function vcToggleIssuance() {
@@ -4806,12 +4959,24 @@ function update(){
         ];
         _rows.forEach(function(row) {
             var _id = row[0], _ann = row[1];
-            _el = document.getElementById(_id + '-block');  if(_el) _el.innerHTML = _vprCell(_ann, SY);
+            _el = document.getElementById(_id + '-block');  if(_el) _el.innerHTML = _vprCell(_ann, SY * _sk);
             _el = document.getElementById(_id + '-epoch');  if(_el) _el.innerHTML = _vprCell(_ann, _EPY);
             _el = document.getElementById(_id + '-month');  if(_el) _el.innerHTML = _vprCell(_ann, 12);
             _el = document.getElementById(_id + '-year');   if(_el) _el.innerHTML = _vprCell(_ann, 1);
         });
     })();
+    // ── QCP: push corrected per-block sim values for the Validation panel ──
+    if (p.s > 0 && window.QCP) {
+        var _qblk = SY * p.s;
+        window.QCP.sim = {
+            iss:   issSolYr      / _qblk,
+            blk:   blkSolYr     / _qblk,
+            mev:   _vcMevSol    / _qblk,
+            total: _vcTotalSolYr / _qblk,
+            px:    p.p
+        };
+        if (window.QCP.ref) qcpRender();
+    }
     renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityFeesApr, priorityFeesApy, totalStakedSol, p);
     document.getElementById('stake-sol-helper').innerHTML = '<strong>Implied stake:</strong> ' + fmt(raikuStakeSol, 'S') + ' of ' + fmt(totalStakedSol, 'S') + ' total staked';
     document.getElementById('blk-cu-helper').innerHTML = '<strong>Reserved CU:</strong> ' + fmt(reservedCu, 'i') + ' CU of ' + fmt(CB, 'i') + ' CU/block';
@@ -5107,7 +5272,7 @@ function initHybridControls() {
     });
 }
 
-renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); setCalibrationContext('horizon'); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls(); _populateJitWindowRef();
+renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); setCalibrationContext('horizon'); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls(); _populateJitWindowRef(); qcpFetch();
 
 // Calibration source info popover — moved to document.body to escape all stacking contexts
 (function() {
