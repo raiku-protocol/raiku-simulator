@@ -1542,7 +1542,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <button class="scenario-btn" id="validator-btn-bull" onclick="applyScenario('bull')">Bull Case</button>
             </div>
         </div>
-        <!-- Market setup: SOL Price + Raiku Stake (2-col) -->
+        <!-- Market setup: SOL Price + Raiku Stake + Network Fees APR (2-col grid, wraps) -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:20px;">
             <div class="validator-context-item">
                 <div class="validator-context-label">SOL Price</div>
@@ -1551,6 +1551,10 @@ details[open] summary::before { transform:rotate(90deg); }
             <div class="validator-context-item">
                 <div class="validator-context-label">Raiku Stake</div>
                 <div class="validator-context-value" id="validator-context-stake">10.0%</div>
+            </div>
+            <div class="validator-context-item">
+                <div class="validator-context-label">Network Fees APR</div>
+                <div class="validator-context-value" id="validator-context-nfapr">0.50%</div>
             </div>
         </div>
         <!-- Derived: Raiku Validator Stake -->
@@ -1593,6 +1597,7 @@ details[open] summary::before { transform:rotate(90deg); }
     <span id="validator-context-ojit" style="display:none;"></span>
     <!-- Base Network Yield inputs — hidden in this layout; controls appear in component expand rows (Patch 3) -->
     <input type="range" id="sl-staking-ratio" min="50" max="85" step="0.1" value="67.7" style="display:none;" oninput="update()">
+    <input type="range" id="sl-nfapr" min="0" max="2" step="0.01" value="0.50" style="display:none;" oninput="update()">
     <span id="validator-staked-value" style="display:none;"></span>
     <span id="validator-staked-source" style="display:none;"></span>
     <span id="validator-inflation-rate" style="display:none;"></span>
@@ -2403,8 +2408,8 @@ const SOLANA_INFLATION_RATE          = 0.0394;  // Solana protocol inflation (al
 const ACTIVE_STAKING_RATIO_DEFAULT   = 0.677;   // Default: March 2026 ≈ 67.7%
 // Commission reference — NOT used in issuance formula (Tab 2 shows validator-level gross, not delegator net)
 const AVG_VALIDATOR_COMMISSION_REF   = 0.07;    // Network-avg commission, reference only; source: Trillium validator data
-// Priority fees applied to residual block share only (Raiku AOT block share already in AOT revenue model)
-const PRIORITY_FEES_NETWORK_APR      = 0.0054;  // Marinade block rewards APR benchmark (last 28d, Mar 2026) — scaled by (1 − blockShare) in update()
+// Network Fees APR (base + priority) — now user-configurable via sl-nfapr (default 0.50%; historical Marinade ref ≈ 0.54%)
+// Applied to residual block share only (Raiku AOT block share already in AOT revenue model)
 // Parity reference — NOT used as model input
 const RATED_DELEGATOR_APY_REFERENCE  = 0.0448;  // Rated Network 30d Delegator APY; includes commission; parity check only
 const APY_COMPOUNDING_PERIODS = EPOCHS_PER_YEAR; // epoch-based compounding (≈ 182 epochs/yr)
@@ -2465,9 +2470,13 @@ function vcOpenExplainer(id) {
     }
     if (id === 'vc-explainer-blk') {
         var slB = document.getElementById('sl-blk');
+        var slNf = document.getElementById('sl-nfapr');
         var bShare = slB ? (+(slB.value) / 100) : 0.08;
+        var nfapr  = slNf ? +slNf.value/100 : 0.005;
         var residual = Math.max(0, 1 - bShare);
-        var pAPR = PRIORITY_FEES_NETWORK_APR * residual, pAPY = aprToApy(pAPR, APY_COMPOUNDING_PERIODS);
+        var pAPR = nfapr * residual, pAPY = aprToApy(pAPR, APY_COMPOUNDING_PERIODS);
+        _e = document.getElementById('vc-blk-exp-nfapr');     if(_e) _e.textContent = fmtValidatorRate(nfapr);
+        _e = document.getElementById('vc-blk-exp-nfapr-inp'); if(_e) _e.textContent = fmtValidatorRate(nfapr);
         _e = document.getElementById('vc-blk-exp-bshare');    if(_e) _e.textContent = (bShare * 100).toFixed(0) + '%';
         _e = document.getElementById('vc-blk-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(pAPR);
         _e = document.getElementById('vc-blk-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(pAPY);
@@ -2693,9 +2702,11 @@ function getDisplayedScenarioName(){
 function getScenarioParams(key){
     const s = SC[key];
     if (!s) return null;
+    const slNf = document.getElementById('sl-nfapr');
     return {
         ca:s.ca, cj:s.cj, ra:s.ra, rj:s.rj, vb:s.vb,
-        jm:s.jm, j:s.j/100, s:s.s/100, b:s.b/100, f:s.f, p:s.p
+        jm:s.jm, j:s.j/100, s:s.s/100, b:s.b/100, f:s.f, p:s.p,
+        nfapr: slNf ? +slNf.value/100 : 0.005
     };
 }
 
@@ -2705,7 +2716,7 @@ function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, p
     const rows = ['con','base','opt','bull'].map(function(key){
         const p = (key === _selectedScenario && liveP) ? liveP : getScenarioParams(key);
         const r = calc(p);
-        const cardPriorityApr = PRIORITY_FEES_NETWORK_APR * Math.max(0, 1 - p.b);
+        const cardPriorityApr = (p.nfapr || 0.005) * Math.max(0, 1 - p.b);
         const basePlusPriorityApy = aprToApy(baseApr + cardPriorityApr, APY_COMPOUNDING_PERIODS);
         const connectedStakeSol = totalStakedSol * p.s;
         const aotApr   = connectedStakeSol > 0 ? r.aotValidatorBase / connectedStakeSol : 0;
@@ -2941,7 +2952,8 @@ function gp(){return{
     b:+document.getElementById('sl-blk').value/100,
     f:+document.getElementById('sl-fcu').value,
     p:+document.getElementById('sl-price').value,
-};}    
+    nfapr:+document.getElementById('sl-nfapr').value/100,  // Network Fees APR as decimal (e.g. 0.005 for 0.50%)
+};}
 
 function computeJitStats(windowEpochs) {
     const data = D_JITO.filter(r => r[1] > 0);
@@ -4640,7 +4652,7 @@ function update(){
     const baseApr = issuanceAPR;
     const baseApy = issuanceAPY;
     const residualBlockShare = Math.max(0, 1 - p.b);
-    const priorityFeesApr = PRIORITY_FEES_NETWORK_APR * residualBlockShare;
+    const priorityFeesApr = p.nfapr * residualBlockShare;
     const priorityFeesApy = aprToApy(priorityFeesApr, APY_COMPOUNDING_PERIODS);
     const totalValidatorRevenueSol = r.totalValRev + r.otherJitRev; // Raiku JIT + Other JIT + AOT base + AOT bonus
     const totalValidatorRevenueUsd = totalValidatorRevenueSol * p.p;
@@ -4748,6 +4760,7 @@ function update(){
     document.getElementById('validator-scenario-name').textContent = getDisplayedScenarioName();
     _vcSet('validator-context-price', '$' + p.p);
     _vcSet('validator-context-stake', (p.s * 100).toFixed(1) + '%');
+    _vcSet('validator-context-nfapr', (p.nfapr * 100).toFixed(2) + '%');
     document.getElementById('validator-context-connected').textContent = fmt(connectedStakeSol, 'S');
     (function(){ var fEl=document.getElementById('validator-stake-formula'); if(!fEl) return;
         fEl.innerHTML = fmt(totalStakedSol,'S') + ' \u00d7 ' + (p.s*100).toFixed(1) + '% = ' + fmt(connectedStakeSol,'S') + ' \u00b7 <a href="https://solanacompass.com/tokenomics#staked" target="_blank" style="color:#4d5566;text-decoration:none;border-bottom:1px solid rgba(77,85,102,0.4);">Solana Compass</a> <span style="opacity:0.6;">(snapshot, Mar\u00a02026)</span>'; }());
@@ -7016,6 +7029,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     }
     makeEditable('validator-context-price',    'sl-price',    10, 400, 5,    function(v){ return '$'+Math.round(v); });
     makeEditable('validator-context-stake',    'sl-stake',    0,  50,  0.1,  function(v){ return v.toFixed(1)+'%'; });
+    makeEditable('validator-context-nfapr',    'sl-nfapr',    0,  2,   0.01, function(v){ return v.toFixed(2)+'%'; });
     makeEditable('validator-context-aot-take', 'sl-comm-aot', 0,  10,  0.25, function(v){ return v.toFixed(1)+'%'; });
     makeEditable('validator-context-jit-take', 'sl-comm-jit', 0,  10,  0.25, function(v){ return v.toFixed(1)+'%'; });
     makeEditable('validator-context-block',    'sl-blk',      0, 100,  0.1,  function(v){ return Math.round(v)+'%'; });
@@ -7104,7 +7118,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Live formula</div>
             <div class="vc-explainer-formula">
-                <div>Network Fees APR = 0.54% &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-apr">—</span></div>
+                <div>Network Fees APR = <span class="vc-ef-val" id="vc-blk-exp-nfapr">—</span> &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-apr">—</span></div>
                 <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-blk-exp-apy">—</span></div>
             </div>
         </div>
@@ -7113,10 +7127,10 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             <div class="vc-explainer-section-title">Live inputs</div>
             <div class="vc-explainer-inputs">
                 <div class="vc-explainer-input-row">
-                    <span class="vc-explainer-input-key">Block Rewards APR (Marinade, last 28d)
-                        <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade</a>
+                    <span class="vc-explainer-input-key">Network Fees APR (base + priority, user-set; default 0.50%)
+                        <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ ref: Marinade</a>
                     </span>
-                    <span class="vc-explainer-input-val">0.54%</span>
+                    <span class="vc-explainer-input-val" id="vc-blk-exp-nfapr-inp">0.50%</span>
                 </div>
                 <div class="vc-explainer-input-row">
                     <span class="vc-explainer-input-key">Raiku Block Share (active scenario)</span>
@@ -7137,7 +7151,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Reference</div>
             <div class="vc-explainer-sources">
-                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (0.54%, last 28 days)</a>
+                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (reference; default 0.50%, user-configurable)</a>
             </div>
         </div>
     </div>
