@@ -1577,7 +1577,7 @@ details[open] summary::before { transform:rotate(90deg); }
     <div class="section fade-in fade-in-1" style="padding-bottom:8px; position:relative;">
         <h2>Validator Yield (Protocol Level)</h2>
         <button id="vc-iss-toggle-btn" onclick="vcToggleIssuance()" style="position:absolute; top:14px; right:14px; font-size:10px; font-family:var(--font-mono); color:var(--text-mid); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.2); border-radius:4px; padding:3px 8px; cursor:pointer; letter-spacing:0.3px; white-space:nowrap;">Hide Issuance</button>
-        <div class="validator-decomp-card" style="margin-top:0;">
+        <div class="validator-decomp-card" style="margin-top:0; padding-bottom:4px;">
             <!-- Top summary band: APY headline · APR · annual totals · per block -->
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
                 <span id="vc-total-apy" style="font-family:var(--font-mono); font-size:24px; font-weight:700; color:#C0FF38; line-height:1;">0.00%</span>
@@ -1642,7 +1642,7 @@ details[open] summary::before { transform:rotate(90deg); }
             <span id="validator-decomp-total-apr" style="display:none;"></span>
         </div><!-- end decomp-card -->
         <!-- Scenario comparison — 4 mini cards below the selected-scenario yield summary -->
-        <div class="validator-scenario-yield-grid" id="validator-scenario-yield-grid" style="margin-top:12px;"></div>
+        <div class="validator-scenario-yield-grid" id="validator-scenario-yield-grid" style="margin-top:4px;"></div>
     </div>
     <!-- Hidden spans: KPI IDs still written to by update() -->
     <span id="validator-ojit-usd" style="display:none;"></span>
