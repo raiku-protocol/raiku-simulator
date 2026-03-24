@@ -1551,7 +1551,7 @@ details[open] summary::before { transform:rotate(90deg); }
         <h2>Protocol Level Yield</h2>
         <div class="validator-decomp-card" style="margin-top:0;">
             <!-- Top summary band: APY headline · APR · annual totals · per block -->
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:3px;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
                 <span id="vc-total-apy" style="font-family:var(--font-mono); font-size:24px; font-weight:700; color:#C0FF38; line-height:1;">0.00%</span>
                 <span style="font-size:11px; color:#C0FF38; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Total APY</span>
                 <span style="display:inline-flex; align-items:center; gap:5px; background:rgba(192,255,56,0.07); border:1px solid rgba(192,255,56,0.2); border-radius:5px; padding:2px 8px;">
@@ -1563,8 +1563,8 @@ details[open] summary::before { transform:rotate(90deg); }
                     <span id="vc-total-apr" style="font-family:var(--font-mono); font-size:14px; color:var(--text-mid); font-weight:500;">0.00%</span>
                     <span style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">APR</span>
                 </span>
+                <span style="flex:1; text-align:right; font-size:8px; color:var(--text2); padding-left:6px; white-space:nowrap;">* APY per component compounded individually from APR</span>
             </div>
-            <div style="font-size:9px; color:var(--text2); line-height:1.4; padding-left:2px; margin-bottom:10px;">* Component APYs individually compounded from APR — don't sum exactly to Total APY</div>
             <!-- 6-segment composition bar -->
             <div class="validator-decomp-bar" id="validator-yield-decomp-bar" style="margin-bottom:8px;">
                 <div class="validator-decomp-seg base"      id="validator-yield-iss-seg"   style="width:0%"></div>
@@ -2377,8 +2377,17 @@ function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, p
                     '<div class="validator-decomp-seg jit"       style="width:' + row.jitWidth.toFixed(2)   + '%"></div>' +
                     '<div class="validator-decomp-seg other-jit" style="width:' + row.ojitWidth.toFixed(2)  + '%"></div>' +
                 '</div>' +
-                '<div class="validator-scenario-yield-total">' + fmtValidatorRate(row.totalApy) + ' APY</div>' +
-                '<div class="validator-scenario-yield-sub">+' + fmtValidatorRate(row.raikuApyUplift) + ' Raiku APY · ' + fmtValidatorRate(row.totalApr) + ' APR</div>' +
+                '<div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap; margin-top:4px;">' +
+                    '<span style="font-family:var(--font-mono); font-size:18px; font-weight:700; color:#C0FF38; line-height:1;">' + fmtValidatorRate(row.totalApy) + '</span>' +
+                    '<span style="font-size:9px; color:#C0FF38; text-transform:uppercase; letter-spacing:0.4px; font-weight:600;">APY</span>' +
+                    '<span style="display:inline-flex; align-items:center; gap:3px; background:rgba(192,255,56,0.07); border:1px solid rgba(192,255,56,0.2); border-radius:4px; padding:1px 5px;">' +
+                        '<span style="font-family:var(--font-mono); font-size:10px; font-weight:600; color:#C0FF38;">+' + fmtValidatorRate(row.raikuApyUplift) + '</span>' +
+                        '<span style="font-size:8px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">Raiku APY</span>' +
+                    '</span>' +
+                    '<span style="opacity:0.25; font-size:10px; margin:0 1px;">·</span>' +
+                    '<span style="font-family:var(--font-mono); font-size:11px; color:var(--text-mid); font-weight:500;">' + fmtValidatorRate(row.totalApr) + '</span>' +
+                    '<span style="font-size:8px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">APR</span>' +
+                '</div>' +
             '</div>';
     }).join('');
 }
