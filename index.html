@@ -1561,7 +1561,7 @@ details[open] summary::before { transform:rotate(90deg); }
     <span id="validator-context-jit-market" style="display:none;"></span>
     <span id="validator-context-ojit" style="display:none;"></span>
     <!-- Base Network Yield inputs — hidden in this layout; controls appear in component expand rows (Patch 3) -->
-    <input type="range" id="sl-staking-ratio" min="50" max="85" step="1" value="66" style="display:none;" oninput="update()">
+    <input type="range" id="sl-staking-ratio" min="50" max="85" step="0.1" value="67.7" style="display:none;" oninput="update()">
     <span id="validator-staked-value" style="display:none;"></span>
     <span id="validator-staked-source" style="display:none;"></span>
     <span id="validator-inflation-rate" style="display:none;"></span>
@@ -2267,8 +2267,8 @@ let _solanaStakeState = {
 // Source: Solana RPC getInflationRate epoch 945 → 3.9395%; schedule: 8% initial, −15%/yr, 1.5% terminal
 const SOLANA_INFLATION_RATE          = 0.0394;  // Solana protocol inflation (all new SOL goes to validators; foundation rate = 0)
 // Staking ratio = active stake / total SOL supply (NOT vs circulating supply)
-// Source: Trillium epoch 936 active stake 413.5M / RPC getSupply total 622.9M = 66.4%
-const ACTIVE_STAKING_RATIO_DEFAULT   = 0.66;    // Default: March 2026 ≈ 66%
+// Source: Solana Compass tokenomics (Mar 2026) → 421,562,663.7 staked = 67.7% of total supply
+const ACTIVE_STAKING_RATIO_DEFAULT   = 0.677;   // Default: March 2026 ≈ 67.7%
 // Commission reference — NOT used in issuance formula (Tab 2 shows validator-level gross, not delegator net)
 const AVG_VALIDATOR_COMMISSION_REF   = 0.07;    // Network-avg commission, reference only; source: Trillium validator data
 // Priority fees applied to residual block share only (Raiku AOT block share already in AOT revenue model)
@@ -6675,12 +6675,12 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Staking ratio</div>
-            <div class="vc-explainer-note">The staking ratio is the share of total SOL supply that is actively staked (currently ~<span id="vc-iss-exp-staking3" style="color:var(--text); font-family:var(--font-mono);">—</span>). It is the denominator in the APR formula: the higher the share of supply staked, the lower the per-unit issuance yield. A rising staking ratio compresses APR for the same inflation level. <a class="vc-explainer-source-inline" href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener">↗ Solana Compass</a></div>
+            <div class="vc-explainer-note">The staking ratio is the share of total SOL supply that is actively staked (currently <span id="vc-iss-exp-staking3" style="color:var(--text); font-family:var(--font-mono);">—</span> — source: Solana Compass, Mar 2026). It is the denominator in the APR formula: the higher the share of supply staked, the lower the per-unit issuance yield. A rising staking ratio compresses APR for the same inflation level. <a class="vc-explainer-source-inline" href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener">↗ Solana Compass</a></div>
         </div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Cross-check vs. Marinade</div>
-            <div class="vc-explainer-note">At default inputs (3.94% inflation, 66% staking ratio) this model yields <strong style="color:var(--text);">5.97% issuance APR</strong>. <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade Network Stats</a> shows ~5.93% APR (March 2026). Delta: 0.04pp — within normal measurement noise from source timing and staking ratio rounding. Alignment confirms the methodology is correctly calibrated.</div>
+            <div class="vc-explainer-note">At default inputs (3.94% inflation, 67.7% staking ratio) this model yields <strong style="color:var(--text);">5.82% issuance APR</strong>. <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade Network Stats</a> shows ~5.93% APR (March 2026). Delta: 0.11pp. Likely sources of difference: Marinade may use a slightly lower staking ratio or a different inflation capture point. The methodology is consistent — both figures are derived from the same underlying formula.</div>
         </div>
 
         <div class="vc-explainer-section">
