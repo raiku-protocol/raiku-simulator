@@ -267,8 +267,8 @@ details[open] summary::before { transform:rotate(90deg); }
 .validator-context-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:700; background:#060809; border:1px solid #20252c; border-radius:5px; padding:7px 8px; margin-top:0; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
 .validator-note { font-size:10px; color:var(--text-mid); line-height:1.5; }
 /* Component explainer triggers */
-.vc-info-btn { background:none; border:none; cursor:pointer; padding:0 0 0 4px; font-size:10px; color:#7FBDD9; opacity:1; line-height:1; flex-shrink:0; vertical-align:middle; }
-.vc-info-btn:hover { color:#B0D8EB; }
+.vc-info-btn { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; border:1px solid #3a3d42; background:#17181b; color:var(--text2); font-size:10px; font-weight:600; cursor:pointer; line-height:1; flex-shrink:0; vertical-align:middle; margin-left:2px; }
+.vc-info-btn:hover { border-color:#5a5d62; color:var(--text); }
 /* Explainer modal */
 .vc-explainer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; justify-content:center; align-items:center; }
 .vc-explainer-overlay.open { display:flex; }
@@ -1604,33 +1604,33 @@ details[open] summary::before { transform:rotate(90deg); }
             <!-- Component legend — 6-column grid, data-component reserved for Patch 3 expand -->
             <div class="validator-decomp-legend" style="grid-template-columns:repeat(6,minmax(0,1fr)); gap:4px 8px; margin-top:8px;">
                 <div class="validator-decomp-item" data-component="iss">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot base"></span>Issuance<button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-iss')">ⓘ</button></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot base"></span>Issuance<button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-iss')">?</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-iss-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-iss-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="blk">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot priority"></span>Network Fees<button class="vc-info-btn" style="opacity:0.2;" disabled>ⓘ</button></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot priority"></span>Network Fees<button class="vc-info-btn" style="opacity:0.2;" disabled>?</button></div>
                     <div style="font-size:8px; color:var(--text2); margin-bottom:2px; line-height:1.3;">base + priority fees</div>
                     <div class="validator-decomp-value" id="validator-decomp-blk-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-blk-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="aot">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot aot"></span>Raiku AOT<button class="vc-info-btn" style="opacity:0.2;" disabled>ⓘ</button></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot aot"></span>Raiku AOT<button class="vc-info-btn" style="opacity:0.2;" disabled>?</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-aot-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-aot-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="jit">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot jit"></span>Raiku JIT<button class="vc-info-btn" style="opacity:0.2;" disabled>ⓘ</button></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot jit"></span>Raiku JIT<button class="vc-info-btn" style="opacity:0.2;" disabled>?</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-jit-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-jit-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="bonus">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot bonus"></span>Validator Bonus<button class="vc-info-btn" style="opacity:0.2;" disabled>ⓘ</button></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot bonus"></span>Validator Bonus<button class="vc-info-btn" style="opacity:0.2;" disabled>?</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-bonus-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-bonus-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="ojit">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot other-jit"></span>Other JIT<button class="vc-info-btn" style="opacity:0.2;" disabled>ⓘ</button></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot other-jit"></span>Other JIT<button class="vc-info-btn" style="opacity:0.2;" disabled>?</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-ojit-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-ojit-apr">0.00% APR</div>
                 </div>
