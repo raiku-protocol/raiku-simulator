@@ -1556,7 +1556,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <span style="font-size:11px; color:#C0FF38; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Total APY</span>
                 <span style="display:inline-flex; align-items:center; gap:5px; background:rgba(192,255,56,0.07); border:1px solid rgba(192,255,56,0.2); border-radius:5px; padding:2px 8px;">
                     <span id="vc-raiku-apy-uplift" style="font-family:var(--font-mono); font-size:13px; font-weight:600; color:#C0FF38;">+0.00%</span>
-                    <span style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">Raiku APR</span>
+                    <span style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">Raiku APY</span>
                 </span>
                 <span style="opacity:0.25; font-size:12px; margin:0 1px;">·</span>
                 <span style="display:inline-flex; align-items:baseline; gap:4px;">
@@ -1573,52 +1573,41 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-decomp-seg jit"       id="validator-yield-jit-seg"   style="width:0%"></div>
                 <div class="validator-decomp-seg other-jit" id="validator-yield-ojit-seg"  style="width:0%"></div>
             </div>
-            <!-- Component legend — 3-column grid, data-component reserved for Patch 3 expand -->
-            <div class="validator-decomp-legend" style="grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px 10px; margin-top:8px;">
+            <!-- Component legend — 6-column grid, data-component reserved for Patch 3 expand -->
+            <div class="validator-decomp-legend" style="grid-template-columns:repeat(6,minmax(0,1fr)); gap:4px 8px; margin-top:8px;">
                 <div class="validator-decomp-item" data-component="iss">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot base"></span>Issuance</div>
-                    <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-iss-apr">0.00% APR</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-iss-apy" style="margin-top:0;">0.00% APY</div>
-                    </div>
+                    <div class="validator-decomp-value" id="validator-decomp-iss-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-iss-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="blk">
-                    <div class="validator-decomp-label"><span class="validator-decomp-dot priority"></span>Network Fees</div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot priority"></span>Network Fees<!-- ⓘ --></div>
                     <div style="font-size:8px; color:var(--text2); margin-bottom:2px; line-height:1.3;">base + priority fees</div>
-                    <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-blk-apr">0.00% APR</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-blk-apy" style="margin-top:0;">0.00% APY</div>
-                    </div>
+                    <div class="validator-decomp-value" id="validator-decomp-blk-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-blk-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="aot">
-                    <div class="validator-decomp-label"><span class="validator-decomp-dot aot"></span>Raiku AOT</div>
-                    <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-aot-apr">0.00% APR</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-aot-apy" style="margin-top:0;">0.00% APY</div>
-                    </div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot aot"></span>Raiku AOT<!-- ⓘ --></div>
+                    <div class="validator-decomp-value" id="validator-decomp-aot-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-aot-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="jit">
-                    <div class="validator-decomp-label"><span class="validator-decomp-dot jit"></span>Raiku JIT</div>
-                    <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-jit-apr">0.00% APR</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-jit-apy" style="margin-top:0;">0.00% APY</div>
-                    </div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot jit"></span>Raiku JIT<!-- ⓘ --></div>
+                    <div class="validator-decomp-value" id="validator-decomp-jit-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-jit-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="bonus">
-                    <div class="validator-decomp-label"><span class="validator-decomp-dot bonus"></span>Validator Bonus</div>
-                    <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-bonus-apr">0.00% APR</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-bonus-apy" style="margin-top:0;">0.00% APY</div>
-                    </div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot bonus"></span>Validator Bonus<!-- ⓘ --></div>
+                    <div class="validator-decomp-value" id="validator-decomp-bonus-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-bonus-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="ojit">
-                    <div class="validator-decomp-label"><span class="validator-decomp-dot other-jit"></span>Other JIT</div>
-                    <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-ojit-apr">0.00% APR</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-ojit-apy" style="margin-top:0;">0.00% APY</div>
-                    </div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot other-jit"></span>Other JIT<!-- ⓘ --></div>
+                    <div class="validator-decomp-value" id="validator-decomp-ojit-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub" id="validator-decomp-ojit-apr">0.00% APR</div>
                 </div>
             </div><!-- end legend -->
+            <div style="margin-top:7px; font-size:8px; color:var(--text2); opacity:0.55; line-height:1.4;">Component APYs are individually compounded from APR and don't sum exactly to Total APY. APR reconciles additively.</div>
             <!-- Hidden: total APY/APR still written by update() -->
             <span id="validator-decomp-total-apy" style="display:none;"></span>
             <span id="validator-decomp-total-apr" style="display:none;"></span>
@@ -2348,6 +2337,7 @@ function getScenarioParams(key){
 function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, priorityApy, totalStakedSol){
     const el = document.getElementById('validator-scenario-yield-grid');
     if (!el) return;
+    const basePlusPriorityApy = aprToApy(baseApr + priorityApr, APY_COMPOUNDING_PERIODS);
     const rows = ['con','base','opt','bull'].map(function(key){
         const p = getScenarioParams(key);
         const r = calc(p);
@@ -2359,18 +2349,19 @@ function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, p
         const raikuApr = aotApr + bonusApr + jitApr + ojitApr;
         const totalApr = baseApr + priorityApr + raikuApr;
         const totalApy = aprToApy(totalApr, APY_COMPOUNDING_PERIODS);
+        const raikuApyUplift = totalApy - basePlusPriorityApy;
         const totalAprForBar = totalApr > 0 ? totalApr : 1;
         return {
             name: SCENARIO_LABELS[key] || key,
             totalApr: totalApr,
             totalApy: totalApy,
+            raikuApyUplift: raikuApyUplift,
             issWidth:   (baseApr        / totalAprForBar * 100),
             blkWidth:   (priorityApr    / totalAprForBar * 100),
             aotWidth:   (aotApr         / totalAprForBar * 100),
             bonusWidth: (bonusApr       / totalAprForBar * 100),
             jitWidth:   (jitApr         / totalAprForBar * 100),
             ojitWidth:  (ojitApr        / totalAprForBar * 100),
-            raikuApr: raikuApr
         };
     });
     el.innerHTML = rows.map(function(row){
@@ -2386,7 +2377,7 @@ function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, p
                     '<div class="validator-decomp-seg other-jit" style="width:' + row.ojitWidth.toFixed(2)  + '%"></div>' +
                 '</div>' +
                 '<div class="validator-scenario-yield-total">' + fmtValidatorRate(row.totalApy) + ' APY</div>' +
-                '<div class="validator-scenario-yield-sub">' + fmtValidatorRate(row.totalApr) + ' APR · Raiku ' + fmtValidatorRate(row.raikuApr) + '</div>' +
+                '<div class="validator-scenario-yield-sub">' + fmtValidatorRate(row.totalApr) + ' APR · +' + fmtValidatorRate(row.raikuApyUplift) + ' Raiku APY</div>' +
             '</div>';
     }).join('');
 }
@@ -4458,7 +4449,7 @@ function update(){
     // ── Protocol Yield Details top card ──────────────────────────────────
     // Headline numbers
     document.getElementById('vc-total-apy').textContent         = fmtValidatorRate(totalApy);
-    document.getElementById('vc-raiku-apy-uplift').textContent  = '+' + fmtValidatorRate(incrementalAprUplift);
+    document.getElementById('vc-raiku-apy-uplift').textContent  = '+' + fmtValidatorRate(incrementalApyUplift);
     document.getElementById('vc-total-apr').textContent         = fmtValidatorRate(totalApr);
     // SOL/yr and USD/yr per component
     const issApy2  = aprToApy(issuanceAPR,     APY_COMPOUNDING_PERIODS);
