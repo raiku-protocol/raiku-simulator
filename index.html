@@ -1434,8 +1434,8 @@ details[open] summary::before { transform:rotate(90deg); }
 <div class="validator-layout">
 <div class="validator-side">
     <div class="section fade-in fade-in-1">
-        <h2>Protocol Setup</h2>
-        <div class="scenario-btns" style="margin-bottom:10px; display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
+        <h2>Protocol Level Setup</h2>
+        <div class="scenario-btns" style="margin-bottom:10px; display:grid; grid-template-columns:repeat(2,1fr); gap:6px;">
             <button class="scenario-btn" id="validator-btn-con" onclick="applyScenario('con')">Conservative</button>
             <button class="scenario-btn active" id="validator-btn-base" onclick="applyScenario('base')">Base Case</button>
             <button class="scenario-btn" id="validator-btn-opt" onclick="applyScenario('opt')">Optimistic</button>
@@ -1491,116 +1491,76 @@ details[open] summary::before { transform:rotate(90deg); }
 </div>
 <div class="validator-main">
     <div class="section fade-in fade-in-1">
-        <h2>Protocol Yield Details</h2>
-        <!-- Headline row: Total APY / Raiku APY Uplift / Total APR -->
-        <div style="display:flex; align-items:baseline; gap:20px; margin-bottom:8px;">
-            <div>
-                <div style="font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">Total APY</div>
-                <div id="vc-total-apy" style="font-family:var(--font-mono); font-size:28px; font-weight:700; color:var(--text); line-height:1;">0.00%</div>
+        <h2>Protocol Level Output</h2>
+        <div class="validator-decomp-card" style="margin-top:0;">
+            <!-- Compact headline: Total APY / Raiku Uplift badge / Total APR -->
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+                <span id="vc-total-apy" style="font-family:var(--font-mono); font-size:24px; font-weight:700; color:#C0FF38; line-height:1;">0.00%</span>
+                <span style="font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px;">Total APY</span>
+                <span style="display:inline-flex; align-items:center; gap:5px; background:rgba(192,255,56,0.07); border:1px solid rgba(192,255,56,0.2); border-radius:5px; padding:2px 8px; margin-left:2px;">
+                    <span id="vc-raiku-apy-uplift" style="font-family:var(--font-mono); font-size:13px; font-weight:600; color:#C0FF38;">+0.00%</span>
+                    <span style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">Raiku Uplift</span>
+                </span>
+                <span style="margin-left:auto; display:flex; flex-direction:column; align-items:flex-end; gap:1px;">
+                    <span style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">Total APR</span>
+                    <span id="vc-total-apr" style="font-family:var(--font-mono); font-size:12px; color:var(--text-mid); font-weight:500;">0.00%</span>
+                </span>
             </div>
-            <div style="margin-left:8px;">
-                <div style="font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">Raiku APY Uplift</div>
-                <div id="vc-raiku-apy-uplift" style="font-family:var(--font-mono); font-size:18px; font-weight:600; color:#C0FF38; line-height:1;">+0.00%</div>
+            <!-- 6-segment composition bar -->
+            <div class="validator-decomp-bar" id="validator-yield-decomp-bar" style="margin-bottom:12px;">
+                <div class="validator-decomp-seg base"      id="validator-yield-iss-seg"   style="width:0%"></div>
+                <div class="validator-decomp-seg priority"  id="validator-yield-blk-seg"   style="width:0%"></div>
+                <div class="validator-decomp-seg aot"       id="validator-yield-aot-seg"   style="width:0%"></div>
+                <div class="validator-decomp-seg bonus"     id="validator-yield-bonus-seg" style="width:0%"></div>
+                <div class="validator-decomp-seg jit"       id="validator-yield-jit-seg"   style="width:0%"></div>
+                <div class="validator-decomp-seg other-jit" id="validator-yield-ojit-seg"  style="width:0%"></div>
             </div>
-            <div style="margin-left:auto; text-align:right;">
-                <div style="font-size:10px; color:var(--text2); margin-bottom:2px;">Total APR</div>
-                <div id="vc-total-apr" style="font-family:var(--font-mono); font-size:13px; color:var(--text-mid); font-weight:500;">0.00%</div>
-            </div>
-        </div>
-        <!-- 6-segment decomp bar -->
-        <div class="validator-decomp-bar" id="validator-yield-decomp-bar" style="margin-bottom:12px;">
-            <div class="validator-decomp-seg base"      id="validator-yield-iss-seg"   style="width:0%"></div>
-            <div class="validator-decomp-seg priority"  id="validator-yield-blk-seg"   style="width:0%"></div>
-            <div class="validator-decomp-seg aot"       id="validator-yield-aot-seg"   style="width:0%"></div>
-            <div class="validator-decomp-seg bonus"     id="validator-yield-bonus-seg" style="width:0%"></div>
-            <div class="validator-decomp-seg jit"       id="validator-yield-jit-seg"   style="width:0%"></div>
-            <div class="validator-decomp-seg other-jit" id="validator-yield-ojit-seg"  style="width:0%"></div>
-        </div>
-        <!-- 6 component rows + total — data-component reserved for Patch 3 expand -->
-        <div id="vc-rows" style="display:flex; flex-direction:column; gap:5px;">
-            <div class="vc-row" data-component="iss">
-                <div class="vc-row-left">
-                    <span class="validator-decomp-dot base" style="flex-shrink:0;"></span>
-                    <span class="vc-row-name">Issuance</span>
+            <!-- Component legend — 3-column grid, data-component reserved for Patch 3 expand -->
+            <div class="validator-decomp-legend" style="grid-template-columns:repeat(3,minmax(0,1fr));">
+                <div class="validator-decomp-item" data-component="iss">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot base"></span>Issuance</div>
+                    <div class="validator-decomp-value" id="validator-decomp-iss-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub"   id="validator-decomp-iss-apr">0.00% APR</div>
+                    <div style="margin-top:4px; font-size:10px; font-family:var(--font-mono); color:var(--text2); line-height:1.5;"><span id="vc-row-iss-sol">—</span><br><span id="vc-row-iss-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
-                <div class="vc-row-right">
-                    <span class="vc-row-apy" id="validator-decomp-iss-apy">0.00% APY</span>
-                    <span class="vc-row-apr" id="validator-decomp-iss-apr">0.00% APR</span>
-                    <span class="vc-row-sol" id="vc-row-iss-sol">— SOL/yr</span>
-                    <span class="vc-row-usd" id="vc-row-iss-usd">—</span>
+                <div class="validator-decomp-item" data-component="blk">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot priority"></span>Network Block Fees</div>
+                    <div class="validator-decomp-value" id="validator-decomp-blk-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub"   id="validator-decomp-blk-apr">0.00% APR</div>
+                    <div style="margin-top:4px; font-size:10px; font-family:var(--font-mono); color:var(--text2); line-height:1.5;"><span id="vc-row-blk-sol">—</span><br><span id="vc-row-blk-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
-            </div>
-            <div class="vc-row" data-component="blk">
-                <div class="vc-row-left">
-                    <span class="validator-decomp-dot priority" style="flex-shrink:0;"></span>
-                    <span class="vc-row-name">Network Block Fees</span>
+                <div class="validator-decomp-item" data-component="aot">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot aot"></span>Raiku AOT</div>
+                    <div class="validator-decomp-value" id="validator-decomp-aot-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub"   id="validator-decomp-aot-apr">0.00% APR</div>
+                    <div style="margin-top:4px; font-size:10px; font-family:var(--font-mono); color:var(--text2); line-height:1.5;"><span id="vc-row-aot-sol">—</span><br><span id="vc-row-aot-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
-                <div class="vc-row-right">
-                    <span class="vc-row-apy" id="validator-decomp-blk-apy">0.00% APY</span>
-                    <span class="vc-row-apr" id="validator-decomp-blk-apr">0.00% APR</span>
-                    <span class="vc-row-sol" id="vc-row-blk-sol">— SOL/yr</span>
-                    <span class="vc-row-usd" id="vc-row-blk-usd">—</span>
+                <div class="validator-decomp-item" data-component="bonus">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot bonus"></span>Validator Bonus</div>
+                    <div class="validator-decomp-value" id="validator-decomp-bonus-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub"   id="validator-decomp-bonus-apr">0.00% APR</div>
+                    <div style="margin-top:4px; font-size:10px; font-family:var(--font-mono); color:var(--text2); line-height:1.5;"><span id="vc-row-bonus-sol">—</span><br><span id="vc-row-bonus-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
-            </div>
-            <div class="vc-row" data-component="aot">
-                <div class="vc-row-left">
-                    <span class="validator-decomp-dot aot" style="flex-shrink:0;"></span>
-                    <span class="vc-row-name">Raiku AOT</span>
+                <div class="validator-decomp-item" data-component="jit">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot jit"></span>Raiku JIT</div>
+                    <div class="validator-decomp-value" id="validator-decomp-jit-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub"   id="validator-decomp-jit-apr">0.00% APR</div>
+                    <div style="margin-top:4px; font-size:10px; font-family:var(--font-mono); color:var(--text2); line-height:1.5;"><span id="vc-row-jit-sol">—</span><br><span id="vc-row-jit-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
-                <div class="vc-row-right">
-                    <span class="vc-row-apy" id="validator-decomp-aot-apy">0.00% APY</span>
-                    <span class="vc-row-apr" id="validator-decomp-aot-apr">0.00% APR</span>
-                    <span class="vc-row-sol" id="vc-row-aot-sol">— SOL/yr</span>
-                    <span class="vc-row-usd" id="vc-row-aot-usd">—</span>
+                <div class="validator-decomp-item" data-component="ojit">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot other-jit"></span>Other JIT</div>
+                    <div class="validator-decomp-value" id="validator-decomp-ojit-apy">0.00% APY</div>
+                    <div class="validator-decomp-sub"   id="validator-decomp-ojit-apr">0.00% APR</div>
+                    <div style="margin-top:4px; font-size:10px; font-family:var(--font-mono); color:var(--text2); line-height:1.5;"><span id="vc-row-ojit-sol">—</span><br><span id="vc-row-ojit-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
-            </div>
-            <div class="vc-row" data-component="bonus">
-                <div class="vc-row-left">
-                    <span class="validator-decomp-dot bonus" style="flex-shrink:0;"></span>
-                    <span class="vc-row-name">Validator Bonus</span>
+                <!-- Total — spans all 3 columns -->
+                <div class="validator-decomp-item" style="grid-column:1/-1; border-top:1px solid rgba(255,255,255,0.07); padding-top:8px; margin-top:4px;">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot" style="background:#C0FF38;"></span><span style="color:#C0FF38; font-weight:700;">Total Yield</span></div>
+                    <div class="validator-decomp-value" id="validator-decomp-total-apy" style="color:#C0FF38; font-weight:700;">0.00% APY</div>
+                    <div class="validator-decomp-sub"   id="validator-decomp-total-apr">0.00% APR</div>
                 </div>
-                <div class="vc-row-right">
-                    <span class="vc-row-apy" id="validator-decomp-bonus-apy">0.00% APY</span>
-                    <span class="vc-row-apr" id="validator-decomp-bonus-apr">0.00% APR</span>
-                    <span class="vc-row-sol" id="vc-row-bonus-sol">— SOL/yr</span>
-                    <span class="vc-row-usd" id="vc-row-bonus-usd">—</span>
-                </div>
-            </div>
-            <div class="vc-row" data-component="jit">
-                <div class="vc-row-left">
-                    <span class="validator-decomp-dot jit" style="flex-shrink:0;"></span>
-                    <span class="vc-row-name">Raiku JIT</span>
-                </div>
-                <div class="vc-row-right">
-                    <span class="vc-row-apy" id="validator-decomp-jit-apy">0.00% APY</span>
-                    <span class="vc-row-apr" id="validator-decomp-jit-apr">0.00% APR</span>
-                    <span class="vc-row-sol" id="vc-row-jit-sol">— SOL/yr</span>
-                    <span class="vc-row-usd" id="vc-row-jit-usd">—</span>
-                </div>
-            </div>
-            <div class="vc-row" data-component="ojit">
-                <div class="vc-row-left">
-                    <span class="validator-decomp-dot other-jit" style="flex-shrink:0;"></span>
-                    <span class="vc-row-name">Other JIT</span>
-                </div>
-                <div class="vc-row-right">
-                    <span class="vc-row-apy" id="validator-decomp-ojit-apy">0.00% APY</span>
-                    <span class="vc-row-apr" id="validator-decomp-ojit-apr">0.00% APR</span>
-                    <span class="vc-row-sol" id="vc-row-ojit-sol">— SOL/yr</span>
-                    <span class="vc-row-usd" id="vc-row-ojit-usd">—</span>
-                </div>
-            </div>
-            <div class="vc-row" style="margin-top:4px; border-color:#2a2d38; background:#16181f;">
-                <div class="vc-row-left">
-                    <span style="width:10px; height:10px; display:inline-block; background:#C0FF38; border-radius:2px; flex-shrink:0;"></span>
-                    <span class="vc-row-name" style="font-weight:700; color:#C0FF38;">Total Yield</span>
-                </div>
-                <div class="vc-row-right">
-                    <span class="vc-row-apy" id="validator-decomp-total-apy" style="font-weight:700; color:#C0FF38;">0.00% APY</span>
-                    <span class="vc-row-apr" id="validator-decomp-total-apr">0.00% APR</span>
-                </div>
-            </div>
-        </div>
+            </div><!-- end legend -->
+        </div><!-- end decomp-card -->
     </div>
     <div class="section fade-in fade-in-1">
         <h2>Raiku Validator Revenue Pool</h2>

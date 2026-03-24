@@ -124,17 +124,24 @@ Implemented:
 Status: IN PROGRESS
 Last updated: 2026-03-24
 
-Corrective pass (2026-03-24):
-- Left sidebar renamed "Protocol Setup"; scenario buttons now 4-col single row
-- Card 1 renamed "Protocol Yield Details"; bar IDs migrated from vc-seg-* to validator-yield-*-seg (single bar, no duplicate)
-- Component rows now use validator-decomp-*-apy/apr IDs; added USD/yr column (vc-row-*-usd); added data-component attrs for Patch 3 expand
-- Total Yield row added at bottom of component list (validator-decomp-total-apy/apr)
-- Old "Yield Details" card with duplicate APR Decomp sub-card removed entirely
-- Scenario comparison extracted to its own section ("Scenario Yield Comparison")
-- update() cleaned: removed dead vc-seg-* and vc-row-*-apy/apr writes; added vc-row-*-usd writes; removed aotApy2/bonusApy2/jitApy2/ojitApy2 vars (no longer needed)
-- Added .vc-row-usd CSS class
+Corrective rebuild pass (2026-03-24):
+- Left: h2 renamed "Protocol Level Setup"; scenario buttons restored to 2x2 grid (4-col single row caused overflow)
+- Right: Section 1 now titled "Protocol Level Output"; uses validator-decomp-card + validator-decomp-legend grid layout (matching original Patch 1 style — the correct base)
+- Component legend: 3-column fixed grid (repeat(3,minmax(0,1fr))); each cell has label/dot, APY value, APR sub, plus SOL/yr and USD/yr lines below
+- Total row spans all 3 columns via grid-column:1/-1, lime colored, bold
+- Headline row (compact, single line): Total APY (24px, lime) / Raiku Uplift badge / Total APR (right-aligned)
+- All IDs preserved — vc-total-apy, vc-raiku-apy-uplift, vc-total-apr, validator-yield-*-seg, validator-decomp-*-apy/apr, vc-row-*-sol, vc-row-*-usd, validator-decomp-total-apy/apr
+- data-component attributes on all 6 component items (reserved for Patch 3)
+- No JS changes needed; update() writes unchanged
+- What was removed: vc-row stacked-row layout (the wrong graphic from prior corrective pass)
+- Heights: left ~300px, right ~310px — balanced top row
 
-First pass (2026-03-24):
+Prior corrective pass (c940199, 2026-03-24) — superseded:
+- Left sidebar renamed "Protocol Setup"; scenario buttons now 4-col single row
+- Card 1 renamed "Protocol Yield Details"; bar IDs migrated from vc-seg-* to validator-yield-*-seg
+- Component rows used vc-row stacked layout — user rejected this direction
+
+First pass (2026-03-24) — superseded:
 - New top composition card (vc-*): Total APY headline / Raiku APY Uplift / Total APR / 6-seg bar / 6 component rows
 - Old "Yield Uplift" 4-card block removed; "Base Network Yield" sidebar hidden
 
