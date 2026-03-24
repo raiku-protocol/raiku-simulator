@@ -1574,11 +1574,9 @@ details[open] summary::before { transform:rotate(90deg); }
     <span id="validator-scenario-name" style="display:none;">Base Case</span>
 </div>
 <div class="validator-main">
-    <div class="section fade-in fade-in-1" style="padding-bottom:8px;">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-            <h2 style="margin-bottom:0;">Validator Yield (Protocol Level)</h2>
-            <button id="vc-iss-toggle-btn" onclick="vcToggleIssuance()" style="font-size:10px; font-family:var(--font-mono); color:var(--text-mid); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.18); border-radius:4px; padding:3px 8px; cursor:pointer; letter-spacing:0.3px;">Hide Issuance</button>
-        </div>
+    <div class="section fade-in fade-in-1" style="padding-bottom:8px; position:relative;">
+        <h2>Validator Yield (Protocol Level)</h2>
+        <button id="vc-iss-toggle-btn" onclick="vcToggleIssuance()" style="position:absolute; top:14px; right:14px; font-size:10px; font-family:var(--font-mono); color:var(--text-mid); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.2); border-radius:4px; padding:3px 8px; cursor:pointer; letter-spacing:0.3px; white-space:nowrap;">Hide Issuance</button>
         <div class="validator-decomp-card" style="margin-top:0;">
             <!-- Top summary band: APY headline · APR · annual totals · per block -->
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
