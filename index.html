@@ -257,7 +257,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .sidebar-yield-sub a { color:var(--lime-soft); text-decoration:none; }
 .sidebar-yield-sub a:hover { text-decoration:underline; }
 
-.validator-layout { display:grid; grid-template-columns:340px 1fr; column-gap:var(--gap); row-gap:16px; }
+.validator-layout { display:grid; grid-template-columns:340px 1fr; column-gap:var(--gap); row-gap:4px; }
 .validator-side { width:340px; min-width:340px; grid-column:1; grid-row:1 / span 2; position:sticky; top:10px; display:flex; flex-direction:column; }
 .validator-main { display:contents; }
 .validator-main > .section { margin-bottom:0; }
@@ -385,6 +385,20 @@ details[open] summary::before { transform:rotate(90deg); }
 .vpr-band-desc { font-size:8px; color:var(--text2); margin-bottom:4px; line-height:1.4; }
 .vpr-band-sol { font-family:var(--font-mono); font-size:14px; font-weight:700; color:var(--text); }
 .vpr-band-usd { font-family:var(--font-mono); font-size:11px; color:var(--text-mid); margin-top:2px; }
+.vpr-table { width:100%; border-collapse:collapse; font-size:11px; }
+.vpr-table th { font-size:8px; color:var(--text2); text-transform:uppercase; letter-spacing:0.6px; padding:7px 12px; text-align:right; border-bottom:1px solid #1a1e27; font-weight:400; white-space:nowrap; }
+.vpr-table th:first-child { text-align:left; padding-left:0; }
+.vpr-table td { padding:5px 12px; text-align:right; border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:top; line-height:1.4; }
+.vpr-table td:first-child { text-align:left; color:var(--text2); font-size:10px; padding-left:0; }
+.vpr-table tr:last-child td { border-bottom:none; }
+.vpr-table tr.vpr-tr-subtotal td { background:rgba(255,255,255,0.015); }
+.vpr-table tr.vpr-tr-subtotal td:first-child { color:var(--text-mid); font-weight:600; }
+.vpr-table tr.vpr-tr-total td { border-top:1px solid rgba(192,255,56,0.18); background:rgba(192,255,56,0.03); }
+.vpr-table tr.vpr-tr-total td:first-child { color:#C0FF38; font-weight:600; }
+.vpr-table tr.vpr-tr-cadence td { border-bottom:1px solid #1a1e27; padding-bottom:6px; }
+.vpr-sol { font-family:var(--font-mono); color:var(--text); font-size:11px; }
+.vpr-usd { display:block; font-family:var(--font-mono); font-size:9px; color:var(--text2); margin-top:1px; }
+.vpr-cnt { font-family:var(--font-mono); color:var(--text-mid); font-size:11px; }
 
 /* Validator Yield Composition top card — component rows */
 .vc-row { display:flex; align-items:center; justify-content:space-between; padding:5px 8px; background:#111213; border:1px solid #1e2028; border-radius:5px; }
@@ -1663,36 +1677,92 @@ details[open] summary::before { transform:rotate(90deg); }
     <span id="validator-apr-formula-line" style="display:none;"></span>
     <span id="validator-apr-formula-note" style="display:none;"></span>
     <span id="validator-apy-formula" style="display:none;"></span>
-    <div class="section fade-in fade-in-2" style="padding-top:10px; padding-bottom:24px;">
+    <div class="section fade-in fade-in-2" style="padding-top:10px; padding-bottom:14px;">
         <h2>Validator Revenue (Protocol Level)</h2>
-        <div class="vpr-band">
-            <div class="vpr-band-item">
-                <div class="vpr-band-label">Annual · Raiku validator set</div>
-                <div class="vpr-band-sol" id="vc-annual-sol">—</div>
-                <div class="vpr-band-usd" id="vc-annual-usd">—</div>
-            </div>
-            <div class="vpr-band-item">
-                <div class="vpr-band-label">Per block · annual ÷ slots/yr</div>
-                <div class="vpr-band-sol" id="vc-perblock-sol">—</div>
-                <div class="vpr-band-usd" id="vc-perblock-usd">—</div>
-            </div>
-            <div class="vpr-band-item">
-                <div class="vpr-band-label">Block Rewards</div>
-                <div class="vpr-band-desc">Issuance + Network Block Fees</div>
-                <div class="vpr-band-sol" id="vc-blockrewards-sol">—</div>
-                <div class="vpr-band-usd" id="vc-blockrewards-usd">—</div>
-            </div>
-            <div class="vpr-band-item">
-                <div class="vpr-band-label">Raiku MEV</div>
-                <div class="vpr-band-desc">AOT + Validator Bonus + JIT + Other JIT</div>
-                <div class="vpr-band-sol" id="vc-raikumev-sol">—</div>
-                <div class="vpr-band-usd" id="vc-raikumev-usd">—</div>
-            </div>
-            <div class="vpr-band-item">
-                <div class="vpr-band-label">Cadence · slots</div>
-                <div class="vpr-band-sol" id="vc-cadence-yr" style="font-size:12px;">—</div>
-                <div class="vpr-band-usd"><span id="vc-cadence-mo">—</span>/mo · 432K/epoch</div>
-            </div>
+        <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow:hidden; padding:0 14px;">
+            <table class="vpr-table">
+                <thead>
+                    <tr>
+                        <th style="width:28%;">Metric</th>
+                        <th>Per block</th>
+                        <th>Per epoch</th>
+                        <th>Per month</th>
+                        <th>Per year</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="vpr-tr-cadence">
+                        <td>Expected blocks</td>
+                        <td><span class="vpr-cnt" id="vpr-blocks-block">1</span></td>
+                        <td><span class="vpr-cnt" id="vpr-blocks-epoch">432K</span></td>
+                        <td><span class="vpr-cnt" id="vpr-blocks-month">6.53M</span></td>
+                        <td><span class="vpr-cnt" id="vpr-blocks-year">78.4M</span></td>
+                    </tr>
+                    <tr>
+                        <td>Issuance</td>
+                        <td id="vpr-iss-block">—</td>
+                        <td id="vpr-iss-epoch">—</td>
+                        <td id="vpr-iss-month">—</td>
+                        <td id="vpr-iss-year">—</td>
+                    </tr>
+                    <tr>
+                        <td>Network Fees</td>
+                        <td id="vpr-blk-block">—</td>
+                        <td id="vpr-blk-epoch">—</td>
+                        <td id="vpr-blk-month">—</td>
+                        <td id="vpr-blk-year">—</td>
+                    </tr>
+                    <tr class="vpr-tr-subtotal">
+                        <td>Block Rewards</td>
+                        <td id="vpr-br-block">—</td>
+                        <td id="vpr-br-epoch">—</td>
+                        <td id="vpr-br-month">—</td>
+                        <td id="vpr-br-year">—</td>
+                    </tr>
+                    <tr>
+                        <td>Raiku AOT</td>
+                        <td id="vpr-aot-block">—</td>
+                        <td id="vpr-aot-epoch">—</td>
+                        <td id="vpr-aot-month">—</td>
+                        <td id="vpr-aot-year">—</td>
+                    </tr>
+                    <tr>
+                        <td>Raiku JIT</td>
+                        <td id="vpr-jit-block">—</td>
+                        <td id="vpr-jit-epoch">—</td>
+                        <td id="vpr-jit-month">—</td>
+                        <td id="vpr-jit-year">—</td>
+                    </tr>
+                    <tr>
+                        <td>Validator Bonus</td>
+                        <td id="vpr-bonus-block">—</td>
+                        <td id="vpr-bonus-epoch">—</td>
+                        <td id="vpr-bonus-month">—</td>
+                        <td id="vpr-bonus-year">—</td>
+                    </tr>
+                    <tr>
+                        <td>Other JIT</td>
+                        <td id="vpr-ojit-block">—</td>
+                        <td id="vpr-ojit-epoch">—</td>
+                        <td id="vpr-ojit-month">—</td>
+                        <td id="vpr-ojit-year">—</td>
+                    </tr>
+                    <tr class="vpr-tr-subtotal">
+                        <td>Raiku MEV</td>
+                        <td id="vpr-mev-block">—</td>
+                        <td id="vpr-mev-epoch">—</td>
+                        <td id="vpr-mev-month">—</td>
+                        <td id="vpr-mev-year">—</td>
+                    </tr>
+                    <tr class="vpr-tr-total">
+                        <td>Total Validator Revenue</td>
+                        <td id="vpr-total-block">—</td>
+                        <td id="vpr-total-epoch">—</td>
+                        <td id="vpr-total-month">—</td>
+                        <td id="vpr-total-year">—</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -4676,17 +4746,49 @@ function update(){
     var _vcMevSol       = aotSolYr + bonusSolYr + jitSolYr + ojitSolYr;
     var _perBSol        = _vcTotalSolYr / SY;
     var _perBUsd        = _perBSol * p.p;
-    var _vcEl;
-    _vcEl = document.getElementById('vc-annual-sol');       if(_vcEl) _vcEl.textContent = fmtValidatorSol(_vcTotalSolYr);
-    _vcEl = document.getElementById('vc-annual-usd');       if(_vcEl) _vcEl.textContent = fmtValidatorUsd(_vcTotalSolYr * p.p);
-    _vcEl = document.getElementById('vc-perblock-sol');     if(_vcEl) _vcEl.textContent = fmtValidatorSol(_perBSol);
-    _vcEl = document.getElementById('vc-perblock-usd');     if(_vcEl) _vcEl.textContent = (_perBUsd < 100 ? '$' + _perBUsd.toFixed(2) : fmtValidatorUsd(_perBUsd));
-    _vcEl = document.getElementById('vc-cadence-yr');       if(_vcEl) _vcEl.textContent = (SY / 1e6).toFixed(1) + 'M';
-    _vcEl = document.getElementById('vc-cadence-mo');       if(_vcEl) _vcEl.textContent = (SY / 12 / 1e6).toFixed(2) + 'M';
-    _vcEl = document.getElementById('vc-blockrewards-sol'); if(_vcEl) _vcEl.textContent = fmtValidatorSol(_vcBlockRewSol);
-    _vcEl = document.getElementById('vc-blockrewards-usd'); if(_vcEl) _vcEl.textContent = fmtValidatorUsd(_vcBlockRewSol * p.p);
-    _vcEl = document.getElementById('vc-raikumev-sol');     if(_vcEl) _vcEl.textContent = fmtValidatorSol(_vcMevSol);
-    _vcEl = document.getElementById('vc-raikumev-usd');     if(_vcEl) _vcEl.textContent = fmtValidatorUsd(_vcMevSol * p.p);
+    // ── Validator Revenue table ──────────────────────────────────────────────
+    (function() {
+        var _el;
+        var _EPY = EPOCHS_PER_YEAR; // ≈ 182
+        var _px  = p.p;
+        function _vprUsd(v) {
+            var a = Math.abs(v);
+            if (a >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B';
+            if (a >= 1e6) return '$' + (v/1e6).toFixed(a >= 10e6 ? 1 : 2) + 'M';
+            if (a >= 1e3) return '$' + (v/1e3).toFixed(a >= 100e3 ? 0 : 1) + 'K';
+            if (a >= 0.01) return '$' + v.toFixed(2);
+            return '$' + v.toFixed(4);
+        }
+        function _vprCell(solAnnual, periods) {
+            var sol = solAnnual / periods;
+            return '<span class="vpr-sol">' + fmtValidatorSol(sol) + '</span>' +
+                   '<span class="vpr-usd">' + _vprUsd(sol * _px) + '</span>';
+        }
+        // Expected blocks row (counts only, based on SY constant)
+        _el = document.getElementById('vpr-blocks-block');  if(_el) _el.textContent = '1';
+        _el = document.getElementById('vpr-blocks-epoch');  if(_el) _el.textContent = '432K';
+        _el = document.getElementById('vpr-blocks-month');  if(_el) _el.textContent = (SY / 12 / 1e6).toFixed(2) + 'M';
+        _el = document.getElementById('vpr-blocks-year');   if(_el) _el.textContent = (SY / 1e6).toFixed(1) + 'M';
+        // Revenue rows: [id-prefix, annual SOL value]
+        var _rows = [
+            ['vpr-iss',   issSolYr],
+            ['vpr-blk',   blkSolYr],
+            ['vpr-br',    _vcBlockRewSol],
+            ['vpr-aot',   aotSolYr],
+            ['vpr-jit',   jitSolYr],
+            ['vpr-bonus', bonusSolYr],
+            ['vpr-ojit',  ojitSolYr],
+            ['vpr-mev',   _vcMevSol],
+            ['vpr-total', _vcTotalSolYr],
+        ];
+        _rows.forEach(function(row) {
+            var _id = row[0], _ann = row[1];
+            _el = document.getElementById(_id + '-block');  if(_el) _el.innerHTML = _vprCell(_ann, SY);
+            _el = document.getElementById(_id + '-epoch');  if(_el) _el.innerHTML = _vprCell(_ann, _EPY);
+            _el = document.getElementById(_id + '-month');  if(_el) _el.innerHTML = _vprCell(_ann, 12);
+            _el = document.getElementById(_id + '-year');   if(_el) _el.innerHTML = _vprCell(_ann, 1);
+        });
+    })();
     renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityFeesApr, priorityFeesApy, totalStakedSol, p);
     document.getElementById('stake-sol-helper').innerHTML = '<strong>Implied stake:</strong> ' + fmt(raikuStakeSol, 'S') + ' of ' + fmt(totalStakedSol, 'S') + ' total staked';
     document.getElementById('blk-cu-helper').innerHTML = '<strong>Reserved CU:</strong> ' + fmt(reservedCu, 'i') + ' CU of ' + fmt(CB, 'i') + ' CU/block';
