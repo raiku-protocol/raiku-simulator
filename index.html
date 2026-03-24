@@ -2272,7 +2272,7 @@ const ACTIVE_STAKING_RATIO_DEFAULT   = 0.677;   // Default: March 2026 ≈ 67.7%
 // Commission reference — NOT used in issuance formula (Tab 2 shows validator-level gross, not delegator net)
 const AVG_VALIDATOR_COMMISSION_REF   = 0.07;    // Network-avg commission, reference only; source: Trillium validator data
 // Priority fees applied to residual block share only (Raiku AOT block share already in AOT revenue model)
-const PRIORITY_FEES_NETWORK_APR      = 0.0040;  // Network-avg priority fee yield; scaled by (1 − blockShare) in update()
+const PRIORITY_FEES_NETWORK_APR      = 0.0054;  // Marinade block rewards APR benchmark (last 28d, Mar 2026) — scaled by (1 − blockShare) in update()
 // Parity reference — NOT used as model input
 const RATED_DELEGATOR_APY_REFERENCE  = 0.0448;  // Rated Network 30d Delegator APY; includes commission; parity check only
 const APY_COMPOUNDING_PERIODS = EPOCHS_PER_YEAR; // epoch-based compounding (≈ 182 epochs/yr)
@@ -6697,17 +6697,17 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     <div class="vc-explainer-card">
         <button class="vc-explainer-close" onclick="vcCloseExplainer('vc-explainer-blk')">×</button>
         <div class="vc-explainer-title">Network Fees</div>
-        <div class="vc-explainer-subtitle">Residual base + priority fee yield earned by validators — independent of issuance and all Raiku-specific flows</div>
+        <div class="vc-explainer-subtitle">Ordinary validator fee yield on block space not reserved by Raiku AOT</div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">What it is</div>
-            <div class="vc-explainer-note">Network Fees is the ordinary fee yield validators earn on the block space not reserved by Raiku AOT. The benchmark is treated as reflecting prevailing network conditions — including the background Jito/MEV ecosystem already present in observed network fee data. Raiku JIT, Other JIT, and Validator Bonus are <em>not</em> subtracted from this benchmark — they are modeled as explicit incremental overlay flows elsewhere. Only Raiku AOT's reserved block share creates a double-count that must be removed here.</div>
+            <div class="vc-explainer-note">Fee yield earned by validators on the share of each block outside Raiku's AOT reservation. Benchmarked against Marinade's observed Block Rewards APR. Raiku JIT and Other JIT are modeled as separate incremental flows and are not subtracted here.</div>
         </div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Live formula</div>
             <div class="vc-explainer-formula">
-                <div>Network Fees APR = <span style="color:#C89060;" title="model parameter — under review, see live inputs below">fee param*</span> &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-apr">—</span></div>
+                <div>Network Fees APR = 0.54% &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-apr">—</span></div>
                 <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-blk-exp-apy">—</span></div>
             </div>
         </div>
@@ -6715,27 +6715,11 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Live inputs</div>
             <div class="vc-explainer-inputs">
-                <div class="vc-explainer-input-row" style="background:#0a0e14;">
-                    <span class="vc-explainer-input-key" style="color:var(--text);">Marinade total staking APR (Mar 2026)
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Block Rewards APR (Marinade, last 28d)
                         <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade</a>
                     </span>
-                    <span class="vc-explainer-input-val">~5.93%</span>
-                </div>
-                <div class="vc-explainer-input-row">
-                    <span class="vc-explainer-input-key">Less: issuance APR (this model)</span>
-                    <span class="vc-explainer-input-val">~5.82%</span>
-                </div>
-                <div class="vc-explainer-input-row" style="border-bottom:1px solid rgba(255,255,255,0.06);">
-                    <span class="vc-explainer-input-key">Implied fee + MEV residual (Marinade-derived)
-                        <span style="font-size:10px; color:var(--text2);">fees + MEV combined; pure fee yield is lower</span>
-                    </span>
-                    <span class="vc-explainer-input-val" style="color:#A0C878;">~0.11%</span>
-                </div>
-                <div class="vc-explainer-input-row" style="background:#0f0d06;">
-                    <span class="vc-explainer-input-key">Model parameter (internal — under review)
-                        <span style="font-size:10px; color:#C89060; font-style:italic;">3× Marinade benchmark — pending pipeline correction</span>
-                    </span>
-                    <span class="vc-explainer-input-val" style="color:#C89060;">0.40%</span>
+                    <span class="vc-explainer-input-val">0.54%</span>
                 </div>
                 <div class="vc-explainer-input-row">
                     <span class="vc-explainer-input-key">Raiku Block Share (active scenario)</span>
@@ -6749,20 +6733,14 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         </div>
 
         <div class="vc-explainer-section">
-            <div class="vc-explainer-section-title">About the model parameter</div>
-            <div class="vc-explainer-note">The Marinade benchmark (<a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade network stats</a>) shows total staking APR ~5.93%. After subtracting issuance (5.82%), the implied residual is ~0.11pp — and that residual covers <em>both</em> priority fees and MEV combined. The pure fee contribution alone is therefore even smaller than 0.11pp.<br><br>The model currently uses 0.40% as an internal parameter — roughly 3× the Marinade-implied residual. <strong style="color:#C89060;">This parameter has no cited external source and is flagged for correction.</strong> The correct derivation is <code style="font-family:var(--font-mono); font-size:11px; color:var(--text);">annual_priority_fees_sol &divide; active_stake_sol</code>, computable from Trillium epoch data or <a class="vc-explainer-source-inline" href="https://dune.com/ilemi/solana-compute" target="_blank" rel="noopener">↗ Dune ilemi/solana-compute</a>.</div>
-        </div>
-
-        <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Why residual block share is applied</div>
-            <div class="vc-explainer-note">Raiku AOT reserves a known share of each block for its auction winners. The fee yield on that reserved portion is already counted in the Raiku AOT component — including it here would double-count. Network Fees is therefore scaled by <code style="font-family:var(--font-mono); font-size:11px; color:var(--text);">1 − Raiku Block Share</code>. At 8% block share (Base Case), 92% of the benchmark accrues here.<br><br>Raiku JIT and Other JIT are <em>not</em> separately subtracted. The fee benchmark is understood as reflecting the observed network fee environment — which already embeds background MEV/JIT activity. Raiku-specific JIT flows are modeled as incremental components added on top, not as deductions from this benchmark.</div>
+            <div class="vc-explainer-note">Raiku AOT reserves a known share of each block for its auction winners. That portion's fee yield is already counted in the Raiku AOT component — including it here would double-count. Network Fees is scaled by <code style="font-family:var(--font-mono); font-size:11px; color:var(--text);">1 − Raiku Block Share</code> to remove it.</div>
         </div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Reference</div>
             <div class="vc-explainer-sources">
-                <a class="vc-explainer-source-link" href="https://dune.com/ilemi/solana-compute" target="_blank" rel="noopener">Dune — Solana Compute (ilemi) — observed on-chain priority fee rates</a>
-                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats (overall validator yield cross-check)</a>
+                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (0.54%, last 28 days)</a>
             </div>
         </div>
     </div>
