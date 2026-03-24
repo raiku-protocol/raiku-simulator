@@ -266,6 +266,31 @@ details[open] summary::before { transform:rotate(90deg); }
 .validator-context-label { font-size:10px; color:#a8aebf; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px; text-align:center; }
 .validator-context-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:700; background:#060809; border:1px solid #20252c; border-radius:5px; padding:7px 8px; margin-top:0; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
 .validator-note { font-size:10px; color:var(--text-mid); line-height:1.5; }
+/* Component explainer triggers */
+.vc-info-btn { background:none; border:none; cursor:pointer; padding:0 0 0 3px; font-size:9px; color:var(--text2); opacity:0.45; line-height:1; flex-shrink:0; vertical-align:middle; }
+.vc-info-btn:hover { opacity:1; color:var(--text-mid); }
+/* Explainer modal */
+.vc-explainer-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; justify-content:center; align-items:center; }
+.vc-explainer-overlay.open { display:flex; }
+.vc-explainer-card { background:#0e1219; border:1px solid #222a38; border-radius:10px; padding:22px 24px; max-width:480px; width:92%; position:relative; max-height:82vh; overflow-y:auto; }
+.vc-explainer-close { position:absolute; top:12px; right:14px; background:none; border:none; cursor:pointer; font-size:18px; color:var(--text2); line-height:1; padding:0; }
+.vc-explainer-close:hover { color:var(--text); }
+.vc-explainer-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:2px; }
+.vc-explainer-subtitle { font-size:10px; color:var(--text2); margin-bottom:18px; line-height:1.5; }
+.vc-explainer-section { margin-bottom:14px; }
+.vc-explainer-section-title { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.7px; margin-bottom:7px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:4px; }
+.vc-explainer-formula { font-family:var(--font-mono); font-size:11px; color:var(--text); background:#070a0f; border:1px solid #1a1e27; border-radius:5px; padding:10px 14px; line-height:2; }
+.vc-ef-val { color:#C0FF38; }
+.vc-ef-dim { color:var(--text2); }
+.vc-explainer-inputs { border:1px solid #1a1e27; border-radius:5px; overflow:hidden; }
+.vc-explainer-input-row { display:flex; justify-content:space-between; align-items:baseline; font-size:11px; padding:6px 12px; background:#070a0f; }
+.vc-explainer-input-row + .vc-explainer-input-row { border-top:1px solid #1a1e27; }
+.vc-explainer-input-key { color:var(--text2); }
+.vc-explainer-input-val { font-family:var(--font-mono); color:var(--text); font-weight:600; }
+.vc-explainer-note { font-size:10px; color:var(--text2); line-height:1.65; }
+.vc-explainer-sources { display:flex; flex-direction:column; gap:5px; }
+.vc-explainer-source-link { font-size:10px; color:var(--text-mid); text-decoration:none; }
+.vc-explainer-source-link:hover { color:var(--text); text-decoration:underline; }
 .validator-global-row { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px 8px; }
 .validator-proto-table { display:grid; grid-template-columns:auto 1fr 1fr; gap:5px 8px; }
 .validator-proto-col-header { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.7px; text-align:center; padding:3px 0 6px; }
@@ -1577,33 +1602,33 @@ details[open] summary::before { transform:rotate(90deg); }
             <!-- Component legend — 6-column grid, data-component reserved for Patch 3 expand -->
             <div class="validator-decomp-legend" style="grid-template-columns:repeat(6,minmax(0,1fr)); gap:4px 8px; margin-top:8px;">
                 <div class="validator-decomp-item" data-component="iss">
-                    <div class="validator-decomp-label"><span class="validator-decomp-dot base"></span>Issuance</div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot base"></span>Issuance<button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-iss')">ⓘ</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-iss-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-iss-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="blk">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot priority"></span>Network Fees<!-- ⓘ --></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot priority"></span>Network Fees<button class="vc-info-btn" style="opacity:0.2;" disabled>ⓘ</button></div>
                     <div style="font-size:8px; color:var(--text2); margin-bottom:2px; line-height:1.3;">base + priority fees</div>
                     <div class="validator-decomp-value" id="validator-decomp-blk-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-blk-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="aot">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot aot"></span>Raiku AOT<!-- ⓘ --></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot aot"></span>Raiku AOT<button class="vc-info-btn" style="opacity:0.2;" disabled>ⓘ</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-aot-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-aot-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="jit">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot jit"></span>Raiku JIT<!-- ⓘ --></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot jit"></span>Raiku JIT<button class="vc-info-btn" style="opacity:0.2;" disabled>ⓘ</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-jit-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-jit-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="bonus">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot bonus"></span>Validator Bonus<!-- ⓘ --></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot bonus"></span>Validator Bonus<button class="vc-info-btn" style="opacity:0.2;" disabled>ⓘ</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-bonus-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-bonus-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="ojit">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot other-jit"></span>Other JIT<!-- ⓘ --></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot other-jit"></span>Other JIT<button class="vc-info-btn" style="opacity:0.2;" disabled>ⓘ</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-ojit-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-ojit-apr">0.00% APR</div>
                 </div>
@@ -2280,6 +2305,16 @@ function fmtMatrixUsd(v){
     if (a >= 1e6) return '$' + (v / 1e6).toFixed(a >= 10e6 ? 0 : 1) + 'M';
     if (a >= 1000) return '$' + (v / 1e3).toFixed(a >= 100e3 ? 0 : 1) + 'K';
     return '$' + Math.round(v);
+}
+
+// ── Component explainer modal ──────────────────────────────────────────
+function vcOpenExplainer(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.add('open');
+}
+function vcCloseExplainer(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('open');
 }
 
 function aprToApy(apr, periods){
@@ -4443,6 +4478,18 @@ function update(){
     // Legend values (APY primary, APR secondary)
     document.getElementById('validator-decomp-iss-apy').textContent   = fmtValidatorRate(aprToApy(issuanceAPR,     APY_COMPOUNDING_PERIODS)) + ' APY';
     document.getElementById('validator-decomp-iss-apr').textContent   = fmtValidatorRate(issuanceAPR)     + ' APR';
+    // ── Issuance explainer live values ────────────────────────────────────
+    (function() {
+        var _e;
+        _e = document.getElementById('vc-iss-exp-inflation'); if(_e) _e.textContent = fmtValidatorRate(SOLANA_INFLATION_RATE);
+        _e = document.getElementById('vc-iss-exp-staking');   if(_e) _e.textContent = fmtValidatorRate(stakingRatio);
+        _e = document.getElementById('vc-iss-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(issuanceAPR);
+        _e = document.getElementById('vc-iss-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(issuanceAPY);
+        _e = document.getElementById('vc-iss-exp-epochs');    if(_e) _e.textContent = APY_COMPOUNDING_PERIODS;
+        _e = document.getElementById('vc-iss-exp-inflation2'); if(_e) _e.textContent = fmtValidatorRate(SOLANA_INFLATION_RATE);
+        _e = document.getElementById('vc-iss-exp-staking2');   if(_e) _e.textContent = fmtValidatorRate(stakingRatio);
+        _e = document.getElementById('vc-iss-exp-epochs2');    if(_e) _e.textContent = APY_COMPOUNDING_PERIODS + ' epochs/yr';
+    })();
     document.getElementById('validator-decomp-blk-apy').textContent   = fmtValidatorRate(aprToApy(priorityFeesApr, APY_COMPOUNDING_PERIODS)) + ' APY';
     document.getElementById('validator-decomp-blk-apr').textContent   = fmtValidatorRate(priorityFeesApr)  + ' APR';
     document.getElementById('validator-decomp-aot-apy').textContent   = fmtValidatorRate(aprToApy(aotApr,          APY_COMPOUNDING_PERIODS)) + ' APY';
@@ -6539,6 +6586,67 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     makeEditable('validator-context-fee',      'sl-fcu',      0,  25,  0.01, function(v){ return (v>=10?v.toFixed(1):v<0.1?v.toFixed(3):v.toFixed(2))+' L'; });
 }());
 </script>
+<!-- ── Issuance Explainer Modal ──────────────────────────────────────── -->
+<div class="vc-explainer-overlay" id="vc-explainer-iss" onclick="if(event.target===this)vcCloseExplainer('vc-explainer-iss')">
+    <div class="vc-explainer-card">
+        <button class="vc-explainer-close" onclick="vcCloseExplainer('vc-explainer-iss')">×</button>
+        <div class="vc-explainer-title">Issuance</div>
+        <div class="vc-explainer-subtitle">Staking yield driven by Solana protocol inflation — validator-level gross, no commission deduction</div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">What it is</div>
+            <div class="vc-explainer-note">Solana emits new SOL each epoch as inflation rewards to stakers. Validators capture this yield proportionally to their connected stake. The staking ratio acts as the denominator: the higher the share of total supply that is staked, the lower the per-unit yield.</div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live formula</div>
+            <div class="vc-explainer-formula">
+                <div>APR &nbsp;= Inflation Rate &div; Staking Ratio</div>
+                <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="vc-ef-val" id="vc-iss-exp-inflation">—</span> &div; <span class="vc-ef-val" id="vc-iss-exp-staking">—</span> = <span class="vc-ef-val" id="vc-iss-exp-apr">—</span></div>
+                <div style="margin-top:4px;"><span class="vc-ef-dim">APY &nbsp;= epoch-compounded over <span id="vc-iss-exp-epochs">—</span> periods/yr</span> = <span class="vc-ef-val" id="vc-iss-exp-apy">—</span></div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live inputs</div>
+            <div class="vc-explainer-inputs">
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Inflation rate (current)</span>
+                    <span class="vc-explainer-input-val" id="vc-iss-exp-inflation2">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Staking ratio (active / total supply)</span>
+                    <span class="vc-explainer-input-val" id="vc-iss-exp-staking2">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Compounding basis</span>
+                    <span class="vc-explainer-input-val" id="vc-iss-exp-epochs2">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Inflation schedule</div>
+            <div class="vc-explainer-note">Solana launched with a higher initial inflation rate that decays on a fixed schedule over time. The simulator uses the current live inflation input from the dataset — not a fixed historical figure. As inflation decays, issuance yield will decrease over time.</div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Staking ratio</div>
+            <div class="vc-explainer-note">The staking ratio is the share of total SOL supply that is actively staked. It serves as the denominator when converting protocol inflation into per-staker APR. The simulator uses the current network-level ratio in its live calculation.</div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Sources</div>
+            <div class="vc-explainer-sources">
+                <a class="vc-explainer-source-link" href="https://solanacompass.com/statistics/staking#economy" target="_blank" rel="noopener">Solana Compass — Staking Economy</a>
+                <a class="vc-explainer-source-link" href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener">Solana Compass — Tokenomics / Staked SOL</a>
+                <a class="vc-explainer-source-link" href="https://docs.solana.com/inflation/inflation_schedule" target="_blank" rel="noopener">Solana Docs — Inflation Schedule</a>
+                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats</a>
+                <a class="vc-explainer-source-link" href="https://dune.com/21sharesresearch/solana-key-metrics" target="_blank" rel="noopener">Dune — Solana Key Metrics (21Shares)</a>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
 
