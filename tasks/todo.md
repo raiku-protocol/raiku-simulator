@@ -121,19 +121,22 @@ Implemented:
 ---
 
 ### Validator Revenue redesign — Patch 2: protocol composition card
-Status: DONE
+Status: IN PROGRESS
 Last updated: 2026-03-24
 
-Implemented:
+Corrective pass (2026-03-24):
+- Left sidebar renamed "Protocol Setup"; scenario buttons now 4-col single row
+- Card 1 renamed "Protocol Yield Details"; bar IDs migrated from vc-seg-* to validator-yield-*-seg (single bar, no duplicate)
+- Component rows now use validator-decomp-*-apy/apr IDs; added USD/yr column (vc-row-*-usd); added data-component attrs for Patch 3 expand
+- Total Yield row added at bottom of component list (validator-decomp-total-apy/apr)
+- Old "Yield Details" card with duplicate APR Decomp sub-card removed entirely
+- Scenario comparison extracted to its own section ("Scenario Yield Comparison")
+- update() cleaned: removed dead vc-seg-* and vc-row-*-apy/apr writes; added vc-row-*-usd writes; removed aotApy2/bonusApy2/jitApy2/ojitApy2 vars (no longer needed)
+- Added .vc-row-usd CSS class
+
+First pass (2026-03-24):
 - New top composition card (vc-*): Total APY headline / Raiku APY Uplift / Total APR / 6-seg bar / 6 component rows
-- 6 component rows: Issuance / Network Block Fees / Raiku AOT / Validator Bonus / Raiku JIT / Other JIT
-- APY primary, APR secondary, SOL/yr per component row (uses existing fmtValidatorSol + '/yr')
-- Old "Yield Uplift" 4-card block removed; section renamed "Yield Details"
-- "Validator audit line" removed (redundant with top card)
-- "Base Network Yield" sidebar section hidden; sl-staking-ratio slider kept in DOM as hidden input
-- Hidden spans preserve all IDs still written to by update(): validator-uplift-apy/apr, validator-total-apy/apr, validator-apr-formula-line/note, validator-apy-formula, validator-staked-value/source, validator-inflation-rate, validator-staking-ratio-display, validator-base-apr/sub/apy, validator-priority-apr/apy
-- CSS: added .vc-row, .vc-row-left, .vc-row-name, .vc-row-right, .vc-row-apy, .vc-row-apr, .vc-row-sol
-- No math changed; all values from existing update() computation (issApy2/blkApy2/aotApy2/bonusApy2/jitApy2/ojitApy2 to avoid name collision with aprToApy calls already in scope)
+- Old "Yield Uplift" 4-card block removed; "Base Network Yield" sidebar hidden
 
 ---
 
