@@ -1609,7 +1609,7 @@ details[open] summary::before { transform:rotate(90deg); }
                     <div class="validator-decomp-sub" id="validator-decomp-iss-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="blk">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot priority"></span>Network Fees<button class="vc-info-btn" style="opacity:0.2;" disabled>?</button></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot priority"></span>Network Fees<button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-blk')">?</button></div>
                     <div style="font-size:8px; color:var(--text2); margin-bottom:2px; line-height:1.3;">base + priority fees</div>
                     <div class="validator-decomp-value" id="validator-decomp-blk-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-blk-apr">0.00% APR</div>
@@ -2313,6 +2313,33 @@ function fmtMatrixUsd(v){
 function vcOpenExplainer(id) {
     var el = document.getElementById(id);
     if (el) el.classList.add('open');
+    // Populate live values immediately on open so dashes never flash
+    var _e;
+    if (id === 'vc-explainer-iss') {
+        var slR = document.getElementById('sl-staking-ratio');
+        var sR = slR ? (+(slR.value) / 100 || ACTIVE_STAKING_RATIO_DEFAULT) : ACTIVE_STAKING_RATIO_DEFAULT;
+        var iAPR = SOLANA_INFLATION_RATE / sR, iAPY = aprToApy(iAPR, APY_COMPOUNDING_PERIODS);
+        _e = document.getElementById('vc-iss-exp-inflation');  if(_e) _e.textContent = fmtValidatorRate(SOLANA_INFLATION_RATE);
+        _e = document.getElementById('vc-iss-exp-staking');    if(_e) _e.textContent = fmtValidatorRate(sR);
+        _e = document.getElementById('vc-iss-exp-apr');        if(_e) _e.textContent = fmtValidatorRate(iAPR);
+        _e = document.getElementById('vc-iss-exp-apy');        if(_e) _e.textContent = fmtValidatorRate(iAPY);
+        _e = document.getElementById('vc-iss-exp-epochs');     if(_e) _e.textContent = APY_COMPOUNDING_PERIODS;
+        _e = document.getElementById('vc-iss-exp-inflation2'); if(_e) _e.textContent = fmtValidatorRate(SOLANA_INFLATION_RATE);
+        _e = document.getElementById('vc-iss-exp-staking2');   if(_e) _e.textContent = fmtValidatorRate(sR);
+        _e = document.getElementById('vc-iss-exp-staking3');   if(_e) _e.textContent = fmtValidatorRate(sR);
+        _e = document.getElementById('vc-iss-exp-epochs2');    if(_e) _e.textContent = APY_COMPOUNDING_PERIODS + ' epochs/yr';
+    }
+    if (id === 'vc-explainer-blk') {
+        var slB = document.getElementById('sl-blk');
+        var bShare = slB ? (+(slB.value) / 100) : 0.08;
+        var residual = Math.max(0, 1 - bShare);
+        var pAPR = PRIORITY_FEES_NETWORK_APR * residual, pAPY = aprToApy(pAPR, APY_COMPOUNDING_PERIODS);
+        _e = document.getElementById('vc-blk-exp-bshare');    if(_e) _e.textContent = (bShare * 100).toFixed(0) + '%';
+        _e = document.getElementById('vc-blk-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(pAPR);
+        _e = document.getElementById('vc-blk-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(pAPY);
+        _e = document.getElementById('vc-blk-exp-bshare2');   if(_e) _e.textContent = (bShare * 100).toFixed(0) + '%';
+        _e = document.getElementById('vc-blk-exp-residual');  if(_e) _e.textContent = (residual * 100).toFixed(0) + '%';
+    }
 }
 function vcCloseExplainer(id) {
     var el = document.getElementById(id);
@@ -4495,6 +4522,15 @@ function update(){
     })();
     document.getElementById('validator-decomp-blk-apy').textContent   = fmtValidatorRate(aprToApy(priorityFeesApr, APY_COMPOUNDING_PERIODS)) + ' APY';
     document.getElementById('validator-decomp-blk-apr').textContent   = fmtValidatorRate(priorityFeesApr)  + ' APR';
+    // ── Network Fees explainer live values ────────────────────────────────
+    (function() {
+        var _e;
+        _e = document.getElementById('vc-blk-exp-bshare');    if(_e) _e.textContent = (p.b * 100).toFixed(0) + '%';
+        _e = document.getElementById('vc-blk-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(priorityFeesApr);
+        _e = document.getElementById('vc-blk-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(priorityFeesApy);
+        _e = document.getElementById('vc-blk-exp-bshare2');   if(_e) _e.textContent = (p.b * 100).toFixed(0) + '%';
+        _e = document.getElementById('vc-blk-exp-residual');  if(_e) _e.textContent = (residualBlockShare * 100).toFixed(0) + '%';
+    })();
     document.getElementById('validator-decomp-aot-apy').textContent   = fmtValidatorRate(aprToApy(aotApr,          APY_COMPOUNDING_PERIODS)) + ' APY';
     document.getElementById('validator-decomp-aot-apr').textContent   = fmtValidatorRate(aotApr)           + ' APR';
     document.getElementById('validator-decomp-bonus-apy').textContent = fmtValidatorRate(aprToApy(bonusApr,        APY_COMPOUNDING_PERIODS)) + ' APY';
@@ -6643,10 +6679,74 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         </div>
 
         <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Cross-check vs. Marinade</div>
+            <div class="vc-explainer-note">At default inputs (3.94% inflation, 66% staking ratio) this model yields <strong style="color:var(--text);">5.97% issuance APR</strong>. <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade Network Stats</a> shows ~5.93% APR (March 2026). Delta: 0.04pp — within normal measurement noise from source timing and staking ratio rounding. Alignment confirms the methodology is correctly calibrated.</div>
+        </div>
+
+        <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Reference</div>
             <div class="vc-explainer-sources">
                 <a class="vc-explainer-source-link" href="https://docs.solana.com/inflation/inflation_schedule" target="_blank" rel="noopener">Solana Docs — Inflation Schedule (8% genesis, 15% taper, ~1.5% floor)</a>
                 <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats (live staking overview)</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ── Network Fees Explainer Modal ──────────────────────────────────── -->
+<div class="vc-explainer-overlay" id="vc-explainer-blk" onclick="if(event.target===this)vcCloseExplainer('vc-explainer-blk')">
+    <div class="vc-explainer-card">
+        <button class="vc-explainer-close" onclick="vcCloseExplainer('vc-explainer-blk')">×</button>
+        <div class="vc-explainer-title">Network Fees</div>
+        <div class="vc-explainer-subtitle">Residual base + priority fee yield earned by validators — independent of issuance and all Raiku-specific flows</div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">What it is</div>
+            <div class="vc-explainer-note">Network Fees is the standard fee yield validators earn from Solana transaction base fees and priority fees, scaled to the share of block space <em>not</em> reserved by Raiku AOT. It is not issuance, not Raiku AOT revenue, not Raiku JIT, not Validator Bonus, and not Other JIT. It represents what validators earn from ordinary network activity on the portion of each block outside Raiku's reservation.</div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live formula</div>
+            <div class="vc-explainer-formula">
+                <div>Network Fees APR = 0.40% &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-apr">—</span></div>
+                <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-blk-exp-apy">—</span></div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live inputs</div>
+            <div class="vc-explainer-inputs">
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Benchmark APR (network-avg fees)
+                        <span style="font-size:10px; color:#C89060; font-style:italic;">assumed constant</span>
+                    </span>
+                    <span class="vc-explainer-input-val">0.40%</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Raiku Block Share (active scenario)</span>
+                    <span class="vc-explainer-input-val" id="vc-blk-exp-bshare2">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Residual Block Factor (1 − Block Share)</span>
+                    <span class="vc-explainer-input-val" id="vc-blk-exp-residual">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">About the 0.40% benchmark</div>
+            <div class="vc-explainer-note">The 0.40% APR is a <strong style="color:var(--text);">fixed internal benchmark</strong>, not live data. It is a network-average estimate of combined base fee + priority fee yield per unit of stake, set at model construction time. It is <strong style="color:var(--text);">not dynamically sourced</strong> from Dune or Trillium in this version. Candidate cross-check for the underlying fee rate: <a class="vc-explainer-source-inline" href="https://dune.com/ilemi/solana-compute" target="_blank" rel="noopener">↗ Dune — Solana Compute (ilemi)</a></div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Why residual block share is applied</div>
+            <div class="vc-explainer-note">Raiku AOT reserves a share of each block for its auction winners. The fee yield on that reserved share is already counted in the Raiku AOT component — including it here would double-count. Network Fees is therefore scaled by <code style="font-family:var(--font-mono); font-size:11px; color:var(--text);">1 − Raiku Block Share</code>. At 8% block share (Base Case), 92% of the benchmark rate accrues here and 8% is attributed to Raiku AOT.</div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Reference</div>
+            <div class="vc-explainer-sources">
+                <a class="vc-explainer-source-link" href="https://dune.com/ilemi/solana-compute" target="_blank" rel="noopener">Dune — Solana Compute (ilemi) — observed on-chain priority fee rates</a>
+                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats (overall validator yield cross-check)</a>
             </div>
         </div>
     </div>
