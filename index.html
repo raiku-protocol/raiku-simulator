@@ -6847,19 +6847,19 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     <div class="vc-explainer-card">
         <button class="vc-explainer-close" onclick="vcCloseExplainer('vc-explainer-aot')">×</button>
         <div class="vc-explainer-title">Raiku AOT</div>
-        <div class="vc-explainer-subtitle">Validator yield from Raiku AOT auction flow — gross fees × validator capture rate ÷ connected stake</div>
+        <div class="vc-explainer-subtitle">Fee yield validators earn from Raiku's AOT reserved-block auctions, net of the AOT Protocol Take Rate</div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">What it is</div>
-            <div class="vc-explainer-note">AOT (Ahead-of-Time) is Raiku's sealed-bid auction for reserved compute units. Validators earn <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">aotGross × (1 − take rate)</code> of the gross AOT fee revenue each year. That SOL/yr amount divided by connected stake gives the APR contribution shown here.</div>
+            <div class="vc-explainer-note">AOT (Ahead-of-Time) is Raiku's sealed-bid auction for reserved Solana compute units (CU). Validators earn AOT Gross × (1 − AOT Protocol Take Rate) of the gross AOT fee revenue each year. That SOL/yr amount divided by total staked SOL × Raiku Stake % gives the APR contribution shown here.</div>
         </div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Live formula</div>
             <div class="vc-explainer-formula">
-                <div>aotGross = Stake% × SY × Block% × CB × Fee/CU ÷ LS</div>
-                <div style="margin-top:4px;">aotValidatorBase = aotGross × validator capture rate</div>
-                <div style="margin-top:4px;">AOT APR = aotValidatorBase ÷ connectedStake = <span class="vc-ef-val" id="vc-aot-exp-apr">—</span></div>
+                <div>AOT Gross (SOL/yr) = (Raiku Stake% × slots per year) × (Raiku Block Share × block CU capacity) × Avg Auction Fee/CU ÷ 10⁹</div>
+                <div style="margin-top:4px;">Validator Base (SOL/yr) = AOT Gross × (1 − AOT Protocol Take Rate)</div>
+                <div style="margin-top:4px;">AOT APR = Validator Base ÷ (total staked SOL × Raiku Stake%) = <span class="vc-ef-val" id="vc-aot-exp-apr">—</span></div>
                 <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-aot-exp-apy">—</span></div>
             </div>
         </div>
@@ -6892,7 +6892,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Derivation</div>
-            <div class="vc-explainer-note">All inputs from current scenario state — no external source. AOT gross scales with Raiku's reserved block share, stake coverage, and the fee/CU bid by auction clients. Validator capture is always <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">1 − protocol take rate</code>.</div>
+            <div class="vc-explainer-note">All inputs from current scenario state — no external source. AOT Gross scales with Raiku Block Share, Raiku Stake %, and the Avg Auction Fee/CU bid by auction clients. Validator capture is always 1 − AOT Protocol Take Rate.</div>
         </div>
     </div>
 </div>
@@ -6902,19 +6902,19 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     <div class="vc-explainer-card">
         <button class="vc-explainer-close" onclick="vcCloseExplainer('vc-explainer-jit')">×</button>
         <div class="vc-explainer-title">Raiku JIT</div>
-        <div class="vc-explainer-subtitle">Validator yield from Raiku JIT tip flow — captured JIT gross × validator rate ÷ connected stake</div>
+        <div class="vc-explainer-subtitle">Fee yield validators earn from Raiku's JIT tip routing, net of the JIT Protocol Take Rate</div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">What it is</div>
-            <div class="vc-explainer-note">JIT (Just-in-Time) is Raiku's real-time tip-based ordering service. Validators earn <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">jitGross × (1 − take rate)</code> of the Raiku-captured JIT market each year. That SOL/yr amount divided by connected stake gives the APR contribution shown here.</div>
+            <div class="vc-explainer-note">JIT (Just-in-Time) is Raiku's real-time tip-based ordering service. Validators earn JIT Gross × (1 − JIT Protocol Take Rate) of the Raiku-captured JIT market each year. That SOL/yr amount divided by total staked SOL × Raiku Stake % gives the APR contribution shown here.</div>
         </div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Live formula</div>
             <div class="vc-explainer-formula">
-                <div>jitGross = JIT market × Raiku JIT share</div>
-                <div style="margin-top:4px;">jitValidatorBase = jitGross × validator capture rate</div>
-                <div style="margin-top:4px;">JIT APR = jitValidatorBase ÷ connectedStake = <span class="vc-ef-val" id="vc-jit-exp-apr">—</span></div>
+                <div>JIT Gross (SOL/yr) = JIT Total Market × Raiku JIT Market Share</div>
+                <div style="margin-top:4px;">Validator Base (SOL/yr) = JIT Gross × (1 − JIT Protocol Take Rate)</div>
+                <div style="margin-top:4px;">JIT APR = Validator Base ÷ (total staked SOL × Raiku Stake%) = <span class="vc-ef-val" id="vc-jit-exp-apr">—</span></div>
                 <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-jit-exp-apy">—</span></div>
             </div>
         </div>
@@ -6945,7 +6945,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Derivation</div>
-            <div class="vc-explainer-note">All inputs from current scenario state. JIT market size is set by the active preset. Raiku JIT share determines how much of that market routes through Raiku's protocol. Validator capture is always <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">1 − protocol take rate</code>.</div>
+            <div class="vc-explainer-note">All inputs from current scenario state. JIT Total Market is set by the active preset. Raiku JIT Market Share determines how much of that market routes through Raiku's protocol. Validator capture is always 1 − JIT Protocol Take Rate.</div>
         </div>
     </div>
 </div>
@@ -6959,15 +6959,15 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">What it is</div>
-            <div class="vc-explainer-note">The Validator Bonus is a funded subsidy drawn from Raiku's AOT and JIT protocol pools and paid on top of the standard <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">(1 − take rate)</code> base. Each pool contributes a separately configurable bonus rate, clamped so rebate + bonus ≤ protocol take rate. If take rate = 0, bonus = 0 by construction.</div>
+            <div class="vc-explainer-note">The Validator Bonus is a funded subsidy drawn from Raiku's AOT and JIT protocol pools, paid on top of each product's standard base validator capture. Each pool contributes a separately configurable bonus rate, clamped so rebate + bonus ≤ protocol take rate for that product. If a take rate = 0, its bonus = 0 by construction.</div>
         </div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Live formula</div>
             <div class="vc-explainer-formula">
-                <div>aotValBonus = aotGross × aotBonusRate</div>
-                <div style="margin-top:4px;">jitValBonus = jitGross × jitBonusRate</div>
-                <div style="margin-top:4px;">Bonus APR = (aotValBonus + jitValBonus) ÷ connectedStake = <span class="vc-ef-val" id="vc-bonus-exp-apr">—</span></div>
+                <div>AOT Bonus (SOL/yr) = AOT Gross × AOT Validator Bonus Rate</div>
+                <div style="margin-top:4px;">JIT Bonus (SOL/yr) = JIT Gross × JIT Validator Bonus Rate</div>
+                <div style="margin-top:4px;">Bonus APR = (AOT Bonus + JIT Bonus) ÷ (total staked SOL × Raiku Stake%) = <span class="vc-ef-val" id="vc-bonus-exp-apr">—</span></div>
                 <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-bonus-exp-apy">—</span></div>
             </div>
         </div>
@@ -7002,15 +7002,15 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">What it is</div>
-            <div class="vc-explainer-note">Other JIT is the share of the total JIT tip market that does not route through Raiku — it flows directly to validators via other ordering services (e.g. native Jito bundles). It is a model-derived residual: <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">max(Raiku Stake% − Raiku JIT share%, 0)</code> of the total JIT market. It bypasses protocol take entirely and is excluded from Raiku gross revenue.</div>
+            <div class="vc-explainer-note">Other JIT is the share of the total JIT tip market that does not route through Raiku — it flows directly to validators via other ordering services (e.g. native Jito bundles). It is a model-derived residual: max(Raiku Stake% − Raiku JIT Market Share, 0) of the total JIT market. It bypasses protocol take entirely and is excluded from Raiku gross revenue.</div>
         </div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Live formula</div>
             <div class="vc-explainer-formula">
-                <div>ojShare = max(Stake% − JIT share%, 0) = <span class="vc-ef-val" id="vc-ojit-exp-ojshare">—</span></div>
-                <div style="margin-top:4px;">otherJitRev = JIT market × ojShare</div>
-                <div style="margin-top:4px;">Other JIT APR = otherJitRev ÷ connectedStake = <span class="vc-ef-val" id="vc-ojit-exp-apr">—</span></div>
+                <div>Other JIT Share = max(Raiku Stake% − Raiku JIT Market Share, 0) = <span class="vc-ef-val" id="vc-ojit-exp-ojshare">—</span></div>
+                <div style="margin-top:4px;">Other JIT Revenue (SOL/yr) = JIT Total Market × Other JIT Share</div>
+                <div style="margin-top:4px;">Other JIT APR = Other JIT Revenue ÷ (total staked SOL × Raiku Stake%) = <span class="vc-ef-val" id="vc-ojit-exp-apr">—</span></div>
                 <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-ojit-exp-apy">—</span></div>
             </div>
         </div>
@@ -7039,7 +7039,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Derivation</div>
-            <div class="vc-explainer-note">Fully model-derived — no external source. Other JIT is 0 when Raiku JIT share ≥ Raiku Stake %. Raiku's stake coverage creates a JIT opportunity ceiling; the uncaptured portion flows to validators via competing ordering services.</div>
+            <div class="vc-explainer-note">Fully model-derived — no external source. Other JIT is 0 when Raiku JIT Market Share ≥ Raiku Stake %. Raiku Stake % defines the maximum JIT market share that can route through Raiku; the uncaptured portion flows to validators via competing ordering services.</div>
         </div>
     </div>
 </div>
