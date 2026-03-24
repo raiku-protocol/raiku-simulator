@@ -386,22 +386,25 @@ details[open] summary::before { transform:rotate(90deg); }
 .vpr-band-sol { font-family:var(--font-mono); font-size:14px; font-weight:700; color:var(--text); }
 .vpr-band-usd { font-family:var(--font-mono); font-size:11px; color:var(--text-mid); margin-top:2px; }
 .vpr-table { width:100%; border-collapse:collapse; font-size:11px; }
-.vpr-table th { font-size:10px; color:var(--text-mid); text-transform:uppercase; letter-spacing:0.7px; padding:11px 12px; text-align:right; border-bottom:2px solid rgba(255,255,255,0.1); font-weight:500; white-space:nowrap; background:#0a0c0f; }
+.vpr-table th { font-size:11px; color:var(--text); text-transform:uppercase; letter-spacing:0.7px; padding:11px 12px; text-align:right; border-bottom:2px solid rgba(255,255,255,0.12); font-weight:700; white-space:nowrap; background:#0a0c0f; }
 .vpr-table th:first-child { text-align:left; padding-left:0; }
 .vpr-table td { padding:6px 12px; text-align:right; border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:middle; line-height:1.4; }
 .vpr-table td:first-child { text-align:left; color:var(--text2); font-size:12px; padding-left:0; }
 .vpr-table tr:last-child td { border-bottom:none; }
 .vpr-table tr.vpr-tr-cadence td { border-bottom:1px solid #1a1e27; padding-top:11px; padding-bottom:11px; }
-.vpr-table tr.vpr-tr-total td { background:rgba(192,255,56,0.06); border-bottom:1px solid rgba(192,255,56,0.12); padding-top:12px; padding-bottom:12px; }
-.vpr-table tr.vpr-tr-total td:first-child { color:#C0FF38; font-weight:700; font-size:13px; }
+.vpr-table tr.vpr-tr-total td { background:rgba(91,141,239,0.07); border-bottom:1px solid rgba(91,141,239,0.18); padding-top:12px; padding-bottom:12px; }
+.vpr-table tr.vpr-tr-total td:first-child { color:#5B8DEF; font-weight:700; font-size:13px; }
 .vpr-table tr.vpr-tr-group td { background:rgba(255,255,255,0.035); cursor:pointer; user-select:none; padding-top:11px; padding-bottom:11px; }
 .vpr-table tr.vpr-tr-group td:first-child { color:var(--text); font-weight:600; font-size:12px; }
 .vpr-table tr.vpr-tr-group:hover td { background:rgba(255,255,255,0.06); }
+.vpr-table tr.vpr-tr-group.vpr-tr-mev td { background:rgba(192,255,56,0.06); }
+.vpr-table tr.vpr-tr-group.vpr-tr-mev td:first-child { color:#C0FF38; font-weight:700; }
+.vpr-table tr.vpr-tr-group.vpr-tr-mev:hover td { background:rgba(192,255,56,0.10); }
 .vpr-table tr.vpr-tr-child td { border-bottom:1px solid rgba(255,255,255,0.02); }
 .vpr-table tr.vpr-tr-child td:first-child { color:var(--text2); font-size:11px; padding-left:18px; }
-.vpr-chevron { font-size:9px; color:var(--text2); margin-left:5px; opacity:0.7; }
+.vpr-chevron { font-size:14px; color:var(--text-mid); margin-left:7px; opacity:0.85; }
 .vpr-sol { font-family:var(--font-mono); color:var(--text); font-size:11px; }
-.vpr-usd { font-family:var(--font-mono); font-size:9px; color:var(--text2); margin-left:4px; }
+.vpr-usd { font-family:var(--font-mono); font-size:10px; color:var(--text2); margin-left:5px; }
 .vpr-cnt { font-family:var(--font-mono); color:var(--text-mid); font-size:11px; }
 
 /* Validator Yield Composition top card — component rows */
@@ -1730,7 +1733,7 @@ details[open] summary::before { transform:rotate(90deg); }
                         <td id="vpr-blk-month">—</td>
                         <td id="vpr-blk-year">—</td>
                     </tr>
-                    <tr class="vpr-tr-group" onclick="vprToggle('mev')">
+                    <tr class="vpr-tr-group vpr-tr-mev" onclick="vprToggle('mev')">
                         <td>Raiku MEV <span class="vpr-chevron" id="vpr-chev-mev">▾</span></td>
                         <td id="vpr-mev-block">—</td>
                         <td id="vpr-mev-epoch">—</td>
