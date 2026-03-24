@@ -1570,9 +1570,6 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-proto-row-label">Protocol Take Rate</div>
                 <div class="validator-proto-cell" id="validator-context-aot-take">5.0%</div>
                 <div class="validator-proto-cell" id="validator-context-jit-take">5.0%</div>
-                <div class="validator-proto-row-label">Stake / Market Share</div>
-                <div class="validator-proto-cell" id="validator-context-aot-stake">—</div>
-                <div class="validator-proto-cell" id="validator-context-jit-share">—</div>
                 <div class="validator-proto-row-label">Block Alloc (%)</div>
                 <div class="validator-proto-cell" id="validator-context-block">8%</div>
                 <div class="validator-proto-cell dim">N/A</div>
@@ -4751,7 +4748,6 @@ function update(){
     document.getElementById('validator-scenario-name').textContent = getDisplayedScenarioName();
     _vcSet('validator-context-price', '$' + p.p);
     _vcSet('validator-context-stake', (p.s * 100).toFixed(1) + '%');
-    _vcSet('validator-context-aot-stake', (p.s * 100).toFixed(1) + '%');
     document.getElementById('validator-context-connected').textContent = fmt(connectedStakeSol, 'S');
     (function(){ var fEl=document.getElementById('validator-stake-formula'); if(!fEl) return;
         fEl.innerHTML = fmt(totalStakedSol,'S') + ' \u00d7 ' + (p.s*100).toFixed(1) + '% = ' + fmt(connectedStakeSol,'S') + ' \u00b7 <a href="https://solanacompass.com/tokenomics#staked" target="_blank" style="color:#4d5566;text-decoration:none;border-bottom:1px solid rgba(77,85,102,0.4);">Solana Compass</a> <span style="opacity:0.6;">(snapshot, Mar\u00a02026)</span>'; }());
@@ -4760,7 +4756,6 @@ function update(){
     _vcSet('validator-context-aot-take', p.ca.toFixed(1) + '%');
     _vcSet('validator-context-jit-take', p.cj.toFixed(1) + '%');
     document.getElementById('validator-context-jit-market').textContent = fmt(p.jm,'S') + '/yr';
-    _vcSet('validator-context-jit-share', (p.j * 100).toFixed(1) + '%');
     document.getElementById('validator-context-ojit').textContent = fmt(p.jm * Math.max(p.s - p.j, 0),'S') + '/yr';
     // JIT avg fee/CU: window-matched to scenario; Bull uses AOT p.f as display proxy
     (function(){ var jfEl=document.getElementById('validator-context-jit-fee'); if(!jfEl||jfEl.querySelector('input')) return;
@@ -7021,8 +7016,6 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     }
     makeEditable('validator-context-price',    'sl-price',    10, 400, 5,    function(v){ return '$'+Math.round(v); });
     makeEditable('validator-context-stake',    'sl-stake',    0,  50,  0.1,  function(v){ return v.toFixed(1)+'%'; });
-    makeEditable('validator-context-aot-stake','sl-stake',    0,  50,  0.1,  function(v){ return v.toFixed(1)+'%'; });
-    makeEditable('validator-context-jit-share','sl-jit',      0,  30,  0.1,  function(v){ return v.toFixed(1)+'%'; });
     makeEditable('validator-context-aot-take', 'sl-comm-aot', 0,  10,  0.25, function(v){ return v.toFixed(1)+'%'; });
     makeEditable('validator-context-jit-take', 'sl-comm-jit', 0,  10,  0.25, function(v){ return v.toFixed(1)+'%'; });
     makeEditable('validator-context-block',    'sl-blk',      0, 100,  0.1,  function(v){ return Math.round(v)+'%'; });
