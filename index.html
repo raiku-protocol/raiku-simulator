@@ -257,16 +257,22 @@ details[open] summary::before { transform:rotate(90deg); }
 .sidebar-yield-sub a { color:var(--lime-soft); text-decoration:none; }
 .sidebar-yield-sub a:hover { text-decoration:underline; }
 
-.validator-layout { display:flex; gap:var(--gap); align-items:flex-start; }
-.validator-side { width:340px; min-width:340px; position:sticky; top:10px; align-self:flex-start; }
-.validator-main { flex:1; min-width:0; width:100%; display:grid; gap:var(--gap); }
+.validator-layout { display:flex; gap:var(--gap); align-items:stretch; }
+.validator-side { width:340px; min-width:340px; position:sticky; top:10px; }
+.validator-main { flex:1; min-width:0; }
 .validator-context-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px 12px; }
 .validator-context-item { min-width:0; }
 .validator-context-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.55px; margin-bottom:3px; }
-.validator-context-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.validator-note { font-size:10px; color:var(--text-mid); line-height:1.5; margin-top:10px; }
-.validator-group-label { font-size:8px; color:var(--text2); opacity:0.65; text-transform:uppercase; letter-spacing:0.8px; padding-bottom:3px; border-bottom:1px solid rgba(255,255,255,0.05); margin-bottom:6px; }
-.validator-global-row { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px 8px; margin-bottom:8px; }
+.validator-context-value { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:600; background:#0e1012; border:1px solid #1b1e25; border-radius:4px; padding:3px 7px; margin-top:2px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.validator-note { font-size:10px; color:var(--text-mid); line-height:1.5; margin-top:auto; padding-top:14px; }
+.validator-global-row { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px 8px; margin-bottom:10px; }
+.validator-proto-table { display:grid; grid-template-columns:auto 1fr 1fr; gap:4px 6px; }
+.validator-proto-col-header { font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.7px; text-align:center; padding:3px 0 4px; }
+.validator-proto-col-header.aot { color:#7BBBAF; border-bottom:2px solid rgba(123,187,175,0.25); }
+.validator-proto-col-header.jit { color:#5B8DEF; border-bottom:2px solid rgba(91,141,239,0.25); }
+.validator-proto-row-label { font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; padding-right:10px; white-space:nowrap; }
+.validator-proto-cell { font-size:11px; font-family:var(--font-mono); font-weight:600; color:var(--text); background:#0e1012; border:1px solid #1b1e25; border-radius:4px; padding:3px 6px; text-align:center; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.validator-proto-cell.dim { background:transparent; border-color:transparent; color:var(--text2); opacity:0.2; pointer-events:none; }
 .validator-support.section { padding:14px 16px; }
 .validator-support h2 { font-size:12px; margin-bottom:10px; color:var(--text-mid); }
 .validator-support-grid { display:grid; gap:8px; }
@@ -1435,7 +1441,7 @@ details[open] summary::before { transform:rotate(90deg); }
 <div class="tab-content" id="tab-validator">
 <div class="validator-layout">
 <div class="validator-side">
-    <div class="section fade-in fade-in-1">
+    <div class="section fade-in fade-in-1" style="height:100%; box-sizing:border-box; display:flex; flex-direction:column;">
         <h2>Protocol Level Setup</h2>
         <!-- Scenario: 4 buttons in one single row -->
         <div class="scenario-btns" style="margin-bottom:8px; display:grid; grid-template-columns:repeat(4,1fr); gap:4px;">
@@ -1459,43 +1465,31 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-context-value" id="validator-context-connected">42.39M SOL</div>
             </div>
         </div>
-        <!-- AOT subsection -->
-        <div class="validator-group-label">AOT</div>
-        <div class="validator-context-grid">
-            <div class="validator-context-item">
-                <div class="validator-context-label">Take Rate</div>
-                <div class="validator-context-value" id="validator-context-aot-take">5.0%</div>
-            </div>
-            <div class="validator-context-item">
-                <div class="validator-context-label">Block Share</div>
-                <div class="validator-context-value" id="validator-context-block">5%</div>
-            </div>
-            <div class="validator-context-item" style="grid-column:1/-1;">
-                <div class="validator-context-label">Avg Auction Fee/CU</div>
-                <div class="validator-context-value" id="validator-context-fee">0.50 L</div>
-            </div>
+        <!-- Protocol comparison table: AOT vs JIT -->
+        <div class="validator-proto-table">
+            <div></div>
+            <div class="validator-proto-col-header aot">AOT</div>
+            <div class="validator-proto-col-header jit">JIT</div>
+            <div class="validator-proto-row-label">Take Rate</div>
+            <div class="validator-proto-cell" id="validator-context-aot-take">5.0%</div>
+            <div class="validator-proto-cell" id="validator-context-jit-take">5.0%</div>
+            <div class="validator-proto-row-label">Block Share</div>
+            <div class="validator-proto-cell" id="validator-context-block">8%</div>
+            <div class="validator-proto-cell dim">—</div>
+            <div class="validator-proto-row-label">Avg Fee / CU</div>
+            <div class="validator-proto-cell" id="validator-context-fee">0.50 L</div>
+            <div class="validator-proto-cell dim">—</div>
+            <div class="validator-proto-row-label">Total Market</div>
+            <div class="validator-proto-cell dim">—</div>
+            <div class="validator-proto-cell" id="validator-context-jit-market">—</div>
+            <div class="validator-proto-row-label">Raiku Share</div>
+            <div class="validator-proto-cell dim">—</div>
+            <div class="validator-proto-cell" id="validator-context-jit-share">—</div>
+            <div class="validator-proto-row-label">Other JIT</div>
+            <div class="validator-proto-cell dim">—</div>
+            <div class="validator-proto-cell" id="validator-context-ojit">—</div>
         </div>
-        <!-- JIT subsection -->
-        <div class="validator-group-label" style="margin-top:10px;">JIT</div>
-        <div class="validator-context-grid">
-            <div class="validator-context-item">
-                <div class="validator-context-label">Take Rate</div>
-                <div class="validator-context-value" id="validator-context-jit-take">5.0%</div>
-            </div>
-            <div class="validator-context-item">
-                <div class="validator-context-label">Total Market</div>
-                <div class="validator-context-value" id="validator-context-jit-market">—</div>
-            </div>
-            <div class="validator-context-item">
-                <div class="validator-context-label">Raiku JIT Share</div>
-                <div class="validator-context-value" id="validator-context-jit-share">—</div>
-            </div>
-            <div class="validator-context-item">
-                <div class="validator-context-label">Other JIT</div>
-                <div class="validator-context-value" id="validator-context-ojit">—</div>
-            </div>
-        </div>
-        <div class="validator-note">Phase 1 uses the currently selected simulator state as the source of truth for validator-side annual revenue, then translates that revenue pool into yield uplift on the connected stake.</div>
+        <div class="validator-note">Computed from the active simulator configuration. Protocol values reflect the setup above applied to the connected validator's stake.</div>
     </div>
     <!-- Base Network Yield inputs — hidden in this layout; controls appear in component expand rows (Patch 3) -->
     <input type="range" id="sl-staking-ratio" min="50" max="85" step="1" value="66" style="display:none;" oninput="update()">
@@ -1540,79 +1534,74 @@ details[open] summary::before { transform:rotate(90deg); }
             <div class="validator-decomp-legend" style="grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px 10px; margin-top:8px;">
                 <div class="validator-decomp-item" data-component="iss">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot base"></span>Issuance</div>
-                    <div class="validator-decomp-value" id="validator-decomp-iss-apy">0.00% APY</div>
-                    <div class="validator-decomp-sub"   id="validator-decomp-iss-apr">0.00% APR</div>
+                    <div style="display:flex; align-items:baseline; gap:5px;">
+                        <div class="validator-decomp-value" id="validator-decomp-iss-apy">0.00% APY</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-iss-apr" style="margin-top:0;">0.00% APR</div>
+                    </div>
                     <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-iss-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-iss-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
                 <div class="validator-decomp-item" data-component="blk">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot priority"></span>Network Block Fees</div>
-                    <div class="validator-decomp-value" id="validator-decomp-blk-apy">0.00% APY</div>
-                    <div class="validator-decomp-sub"   id="validator-decomp-blk-apr">0.00% APR</div>
+                    <div style="display:flex; align-items:baseline; gap:5px;">
+                        <div class="validator-decomp-value" id="validator-decomp-blk-apy">0.00% APY</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-blk-apr" style="margin-top:0;">0.00% APR</div>
+                    </div>
                     <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-blk-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-blk-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
                 <div class="validator-decomp-item" data-component="aot">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot aot"></span>Raiku AOT</div>
-                    <div class="validator-decomp-value" id="validator-decomp-aot-apy">0.00% APY</div>
-                    <div class="validator-decomp-sub"   id="validator-decomp-aot-apr">0.00% APR</div>
+                    <div style="display:flex; align-items:baseline; gap:5px;">
+                        <div class="validator-decomp-value" id="validator-decomp-aot-apy">0.00% APY</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-aot-apr" style="margin-top:0;">0.00% APR</div>
+                    </div>
                     <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-aot-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-aot-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
                 <div class="validator-decomp-item" data-component="bonus">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot bonus"></span>Validator Bonus</div>
-                    <div class="validator-decomp-value" id="validator-decomp-bonus-apy">0.00% APY</div>
-                    <div class="validator-decomp-sub"   id="validator-decomp-bonus-apr">0.00% APR</div>
+                    <div style="display:flex; align-items:baseline; gap:5px;">
+                        <div class="validator-decomp-value" id="validator-decomp-bonus-apy">0.00% APY</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-bonus-apr" style="margin-top:0;">0.00% APR</div>
+                    </div>
                     <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-bonus-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-bonus-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
                 <div class="validator-decomp-item" data-component="jit">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot jit"></span>Raiku JIT</div>
-                    <div class="validator-decomp-value" id="validator-decomp-jit-apy">0.00% APY</div>
-                    <div class="validator-decomp-sub"   id="validator-decomp-jit-apr">0.00% APR</div>
+                    <div style="display:flex; align-items:baseline; gap:5px;">
+                        <div class="validator-decomp-value" id="validator-decomp-jit-apy">0.00% APY</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-jit-apr" style="margin-top:0;">0.00% APR</div>
+                    </div>
                     <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-jit-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-jit-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
                 <div class="validator-decomp-item" data-component="ojit">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot other-jit"></span>Other JIT</div>
-                    <div class="validator-decomp-value" id="validator-decomp-ojit-apy">0.00% APY</div>
-                    <div class="validator-decomp-sub"   id="validator-decomp-ojit-apr">0.00% APR</div>
+                    <div style="display:flex; align-items:baseline; gap:5px;">
+                        <div class="validator-decomp-value" id="validator-decomp-ojit-apy">0.00% APY</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-ojit-apr" style="margin-top:0;">0.00% APR</div>
+                    </div>
                     <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-ojit-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-ojit-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
                 <!-- Total — spans all 3 columns -->
                 <div class="validator-decomp-item" style="grid-column:1/-1; border-top:1px solid rgba(255,255,255,0.07); padding-top:8px; margin-top:4px;">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot" style="background:#C0FF38;"></span><span style="color:#C0FF38; font-weight:700;">Total Yield</span></div>
-                    <div class="validator-decomp-value" id="validator-decomp-total-apy" style="color:#C0FF38; font-weight:700;">0.00% APY</div>
-                    <div class="validator-decomp-sub"   id="validator-decomp-total-apr">0.00% APR</div>
+                    <div style="display:flex; align-items:baseline; gap:5px;">
+                        <div class="validator-decomp-value" id="validator-decomp-total-apy" style="color:#C0FF38; font-weight:700;">0.00% APY</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-total-apr" style="margin-top:0;">0.00% APR</div>
+                    </div>
                 </div>
             </div><!-- end legend -->
         </div><!-- end decomp-card -->
     </div>
-    <div class="section fade-in fade-in-1">
-        <h2>Raiku Validator Revenue Pool</h2>
-        <div class="validator-kpi-grid">
-            <div class="validator-kpi">
-                <div class="validator-kpi-label" style="color:#6B9EBC;">Other JIT (direct)</div>
-                <div class="validator-kpi-value" id="validator-ojit-usd">$0</div>
-                <div class="validator-kpi-sub" id="validator-ojit-sol">0 SOL/yr · bypass</div>
-            </div>
-            <div class="validator-kpi">
-                <div class="validator-kpi-label" style="color:#5B8DEF;">Raiku JIT</div>
-                <div class="validator-kpi-value" id="validator-jit-usd">$0</div>
-                <div class="validator-kpi-sub" id="validator-jit-sol">0 SOL/yr</div>
-            </div>
-            <div class="validator-kpi">
-                <div class="validator-kpi-label" style="color:#7BBBAF;">AOT Base</div>
-                <div class="validator-kpi-value" id="validator-aot-usd">$0</div>
-                <div class="validator-kpi-sub" id="validator-aot-sol">0 SOL/yr</div>
-            </div>
-            <div class="validator-kpi">
-                <div class="validator-kpi-label" style="color:#4178DE;">Validator Bonus</div>
-                <div class="validator-kpi-value" id="validator-bonus-usd">$0</div>
-                <div class="validator-kpi-sub" id="validator-bonus-sol">0 SOL/yr</div>
-            </div>
-            <div class="validator-kpi" style="background:#0e1510; border:1px solid rgba(192,255,56,0.25); border-left:3px solid #C0FF38; border-radius:6px; padding:10px 12px; margin-top:10px;">
-                <div class="validator-kpi-label" style="color:#C0FF38; font-weight:700;">Total Validator Revenue</div>
-                <div class="validator-kpi-value" id="validator-total-usd" style="font-weight:700;">$0</div>
-                <div class="validator-kpi-sub" id="validator-total-sol">0 SOL/yr</div>
-            </div>
-        </div>
-    </div>
+    <!-- Hidden spans: KPI IDs still written to by update() -->
+    <span id="validator-ojit-usd" style="display:none;"></span>
+    <span id="validator-ojit-sol" style="display:none;"></span>
+    <span id="validator-jit-usd" style="display:none;"></span>
+    <span id="validator-jit-sol" style="display:none;"></span>
+    <span id="validator-aot-usd" style="display:none;"></span>
+    <span id="validator-aot-sol" style="display:none;"></span>
+    <span id="validator-bonus-usd" style="display:none;"></span>
+    <span id="validator-bonus-sol" style="display:none;"></span>
+    <span id="validator-total-usd" style="display:none;"></span>
+    <span id="validator-total-sol" style="display:none;"></span>
     <!-- Hidden spans preserve IDs still written to by update() -->
     <span id="validator-uplift-apy" style="display:none;"></span>
     <span id="validator-total-apy" style="display:none;"></span>
