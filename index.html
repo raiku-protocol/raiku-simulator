@@ -275,6 +275,13 @@ details[open] summary::before { transform:rotate(90deg); }
 .validator-proto-cell.dim { background:transparent; border:1px solid #181b20; color:#3a3f4a; font-size:10px; }
 .validator-proto-cell.editable { cursor:text; }
 .validator-proto-cell.editable:hover { border-color:#2c3240; background:#0a0d10; }
+.validator-context-value.readonly { opacity:0.5; cursor:default; background:#030405; border-color:#161a1f; }
+.validator-context-value.editable { cursor:text; }
+.validator-context-value.editable:hover { border-color:#2c3240; background:#0a0d10; }
+.validator-btns-2x2 { display:grid; grid-template-columns:repeat(2,1fr); gap:5px; margin-top:10px; }
+.validator-btns-2x2 .scenario-btn { padding:7px 6px; font-size:11px; border-radius:5px; border-width:1px; text-align:center; width:100%; border-color:#2a2d32; background:#111315; }
+.validator-btns-2x2 .scenario-btn:hover { border-color:#444; }
+.validator-btns-2x2 .scenario-btn.active { background:var(--lime-dim); border-color:var(--lime); color:var(--lime); }
 .validator-support.section { padding:14px 16px; }
 .validator-support h2 { font-size:12px; margin-bottom:10px; color:var(--text-mid); }
 .validator-support-grid { display:grid; gap:8px; }
@@ -1447,13 +1454,13 @@ details[open] summary::before { transform:rotate(90deg); }
         <!-- Top group: heading + scenario presets + global values -->
         <div>
             <h2>Protocol Level Setup</h2>
-            <div class="scenario-btns" style="margin-top:10px; margin-bottom:0; display:grid; grid-template-columns:repeat(4,1fr); gap:4px;">
-                <button class="scenario-btn" id="validator-btn-con" onclick="applyScenario('con')" style="font-size:10px; padding:7px 3px; overflow:hidden; text-overflow:ellipsis;">Conservative</button>
-                <button class="scenario-btn active" id="validator-btn-base" onclick="applyScenario('base')" style="font-size:10px; padding:7px 3px;">Base Case</button>
-                <button class="scenario-btn" id="validator-btn-opt" onclick="applyScenario('opt')" style="font-size:10px; padding:7px 3px; overflow:hidden; text-overflow:ellipsis;">Optimistic</button>
-                <button class="scenario-btn" id="validator-btn-bull" onclick="applyScenario('bull')" style="font-size:10px; padding:7px 3px;">Bull Case</button>
+            <div class="validator-btns-2x2">
+                <button class="scenario-btn" id="validator-btn-con" onclick="applyScenario('con')">Conservative</button>
+                <button class="scenario-btn active" id="validator-btn-base" onclick="applyScenario('base')">Base Case</button>
+                <button class="scenario-btn" id="validator-btn-opt" onclick="applyScenario('opt')">Optimistic</button>
+                <button class="scenario-btn" id="validator-btn-bull" onclick="applyScenario('bull')">Bull Case</button>
             </div>
-            <div class="validator-global-row" style="margin-top:14px;">
+            <div class="validator-global-row" style="margin-top:12px;">
                 <div class="validator-context-item">
                     <div class="validator-context-label">SOL Price</div>
                     <div class="validator-context-value" id="validator-context-price">$100</div>
@@ -1464,11 +1471,11 @@ details[open] summary::before { transform:rotate(90deg); }
                 </div>
                 <div class="validator-context-item">
                     <div class="validator-context-label">Validator Stake</div>
-                    <div class="validator-context-value" id="validator-context-connected">42.39M SOL</div>
+                    <div class="validator-context-value readonly" id="validator-context-connected" title="Derived — read only">42.39M SOL</div>
                 </div>
             </div>
         </div>
-        <!-- Middle group: AOT vs JIT protocol parameters -->
+        <!-- Middle group: AOT vs JIT protocol parameters (3 editable rows) -->
         <div>
             <div class="validator-proto-table">
                 <div></div>
@@ -1483,17 +1490,14 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-proto-row-label">Avg Fee / CU</div>
                 <div class="validator-proto-cell" id="validator-context-fee">0.50 L</div>
                 <div class="validator-proto-cell" id="validator-context-jit-fee">—</div>
-                <div class="validator-proto-row-label">Total Market</div>
-                <div class="validator-proto-cell dim">N/A</div>
-                <div class="validator-proto-cell" id="validator-context-jit-market">—</div>
-                <div class="validator-proto-row-label">Other JIT</div>
-                <div class="validator-proto-cell dim">N/A</div>
-                <div class="validator-proto-cell" id="validator-context-ojit">—</div>
             </div>
         </div>
         <!-- Bottom: protocol note -->
         <div class="validator-note">Protocol-level setup. These parameters define Raiku's operating conditions — take rates, block allocation, fee levels, and market exposure. Validator yield is computed from this configuration applied to the stake above.</div>
     </div>
+    <!-- Hidden: removed table rows — IDs still written by update() -->
+    <span id="validator-context-jit-market" style="display:none;"></span>
+    <span id="validator-context-ojit" style="display:none;"></span>
     <!-- Base Network Yield inputs — hidden in this layout; controls appear in component expand rows (Patch 3) -->
     <input type="range" id="sl-staking-ratio" min="50" max="85" step="1" value="66" style="display:none;" oninput="update()">
     <span id="validator-staked-value" style="display:none;"></span>
@@ -1583,15 +1587,10 @@ details[open] summary::before { transform:rotate(90deg); }
                     </div>
                     <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-ojit-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-ojit-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
-                <!-- Total — spans all 3 columns -->
-                <div class="validator-decomp-item" style="grid-column:1/-1; border-top:1px solid rgba(255,255,255,0.07); padding-top:8px; margin-top:4px;">
-                    <div class="validator-decomp-label"><span class="validator-decomp-dot" style="background:#C0FF38;"></span><span style="color:#C0FF38; font-weight:700;">Total Yield</span></div>
-                    <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-total-apy" style="color:#C0FF38; font-weight:700;">0.00% APY</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-total-apr" style="margin-top:0;">0.00% APR</div>
-                    </div>
-                </div>
             </div><!-- end legend -->
+            <!-- Hidden: total APY/APR still written by update() -->
+            <span id="validator-decomp-total-apy" style="display:none;"></span>
+            <span id="validator-decomp-total-apr" style="display:none;"></span>
         </div><!-- end decomp-card -->
     </div>
     <!-- Hidden spans: KPI IDs still written to by update() -->
