@@ -1556,7 +1556,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <span style="font-size:11px; color:#C0FF38; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Total APY</span>
                 <span style="display:inline-flex; align-items:center; gap:5px; background:rgba(192,255,56,0.07); border:1px solid rgba(192,255,56,0.2); border-radius:5px; padding:2px 8px;">
                     <span id="vc-raiku-apy-uplift" style="font-family:var(--font-mono); font-size:13px; font-weight:600; color:#C0FF38;">+0.00%</span>
-                    <span style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">Raiku Uplift</span>
+                    <span style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">Raiku APR</span>
                 </span>
                 <span style="opacity:0.25; font-size:12px; margin:0 1px;">·</span>
                 <span style="display:inline-flex; align-items:baseline; gap:4px;">
@@ -1578,50 +1578,45 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-decomp-item" data-component="iss">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot base"></span>Issuance</div>
                     <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-iss-apy">0.00% APY</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-iss-apr" style="margin-top:0;">0.00% APR</div>
+                        <div class="validator-decomp-value" id="validator-decomp-iss-apr">0.00% APR</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-iss-apy" style="margin-top:0;">0.00% APY</div>
                     </div>
-                    <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-iss-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-iss-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
                 <div class="validator-decomp-item" data-component="blk">
-                    <div class="validator-decomp-label"><span class="validator-decomp-dot priority"></span>Network Block Fees</div>
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot priority"></span>Network Fees</div>
+                    <div style="font-size:8px; color:var(--text2); margin-bottom:2px; line-height:1.3;">base + priority fees</div>
                     <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-blk-apy">0.00% APY</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-blk-apr" style="margin-top:0;">0.00% APR</div>
+                        <div class="validator-decomp-value" id="validator-decomp-blk-apr">0.00% APR</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-blk-apy" style="margin-top:0;">0.00% APY</div>
                     </div>
-                    <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-blk-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-blk-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
                 <div class="validator-decomp-item" data-component="aot">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot aot"></span>Raiku AOT</div>
                     <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-aot-apy">0.00% APY</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-aot-apr" style="margin-top:0;">0.00% APR</div>
+                        <div class="validator-decomp-value" id="validator-decomp-aot-apr">0.00% APR</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-aot-apy" style="margin-top:0;">0.00% APY</div>
                     </div>
-                    <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-aot-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-aot-usd" style="color:var(--text-mid);">—</span></div>
-                </div>
-                <div class="validator-decomp-item" data-component="bonus">
-                    <div class="validator-decomp-label"><span class="validator-decomp-dot bonus"></span>Validator Bonus</div>
-                    <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-bonus-apy">0.00% APY</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-bonus-apr" style="margin-top:0;">0.00% APR</div>
-                    </div>
-                    <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-bonus-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-bonus-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
                 <div class="validator-decomp-item" data-component="jit">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot jit"></span>Raiku JIT</div>
                     <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-jit-apy">0.00% APY</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-jit-apr" style="margin-top:0;">0.00% APR</div>
+                        <div class="validator-decomp-value" id="validator-decomp-jit-apr">0.00% APR</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-jit-apy" style="margin-top:0;">0.00% APY</div>
                     </div>
-                    <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-jit-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-jit-usd" style="color:var(--text-mid);">—</span></div>
+                </div>
+                <div class="validator-decomp-item" data-component="bonus">
+                    <div class="validator-decomp-label"><span class="validator-decomp-dot bonus"></span>Validator Bonus</div>
+                    <div style="display:flex; align-items:baseline; gap:5px;">
+                        <div class="validator-decomp-value" id="validator-decomp-bonus-apr">0.00% APR</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-bonus-apy" style="margin-top:0;">0.00% APY</div>
+                    </div>
                 </div>
                 <div class="validator-decomp-item" data-component="ojit">
                     <div class="validator-decomp-label"><span class="validator-decomp-dot other-jit"></span>Other JIT</div>
                     <div style="display:flex; align-items:baseline; gap:5px;">
-                        <div class="validator-decomp-value" id="validator-decomp-ojit-apy">0.00% APY</div>
-                        <div class="validator-decomp-sub" id="validator-decomp-ojit-apr" style="margin-top:0;">0.00% APR</div>
+                        <div class="validator-decomp-value" id="validator-decomp-ojit-apr">0.00% APR</div>
+                        <div class="validator-decomp-sub" id="validator-decomp-ojit-apy" style="margin-top:0;">0.00% APY</div>
                     </div>
-                    <div style="margin-top:2px; font-size:10px; font-family:var(--font-mono); color:var(--text2);"><span id="vc-row-ojit-sol">—</span><span style="opacity:0.3;"> · </span><span id="vc-row-ojit-usd" style="color:var(--text-mid);">—</span></div>
                 </div>
             </div><!-- end legend -->
             <!-- Hidden: total APY/APR still written by update() -->
@@ -4463,7 +4458,7 @@ function update(){
     // ── Protocol Yield Details top card ──────────────────────────────────
     // Headline numbers
     document.getElementById('vc-total-apy').textContent         = fmtValidatorRate(totalApy);
-    document.getElementById('vc-raiku-apy-uplift').textContent  = '+' + fmtValidatorRate(incrementalApyUplift);
+    document.getElementById('vc-raiku-apy-uplift').textContent  = '+' + fmtValidatorRate(incrementalAprUplift);
     document.getElementById('vc-total-apr').textContent         = fmtValidatorRate(totalApr);
     // SOL/yr and USD/yr per component
     const issApy2  = aprToApy(issuanceAPR,     APY_COMPOUNDING_PERIODS);
@@ -4474,18 +4469,6 @@ function update(){
     const bonusSolYr = r.aotValBonus + (r.jitValBonus || 0);
     const jitSolYr   = r.jitValidatorBase;
     const ojitSolYr  = r.otherJitRev;
-    document.getElementById('vc-row-iss-sol').textContent   = fmtValidatorSol(issSolYr)   + '/yr';
-    document.getElementById('vc-row-blk-sol').textContent   = fmtValidatorSol(blkSolYr)   + '/yr';
-    document.getElementById('vc-row-aot-sol').textContent   = aotSolYr   > 0.001 ? fmtValidatorSol(aotSolYr)   + '/yr' : '\u2014';
-    document.getElementById('vc-row-bonus-sol').textContent = bonusSolYr > 0.001 ? fmtValidatorSol(bonusSolYr) + '/yr' : '\u2014';
-    document.getElementById('vc-row-jit-sol').textContent   = jitSolYr   > 0.001 ? fmtValidatorSol(jitSolYr)   + '/yr' : '\u2014';
-    document.getElementById('vc-row-ojit-sol').textContent  = ojitSolYr  > 0.001 ? fmtValidatorSol(ojitSolYr)  + '/yr' : '\u2014';
-    document.getElementById('vc-row-iss-usd').textContent   = fmtValidatorUsd(issSolYr   * p.p);
-    document.getElementById('vc-row-blk-usd').textContent   = fmtValidatorUsd(blkSolYr   * p.p);
-    document.getElementById('vc-row-aot-usd').textContent   = aotSolYr   > 0.001 ? fmtValidatorUsd(aotSolYr   * p.p) : '\u2014';
-    document.getElementById('vc-row-bonus-usd').textContent = bonusSolYr > 0.001 ? fmtValidatorUsd(bonusSolYr * p.p) : '\u2014';
-    document.getElementById('vc-row-jit-usd').textContent   = jitSolYr   > 0.001 ? fmtValidatorUsd(jitSolYr   * p.p) : '\u2014';
-    document.getElementById('vc-row-ojit-usd').textContent  = ojitSolYr  > 0.001 ? fmtValidatorUsd(ojitSolYr  * p.p) : '\u2014';
     // ── Protocol Results block ──────────────────────────────────────────────
     var _vcTotalSolYr   = issSolYr + blkSolYr + aotSolYr + bonusSolYr + jitSolYr + ojitSolYr;
     var _vcBlockRewSol  = issSolYr + blkSolYr;
