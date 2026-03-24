@@ -6707,7 +6707,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Live formula</div>
             <div class="vc-explainer-formula">
-                <div>Network Fees APR = 0.40% &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-apr">—</span></div>
+                <div>Network Fees APR = <span style="color:#C89060;" title="temporary placeholder — no cited source">0.40%*</span> &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-apr">—</span></div>
                 <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-blk-exp-apy">—</span></div>
             </div>
         </div>
@@ -6716,10 +6716,11 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             <div class="vc-explainer-section-title">Live inputs</div>
             <div class="vc-explainer-inputs">
                 <div class="vc-explainer-input-row">
-                    <span class="vc-explainer-input-key">Benchmark APR (network-avg fees)
-                        <span style="font-size:10px; color:#C89060; font-style:italic;">assumed constant</span>
+                    <span class="vc-explainer-input-key">Network fee yield
+                        <span style="font-size:10px; color:#C89060; font-style:italic;">temp. placeholder — no cited source</span>
+                        <a class="vc-explainer-source-inline" href="https://dune.com/ilemi/solana-compute" target="_blank" rel="noopener">↗ verify via Dune</a>
                     </span>
-                    <span class="vc-explainer-input-val">0.40%</span>
+                    <span class="vc-explainer-input-val">0.40%*</span>
                 </div>
                 <div class="vc-explainer-input-row">
                     <span class="vc-explainer-input-key">Raiku Block Share (active scenario)</span>
@@ -6733,8 +6734,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         </div>
 
         <div class="vc-explainer-section">
-            <div class="vc-explainer-section-title">About the 0.40% benchmark</div>
-            <div class="vc-explainer-note">The 0.40% APR is a <strong style="color:var(--text);">fixed internal benchmark</strong>, not live data. It is a network-average estimate of combined base fee + priority fee yield per unit of stake, set at model construction time. It is <strong style="color:var(--text);">not dynamically sourced</strong> from Dune or Trillium in this version. Candidate cross-check for the underlying fee rate: <a class="vc-explainer-source-inline" href="https://dune.com/ilemi/solana-compute" target="_blank" rel="noopener">↗ Dune — Solana Compute (ilemi)</a></div>
+            <div class="vc-explainer-section-title">About the 0.40%* estimate</div>
+            <div class="vc-explainer-note"><strong style="color:#C89060;">Temporary placeholder — no external source attached.</strong> The correct derivation is: <code style="font-family:var(--font-mono); font-size:11px; color:var(--text);">annual priority fees (SOL) &divide; active stake (SOL)</code>, computable from on-chain data (<a class="vc-explainer-source-inline" href="https://dune.com/ilemi/solana-compute" target="_blank" rel="noopener">↗ Dune ilemi/solana-compute</a> or Trillium <code style="font-size:11px;">/epoch_data → priority_fees_sol</code>).<br><br>Marinade cross-check suggests the true figure is substantially lower: Marinade total APR 5.93% − our issuance component 5.82% = ~0.11pp residual — and that residual covers <em>both</em> priority fees and MEV, leaving the pure fee contribution even smaller. The 0.40% figure likely overstates the fee yield and should be replaced with a pipeline-computed value.</div>
         </div>
 
         <div class="vc-explainer-section">
