@@ -1615,22 +1615,22 @@ details[open] summary::before { transform:rotate(90deg); }
                     <div class="validator-decomp-sub" id="validator-decomp-blk-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="aot">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot aot"></span>Raiku AOT<button class="vc-info-btn" style="opacity:0.2;" disabled>?</button></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot aot"></span>Raiku AOT<button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-aot')">?</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-aot-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-aot-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="jit">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot jit"></span>Raiku JIT<button class="vc-info-btn" style="opacity:0.2;" disabled>?</button></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot jit"></span>Raiku JIT<button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-jit')">?</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-jit-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-jit-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="bonus">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot bonus"></span>Validator Bonus<button class="vc-info-btn" style="opacity:0.2;" disabled>?</button></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot bonus"></span>Validator Bonus<button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-bonus')">?</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-bonus-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-bonus-apr">0.00% APR</div>
                 </div>
                 <div class="validator-decomp-item" data-component="ojit">
-                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot other-jit"></span>Other JIT<button class="vc-info-btn" style="opacity:0.2;" disabled>?</button></div>
+                    <div class="validator-decomp-label" style="display:flex; align-items:center; gap:3px;"><span class="validator-decomp-dot other-jit"></span>Other JIT<button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-ojit')">?</button></div>
                     <div class="validator-decomp-value" id="validator-decomp-ojit-apy">0.00% APY</div>
                     <div class="validator-decomp-sub" id="validator-decomp-ojit-apr">0.00% APR</div>
                 </div>
@@ -2339,6 +2339,54 @@ function vcOpenExplainer(id) {
         _e = document.getElementById('vc-blk-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(pAPY);
         _e = document.getElementById('vc-blk-exp-bshare2');   if(_e) _e.textContent = (bShare * 100).toFixed(0) + '%';
         _e = document.getElementById('vc-blk-exp-residual');  if(_e) _e.textContent = (residual * 100).toFixed(0) + '%';
+    }
+    if (id === 'vc-explainer-aot') {
+        var _p = gp(), _r = calc(_p);
+        var _cStake = getCurrentTotalSolanaStakedSol() * _p.s;
+        var _aApr = _cStake > 0 ? _r.aotValidatorBase / _cStake : 0;
+        var _aApy = aprToApy(_aApr, APY_COMPOUNDING_PERIODS);
+        _e = document.getElementById('vc-aot-exp-stake');     if(_e) _e.textContent = (_p.s * 100).toFixed(1) + '%';
+        _e = document.getElementById('vc-aot-exp-blk');       if(_e) _e.textContent = (_p.b * 100).toFixed(0) + '%';
+        _e = document.getElementById('vc-aot-exp-fcu');       if(_e) _e.textContent = _p.f.toFixed(2) + ' L/CU';
+        _e = document.getElementById('vc-aot-exp-take');      if(_e) _e.textContent = _p.ca.toFixed(1) + '%';
+        _e = document.getElementById('vc-aot-exp-val-rate');  if(_e) _e.textContent = (100 - _p.ca).toFixed(1) + '%';
+        _e = document.getElementById('vc-aot-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(_aApr);
+        _e = document.getElementById('vc-aot-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(_aApy);
+    }
+    if (id === 'vc-explainer-jit') {
+        var _p = gp(), _r = calc(_p);
+        var _cStake = getCurrentTotalSolanaStakedSol() * _p.s;
+        var _jApr = _cStake > 0 ? _r.jitValidatorBase / _cStake : 0;
+        var _jApy = aprToApy(_jApr, APY_COMPOUNDING_PERIODS);
+        _e = document.getElementById('vc-jit-exp-market');    if(_e) _e.textContent = fmtValidatorSol(_p.jm) + '/yr';
+        _e = document.getElementById('vc-jit-exp-share');     if(_e) _e.textContent = (_p.j * 100).toFixed(1) + '%';
+        _e = document.getElementById('vc-jit-exp-take');      if(_e) _e.textContent = _p.cj.toFixed(1) + '%';
+        _e = document.getElementById('vc-jit-exp-val-rate');  if(_e) _e.textContent = (100 - _p.cj).toFixed(1) + '%';
+        _e = document.getElementById('vc-jit-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(_jApr);
+        _e = document.getElementById('vc-jit-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(_jApy);
+    }
+    if (id === 'vc-explainer-bonus') {
+        var _p = gp(), _r = calc(_p);
+        var _cStake = getCurrentTotalSolanaStakedSol() * _p.s;
+        var _bApr = _cStake > 0 ? (_r.aotValBonus + (_r.jitValBonus || 0)) / _cStake : 0;
+        var _bApy = aprToApy(_bApr, APY_COMPOUNDING_PERIODS);
+        _e = document.getElementById('vc-bonus-exp-aot-bonus'); if(_e) _e.textContent = _p.vb.toFixed(2) + '%';
+        _e = document.getElementById('vc-bonus-exp-jit-bonus'); if(_e) _e.textContent = (_p.jvb || 0).toFixed(2) + '%';
+        _e = document.getElementById('vc-bonus-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(_bApr);
+        _e = document.getElementById('vc-bonus-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(_bApy);
+    }
+    if (id === 'vc-explainer-ojit') {
+        var _p = gp(), _r = calc(_p);
+        var _cStake = getCurrentTotalSolanaStakedSol() * _p.s;
+        var _ojApr = _cStake > 0 ? _r.otherJitRev / _cStake : 0;
+        var _ojApy = aprToApy(_ojApr, APY_COMPOUNDING_PERIODS);
+        var _ojShare = Math.max(_p.s - _p.j, 0);
+        _e = document.getElementById('vc-ojit-exp-market');    if(_e) _e.textContent = fmtValidatorSol(_p.jm) + '/yr';
+        _e = document.getElementById('vc-ojit-exp-stake');     if(_e) _e.textContent = (_p.s * 100).toFixed(1) + '%';
+        _e = document.getElementById('vc-ojit-exp-jit-share'); if(_e) _e.textContent = (_p.j * 100).toFixed(1) + '%';
+        _e = document.getElementById('vc-ojit-exp-ojshare');   if(_e) _e.textContent = (_ojShare * 100).toFixed(1) + '%';
+        _e = document.getElementById('vc-ojit-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(_ojApr);
+        _e = document.getElementById('vc-ojit-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(_ojApy);
     }
 }
 function vcCloseExplainer(id) {
@@ -4531,6 +4579,54 @@ function update(){
         _e = document.getElementById('vc-blk-exp-bshare2');   if(_e) _e.textContent = (p.b * 100).toFixed(0) + '%';
         _e = document.getElementById('vc-blk-exp-residual');  if(_e) _e.textContent = (residualBlockShare * 100).toFixed(0) + '%';
     })();
+    // ── Raiku AOT explainer live values ───────────────────────────────────
+    (function() {
+        var _e;
+        var _aApr = connectedStakeSol > 0 ? r.aotValidatorBase / connectedStakeSol : 0;
+        var _aApy = aprToApy(_aApr, APY_COMPOUNDING_PERIODS);
+        _e = document.getElementById('vc-aot-exp-stake');     if(_e) _e.textContent = (p.s * 100).toFixed(1) + '%';
+        _e = document.getElementById('vc-aot-exp-blk');       if(_e) _e.textContent = (p.b * 100).toFixed(0) + '%';
+        _e = document.getElementById('vc-aot-exp-fcu');       if(_e) _e.textContent = p.f.toFixed(2) + ' L/CU';
+        _e = document.getElementById('vc-aot-exp-take');      if(_e) _e.textContent = p.ca.toFixed(1) + '%';
+        _e = document.getElementById('vc-aot-exp-val-rate');  if(_e) _e.textContent = (100 - p.ca).toFixed(1) + '%';
+        _e = document.getElementById('vc-aot-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(_aApr);
+        _e = document.getElementById('vc-aot-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(_aApy);
+    })();
+    // ── Raiku JIT explainer live values ───────────────────────────────────
+    (function() {
+        var _e;
+        var _jApr = connectedStakeSol > 0 ? r.jitValidatorBase / connectedStakeSol : 0;
+        var _jApy = aprToApy(_jApr, APY_COMPOUNDING_PERIODS);
+        _e = document.getElementById('vc-jit-exp-market');    if(_e) _e.textContent = fmtValidatorSol(p.jm) + '/yr';
+        _e = document.getElementById('vc-jit-exp-share');     if(_e) _e.textContent = (p.j * 100).toFixed(1) + '%';
+        _e = document.getElementById('vc-jit-exp-take');      if(_e) _e.textContent = p.cj.toFixed(1) + '%';
+        _e = document.getElementById('vc-jit-exp-val-rate');  if(_e) _e.textContent = (100 - p.cj).toFixed(1) + '%';
+        _e = document.getElementById('vc-jit-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(_jApr);
+        _e = document.getElementById('vc-jit-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(_jApy);
+    })();
+    // ── Validator Bonus explainer live values ─────────────────────────────
+    (function() {
+        var _e;
+        var _bApr = connectedStakeSol > 0 ? (r.aotValBonus + (r.jitValBonus || 0)) / connectedStakeSol : 0;
+        var _bApy = aprToApy(_bApr, APY_COMPOUNDING_PERIODS);
+        _e = document.getElementById('vc-bonus-exp-aot-bonus'); if(_e) _e.textContent = p.vb.toFixed(2) + '%';
+        _e = document.getElementById('vc-bonus-exp-jit-bonus'); if(_e) _e.textContent = (p.jvb || 0).toFixed(2) + '%';
+        _e = document.getElementById('vc-bonus-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(_bApr);
+        _e = document.getElementById('vc-bonus-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(_bApy);
+    })();
+    // ── Other JIT explainer live values ───────────────────────────────────
+    (function() {
+        var _e;
+        var _ojApr = connectedStakeSol > 0 ? r.otherJitRev / connectedStakeSol : 0;
+        var _ojApy = aprToApy(_ojApr, APY_COMPOUNDING_PERIODS);
+        var _ojShare = Math.max(p.s - p.j, 0);
+        _e = document.getElementById('vc-ojit-exp-market');    if(_e) _e.textContent = fmtValidatorSol(p.jm) + '/yr';
+        _e = document.getElementById('vc-ojit-exp-stake');     if(_e) _e.textContent = (p.s * 100).toFixed(1) + '%';
+        _e = document.getElementById('vc-ojit-exp-jit-share'); if(_e) _e.textContent = (p.j * 100).toFixed(1) + '%';
+        _e = document.getElementById('vc-ojit-exp-ojshare');   if(_e) _e.textContent = (_ojShare * 100).toFixed(1) + '%';
+        _e = document.getElementById('vc-ojit-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(_ojApr);
+        _e = document.getElementById('vc-ojit-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(_ojApy);
+    })();
     document.getElementById('validator-decomp-aot-apy').textContent   = fmtValidatorRate(aprToApy(aotApr,          APY_COMPOUNDING_PERIODS)) + ' APY';
     document.getElementById('validator-decomp-aot-apr').textContent   = fmtValidatorRate(aotApr)           + ' APR';
     document.getElementById('validator-decomp-bonus-apy').textContent = fmtValidatorRate(aprToApy(bonusApr,        APY_COMPOUNDING_PERIODS)) + ' APY';
@@ -6701,7 +6797,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">What it is</div>
-            <div class="vc-explainer-note">Fee yield earned by validators on the share of each block outside Raiku's AOT reservation. Benchmarked against Marinade's observed Block Rewards APR. Raiku JIT and Other JIT are modeled as separate incremental flows and are not subtracted here.</div>
+            <div class="vc-explainer-note">The benchmark is treated as reflecting prevailing network conditions, including the background JIT/MEV ecosystem already present in observed network fee data. Only Raiku AOT's reserved block share creates a double-count that must be removed here.</div>
         </div>
 
         <div class="vc-explainer-section">
@@ -6742,6 +6838,208 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             <div class="vc-explainer-sources">
                 <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (0.54%, last 28 days)</a>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Raiku AOT explainer ──────────────────────────────────────────────── -->
+<div class="vc-explainer-overlay" id="vc-explainer-aot" onclick="if(event.target===this)vcCloseExplainer('vc-explainer-aot')">
+    <div class="vc-explainer-card">
+        <button class="vc-explainer-close" onclick="vcCloseExplainer('vc-explainer-aot')">×</button>
+        <div class="vc-explainer-title">Raiku AOT</div>
+        <div class="vc-explainer-subtitle">Validator yield from Raiku AOT auction flow — gross fees × validator capture rate ÷ connected stake</div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">What it is</div>
+            <div class="vc-explainer-note">AOT (Ahead-of-Time) is Raiku's sealed-bid auction for reserved compute units. Validators earn <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">aotGross × (1 − take rate)</code> of the gross AOT fee revenue each year. That SOL/yr amount divided by connected stake gives the APR contribution shown here.</div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live formula</div>
+            <div class="vc-explainer-formula">
+                <div>aotGross = Stake% × SY × Block% × CB × Fee/CU ÷ LS</div>
+                <div style="margin-top:4px;">aotValidatorBase = aotGross × validator capture rate</div>
+                <div style="margin-top:4px;">AOT APR = aotValidatorBase ÷ connectedStake = <span class="vc-ef-val" id="vc-aot-exp-apr">—</span></div>
+                <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-aot-exp-apy">—</span></div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live inputs</div>
+            <div class="vc-explainer-inputs">
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Raiku Stake %</span>
+                    <span class="vc-explainer-input-val" id="vc-aot-exp-stake">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Raiku Block Share</span>
+                    <span class="vc-explainer-input-val" id="vc-aot-exp-blk">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Avg Auction Fee/CU</span>
+                    <span class="vc-explainer-input-val" id="vc-aot-exp-fcu">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">AOT Protocol Take Rate</span>
+                    <span class="vc-explainer-input-val" id="vc-aot-exp-take">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Validator Capture Rate (1 − take)</span>
+                    <span class="vc-explainer-input-val" id="vc-aot-exp-val-rate">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Derivation</div>
+            <div class="vc-explainer-note">All inputs from current scenario state — no external source. AOT gross scales with Raiku's reserved block share, stake coverage, and the fee/CU bid by auction clients. Validator capture is always <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">1 − protocol take rate</code>.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Raiku JIT explainer ──────────────────────────────────────────────── -->
+<div class="vc-explainer-overlay" id="vc-explainer-jit" onclick="if(event.target===this)vcCloseExplainer('vc-explainer-jit')">
+    <div class="vc-explainer-card">
+        <button class="vc-explainer-close" onclick="vcCloseExplainer('vc-explainer-jit')">×</button>
+        <div class="vc-explainer-title">Raiku JIT</div>
+        <div class="vc-explainer-subtitle">Validator yield from Raiku JIT tip flow — captured JIT gross × validator rate ÷ connected stake</div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">What it is</div>
+            <div class="vc-explainer-note">JIT (Just-in-Time) is Raiku's real-time tip-based ordering service. Validators earn <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">jitGross × (1 − take rate)</code> of the Raiku-captured JIT market each year. That SOL/yr amount divided by connected stake gives the APR contribution shown here.</div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live formula</div>
+            <div class="vc-explainer-formula">
+                <div>jitGross = JIT market × Raiku JIT share</div>
+                <div style="margin-top:4px;">jitValidatorBase = jitGross × validator capture rate</div>
+                <div style="margin-top:4px;">JIT APR = jitValidatorBase ÷ connectedStake = <span class="vc-ef-val" id="vc-jit-exp-apr">—</span></div>
+                <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-jit-exp-apy">—</span></div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live inputs</div>
+            <div class="vc-explainer-inputs">
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">JIT Total Market (SOL/yr)
+                        <span style="font-size:10px; color:var(--text2);">scenario preset</span>
+                    </span>
+                    <span class="vc-explainer-input-val" id="vc-jit-exp-market">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Raiku JIT Market Share</span>
+                    <span class="vc-explainer-input-val" id="vc-jit-exp-share">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">JIT Protocol Take Rate</span>
+                    <span class="vc-explainer-input-val" id="vc-jit-exp-take">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Validator Capture Rate (1 − take)</span>
+                    <span class="vc-explainer-input-val" id="vc-jit-exp-val-rate">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Derivation</div>
+            <div class="vc-explainer-note">All inputs from current scenario state. JIT market size is set by the active preset. Raiku JIT share determines how much of that market routes through Raiku's protocol. Validator capture is always <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">1 − protocol take rate</code>.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Validator Bonus explainer ────────────────────────────────────────── -->
+<div class="vc-explainer-overlay" id="vc-explainer-bonus" onclick="if(event.target===this)vcCloseExplainer('vc-explainer-bonus')">
+    <div class="vc-explainer-card">
+        <button class="vc-explainer-close" onclick="vcCloseExplainer('vc-explainer-bonus')">×</button>
+        <div class="vc-explainer-title">Validator Bonus</div>
+        <div class="vc-explainer-subtitle">Protocol subsidy paid to validators from Raiku's protocol pool — on top of base validator capture</div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">What it is</div>
+            <div class="vc-explainer-note">The Validator Bonus is a funded subsidy drawn from Raiku's AOT and JIT protocol pools and paid on top of the standard <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">(1 − take rate)</code> base. Each pool contributes a separately configurable bonus rate, clamped so rebate + bonus ≤ protocol take rate. If take rate = 0, bonus = 0 by construction.</div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live formula</div>
+            <div class="vc-explainer-formula">
+                <div>aotValBonus = aotGross × aotBonusRate</div>
+                <div style="margin-top:4px;">jitValBonus = jitGross × jitBonusRate</div>
+                <div style="margin-top:4px;">Bonus APR = (aotValBonus + jitValBonus) ÷ connectedStake = <span class="vc-ef-val" id="vc-bonus-exp-apr">—</span></div>
+                <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-bonus-exp-apy">—</span></div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live inputs</div>
+            <div class="vc-explainer-inputs">
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">AOT Validator Bonus Rate</span>
+                    <span class="vc-explainer-input-val" id="vc-bonus-exp-aot-bonus">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">JIT Validator Bonus Rate</span>
+                    <span class="vc-explainer-input-val" id="vc-bonus-exp-jit-bonus">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Derivation</div>
+            <div class="vc-explainer-note">Both bonus rates are configurable protocol parameters. The model aggregates AOT and JIT bonuses into a single APR contribution. All inputs from current scenario state — no external source.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Other JIT explainer ──────────────────────────────────────────────── -->
+<div class="vc-explainer-overlay" id="vc-explainer-ojit" onclick="if(event.target===this)vcCloseExplainer('vc-explainer-ojit')">
+    <div class="vc-explainer-card">
+        <button class="vc-explainer-close" onclick="vcCloseExplainer('vc-explainer-ojit')">×</button>
+        <div class="vc-explainer-title">Other JIT</div>
+        <div class="vc-explainer-subtitle">Validator yield from non-Raiku JIT flows — bypasses Raiku protocol, goes directly to validators</div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">What it is</div>
+            <div class="vc-explainer-note">Other JIT is the share of the total JIT tip market that does not route through Raiku — it flows directly to validators via other ordering services (e.g. native Jito bundles). It is a model-derived residual: <code style="font-size:11px; font-family:var(--font-mono); color:var(--text);">max(Raiku Stake% − Raiku JIT share%, 0)</code> of the total JIT market. It bypasses protocol take entirely and is excluded from Raiku gross revenue.</div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live formula</div>
+            <div class="vc-explainer-formula">
+                <div>ojShare = max(Stake% − JIT share%, 0) = <span class="vc-ef-val" id="vc-ojit-exp-ojshare">—</span></div>
+                <div style="margin-top:4px;">otherJitRev = JIT market × ojShare</div>
+                <div style="margin-top:4px;">Other JIT APR = otherJitRev ÷ connectedStake = <span class="vc-ef-val" id="vc-ojit-exp-apr">—</span></div>
+                <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-ojit-exp-apy">—</span></div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Live inputs</div>
+            <div class="vc-explainer-inputs">
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">JIT Total Market (SOL/yr)</span>
+                    <span class="vc-explainer-input-val" id="vc-ojit-exp-market">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Raiku Stake %</span>
+                    <span class="vc-explainer-input-val" id="vc-ojit-exp-stake">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Raiku JIT Market Share</span>
+                    <span class="vc-explainer-input-val" id="vc-ojit-exp-jit-share">—</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Other JIT Share (derived)</span>
+                    <span class="vc-explainer-input-val" id="vc-ojit-exp-ojshare-inp">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Derivation</div>
+            <div class="vc-explainer-note">Fully model-derived — no external source. Other JIT is 0 when Raiku JIT share ≥ Raiku Stake %. Raiku's stake coverage creates a JIT opportunity ceiling; the uncaptured portion flows to validators via competing ordering services.</div>
         </div>
     </div>
 </div>
