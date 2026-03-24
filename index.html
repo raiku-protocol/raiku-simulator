@@ -2201,7 +2201,7 @@ const SC = {
            desc:"Bull — high-payer stress case using active-payer P75 non-base fee/CU, displayed at 2.00 lam/CU."},
 };
 let _selectedScenario = 'base';
-const STAKE_FALLBACK_SOL = 423948189.4;
+const STAKE_FALLBACK_SOL = 421562663; // Solana Compass snapshot, Mar 2026
 let _solanaStakeState = {
     sol: STAKE_FALLBACK_SOL,
     sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a>',
@@ -4346,7 +4346,7 @@ function update(){
     _vcSet('validator-context-aot-stake', (p.s * 100).toFixed(1) + '%');
     document.getElementById('validator-context-connected').textContent = fmt(connectedStakeSol, 'S');
     (function(){ var fEl=document.getElementById('validator-stake-formula'); if(!fEl) return;
-        fEl.innerHTML = fmt(totalStakedSol,'S') + ' \u00d7 ' + (p.s*100).toFixed(1) + '% = ' + fmt(connectedStakeSol,'S') + ' \u00b7 <a href="https://solanacompass.com/tokenomics#staked" target="_blank" style="color:#4d5566;text-decoration:none;border-bottom:1px solid rgba(77,85,102,0.4);">Solana Compass</a>'; }());
+        fEl.innerHTML = fmt(totalStakedSol,'S') + ' \u00d7 ' + (p.s*100).toFixed(1) + '% = ' + fmt(connectedStakeSol,'S') + ' \u00b7 <a href="https://solanacompass.com/tokenomics#staked" target="_blank" style="color:#4d5566;text-decoration:none;border-bottom:1px solid rgba(77,85,102,0.4);">Solana Compass</a> <span style="opacity:0.6;">(snapshot, Mar\u00a02026)</span>'; }());
     _vcSet('validator-context-block', Math.round(p.b * 100) + '%');
     _vcSet('validator-context-fee', (p.f < 0.1 ? p.f.toFixed(3) : p.f >= 10 ? p.f.toFixed(1) : p.f.toFixed(2)) + ' L');
     _vcSet('validator-context-aot-take', p.ca.toFixed(1) + '%');
