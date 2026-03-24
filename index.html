@@ -2465,17 +2465,18 @@ function getScenarioParams(key){
 function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, priorityApy, totalStakedSol){
     const el = document.getElementById('validator-scenario-yield-grid');
     if (!el) return;
-    const basePlusPriorityApy = aprToApy(baseApr + priorityApr, APY_COMPOUNDING_PERIODS);
     const rows = ['con','base','opt','bull'].map(function(key){
         const p = getScenarioParams(key);
         const r = calc(p);
+        const cardPriorityApr = PRIORITY_FEES_NETWORK_APR * Math.max(0, 1 - p.b);
+        const basePlusPriorityApy = aprToApy(baseApr + cardPriorityApr, APY_COMPOUNDING_PERIODS);
         const connectedStakeSol = totalStakedSol * p.s;
         const aotApr   = connectedStakeSol > 0 ? r.aotValidatorBase / connectedStakeSol : 0;
         const bonusApr = connectedStakeSol > 0 ? (r.aotValBonus + (r.jitValBonus || 0)) / connectedStakeSol : 0;
         const jitApr   = connectedStakeSol > 0 ? r.jitValidatorBase / connectedStakeSol : 0;
         const ojitApr  = connectedStakeSol > 0 ? r.otherJitRev / connectedStakeSol : 0;
         const raikuApr = aotApr + bonusApr + jitApr + ojitApr;
-        const totalApr = baseApr + priorityApr + raikuApr;
+        const totalApr = baseApr + cardPriorityApr + raikuApr;
         const totalApy = aprToApy(totalApr, APY_COMPOUNDING_PERIODS);
         const raikuApyUplift = totalApy - basePlusPriorityApy;
         const totalAprForBar = totalApr > 0 ? totalApr : 1;
@@ -2484,12 +2485,12 @@ function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, p
             totalApr: totalApr,
             totalApy: totalApy,
             raikuApyUplift: raikuApyUplift,
-            issWidth:   (baseApr        / totalAprForBar * 100),
-            blkWidth:   (priorityApr    / totalAprForBar * 100),
-            aotWidth:   (aotApr         / totalAprForBar * 100),
-            bonusWidth: (bonusApr       / totalAprForBar * 100),
-            jitWidth:   (jitApr         / totalAprForBar * 100),
-            ojitWidth:  (ojitApr        / totalAprForBar * 100),
+            issWidth:   (baseApr         / totalAprForBar * 100),
+            blkWidth:   (cardPriorityApr / totalAprForBar * 100),
+            aotWidth:   (aotApr          / totalAprForBar * 100),
+            bonusWidth: (bonusApr        / totalAprForBar * 100),
+            jitWidth:   (jitApr          / totalAprForBar * 100),
+            ojitWidth:  (ojitApr         / totalAprForBar * 100),
         };
     });
     el.innerHTML = rows.map(function(row){
