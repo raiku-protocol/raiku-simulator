@@ -1472,8 +1472,16 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-context-value" id="validator-context-stake">10.0%</div>
             </div>
         </div>
+        <!-- Derived: Raiku Validator Stake -->
+        <div style="margin-top:12px; padding:8px 10px; background:#04060a; border:1px solid #16191f; border-radius:5px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.6px;">Raiku Validator Stake</span>
+                <span style="font-size:12px; font-family:var(--font-mono); font-weight:600; color:#8a93a8;" id="validator-context-connected">—</span>
+            </div>
+            <div style="font-size:9px; color:#404755; margin-top:3px; line-height:1.4;">Active stake × Raiku Stake% · <a href="https://trillium.so/pages/trillium-api-documentation.html" target="_blank" style="color:#4d5566; text-decoration:none; border-bottom:1px solid rgba(77,85,102,0.4);">Trillium</a></div>
+        </div>
         <!-- Protocol parameters: AOT vs JIT -->
-        <div style="margin-top:20px;">
+        <div style="margin-top:14px;">
             <div class="validator-proto-table">
                 <div></div>
                 <div class="validator-proto-col-header aot">AOT</div>
@@ -1481,23 +1489,22 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-proto-row-label">Protocol Take Rate</div>
                 <div class="validator-proto-cell" id="validator-context-aot-take">5.0%</div>
                 <div class="validator-proto-cell" id="validator-context-jit-take">5.0%</div>
-                <div class="validator-proto-row-label">Block / JIT Share</div>
-                <div class="validator-proto-cell" id="validator-context-block">8%</div>
+                <div class="validator-proto-row-label">Stake Share</div>
+                <div class="validator-proto-cell" id="validator-context-aot-stake">—</div>
                 <div class="validator-proto-cell" id="validator-context-jit-share">—</div>
-                <div class="validator-proto-row-label">Avg Fee / CU (L)</div>
+                <div class="validator-proto-row-label">Block Share</div>
+                <div class="validator-proto-cell" id="validator-context-block">8%</div>
+                <div class="validator-proto-cell dim">N/A</div>
+                <div class="validator-proto-row-label">Avg Fee / CU (lam)</div>
                 <div class="validator-proto-cell" id="validator-context-fee">0.50 L</div>
                 <div class="validator-proto-cell" id="validator-context-jit-fee">—</div>
             </div>
         </div>
         <!-- Spacer: absorbs excess card height, pins footer to bottom -->
         <div style="flex:1; min-height:16px;"></div>
-        <!-- Footer: derived stake readout + note -->
+        <!-- Footer: note -->
         <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-top:1px solid rgba(255,255,255,0.05); margin-bottom:10px;">
-                <span style="font-size:9px; color:#525866; text-transform:uppercase; letter-spacing:0.5px;">Connected Validator Stake</span>
-                <span style="font-size:10px; font-family:var(--font-mono); color:#5a6070;" id="validator-context-connected">42.39M SOL</span>
-            </div>
-            <div class="validator-note">Protocol-level assumptions for the selected scenario. These values set global operating conditions — take rates, block allocation, and fee levels. Validator yield is derived from this setup. Individual validator configuration (stake input, per-validator revenue) will be available as a separate module.</div>
+            <div class="validator-note">Protocol-level aggregated setup for Raiku. For individual validator inputs and revenue outputs, use the validator module below.</div>
         </div>
     </div>
     <!-- Hidden: removed table rows — IDs still written by update() -->
@@ -4333,6 +4340,7 @@ function update(){
     document.getElementById('validator-scenario-name').textContent = getDisplayedScenarioName();
     _vcSet('validator-context-price', '$' + p.p);
     _vcSet('validator-context-stake', (p.s * 100).toFixed(1) + '%');
+    _vcSet('validator-context-aot-stake', (p.s * 100).toFixed(1) + '%');
     document.getElementById('validator-context-connected').textContent = fmt(connectedStakeSol, 'S');
     _vcSet('validator-context-block', Math.round(p.b * 100) + '%');
     _vcSet('validator-context-fee', (p.f < 0.1 ? p.f.toFixed(3) : p.f >= 10 ? p.f.toFixed(1) : p.f.toFixed(2)) + ' L');
