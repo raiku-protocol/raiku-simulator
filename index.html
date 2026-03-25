@@ -2666,30 +2666,62 @@ function qcpRender() {
     // All reference rows remain visible; only which value gets green changes.
     // mt: 'baseline' | 'mev' | 'total'
     function buildPool(dataset, mt, sc, netMed, p25, p75, s50Med, m50Med) {
-        // Baseline (priority fees): only network median gets green emphasis
+        // Baseline (priority fees): only network median gets green emphasis, all scenarios
         if (mt === 'baseline') {
             return [netMed].filter(function(v){ return v != null; });
         }
-        var maps = {
-            'latest_epoch': {
-                'con': [netMed], 'base': [netMed], 'opt': [], 'bull': []
-            },
-            'last_12m_all': {
-                'con':  [netMed],
-                'base': [p75, m50Med],
-                'opt':  [],
-                'bull': []
-            },
-            'last_24m_elevated_extreme': {
-                'con':  [],
-                'base': [netMed],
-                'opt':  [p75, s50Med],
-                'bull': [p75, m50Med]
-            }
-        };
+        var maps;
+        if (mt === 'mev') {
+            maps = {
+                'latest_epoch': { 'con': [], 'base': [], 'opt': [], 'bull': [] },
+                'last_12m_all': {
+                    'con':  [netMed],
+                    'base': [p75, m50Med],
+                    'opt':  [],
+                    'bull': []
+                },
+                'last_24m_elevated_extreme': {
+                    'con':  [],
+                    'base': [],
+                    'opt':  [netMed, p75],
+                    'bull': [m50Med]
+                }
+            };
+        } else if (mt === 'total') {
+            maps = {
+                'latest_epoch': { 'con': [netMed], 'base': [], 'opt': [], 'bull': [] },
+                'last_12m_all': {
+                    'con':  [netMed],
+                    'base': [netMed, s50Med, m50Med],
+                    'opt':  [],
+                    'bull': []
+                },
+                'last_24m_elevated_extreme': {
+                    'con':  [],
+                    'base': [],
+                    'opt':  [p75, s50Med],
+                    'bull': [p75, m50Med]
+                }
+            };
+        } else { // 'rev' — Total REV (inflation-adjusted), latest epoch handled by refBlock
+            maps = {
+                'last_12m_all': {
+                    'con':  [netMed],
+                    'base': [m50Med],
+                    'opt':  [],
+                    'bull': []
+                },
+                'last_24m_elevated_extreme': {
+                    'con':  [netMed],
+                    'base': [],
+                    'opt':  [p75, m50Med],
+                    'bull': [p75, m50Med]
+                }
+            };
+        }
         var dm = maps[dataset];
-        if (!dm) return [netMed, s50Med, m50Med].filter(function(v){ return v != null; });
-        return (dm[sc] || [netMed]).filter(function(v){ return v != null; });
+        if (!dm) return [];
+        return (dm[sc] || []).filter(function(v){ return v != null; });
     }
 
     // ── Epoch 945 cross-section reference blocks (for r1, r2, r6) ──
@@ -2697,13 +2729,20 @@ function qcpRender() {
         var m = bench[key];
         if (!m) return '<span class="qcp-nm">\u2014</span>';
         var p = m.percentiles, c = m.cohorts;
-        var pool = [m.network.mean, m.network.median, p.p25, p.p75,
+        var pool;
+        if (key === 'rev') {
+            // Latest epoch Total REV: Conservative highlights network median only; others nothing
+            pool = _selectedScenario === 'con' ? [m.network.median] : [];
+        } else {
+            pool = [m.network.mean, m.network.median, p.p25, p.p75,
                     c.top_50_by_stake.median, c.top_50_by_mev.median];
-        return refLine('Network mean',   fSol(m.network.mean)   + ' SOL', null, isClosestTo(m.network.mean, simVal, pool))
-            + refLine('Network median',  fSol(m.network.median) + ' SOL', null, isClosestTo(m.network.median, simVal, pool))
+        }
+        var hl = function(v) { return pool.length > 0 && pool.indexOf(v) !== -1 && isClosestTo(v, simVal, pool); };
+        return refLine('Network mean',   fSol(m.network.mean)   + ' SOL', null, hl(m.network.mean))
+            + refLine('Network median',  fSol(m.network.median) + ' SOL', null, hl(m.network.median))
             + refLine('P25\u2013P75',    fSol(p.p25) + '\u2013' + fSol(p.p75) + ' SOL')
-            + refLine('Top 50 (stake)',  fSol(c.top_50_by_stake.median) + ' SOL', null, isClosestTo(c.top_50_by_stake.median, simVal, pool))
-            + refLine('Top 50 (MEV)',    fSol(c.top_50_by_mev.median) + ' SOL', null, isClosestTo(c.top_50_by_mev.median, simVal, pool));
+            + refLine('Top 50 (stake)',  fSol(c.top_50_by_stake.median) + ' SOL', null, hl(c.top_50_by_stake.median))
+            + refLine('Top 50 (MEV)',    fSol(c.top_50_by_mev.median) + ' SOL', null, hl(c.top_50_by_mev.median));
     }
 
     // ── Time benchmark cell builder ────────────────────────────────────
@@ -2745,14 +2784,15 @@ function qcpRender() {
             s50 && s50.median != null ? s50.median : null,
             m50 && m50.median != null ? m50.median : null
         );
+        var hl = function(v) { return pool.length > 0 && pool.indexOf(v) !== -1 && isClosestTo(v, simVal, pool); };
 
-        var lines = refLine('Network median', fSol(net.median) + ' SOL', null, isClosestTo(net.median, simVal, pool));
+        var lines = refLine('Network median', fSol(net.median) + ' SOL', null, hl(net.median));
         if (p25 != null && p75 != null)
-            lines += refLine('P25\u2013P75', fSol(p25) + '\u2013' + fSol(p75) + ' SOL');
+            lines += refLine('P25\u2013P75', fSol(p25) + '\u2013' + fSol(p75) + ' SOL', null, hl(p75));
         if (s50 && s50.median != null)
-            lines += refLine('Top 50 (stake)', fSol(s50.median) + ' SOL', null, isClosestTo(s50.median, simVal, pool));
+            lines += refLine('Top 50 (stake)', fSol(s50.median) + ' SOL', null, hl(s50.median));
         if (m50 && m50.median != null)
-            lines += refLine('Top 50 (MEV)', fSol(m50.median) + ' SOL', null, isClosestTo(m50.median, simVal, pool));
+            lines += refLine('Top 50 (MEV)', fSol(m50.median) + ' SOL', null, hl(m50.median));
         return lines;
     }
 
@@ -2950,24 +2990,25 @@ function qcpRender() {
         var p75Adj  = (p75 != null && issBase != null) ? p75 + issBase : p75;
         var s50Adj  = (s50 && s50.median != null) ? (issBase != null ? s50.median + issBase : s50.median) : null;
         var m50Adj  = (m50 && m50.median != null) ? (issBase != null ? m50.median + issBase : m50.median) : null;
-        var pool = buildPool(dataset, 'total', _selectedScenario,
+        var pool = buildPool(dataset, 'rev', _selectedScenario,
             netAdj,
             p25Adj != null ? p25Adj : null,
             p75Adj != null ? p75Adj : null,
             s50Adj,
             m50Adj
         );
+        var hl = function(v) { return pool.length > 0 && pool.indexOf(v) !== -1 && isClosestTo(v, simVal, pool); };
         var lines = '';
         if (issBase != null) {
             lines += '<div style="font-size:9.5px;color:var(--text-mid);opacity:0.55;margin-bottom:3px;line-height:1.3;">derived: reward + iss(Ep.945)</div>';
         }
-        lines += refLine('Network median', fSol(netAdj) + ' SOL', null, isClosestTo(netAdj, simVal, pool));
+        lines += refLine('Network median', fSol(netAdj) + ' SOL', null, hl(netAdj));
         if (p25Adj != null && p75Adj != null)
-            lines += refLine('P25\u2013P75', fSol(p25Adj) + '\u2013' + fSol(p75Adj) + ' SOL');
+            lines += refLine('P25\u2013P75', fSol(p25Adj) + '\u2013' + fSol(p75Adj) + ' SOL', null, hl(p75Adj));
         if (s50Adj != null)
-            lines += refLine('Top 50 (stake)', fSol(s50Adj) + ' SOL', null, isClosestTo(s50Adj, simVal, pool));
+            lines += refLine('Top 50 (stake)', fSol(s50Adj) + ' SOL', null, hl(s50Adj));
         if (m50Adj != null)
-            lines += refLine('Top 50 (MEV)', fSol(m50Adj) + ' SOL', null, isClosestTo(m50Adj, simVal, pool));
+            lines += refLine('Top 50 (MEV)', fSol(m50Adj) + ' SOL', null, hl(m50Adj));
         return lines;
     }
 
