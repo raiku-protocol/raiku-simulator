@@ -1804,9 +1804,9 @@ details[open] summary::before { transform:rotate(90deg); }
             </div>
             <div id="qcp-body" style="display:none; padding:0 20px 6px;">
                 <div style="padding:8px 0 10px; font-size:11px; color:var(--text-mid); line-height:1.9;">
-                    <div><span style="color:var(--text2);font-weight:600;">Primary source:</span> Trillium API — live fetch (current epoch) &amp; 12-month validator history</div>
-                    <div><span style="color:var(--text2);font-weight:600;">Reference dashboard:</span> <a href="https://trillium-dashboard.trillium.so/" target="_blank" style="color:var(--text-mid);text-decoration:underline;">trillium-dashboard.trillium.so</a> — human-readable</div>
-                    <div><span style="color:var(--text2);font-weight:600;">Manual cross-check:</span> <a href="https://validblocks.app" target="_blank" style="color:var(--text-mid);text-decoration:underline;">validblocks.app</a> — validator stats reference</div>
+                    <div><span style="color:var(--text2);font-weight:600;">Primary source:</span> <a href="https://api.trillium.so" target="_blank" style="color:var(--text-mid);text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2);">Trillium API</a> — live fetch (current epoch) &amp; 12-month validator history</div>
+                    <div><span style="color:var(--text2);font-weight:600;">Reference dashboard:</span> <a href="https://trillium-dashboard.trillium.so/" target="_blank" style="color:var(--text-mid);text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2);">Trillium Dashboard</a></div>
+                    <div><span style="color:var(--text2);font-weight:600;">Cross-check:</span> <a href="https://validblocks.app" target="_blank" style="color:var(--text-mid);text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2);">ValidBlocks</a></div>
                 </div>
                 <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow-x:auto; padding:0;">
                     <table class="qcp-table">
@@ -1815,8 +1815,8 @@ details[open] summary::before { transform:rotate(90deg); }
                                 <th style="width:12%; padding-left:16px;">Metric</th>
                                 <th style="width:13%;">Raiku Simulator</th>
                                 <th style="width:14%;">Latest epoch</th>
-                                <th style="width:17%;">12m all <span style="font-weight:400;color:var(--lime-soft);font-size:9px;text-transform:none;letter-spacing:0;">· main benchmark</span> <span title="All epochs across the last 12 months (epochs 750–945). Main long-run benchmark." style="cursor:help;opacity:0.5;font-size:9px;margin-left:3px;">ⓘ</span></th>
-                                <th style="width:16%;">12m elev.+extreme <span style="font-weight:400;color:var(--text-mid);font-size:9px;text-transform:none;letter-spacing:0;">· contextual</span> <span title="Only epochs tagged elevated or extreme by the regime classifier. Contextual only — do not override the main 12M benchmark. Note: some extreme epochs had low absolute MEV due to relative baseline effects." style="cursor:help;opacity:0.5;font-size:9px;margin-left:3px;">ⓘ</span></th>
+                                <th style="width:17%;">12m all <span style="font-weight:400;color:var(--lime-soft);font-size:9px;text-transform:none;letter-spacing:0;">· main benchmark</span> <button class="vc-info-btn" title="All epochs over the last 12 months. This is the primary long-run benchmark." style="margin-left:4px;vertical-align:middle;">?</button></th>
+                                <th style="width:16%;">12m elev.+extreme <span style="font-weight:400;color:var(--text-mid);font-size:9px;text-transform:none;letter-spacing:0;">· contextual</span> <button class="vc-info-btn" title="Subset of epochs classified as Elevated or Extreme based on rolling 30-epoch volatility signals. Triggers include: large price moves, unusually high MEV or priority fees, strong deviation from recent baseline. This is a contextual regime, not a primary benchmark." style="margin-left:4px;vertical-align:middle;">?</button></th>
                                 <th style="width:14%;">Interpretation</th>
                                 <th style="width:14%;">Status</th>
                             </tr>
@@ -2567,7 +2567,7 @@ function qcpFetch() {
                 var blocks = d.total_blocks_produced || 1;
                 window.QCP.ref = { epoch: e, blocks: blocks };
                 var lbl = document.getElementById('qcp-epoch-lbl');
-                if (lbl) lbl.textContent = '\u2014 Latest epoch: ' + e;
+                if (lbl) lbl.textContent = 'Latest epoch: ' + e;
                 if (window.QCP.bench) qcpRender();
             })
             .catch(function() {
@@ -2589,7 +2589,7 @@ function qcpLoadBenchmarks() {
             window.QCP.bench = d;
             var lbl = document.getElementById('qcp-epoch-lbl');
             if (lbl && !window.QCP.ref) {
-                lbl.textContent = '\u2014 Latest epoch: ' + d.meta.epoch;
+                lbl.textContent = 'Latest epoch: ' + d.meta.epoch;
             }
             if (window.QCP.sim && window.QCP.sim.iss != null) qcpRender();
         })
@@ -2804,7 +2804,7 @@ function qcpRender() {
         var p25 = net.p25, p75 = net.p75;
         var lines = '';
         if (issBase != null) {
-            lines += '<div style="font-size:9.5px;color:var(--text-mid);opacity:0.6;margin-bottom:3px;line-height:1.3;">derived: reward + iss(Ep.945)</div>';
+            lines += '<div style="font-size:9.5px;color:var(--text-mid);opacity:0.55;margin-bottom:3px;line-height:1.3;">derived: reward + iss(Ep.945)</div>';
         }
         lines += refLine('Network median', fSol(issBase != null ? net.median + issBase : net.median) + ' SOL');
         if (p25 != null && p75 != null)
@@ -2836,7 +2836,7 @@ function qcpRender() {
 
     // r3 — Priority fees (temporal) — Section A: baseline metrics
     var r3 = rowTemporal(
-        'Priority fees / block' + sub('Network Fees \u2212 Signature Fees (Base Fees)'),
+        'Priority fees / block' + sub('Priority Fees = Network Fees \u2212 Signature Fees'),
         simPriCell,
         timeCell('latest_epoch',             'priority_fees', 'priority_fees'),
         timeCell('last_12m_all',             'priority_fees', null),
@@ -2878,7 +2878,7 @@ function qcpRender() {
         statUplift(sim.total, 'rev')
     );
 
-    tb.innerHTML = sectionRow('Baseline metrics \u2014 should match network closely')
+    tb.innerHTML = sectionRow('Baseline metrics')
         + r1 + r2 + r3
         + sectionRow('MEV metrics')
         + r4
