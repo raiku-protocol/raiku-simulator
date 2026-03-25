@@ -1817,7 +1817,7 @@ details[open] summary::before { transform:rotate(90deg); }
   <span id="qcp-epoch-col-lbl" style="font-weight:400;font-size:9px;color:var(--text-mid);display:block;margin-top:2px;text-transform:none;letter-spacing:0;"></span>
 </th>
                                 <th style="width:17%;">12m all <span style="font-weight:400;color:var(--lime-soft);font-size:9px;text-transform:none;letter-spacing:0;">· main benchmark</span> <button class="vc-info-btn" title="All epochs over the last 12 months. This is the primary long-run benchmark." style="margin-left:4px;vertical-align:middle;">?</button></th>
-                                <th style="width:16%;">12m elev.+extreme <span style="font-weight:400;color:var(--text-mid);font-size:9px;text-transform:none;letter-spacing:0;">· contextual</span> <button class="vc-info-btn" title="Subset of epochs classified as Elevated or Extreme based on rolling 30-epoch volatility signals. Triggers include: large price moves, unusually high MEV or priority fees, strong deviation from recent baseline. This is a contextual regime, not a primary benchmark." style="margin-left:4px;vertical-align:middle;">?</button></th>
+                                <th style="width:16%;">24m elev.+extreme <span style="font-weight:400;color:var(--text-mid);font-size:9px;text-transform:none;letter-spacing:0;">· high-activity ref</span> <button class="vc-info-btn" title="Subset of epochs classified as Elevated or Extreme across the last 24 months. Use this as a high-activity reference, especially for optimistic or bull-style comparisons. This is contextual and should be read alongside the 12M all benchmark." style="margin-left:4px;vertical-align:middle;">?</button></th>
                                 <th style="width:14%;">Interpretation</th>
                                 <th style="width:14%;">Status</th>
                             </tr>
@@ -2677,7 +2677,7 @@ function qcpRender() {
     }
 
     // ── Time benchmark cell builder ────────────────────────────────────
-    // dataset: 'latest_epoch' | 'last_12m_all' | 'last_12m_elevated_extreme'
+    // dataset: 'latest_epoch' | 'last_12m_all' | 'last_24m_elevated_extreme'
     // metricKey: 'priority_fees' | 'mev' | 'total_reward'
     // benchKey: matching key in bench for epoch-945 percentiles (used for latest_epoch p25/p75)
     function timeCell(dataset, metricKey, benchKey, simVal) {
@@ -2876,7 +2876,7 @@ function qcpRender() {
         simPriCell,
         timeCell('latest_epoch',             'priority_fees', 'priority_fees', simPri),
         timeCell('last_12m_all',             'priority_fees', null,            simPri),
-        timeCell('last_12m_elevated_extreme','priority_fees', null,            simPri),
+        timeCell('last_24m_elevated_extreme','priority_fees', null,            simPri),
         'Baseline fee component derived from Network Fees minus Signature Fees',
         statTime(simPri != null ? simPri : sim.blk, 'priority_fees')
     );
@@ -2887,7 +2887,7 @@ function qcpRender() {
         sim.mev != null ? monoVal(sim.mev) + sub('AOT + JIT + Bonus + Other JIT') : '<span class="qcp-nm">\u2014</span>',
         timeCell('latest_epoch',             'mev', 'mev', sim.mev),
         timeCell('last_12m_all',             'mev', null,  sim.mev),
-        timeCell('last_12m_elevated_extreme','mev', null,  sim.mev),
+        timeCell('last_24m_elevated_extreme','mev', null,  sim.mev),
         'Capture is highly concentrated in top MEV validators',
         statTime(sim.mev, 'mev')
     );
@@ -2898,7 +2898,7 @@ function qcpRender() {
         simRewardCell,
         timeCell('latest_epoch',             'total_reward', null, simReward),
         timeCell('last_12m_all',             'total_reward', null, simReward),
-        timeCell('last_12m_elevated_extreme','total_reward', null, simReward),
+        timeCell('last_24m_elevated_extreme','total_reward', null, simReward),
         'Fees plus MEV \u2014 validator earning power before inflation',
         statTime(simReward, 'total_reward')
     );
@@ -2909,7 +2909,7 @@ function qcpRender() {
         sim.total != null ? monoVal(sim.total) : '<span class="qcp-nm">\u2014</span>',
         refBlock('rev', sim.total),
         timeCellTotalRev('last_12m_all',              sim.total),
-        timeCellTotalRev('last_12m_elevated_extreme', sim.total),
+        timeCellTotalRev('last_24m_elevated_extreme', sim.total),
         'Full validator revenue including inflation',
         statUplift(sim.total, 'rev')
     );
