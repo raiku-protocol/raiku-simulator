@@ -1704,7 +1704,7 @@ details[open] summary::before { transform:rotate(90deg); }
     <span id="validator-apr-formula-line" style="display:none;"></span>
     <span id="validator-apr-formula-note" style="display:none;"></span>
     <span id="validator-apy-formula" style="display:none;"></span>
-    <div class="section fade-in fade-in-2" style="padding-top:10px; padding-bottom:14px;">
+    <div class="section fade-in fade-in-2" style="padding-top:10px; padding-bottom:0;">
         <h2>Validator Revenue (Protocol Level)</h2>
         <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow:hidden; padding:0 14px;">
             <table class="vpr-table">
@@ -1791,63 +1791,36 @@ details[open] summary::before { transform:rotate(90deg); }
                 </tbody>
             </table>
         </div>
-    </div>
-
-    <!-- ── External Validation ─────────────────────────────────────────── -->
-    <div class="section fade-in fade-in-3" style="margin-top:var(--gap); padding:0; overflow:hidden;">
-        <div onclick="qcpToggle()" style="display:flex; align-items:center; padding:14px 20px; cursor:pointer; user-select:none;">
-            <h2 style="margin:0; flex:1;">External Validation <span id="qcp-epoch-lbl" style="font-size:11px; color:var(--text-mid); font-weight:400; letter-spacing:0; text-transform:none;"></span></h2>
-            <span id="qcp-caret" style="font-size:11px; color:var(--text-mid); font-family:var(--font-mono); margin-left:8px;">▶</span>
-        </div>
-        <div id="qcp-body" style="display:none;">
-            <div style="margin:0 20px; background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow-x:auto; padding:0;">
-                <table class="qcp-table">
-                    <thead>
-                        <tr>
-                            <th style="width:18%; padding-left:16px;">Metric</th>
-                            <th style="width:22%;">Raiku Simulator</th>
-                            <th style="width:22%;" id="qcp-ref1-hdr">Reference</th>
-                            <th style="width:22%;">Source</th>
-                            <th style="width:16%;">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="qcp-tbody">
-                        <tr><td colspan="5" class="qcp-nm" style="padding:14px 16px; font-size:12px;">Fetching Trillium reference data…</td></tr>
-                    </tbody>
-                </table>
+        <!-- ── Validation / Cross-checking (inside same card) ──────────── -->
+        <div style="border-top:1px solid rgba(255,255,255,0.05); margin-top:12px; margin-left:-20px; margin-right:-20px; padding:0 20px;">
+            <div onclick="qcpToggle()" style="display:flex; align-items:center; padding:10px 0; cursor:pointer; user-select:none;">
+                <span style="font-size:10.5px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.6px; flex:1; font-family:var(--font-mono);">Validation / Cross-checking <span id="qcp-epoch-lbl" style="font-size:10px; color:var(--text-mid); font-weight:400; letter-spacing:0; text-transform:none;"></span></span>
+                <span id="qcp-caret" style="font-size:11px; color:var(--text-mid); font-family:var(--font-mono); margin-left:8px;">▶</span>
             </div>
-            <div style="padding:8px 20px 14px; font-size:11px; color:var(--text-mid); line-height:1.7;">
-                <strong style="color:var(--text2);">Live:</strong>
-                <a href="https://api.trillium.so/" target="_blank" style="color:var(--text-mid);">Trillium API</a> (auto-fetched) ·
-                <strong style="color:var(--text2);">Manual:</strong>
-                <a href="https://dashboards.validblocks.com/svp" target="_blank" style="color:var(--text-mid);">ValidBlocks</a>
-                &nbsp;·&nbsp; Section A: match closely · Section B: can exceed baseline when Raiku uplift is active
-            </div>
-        </div>
-    </div>
-
-    <!-- ── Validator Setup — Individual Level ───────────────────────────── -->
-    <div class="section fade-in fade-in-3" style="margin-top:var(--gap); padding:0; overflow:hidden;">
-        <div onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none';this.querySelector('.vc-ph-caret').textContent=b.style.display==='none'?'▶':'▼';" style="display:flex; align-items:center; padding:14px 20px; cursor:pointer; user-select:none;">
-            <h2 style="margin:0; flex:1;">Validator Setup — Individual Level</h2>
-            <span class="vc-ph-caret" style="font-size:11px; color:var(--text-mid); font-family:var(--font-mono); margin-left:8px;">▶</span>
-        </div>
-        <div style="display:none; padding:0 20px 16px;">
-            <div style="font-size:12px; color:var(--text-mid); line-height:1.6; padding:16px; background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px;">
-                Enter your validator's stake (SOL or %) to compute its individual share of the protocol-level revenues shown above. Coming in a future patch.
-            </div>
-        </div>
-    </div>
-
-    <!-- ── Validator Yield — Individual Setup ───────────────────────────── -->
-    <div class="section fade-in fade-in-3" style="margin-top:var(--gap); padding:0; overflow:hidden;">
-        <div onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none';this.querySelector('.vc-ph-caret').textContent=b.style.display==='none'?'▶':'▼';" style="display:flex; align-items:center; padding:14px 20px; cursor:pointer; user-select:none;">
-            <h2 style="margin:0; flex:1;">Validator Yield — Individual Setup</h2>
-            <span class="vc-ph-caret" style="font-size:11px; color:var(--text-mid); font-family:var(--font-mono); margin-left:8px;">▶</span>
-        </div>
-        <div style="display:none; padding:0 20px 16px;">
-            <div style="font-size:12px; color:var(--text-mid); line-height:1.6; padding:16px; background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px;">
-                Detailed yield breakdown for a connected validator: issuance share, priority fee share, Raiku AOT/JIT bonus, epoch-based APY. Coming in a future patch.
+            <div id="qcp-body" style="display:none; padding-bottom:6px;">
+                <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow-x:auto; padding:0;">
+                    <table class="qcp-table">
+                        <thead>
+                            <tr>
+                                <th style="width:18%; padding-left:16px;">Metric</th>
+                                <th style="width:22%;">Raiku Simulator</th>
+                                <th style="width:22%;" id="qcp-ref1-hdr">Reference</th>
+                                <th style="width:22%;">Source</th>
+                                <th style="width:16%;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="qcp-tbody">
+                            <tr><td colspan="5" class="qcp-nm" style="padding:14px 16px; font-size:12px;">Fetching Trillium reference data…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding:6px 0 4px; font-size:11px; color:var(--text-mid); line-height:1.7;">
+                    <strong style="color:var(--text2);">Live:</strong>
+                    <a href="https://api.trillium.so/" target="_blank" style="color:var(--text-mid);">Trillium API</a> (auto-fetched) ·
+                    <strong style="color:var(--text2);">Manual:</strong>
+                    <a href="https://dashboards.validblocks.com/svp" target="_blank" style="color:var(--text-mid);">ValidBlocks</a>
+                    &nbsp;·&nbsp; Section A: match closely · Section B: can exceed baseline when Raiku uplift is active
+                </div>
             </div>
         </div>
     </div>
