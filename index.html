@@ -1800,7 +1800,6 @@ details[open] summary::before { transform:rotate(90deg); }
             <div id="qcp-toggle-btn" class="qcp-toggle-row" onclick="qcpToggle()">
                 <span id="qcp-caret" style="font-size:10px; color:var(--lime-soft); font-family:var(--font-mono); margin-right:7px;">▶</span>
                 <span style="font-size:11px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.7px; font-family:var(--font-mono);">Validation / Cross-checking</span>
-                <span id="qcp-epoch-lbl" style="font-size:10px; color:var(--text-mid); font-weight:400; letter-spacing:0; text-transform:none; margin-left:8px;"></span>
             </div>
             <div id="qcp-body" style="display:none; padding:0 20px 6px;">
                 <div style="padding:8px 0 10px; font-size:11px; color:var(--text-mid); line-height:1.9;">
@@ -1814,7 +1813,9 @@ details[open] summary::before { transform:rotate(90deg); }
                             <tr>
                                 <th style="width:12%; padding-left:16px;">Metric</th>
                                 <th style="width:13%;">Raiku Simulator</th>
-                                <th style="width:14%;">Latest epoch</th>
+                                <th style="width:14%;">Latest epoch
+  <span id="qcp-epoch-col-lbl" style="font-weight:400;font-size:9px;color:var(--text-mid);display:block;margin-top:2px;text-transform:none;letter-spacing:0;"></span>
+</th>
                                 <th style="width:17%;">12m all <span style="font-weight:400;color:var(--lime-soft);font-size:9px;text-transform:none;letter-spacing:0;">· main benchmark</span> <button class="vc-info-btn" title="All epochs over the last 12 months. This is the primary long-run benchmark." style="margin-left:4px;vertical-align:middle;">?</button></th>
                                 <th style="width:16%;">12m elev.+extreme <span style="font-weight:400;color:var(--text-mid);font-size:9px;text-transform:none;letter-spacing:0;">· contextual</span> <button class="vc-info-btn" title="Subset of epochs classified as Elevated or Extreme based on rolling 30-epoch volatility signals. Triggers include: large price moves, unusually high MEV or priority fees, strong deviation from recent baseline. This is a contextual regime, not a primary benchmark." style="margin-left:4px;vertical-align:middle;">?</button></th>
                                 <th style="width:14%;">Interpretation</th>
@@ -2566,8 +2567,8 @@ function qcpFetch() {
                 if (!d) return;
                 var blocks = d.total_blocks_produced || 1;
                 window.QCP.ref = { epoch: e, blocks: blocks };
-                var lbl = document.getElementById('qcp-epoch-lbl');
-                if (lbl) lbl.textContent = 'Latest epoch: ' + e;
+                var lbl = document.getElementById('qcp-epoch-col-lbl');
+                if (lbl) lbl.textContent = '#' + e;
                 if (window.QCP.bench) qcpRender();
             })
             .catch(function() {
@@ -2587,9 +2588,9 @@ function qcpLoadBenchmarks() {
         .then(function(r) { return r.ok ? r.json() : Promise.reject('not found'); })
         .then(function(d) {
             window.QCP.bench = d;
-            var lbl = document.getElementById('qcp-epoch-lbl');
+            var lbl = document.getElementById('qcp-epoch-col-lbl');
             if (lbl && !window.QCP.ref) {
-                lbl.textContent = 'Latest epoch: ' + d.meta.epoch;
+                lbl.textContent = '#' + d.meta.epoch;
             }
             if (window.QCP.sim && window.QCP.sim.iss != null) qcpRender();
         })
@@ -2633,36 +2634,53 @@ function qcpRender() {
     }
     function monoVal(v) {
         if (v == null || isNaN(v)) return '<span class="qcp-nm">\u2014</span>';
-        return '<span style="font-family:var(--font-mono);font-size:12px;color:#E8E8E8;font-weight:700;">' + fSol(v) + ' SOL</span>';
+        return '<span style="font-family:var(--font-mono);font-size:12px;color:var(--lime);font-weight:700;">' + fSol(v) + ' SOL</span>';
     }
     function sub(txt) {
         return '<span style="font-size:10.5px;color:var(--text-mid);display:block;margin-top:2px;line-height:1.4;">' + txt + '</span>';
     }
-    function refLine(label, val, note) {
+    function refLine(label, val, note, highlight) {
+        var valColor  = highlight ? '#7EC87A' : 'var(--text2)';
+        var valWeight = highlight ? '700' : '400';
         return '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:2px;">'
             + '<span style="font-size:10.5px;color:var(--text-mid);white-space:nowrap;">' + label + '</span>'
-            + '<span style="font-family:var(--font-mono);font-size:11px;color:var(--text2);white-space:nowrap;">' + val + '</span>'
+            + '<span style="font-family:var(--font-mono);font-size:11px;color:' + valColor + ';font-weight:' + valWeight + ';white-space:nowrap;">' + val + '</span>'
             + '</div>'
             + (note ? '<div style="font-size:9.5px;color:var(--text-mid);opacity:0.65;margin-bottom:3px;line-height:1.3;">' + note + '</div>' : '');
     }
 
-    // ── Epoch 945 cross-section reference blocks (unchanged — for r1, r2, r6) ──
-    function refBlock(key) {
+    // ── Closest-value finder: returns true if candidate is the nearest to simVal in pool ──
+    function isClosestTo(candidate, simVal, pool) {
+        if (simVal == null || candidate == null) return false;
+        var bestDiff = Infinity;
+        pool.forEach(function(v) {
+            if (v != null) {
+                var d = Math.abs(v - simVal);
+                if (d < bestDiff) bestDiff = d;
+            }
+        });
+        return Math.abs(candidate - simVal) <= bestDiff + 1e-10;
+    }
+
+    // ── Epoch 945 cross-section reference blocks (for r1, r2, r6) ──
+    function refBlock(key, simVal) {
         var m = bench[key];
         if (!m) return '<span class="qcp-nm">\u2014</span>';
         var p = m.percentiles, c = m.cohorts;
-        return refLine('Network mean',   fSol(m.network.mean)   + ' SOL')
-            + refLine('Network median',  fSol(m.network.median) + ' SOL')
+        var pool = [m.network.mean, m.network.median, p.p25, p.p75,
+                    c.top_50_by_stake.median, c.top_50_by_mev.median];
+        return refLine('Network mean',   fSol(m.network.mean)   + ' SOL', null, isClosestTo(m.network.mean, simVal, pool))
+            + refLine('Network median',  fSol(m.network.median) + ' SOL', null, isClosestTo(m.network.median, simVal, pool))
             + refLine('P25\u2013P75',    fSol(p.p25) + '\u2013' + fSol(p.p75) + ' SOL')
-            + refLine('Top 50 (stake)',  fSol(c.top_50_by_stake.median) + ' SOL')
-            + refLine('Top 50 (MEV)',    fSol(c.top_50_by_mev.median) + ' SOL');
+            + refLine('Top 50 (stake)',  fSol(c.top_50_by_stake.median) + ' SOL', null, isClosestTo(c.top_50_by_stake.median, simVal, pool))
+            + refLine('Top 50 (MEV)',    fSol(c.top_50_by_mev.median) + ' SOL', null, isClosestTo(c.top_50_by_mev.median, simVal, pool));
     }
 
     // ── Time benchmark cell builder ────────────────────────────────────
     // dataset: 'latest_epoch' | 'last_12m_all' | 'last_12m_elevated_extreme'
     // metricKey: 'priority_fees' | 'mev' | 'total_reward'
     // benchKey: matching key in bench for epoch-945 percentiles (used for latest_epoch p25/p75)
-    function timeCell(dataset, metricKey, benchKey) {
+    function timeCell(dataset, metricKey, benchKey, simVal) {
         if (!timeBench) return '<span class="qcp-nm" style="font-size:10.5px;">Loading\u2026</span>';
         var ds = timeBench[dataset];
         if (!ds) return '<span class="qcp-nm">\u2014</span>';
@@ -2690,13 +2708,19 @@ function qcpRender() {
             p75 = net.p75;
         }
 
-        var lines = refLine('Network median', fSol(net.median) + ' SOL');
+        var pool = [net.median];
+        if (p25 != null) pool.push(p25);
+        if (p75 != null) pool.push(p75);
+        if (s50 && s50.median != null) pool.push(s50.median);
+        if (m50 && m50.median != null) pool.push(m50.median);
+
+        var lines = refLine('Network median', fSol(net.median) + ' SOL', null, isClosestTo(net.median, simVal, pool));
         if (p25 != null && p75 != null)
             lines += refLine('P25\u2013P75', fSol(p25) + '\u2013' + fSol(p75) + ' SOL');
         if (s50 && s50.median != null)
-            lines += refLine('Top 50 (stake)', fSol(s50.median) + ' SOL');
+            lines += refLine('Top 50 (stake)', fSol(s50.median) + ' SOL', null, isClosestTo(s50.median, simVal, pool));
         if (m50 && m50.median != null)
-            lines += refLine('Top 50 (MEV)', fSol(m50.median) + ' SOL');
+            lines += refLine('Top 50 (MEV)', fSol(m50.median) + ' SOL', null, isClosestTo(m50.median, simVal, pool));
         return lines;
     }
 
@@ -2779,21 +2803,23 @@ function qcpRender() {
         : '<span class="qcp-nm">\u2014</span>';
 
     // ── Epoch-945 reference block for MEV (inline, no-split) ──────────
-    function refBlockMev() {
+    function refBlockMev(simVal) {
         var m = bench.mev;
         if (!m) return '<span class="qcp-nm">\u2014</span>';
         var p = m.percentiles, c = m.cohorts;
-        return refLine('Network mean',   fSol(m.network.mean)   + ' SOL', 'All validators incl. zero-MEV \u2014 biased low')
-            + refLine('Network median',  fSol(m.network.median) + ' SOL')
+        var pool = [m.network.mean, m.network.median, p.p25, p.p75,
+                    c.top_50_by_stake.median, c.top_50_by_mev.median];
+        return refLine('Network mean',   fSol(m.network.mean)   + ' SOL', 'All validators incl. zero-MEV \u2014 biased low', isClosestTo(m.network.mean, simVal, pool))
+            + refLine('Network median',  fSol(m.network.median) + ' SOL', null, isClosestTo(m.network.median, simVal, pool))
             + refLine('P25\u2013P75',    fSol(p.p25) + '\u2013' + fSol(p.p75) + ' SOL')
-            + refLine('Top 50 (stake)',  fSol(c.top_50_by_stake.median) + ' SOL')
-            + refLine('Top 50 (MEV)',    fSol(c.top_50_by_mev.median)   + ' SOL');
+            + refLine('Top 50 (stake)',  fSol(c.top_50_by_stake.median) + ' SOL', null, isClosestTo(c.top_50_by_stake.median, simVal, pool))
+            + refLine('Top 50 (MEV)',    fSol(c.top_50_by_mev.median)   + ' SOL', null, isClosestTo(c.top_50_by_mev.median, simVal, pool));
     }
 
     // ── Build rows ─────────────────────────────────────────────────────
 
     // ── timeCellTotalRev: derived 12m Total REV = total_reward + inflation (Ep.945) ──
-    function timeCellTotalRev(dataset) {
+    function timeCellTotalRev(dataset, simVal) {
         if (!timeBench) return '<span class="qcp-nm" style="font-size:10.5px;">Loading\u2026</span>';
         var ds = timeBench[dataset];
         if (!ds) return '<span class="qcp-nm">\u2014</span>';
@@ -2802,17 +2828,27 @@ function qcpRender() {
         var issBase = (bench && bench.inflation) ? bench.inflation.network.median : null;
         var net = m.network, s50 = m.top_50_by_stake, m50 = m.top_50_by_mev;
         var p25 = net.p25, p75 = net.p75;
+        var netAdj  = issBase != null ? net.median + issBase : net.median;
+        var p25Adj  = (p25 != null && issBase != null) ? p25 + issBase : p25;
+        var p75Adj  = (p75 != null && issBase != null) ? p75 + issBase : p75;
+        var s50Adj  = (s50 && s50.median != null) ? (issBase != null ? s50.median + issBase : s50.median) : null;
+        var m50Adj  = (m50 && m50.median != null) ? (issBase != null ? m50.median + issBase : m50.median) : null;
+        var pool = [netAdj];
+        if (p25Adj != null) pool.push(p25Adj);
+        if (p75Adj != null) pool.push(p75Adj);
+        if (s50Adj != null) pool.push(s50Adj);
+        if (m50Adj != null) pool.push(m50Adj);
         var lines = '';
         if (issBase != null) {
             lines += '<div style="font-size:9.5px;color:var(--text-mid);opacity:0.55;margin-bottom:3px;line-height:1.3;">derived: reward + iss(Ep.945)</div>';
         }
-        lines += refLine('Network median', fSol(issBase != null ? net.median + issBase : net.median) + ' SOL');
-        if (p25 != null && p75 != null)
-            lines += refLine('P25\u2013P75', fSol(issBase != null ? p25 + issBase : p25) + '\u2013' + fSol(issBase != null ? p75 + issBase : p75) + ' SOL');
-        if (s50 && s50.median != null)
-            lines += refLine('Top 50 (stake)', fSol(issBase != null ? s50.median + issBase : s50.median) + ' SOL');
-        if (m50 && m50.median != null)
-            lines += refLine('Top 50 (MEV)', fSol(issBase != null ? m50.median + issBase : m50.median) + ' SOL');
+        lines += refLine('Network median', fSol(netAdj) + ' SOL', null, isClosestTo(netAdj, simVal, pool));
+        if (p25Adj != null && p75Adj != null)
+            lines += refLine('P25\u2013P75', fSol(p25Adj) + '\u2013' + fSol(p75Adj) + ' SOL');
+        if (s50Adj != null)
+            lines += refLine('Top 50 (stake)', fSol(s50Adj) + ' SOL', null, isClosestTo(s50Adj, simVal, pool));
+        if (m50Adj != null)
+            lines += refLine('Top 50 (MEV)', fSol(m50Adj) + ' SOL', null, isClosestTo(m50Adj, simVal, pool));
         return lines;
     }
 
@@ -2820,7 +2856,7 @@ function qcpRender() {
     var r1 = rowBaseline(
         'Inflation / block' + sub('Validator issuance reward'),
         monoVal(sim.iss),
-        refBlock('inflation'),
+        refBlock('inflation', sim.iss),
         'Common inflation baseline, should match network closely',
         statBaseline(sim.iss, 'inflation')
     );
@@ -2829,7 +2865,7 @@ function qcpRender() {
     var r2 = rowBaseline(
         'Base fees / block' + sub('Signature fees \u00b7 5,000 lam/sig'),
         '<span class="qcp-nm" style="font-size:11px;">Not modeled separately</span>',
-        refBlock('sig_fees'),
+        refBlock('sig_fees', null),
         'Reference-only signature fee component, not modeled separately',
         '<span class="qcp-sn">N/A</span>'
     );
@@ -2838,9 +2874,9 @@ function qcpRender() {
     var r3 = rowTemporal(
         'Priority fees / block' + sub('Priority Fees = Network Fees \u2212 Signature Fees'),
         simPriCell,
-        timeCell('latest_epoch',             'priority_fees', 'priority_fees'),
-        timeCell('last_12m_all',             'priority_fees', null),
-        timeCell('last_12m_elevated_extreme','priority_fees', null),
+        timeCell('latest_epoch',             'priority_fees', 'priority_fees', simPri),
+        timeCell('last_12m_all',             'priority_fees', null,            simPri),
+        timeCell('last_12m_elevated_extreme','priority_fees', null,            simPri),
         'Baseline fee component derived from Network Fees minus Signature Fees',
         statTime(simPri != null ? simPri : sim.blk, 'priority_fees')
     );
@@ -2849,9 +2885,9 @@ function qcpRender() {
     var r4 = rowTemporal(
         'Total MEV / block',
         sim.mev != null ? monoVal(sim.mev) + sub('AOT + JIT + Bonus + Other JIT') : '<span class="qcp-nm">\u2014</span>',
-        timeCell('latest_epoch',             'mev', 'mev'),
-        timeCell('last_12m_all',             'mev', null),
-        timeCell('last_12m_elevated_extreme','mev', null),
+        timeCell('latest_epoch',             'mev', 'mev', sim.mev),
+        timeCell('last_12m_all',             'mev', null,  sim.mev),
+        timeCell('last_12m_elevated_extreme','mev', null,  sim.mev),
         'Capture is highly concentrated in top MEV validators',
         statTime(sim.mev, 'mev')
     );
@@ -2860,9 +2896,9 @@ function qcpRender() {
     var r5 = rowTemporal(
         'Total reward / block' + sub('Base Fees + Priority Fees + MEV'),
         simRewardCell,
-        timeCell('latest_epoch',             'total_reward', null),
-        timeCell('last_12m_all',             'total_reward', null),
-        timeCell('last_12m_elevated_extreme','total_reward', null),
+        timeCell('latest_epoch',             'total_reward', null, simReward),
+        timeCell('last_12m_all',             'total_reward', null, simReward),
+        timeCell('last_12m_elevated_extreme','total_reward', null, simReward),
         'Fees plus MEV \u2014 validator earning power before inflation',
         statTime(simReward, 'total_reward')
     );
@@ -2871,9 +2907,9 @@ function qcpRender() {
     var r6 = rowTemporal(
         'Total REV / block' + sub('Inflation + Fees + MEV'),
         sim.total != null ? monoVal(sim.total) : '<span class="qcp-nm">\u2014</span>',
-        refBlock('rev'),
-        timeCellTotalRev('last_12m_all'),
-        timeCellTotalRev('last_12m_elevated_extreme'),
+        refBlock('rev', sim.total),
+        timeCellTotalRev('last_12m_all',              sim.total),
+        timeCellTotalRev('last_12m_elevated_extreme', sim.total),
         'Full validator revenue including inflation',
         statUplift(sim.total, 'rev')
     );
