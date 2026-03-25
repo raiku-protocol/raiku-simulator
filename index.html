@@ -1816,8 +1816,8 @@ details[open] summary::before { transform:rotate(90deg); }
                                 <th style="width:14%;">Latest epoch
   <span id="qcp-epoch-col-lbl" style="font-weight:400;font-size:9px;color:var(--text-mid);display:block;margin-top:2px;text-transform:none;letter-spacing:0;"></span>
 </th>
-                                <th style="width:17%;">12m all <span style="font-weight:400;color:var(--lime-soft);font-size:9px;text-transform:none;letter-spacing:0;">· main benchmark</span> <button class="vc-info-btn" title="All epochs over the last 12 months. This is the primary long-run benchmark." style="margin-left:4px;vertical-align:middle;">?</button></th>
-                                <th style="width:16%;">24m elev.+extreme <span style="font-weight:400;color:var(--text-mid);font-size:9px;text-transform:none;letter-spacing:0;">· high-activity ref</span> <button class="vc-info-btn" title="Subset of epochs classified as Elevated or Extreme across the last 24 months. Use this as a high-activity reference, especially for optimistic or bull-style comparisons. This is contextual and should be read alongside the 12M all benchmark." style="margin-left:4px;vertical-align:middle;">?</button></th>
+                                <th style="width:17%;">12m all <span style="font-weight:400;color:var(--lime-soft);font-size:9px;text-transform:none;letter-spacing:0;">· main benchmark</span> <button class="vc-info-btn" onclick="vcOpenExplainer('qcp-explainer-12m-all')" title="All epochs over the last 12 months. This is the primary long-run benchmark." style="margin-left:4px;vertical-align:middle;">?</button></th>
+                                <th style="width:16%;">24m elev.+extreme <span style="font-weight:400;color:var(--text-mid);font-size:9px;text-transform:none;letter-spacing:0;">· high-activity ref</span> <button class="vc-info-btn" onclick="vcOpenExplainer('qcp-explainer-24m-ee')" title="Subset of epochs classified as Elevated or Extreme across the last 24 months. High-activity reference for optimistic/bull comparisons." style="margin-left:4px;vertical-align:middle;">?</button></th>
                                 <th style="width:14%;">Interpretation</th>
                                 <th style="width:14%;">Status</th>
                             </tr>
@@ -2662,6 +2662,37 @@ function qcpRender() {
         return Math.abs(candidate - simVal) <= bestDiff + 1e-10;
     }
 
+    // ── Scenario-aware pool of values eligible for green highlighting ──
+    // mt: 'baseline' | 'mev' | 'total'
+    // dataset: 'latest_epoch' | 'last_12m_all' | 'last_24m_elevated_extreme'
+    // sc: _selectedScenario ('con','base','opt','bull')
+    function buildPool(dataset, mt, sc, netMed, p25, p75, s50Med, m50Med) {
+        if (mt === 'baseline') {
+            if (dataset === 'last_24m_elevated_extreme') return [];
+            return [netMed, s50Med, m50Med].filter(function(v){ return v != null; });
+        }
+        var maps = {
+            'latest_epoch': {
+                'con': [netMed], 'base': [netMed], 'opt': [], 'bull': []
+            },
+            'last_12m_all': {
+                'con':  [netMed],
+                'base': [p75, m50Med],
+                'opt':  [],
+                'bull': []
+            },
+            'last_24m_elevated_extreme': {
+                'con':  [],
+                'base': [netMed],
+                'opt':  [p75, s50Med],
+                'bull': [p75, m50Med]
+            }
+        };
+        var dm = maps[dataset];
+        if (!dm) return [netMed, s50Med, m50Med].filter(function(v){ return v != null; });
+        return (dm[sc] || [netMed]).filter(function(v){ return v != null; });
+    }
+
     // ── Epoch 945 cross-section reference blocks (for r1, r2, r6) ──
     function refBlock(key, simVal) {
         var m = bench[key];
@@ -2680,7 +2711,8 @@ function qcpRender() {
     // dataset: 'latest_epoch' | 'last_12m_all' | 'last_24m_elevated_extreme'
     // metricKey: 'priority_fees' | 'mev' | 'total_reward'
     // benchKey: matching key in bench for epoch-945 percentiles (used for latest_epoch p25/p75)
-    function timeCell(dataset, metricKey, benchKey, simVal) {
+    // metricType: 'baseline' | 'mev' | 'total'
+    function timeCell(dataset, metricKey, benchKey, simVal, metricType) {
         if (!timeBench) return '<span class="qcp-nm" style="font-size:10.5px;">Loading\u2026</span>';
         var ds = timeBench[dataset];
         if (!ds) return '<span class="qcp-nm">\u2014</span>';
@@ -2708,11 +2740,14 @@ function qcpRender() {
             p75 = net.p75;
         }
 
-        var pool = [net.median];
-        if (p25 != null) pool.push(p25);
-        if (p75 != null) pool.push(p75);
-        if (s50 && s50.median != null) pool.push(s50.median);
-        if (m50 && m50.median != null) pool.push(m50.median);
+        var mt = metricType || 'mev';
+        var pool = buildPool(dataset, mt, _selectedScenario,
+            net.median,
+            p25 != null ? p25 : null,
+            p75 != null ? p75 : null,
+            s50 && s50.median != null ? s50.median : null,
+            m50 && m50.median != null ? m50.median : null
+        );
 
         var lines = refLine('Network median', fSol(net.median) + ' SOL', null, isClosestTo(net.median, simVal, pool));
         if (p25 != null && p75 != null)
@@ -2735,27 +2770,41 @@ function qcpRender() {
     }
     function statTime(sv, metricKey) {
         if (sv == null || !timeBench) return '<span class="qcp-sn">\u2014</span>';
-        var m = (timeBench.last_12m_all.metrics || {})[metricKey];
-        if (!m) return '<span class="qcp-sn">\u2014</span>';
-        var net = m.network, m50 = m.top_50_by_mev;
-        if (net.p25 == null) return '<span class="qcp-sn">\u2014</span>';
-        if (sv < net.p25)
+        var m12 = (timeBench.last_12m_all && timeBench.last_12m_all.metrics || {})[metricKey];
+        var m24 = (timeBench.last_24m_elevated_extreme && timeBench.last_24m_elevated_extreme.metrics || {})[metricKey];
+        if (!m12) return '<span class="qcp-sn">\u2014</span>';
+        var net12 = m12.network, m50_12 = m12.top_50_by_mev;
+        if (net12.p25 == null) return '<span class="qcp-sn">\u2014</span>';
+        if (sv < net12.p25)
             return '<span class="qcp-sr">Below 12m range</span>';
-        if (sv <= net.p75)
+        if (sv <= net12.p75)
             return '<span class="qcp-sa">Within 12m range</span>';
-        if (sv <= m50.median)
-            return '<span class="qcp-sc">Above network \u00b7 top validator range</span>';
-        if (sv > m50.median * 3)
+        if (m50_12 && sv < m50_12.median * 0.92)
+            return '<span class="qcp-sc">Between P75 and top 50 MEV</span>';
+        if (m50_12 && sv <= m50_12.median * 1.12)
+            return '<span class="qcp-sc">Near top 50 MEV cohort</span>';
+        // Above 12m top cohort — check against 24m EE for nuance
+        if (m24) {
+            var net24 = m24.network, m50_24 = m24.top_50_by_mev;
+            if (net24 && sv <= net24.p75)
+                return '<span class="qcp-sc">Within 24m active range</span>';
+            if (m50_24 && sv <= m50_24.median * 1.12)
+                return '<span class="qcp-sc">Near 24m top MEV cohort</span>';
+            if (m50_24 && sv <= m50_24.median * 1.5)
+                return '<span class="qcp-sc">Above 12m top cohort</span>';
+        }
+        if (m50_12 && sv > m50_12.median * 3)
             return '<span class="qcp-sr">Above benchmark range \u2014 verify model</span>';
-        return '<span class="qcp-sc">Above top MEV cohort</span>';
+        return '<span class="qcp-sc">Above 12m top cohort</span>';
     }
     function statUplift(sv, key) {
         if (sv == null || !bench[key]) return '<span class="qcp-sn">\u2014</span>';
         var m = bench[key], p = m.percentiles;
         var top50mev = m.cohorts.top_50_by_mev.median;
-        if (sv > top50mev) return '<span class="qcp-sa">Above top MEV cohort</span>';
-        if (sv > p.p75)    return '<span class="qcp-sc">Within top validator range</span>';
-        if (sv > p.p25)    return '<span class="qcp-sn">Near network median</span>';
+        if (sv > top50mev * 1.12) return '<span class="qcp-sc">Above top 50 MEV (Ep.945)</span>';
+        if (sv > top50mev)        return '<span class="qcp-sc">Near top 50 MEV (Ep.945)</span>';
+        if (sv > p.p75)           return '<span class="qcp-sn">Within top validator range</span>';
+        if (sv > p.p25)           return '<span class="qcp-sn">Near network median</span>';
         return '<span class="qcp-sr">Below expected range</span>';
     }
 
@@ -2833,11 +2882,13 @@ function qcpRender() {
         var p75Adj  = (p75 != null && issBase != null) ? p75 + issBase : p75;
         var s50Adj  = (s50 && s50.median != null) ? (issBase != null ? s50.median + issBase : s50.median) : null;
         var m50Adj  = (m50 && m50.median != null) ? (issBase != null ? m50.median + issBase : m50.median) : null;
-        var pool = [netAdj];
-        if (p25Adj != null) pool.push(p25Adj);
-        if (p75Adj != null) pool.push(p75Adj);
-        if (s50Adj != null) pool.push(s50Adj);
-        if (m50Adj != null) pool.push(m50Adj);
+        var pool = buildPool(dataset, 'total', _selectedScenario,
+            netAdj,
+            p25Adj != null ? p25Adj : null,
+            p75Adj != null ? p75Adj : null,
+            s50Adj,
+            m50Adj
+        );
         var lines = '';
         if (issBase != null) {
             lines += '<div style="font-size:9.5px;color:var(--text-mid);opacity:0.55;margin-bottom:3px;line-height:1.3;">derived: reward + iss(Ep.945)</div>';
@@ -2874,9 +2925,9 @@ function qcpRender() {
     var r3 = rowTemporal(
         'Priority fees / block' + sub('Priority Fees = Network Fees \u2212 Signature Fees'),
         simPriCell,
-        timeCell('latest_epoch',             'priority_fees', 'priority_fees', simPri),
-        timeCell('last_12m_all',             'priority_fees', null,            simPri),
-        timeCell('last_24m_elevated_extreme','priority_fees', null,            simPri),
+        timeCell('latest_epoch',              'priority_fees', 'priority_fees', simPri, 'baseline'),
+        timeCell('last_12m_all',              'priority_fees', null,            simPri, 'baseline'),
+        timeCell('last_24m_elevated_extreme', 'priority_fees', null,            simPri, 'baseline'),
         'Baseline fee component derived from Network Fees minus Signature Fees',
         statTime(simPri != null ? simPri : sim.blk, 'priority_fees')
     );
@@ -2885,9 +2936,9 @@ function qcpRender() {
     var r4 = rowTemporal(
         'Total MEV / block',
         sim.mev != null ? monoVal(sim.mev) + sub('AOT + JIT + Bonus + Other JIT') : '<span class="qcp-nm">\u2014</span>',
-        timeCell('latest_epoch',             'mev', 'mev', sim.mev),
-        timeCell('last_12m_all',             'mev', null,  sim.mev),
-        timeCell('last_24m_elevated_extreme','mev', null,  sim.mev),
+        timeCell('latest_epoch',              'mev', 'mev', sim.mev, 'mev'),
+        timeCell('last_12m_all',              'mev', null,  sim.mev, 'mev'),
+        timeCell('last_24m_elevated_extreme', 'mev', null,  sim.mev, 'mev'),
         'Capture is highly concentrated in top MEV validators',
         statTime(sim.mev, 'mev')
     );
@@ -2896,9 +2947,9 @@ function qcpRender() {
     var r5 = rowTemporal(
         'Total reward / block' + sub('Base Fees + Priority Fees + MEV'),
         simRewardCell,
-        timeCell('latest_epoch',             'total_reward', null, simReward),
-        timeCell('last_12m_all',             'total_reward', null, simReward),
-        timeCell('last_24m_elevated_extreme','total_reward', null, simReward),
+        timeCell('latest_epoch',              'total_reward', null, simReward, 'total'),
+        timeCell('last_12m_all',              'total_reward', null, simReward, 'total'),
+        timeCell('last_24m_elevated_extreme', 'total_reward', null, simReward, 'total'),
         'Fees plus MEV \u2014 validator earning power before inflation',
         statTime(simReward, 'total_reward')
     );
@@ -7665,6 +7716,66 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             <div class="vc-explainer-note">Fully model-derived — no external source. Other JIT is 0 when Raiku JIT Market Share ≥ Raiku Stake %. Raiku Stake % defines the maximum JIT market share that can route through Raiku; the uncaptured portion flows to validators via competing ordering services.</div>
         </div>
     </div>
+</div>
+<!-- ── QCP: 12M All benchmark explainer ──────────────────────────────── -->
+<div class="vc-explainer-overlay" id="qcp-explainer-12m-all">
+  <div class="vc-explainer-card">
+    <button class="vc-explainer-close" onclick="document.getElementById('qcp-explainer-12m-all').classList.remove('open')">✕</button>
+    <div class="vc-explainer-title">12M All — Long-run benchmark</div>
+    <div class="vc-explainer-subtitle">All Solana epochs over the last 12 months (epochs 750–945).</div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">Definition</div>
+      <div class="vc-explainer-note">Includes every epoch regardless of market conditions. Use this as the primary long-run reference for validator economics under typical conditions.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">Coverage</div>
+      <div class="vc-explainer-note">196 epochs · ~760 validators per epoch · all regime types (normal, elevated, extreme)</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">Source</div>
+      <div class="vc-explainer-sources">
+        <a class="vc-explainer-source-link" href="https://api.trillium.so" target="_blank">Trillium API — /validator_rewards/{epoch}</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ── QCP: 24M Elev.+Extreme benchmark explainer ────────────────────── -->
+<div class="vc-explainer-overlay" id="qcp-explainer-24m-ee">
+  <div class="vc-explainer-card">
+    <button class="vc-explainer-close" onclick="document.getElementById('qcp-explainer-24m-ee').classList.remove('open')">✕</button>
+    <div class="vc-explainer-title">24M Elev.+Extreme — High-activity benchmark</div>
+    <div class="vc-explainer-subtitle">Subset of epochs classified as Elevated or Extreme across the last 24 months (epochs 552–945).</div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">Regime definition</div>
+      <div class="vc-explainer-note">Each epoch is classified using rolling 30-epoch z-scores. An epoch is tagged when any single signal breaches a threshold:</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">Extreme — any of</div>
+      <div class="vc-explainer-formula" style="font-size:11px; line-height:1.8;">
+        |price change| ≥ 15%<br>
+        MEV z-score ≥ 3.0 · or MEV multiple ≥ 5×<br>
+        Priority fee z-score ≥ 3.0 · or fee multiple ≥ 5×
+      </div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">Elevated — any of</div>
+      <div class="vc-explainer-formula" style="font-size:11px; line-height:1.8;">
+        |price change| ≥ 8%<br>
+        MEV z-score ≥ 2.0 · or MEV multiple ≥ 2.5×<br>
+        Priority fee z-score ≥ 2.0 · or fee multiple ≥ 2.5×
+      </div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">Coverage</div>
+      <div class="vc-explainer-note">117 elevated/extreme epochs out of 394 available · Captures the 2024 bull cycle. Use as a high-activity reference for optimistic and bull-case comparisons. Read alongside 12M All.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">Source</div>
+      <div class="vc-explainer-sources">
+        <a class="vc-explainer-source-link" href="https://api.trillium.so" target="_blank">Trillium API — /validator_rewards/{epoch}</a>
+      </div>
+    </div>
+  </div>
 </div>
 </body>
 </html>
