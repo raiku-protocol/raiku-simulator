@@ -1554,7 +1554,7 @@ details[open] summary::before { transform:rotate(90deg); }
             </div>
             <div class="validator-context-item">
                 <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">Network Fees APR <button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-blk')">?</button></div>
-                <div class="validator-context-value" id="validator-context-nfapr">0.50%</div>
+                <div class="validator-context-value" id="validator-context-nfapr">0.54%</div>
             </div>
         </div>
         <!-- Derived: Raiku Validator Stake -->
@@ -1597,7 +1597,7 @@ details[open] summary::before { transform:rotate(90deg); }
     <span id="validator-context-ojit" style="display:none;"></span>
     <!-- Base Network Yield inputs — hidden in this layout; controls appear in component expand rows (Patch 3) -->
     <input type="range" id="sl-staking-ratio" min="50" max="85" step="0.1" value="67.7" style="display:none;" oninput="update()">
-    <input type="range" id="sl-nfapr" min="0" max="2" step="0.01" value="0.50" style="display:none;" oninput="update()">
+    <input type="range" id="sl-nfapr" min="0" max="2" step="0.01" value="0.54" style="display:none;" oninput="update()"><!-- value = NETWORK_FEES_APR_REF × 100; do not round separately -->
     <span id="validator-staked-value" style="display:none;"></span>
     <span id="validator-staked-source" style="display:none;"></span>
     <span id="validator-inflation-rate" style="display:none;"></span>
@@ -2409,7 +2409,7 @@ const ACTIVE_STAKING_RATIO_DEFAULT   = 0.677;   // Default: March 2026 ≈ 67.7%
 // Commission reference — NOT used in issuance formula (Tab 2 shows validator-level gross, not delegator net)
 const AVG_VALIDATOR_COMMISSION_REF   = 0.07;    // Network-avg commission, reference only; source: Trillium validator data
 const NETWORK_FEES_APR_REF           = 0.0054;  // Marinade Block Rewards APR benchmark (base + priority fees, full-network); March 2026 data; display/reference only — model input is sl-nfapr
-// Network Fees APR (base + priority) — user-configurable via sl-nfapr (default 0.50%; benchmark ref above ≈ 0.54%)
+// Network Fees APR (base + priority) — user-configurable via sl-nfapr; initialized from NETWORK_FEES_APR_REF (0.54%) × 100; edit cell to override
 // Applied to residual block share only (Raiku AOT block share already in AOT revenue model)
 // Parity reference — NOT used as model input
 const RATED_DELEGATOR_APY_REFERENCE  = 0.0448;  // Rated Network 30d Delegator APY; includes commission; parity check only
@@ -7141,7 +7141,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
                     <span class="vc-explainer-input-val">0.54%</span>
                 </div>
                 <div class="vc-explainer-input-row">
-                    <span class="vc-explainer-input-key">Network Fees APR (user override — edit the cell to adjust)
+                    <span class="vc-explainer-input-key">Full-network source APR (active input — edit cell to override benchmark)
                         <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ ref: Marinade</a>
                     </span>
                     <span class="vc-explainer-input-val" id="vc-blk-exp-nfapr-inp">0.50%</span>
@@ -7165,7 +7165,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Reference</div>
             <div class="vc-explainer-sources">
-                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (full-network benchmark ≈ 0.54%; model uses user-configurable override, default 0.50%)</a>
+                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (full-network benchmark ≈ 0.54%; input initialized from this benchmark, editable to override)</a>
             </div>
         </div>
     </div>
