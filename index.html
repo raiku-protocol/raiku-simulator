@@ -1805,24 +1805,24 @@ details[open] summary::before { transform:rotate(90deg); }
                     <table class="qcp-table">
                         <thead>
                             <tr>
-                                <th style="width:18%; padding-left:16px;">Metric</th>
+                                <th style="width:20%; padding-left:16px;">Metric</th>
                                 <th style="width:22%;">Raiku Simulator</th>
-                                <th style="width:22%;" id="qcp-ref1-hdr">Reference</th>
-                                <th style="width:22%;">Source</th>
-                                <th style="width:16%;">Status</th>
+                                <th style="width:40%;">Reference <span style="font-weight:400;color:var(--text-mid);font-size:9.5px;text-transform:none;letter-spacing:0;">— Ep.945 benchmarks · 762 validators</span></th>
+                                <th style="width:18%;">Status</th>
                             </tr>
                         </thead>
                         <tbody id="qcp-tbody">
-                            <tr><td colspan="5" class="qcp-nm" style="padding:14px 16px; font-size:12px;">Fetching Trillium reference data…</td></tr>
+                            <tr><td colspan="4" class="qcp-nm" style="padding:14px 16px; font-size:12px;">Loading benchmarks…</td></tr>
                         </tbody>
                     </table>
                 </div>
                 <div style="padding:6px 0 4px; font-size:11px; color:var(--text-mid); line-height:1.7;">
+                    <strong style="color:var(--text2);">Benchmarks:</strong> Epoch 945 · 762 validators (validator_benchmarks_epoch_945.json) &nbsp;·&nbsp;
                     <strong style="color:var(--text2);">Live:</strong>
-                    <a href="https://api.trillium.so/" target="_blank" style="color:var(--text-mid);">Trillium API</a> (auto-fetched) ·
+                    <a href="https://api.trillium.so/" target="_blank" style="color:var(--text-mid);">Trillium API</a> &nbsp;·&nbsp;
                     <strong style="color:var(--text2);">Manual:</strong>
                     <a href="https://dashboards.validblocks.com/svp" target="_blank" style="color:var(--text-mid);">ValidBlocks</a>
-                    &nbsp;·&nbsp; Section A: match closely · Section B: can exceed baseline when Raiku uplift is active
+                    &nbsp;·&nbsp; Baseline: match network; Uplift: Raiku expected above P75
                 </div>
             </div>
         </div>
@@ -2548,7 +2548,7 @@ function vprToggle(group) {
 }
 
 // ── Validation / QC panel ────────────────────────────────────────────
-window.QCP = { ref: null, sim: {} };
+window.QCP = { ref: null, bench: null, sim: {} };
 
 function qcpFetch() {
     var probe = 960;
@@ -2563,17 +2563,11 @@ function qcpFetch() {
             .then(function(d) {
                 if (!d) return;
                 var blocks = d.total_blocks_produced || 1;
-                window.QCP.ref = {
-                    epoch: e,
-                    blocks: blocks,
-                    iss:      (d.total_total_inflation_reward  || 0) / blocks,
-                    baseFees: (d.total_validator_signature_fees != null) ? d.total_validator_signature_fees / blocks : null,
-                    fees:     (d.total_validator_priority_fees || 0) / blocks,
-                    mev:      (d.total_mev_earned              || 0) / blocks,
-                    total:    ((d.total_total_inflation_reward || 0) + (d.total_validator_priority_fees || 0) + (d.total_mev_earned || 0)) / blocks,
-                    px:       d.sol_price_usd || 0
-                };
-                qcpRender();
+                window.QCP.ref = { epoch: e, blocks: blocks };
+                var lbl = document.getElementById('qcp-epoch-lbl');
+                var bEp = window.QCP.bench ? window.QCP.bench.meta.epoch : null;
+                if (lbl) lbl.textContent = '\u2014' + (bEp ? ' Ep.' + bEp + ' benchmarks \u00b7' : '') + ' live: Ep.' + e + ' (' + Math.round(blocks).toLocaleString() + ' blocks)';
+                if (window.QCP.bench) qcpRender();
             })
             .catch(function() {
                 qcpFallback('Trillium fetch failed (CORS or network) — open DevTools > Network to inspect');
@@ -2584,7 +2578,24 @@ function qcpFetch() {
 
 function qcpFallback(msg) {
     var tb = document.getElementById('qcp-tbody');
-    if (tb) tb.innerHTML = '<tr><td colspan="5" class="qcp-nm" style="padding:14px 16px; font-size:12px;">Live fetch failed: ' + msg + '. Check <a href="https://trillium-dashboard.trillium.so/" target="_blank" style="color:var(--text-mid);">trillium-dashboard.trillium.so</a>.</td></tr>';
+    if (tb) tb.innerHTML = '<tr><td colspan="4" class="qcp-nm" style="padding:14px 16px; font-size:12px;">Live fetch failed: ' + msg + '. Check <a href="https://trillium-dashboard.trillium.so/" target="_blank" style="color:var(--text-mid);">trillium-dashboard.trillium.so</a>.</td></tr>';
+}
+
+function qcpLoadBenchmarks() {
+    fetch('data/validator_benchmarks_epoch_945.json')
+        .then(function(r) { return r.ok ? r.json() : Promise.reject('not found'); })
+        .then(function(d) {
+            window.QCP.bench = d;
+            var lbl = document.getElementById('qcp-epoch-lbl');
+            if (lbl && !window.QCP.ref) {
+                lbl.textContent = '\u2014 Ep.' + d.meta.epoch + ' benchmarks \u00b7 ' + d.meta.sample_size + ' validators';
+            }
+            if (window.QCP.sim && window.QCP.sim.iss != null) qcpRender();
+        })
+        .catch(function() {
+            var tb = document.getElementById('qcp-tbody');
+            if (tb) tb.innerHTML = '<tr><td colspan="4" class="qcp-nm" style="padding:14px 16px;">Benchmark file not found. Serve locally with a dev server.</td></tr>';
+        });
 }
 
 function qcpToggle() {
@@ -2599,152 +2610,99 @@ function qcpToggle() {
 function qcpRender() {
     var tb = document.getElementById('qcp-tbody');
     if (!tb) return;
-    var ref = window.QCP.ref;
-    var sim = window.QCP.sim || {};
-    if (!ref || !ref.epoch) { qcpFallback('Reference not yet loaded'); return; }
-
-    var TRLURL     = 'https://trillium-dashboard.trillium.so/';
-    var SYNDICA_URL = 'https://blog.syndica.io/deep-dive-solana-onchain-activity-january-2026/';
-    var FIGMENT_URL = 'https://www.figment.io/insights/figment-upgrades-solana-infrastructure-with-rakurai-client/';
+    var bench = window.QCP.bench;
+    var sim   = window.QCP.sim || {};
+    if (!bench) { tb.innerHTML = '<tr><td colspan="4" class="qcp-nm" style="padding:14px 16px;">Loading benchmark data\u2026</td></tr>'; return; }
 
     function fSol(v) {
-        if (v == null || isNaN(v)) return '—';
+        if (v == null || isNaN(v)) return '\u2014';
         return v < 0.001 ? v.toFixed(6) : v.toFixed(5);
     }
-    function mono(v) {
-        if (v == null || isNaN(v)) return '<span class="qcp-nm">—</span>';
+    function monoVal(v) {
+        if (v == null || isNaN(v)) return '<span class="qcp-nm">\u2014</span>';
         return '<span style="font-family:var(--font-mono);font-size:12px;color:var(--text);font-weight:600;">' + fSol(v) + ' SOL</span>';
-    }
-    function monoStr(s) {
-        return '<span style="font-family:var(--font-mono);font-size:11px;color:var(--text2);font-weight:600;">' + s + '</span>';
     }
     function sub(txt) {
         return '<span style="font-size:10.5px;color:var(--text-mid);display:block;margin-top:2px;line-height:1.4;">' + txt + '</span>';
     }
-    function srcLink(label, url, note) {
-        return '<a href="' + url + '" target="_blank" style="color:var(--text);font-size:11px;font-weight:600;text-decoration:none;">' + label + ' \u2197</a>'
-            + (note ? sub(note) : '');
+    function refLine(label, val, highlight) {
+        return '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:3px;">'
+            + '<span style="font-size:10.5px;color:var(--text-mid);white-space:nowrap;">' + label + '</span>'
+            + '<span style="font-family:var(--font-mono);font-size:11px;color:' + (highlight ? '#C0FF38' : 'var(--text2)') + ';white-space:nowrap;">' + val + '</span>'
+            + '</div>';
     }
-    function srcTrl(note) { return srcLink('Trillium', TRLURL, note); }
-    function statA(sv, rv) {
-        if (sv == null || rv == null || !rv) return '<span class="qcp-sn">—</span>';
-        var g = Math.abs((sv - rv) / rv * 100);
-        if (g < 10) return '<span class="qcp-sa">Aligned</span>';
-        if (g < 25) return '<span class="qcp-sc">Close</span>';
+    function refBlock(key) {
+        var m = bench[key];
+        if (!m) return '<span class="qcp-nm">\u2014</span>';
+        var p = m.percentiles, c = m.cohorts;
+        var fig = (bench.figment && bench.figment.metrics) ? bench.figment.metrics[key] : null;
+        return refLine('Network median', fSol(m.network.median) + ' SOL')
+            + refLine('P25\u2013P75', fSol(p.p25) + '\u2013' + fSol(p.p75) + ' SOL')
+            + refLine('Top 50 (stake)', fSol(c.top_50_by_stake.median) + ' SOL')
+            + refLine('Top 50 (MEV)', fSol(c.top_50_by_mev.median) + ' SOL')
+            + (fig != null ? refLine('Figment (Rakurai)', fSol(fig) + ' SOL', true) : '');
+    }
+    function statBaseline(sv, key) {
+        if (sv == null || !bench[key]) return '<span class="qcp-sn">\u2014</span>';
+        var gap = Math.abs((sv - bench[key].network.median) / bench[key].network.median * 100);
+        if (gap < 15) return '<span class="qcp-sa">Aligned</span>';
+        if (gap < 30) return '<span class="qcp-sc">Close</span>';
         return '<span class="qcp-sr">Needs review</span>';
     }
-    function statNc() { return '<span class="qcp-sn">N/A</span>'; }
-    function statB(sv, rv) {
-        if (sv == null || rv == null || !rv) return '<span class="qcp-sn">—</span>';
-        var g = (sv - rv) / rv * 100;
-        if (g >  10) return '<span class="qcp-sa">Above baseline</span>';
-        if (g > -10) return '<span class="qcp-sc">Near baseline</span>';
-        return '<span class="qcp-sr">Below baseline</span>';
+    function statUplift(sv, key) {
+        if (sv == null || !bench[key]) return '<span class="qcp-sn">\u2014</span>';
+        var m = bench[key], p = m.percentiles;
+        var top50mev = m.cohorts.top_50_by_mev.median;
+        if (sv > top50mev)  return '<span class="qcp-sa">Above top MEV cohort</span>';
+        if (sv > p.p75)     return '<span class="qcp-sc">Within top validator range</span>';
+        if (sv > p.p50)     return '<span class="qcp-sc">Above network median</span>';
+        if (sv >= p.p25)    return '<span class="qcp-sn">Within network range</span>';
+        return '<span class="qcp-sr">Below expected range</span>';
     }
     function sectionRow(label) {
-        return '<tr style="background:#0b0d11;"><td colspan="5" style="padding:8px 16px 7px;font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.08);border-top:1px solid rgba(255,255,255,0.06);">' + label + '</td></tr>';
+        return '<tr style="background:#0b0d11;"><td colspan="4" style="padding:8px 16px 7px;font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.08);border-top:1px solid rgba(255,255,255,0.06);">' + label + '</td></tr>';
     }
-    function row(metric, simCell, refCell, sourceCell, statusCell) {
+    function row(metric, simCell, refCell, statusCell) {
         return '<tr>'
             + '<td style="font-weight:600;color:var(--text);font-size:12px;padding-left:16px;vertical-align:top;">' + metric + '</td>'
             + '<td style="vertical-align:top;">' + simCell + '</td>'
             + '<td style="vertical-align:top;">' + refCell + '</td>'
-            + '<td style="vertical-align:top;">' + sourceCell + '</td>'
             + '<td style="vertical-align:top;">' + statusCell + '</td>'
             + '</tr>';
     }
 
-    var ep = 'Epoch ' + ref.epoch;
-    var lbl = document.getElementById('qcp-epoch-lbl');
-    if (lbl) lbl.textContent = '\u2014 live ref: ' + ep + ' (' + Math.round(ref.blocks).toLocaleString() + ' blocks \u00b7 most recent indexed)';
-
-    // ── Row 1 — Issuance / block ──────────────────────────────────────────
     var r1 = row(
-        'Issuance / block' + sub('Inflation reward'),
-        mono(sim.iss),
-        mono(ref.iss),
-        srcTrl('Network avg \u00b7 ' + ep),
-        statA(sim.iss, ref.iss)
+        'Inflation / block' + sub('Validator issuance reward'),
+        monoVal(sim.iss),
+        refBlock('inflation'),
+        statBaseline(sim.iss, 'inflation')
     );
-
-    // ── Row 2 — Base fees / block ─────────────────────────────────────────
     var r2 = row(
-        'Base fees / block' + sub('5,000 lamports/sig \u00b7 50% burned'),
-        sub('Not modeled separately'),
-        ref.baseFees != null ? mono(ref.baseFees) : '<span class="qcp-nm">Not returned this epoch</span>',
-        srcTrl('Network avg \u00b7 ' + ep),
-        statNc()
+        'Sig fees / block' + sub('5,000 lam/sig \u00b7 50% burned'),
+        '<span class="qcp-nm" style="font-size:11px;">Not modeled separately</span>',
+        refBlock('sig_fees'),
+        '<span class="qcp-sn">N/A</span>'
     );
-
-    // ── Row 3 — Priority fees / block ─────────────────────────────────────
-    // sim.blk = Network Fees (base + priority). Subtract Trillium signature fees to isolate priority-only.
-    var simPri = (sim.blk != null && ref.baseFees != null) ? Math.max(0, sim.blk - ref.baseFees) : null;
-    var simPriCell, r3status;
-    if (simPri != null) {
-        simPriCell = mono(simPri)
-            + sub('= Network Fees \u2212 Base Fees')
-            + sub(fSol(sim.blk) + ' \u2212 ' + fSol(ref.baseFees) + ' = <strong style="color:var(--text);">' + fSol(simPri) + '</strong> SOL');
-        r3status = statA(simPri, ref.fees);
-    } else if (sim.blk != null) {
-        simPriCell = mono(sim.blk) + sub('Net Fees \u2014 base fees not returned this epoch');
-        r3status = statNc();
-    } else {
-        simPriCell = '<span class="qcp-nm">\u2014</span>';
-        r3status = '<span class="qcp-sn">\u2014</span>';
-    }
     var r3 = row(
         'Priority fees / block',
-        simPriCell,
-        mono(ref.fees),
-        srcTrl('Network avg \u00b7 ' + ep),
-        r3status
+        sim.blk != null ? monoVal(sim.blk) + sub('network fees (base + priority)') : '<span class="qcp-nm">\u2014</span>',
+        refBlock('priority_fees'),
+        statBaseline(sim.blk, 'priority_fees')
     );
-
-    // ── Row 4 — Total MEV / block — multi-source benchmark ────────────────
-    // Source 1: Trillium network avg — includes ALL validators, many with 0 MEV → biased low
-    // Source 2: MEV-active validators estimate — Syndica Jan 2026: Rakurai-client validators
-    //           show +158% tip capture vs. typical at p50 → multiply network avg by 2.58
-    // Source 3: Figment case study Mar 2026 — Rakurai migration yielded 5× previous tip level
-    //           → relative metric only, no standalone per-block figure
-    var mevActiveEst = ref.mev != null ? ref.mev * 2.58 : null;
-
-    var mevRefHtml =
-        '<div>' + mono(ref.mev) + sub('Network avg \u00b7 all validators \u00b7 biased low') + '</div>'
-        + (mevActiveEst != null
-            ? '<div style="margin-top:7px;padding-top:7px;border-top:1px solid rgba(255,255,255,0.05);">'
-              + '<span style="font-family:var(--font-mono);font-size:12px;color:var(--text2);font-weight:600;">~' + fSol(mevActiveEst) + ' SOL</span>'
-              + sub('MEV-active validators est. (Syndica \u00d72.58)')
-              + '</div>'
-            : '')
-        + '<div style="margin-top:7px;padding-top:7px;border-top:1px solid rgba(255,255,255,0.05);">'
-        + monoStr('+5\u00d7 tips') + sub('Figment · post-Rakurai migration · relative only')
-        + '</div>';
-
-    var mevSrcHtml =
-        srcTrl('Network avg \u00b7 ' + ep)
-        + '<div style="margin-top:6px;">' + srcLink('Syndica', SYNDICA_URL, 'Jan 2026 \u00b7 tip capture +158% at p50') + '</div>'
-        + '<div style="margin-top:6px;">' + srcLink('Figment', FIGMENT_URL, 'Mar 2026 \u00b7 case study') + '</div>';
-
     var r4 = row(
-        'Total MEV / block'
-            + sub('AOT + JIT + Bonus + Other JIT')
-            + sub('\u26a0 Network avg is biased low \u00b7 MEV is highly skewed \u00b7 top validators capture disproportionately more'),
-        sim.mev != null ? mono(sim.mev) : '<span class="qcp-nm">\u2014</span>',
-        mevRefHtml,
-        mevSrcHtml,
-        statB(sim.mev, ref.mev)
+        'Total MEV / block' + sub('\u26a0 Network avg biased low \u00b7 skewed toward top validators'),
+        sim.mev != null ? monoVal(sim.mev) : '<span class="qcp-nm">\u2014</span>',
+        refBlock('mev'),
+        statUplift(sim.mev, 'mev')
     );
-
-    // ── Row 5 — Total REV / block ──────────────────────────────────────────
     var r5 = row(
         'Total REV / block',
-        mono(sim.total),
-        mono(ref.total) + sub('Iss + priority + JIT MEV \u00b7 no AOT'),
-        srcTrl('Network avg \u00b7 ' + ep),
-        statB(sim.total, ref.total)
+        sim.total != null ? monoVal(sim.total) + sub('Iss + fees + MEV') : '<span class="qcp-nm">\u2014</span>',
+        refBlock('rev'),
+        statUplift(sim.total, 'rev')
     );
 
-    tb.innerHTML = sectionRow('Baseline metrics \u2014 should match closely')
+    tb.innerHTML = sectionRow('Baseline metrics \u2014 should match network closely')
         + r1 + r2 + r3
         + sectionRow('Uplift metrics \u2014 Raiku expected above baseline')
         + r4 + r5;
@@ -5112,7 +5070,7 @@ function update(){
             total:  _vcTotalSolYr                 / _qblk,
             px:     p.p
         };
-        if (window.QCP.ref) qcpRender();
+        if (window.QCP.bench) qcpRender();
     }
     renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityFeesApr, priorityFeesApy, totalStakedSol, p);
     document.getElementById('stake-sol-helper').innerHTML = '<strong>Implied stake:</strong> ' + fmt(raikuStakeSol, 'S') + ' of ' + fmt(totalStakedSol, 'S') + ' total staked';
@@ -5409,7 +5367,7 @@ function initHybridControls() {
     });
 }
 
-renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); setCalibrationContext('horizon'); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls(); _populateJitWindowRef(); qcpFetch();
+renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); setCalibrationContext('horizon'); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls(); _populateJitWindowRef(); qcpFetch(); qcpLoadBenchmarks();
 
 // Calibration source info popover — moved to document.body to escape all stacking contexts
 (function() {
