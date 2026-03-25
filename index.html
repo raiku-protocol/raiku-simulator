@@ -1795,41 +1795,62 @@ details[open] summary::before { transform:rotate(90deg); }
 </div>
 </div>
 <!-- ── External Validation Panel ─────────────────────────────────────── -->
-<div class="section fade-in fade-in-3" style="margin-top:4px;">
-    <h2 style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        External Validation
-        <span id="qcp-epoch-lbl" style="font-size:12px; color:var(--text-mid); font-weight:400; letter-spacing:0; text-transform:none;"></span>
-    </h2>
-    <div style="font-size:13px; color:var(--text-mid); margin-bottom:14px; line-height:1.6;">
-        Compare the simulator's per-block outputs with external references. Common baseline metrics should match closely. Raiku-specific uplift metrics can exceed baseline references.
+<div class="section fade-in fade-in-3" style="margin-top:4px; padding:0; overflow:hidden;">
+    <div onclick="qcpToggle()" style="display:flex; align-items:center; padding:14px 20px; cursor:pointer; user-select:none;">
+        <h2 style="margin:0; flex:1;">External Validation <span id="qcp-epoch-lbl" style="font-size:11px; color:var(--text-mid); font-weight:400; letter-spacing:0; text-transform:none;"></span></h2>
+        <span id="qcp-caret" style="font-size:11px; color:var(--text-mid); font-family:var(--font-mono); margin-left:8px;">▶</span>
     </div>
-    <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow-x:auto; padding:0;">
-        <table class="qcp-table">
-            <thead>
-                <tr>
-                    <th style="width:14%; padding-left:16px;">Metric</th>
-                    <th style="width:15%;">Raiku Simulator</th>
-                    <th style="width:15%;" id="qcp-ref1-hdr">Trillium<br><span style="font-size:10px; font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-mid);">Network avg · live</span></th>
-                    <th style="width:10%;"><a href="https://dashboards.validblocks.com/api-docs" target="_blank" style="color:var(--text); text-decoration:none;">ValidBlocks</a><br><span style="font-size:10px; font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-mid);">Manual · per-validator</span></th>
-                    <th style="width:10%;"><a href="https://schedulerwar.vercel.app/rewards-leaderboard" target="_blank" style="color:var(--text); text-decoration:none;">Scheduler War</a><br><span style="font-size:10px; font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-mid);">Manual · fees+tips</span></th>
-                    <th style="width:27%;">Interpretation</th>
-                    <th style="width:9%;">Status</th>
-                </tr>
-            </thead>
-            <tbody id="qcp-tbody">
-                <tr><td colspan="7" class="qcp-nm" style="padding:14px 16px; font-size:12px;">Fetching Trillium reference data…</td></tr>
-            </tbody>
-        </table>
+    <div id="qcp-body" style="display:none;">
+        <div style="padding:0 20px 14px; font-size:13px; color:var(--text-mid); line-height:1.6;">
+            Compare the simulator's per-block outputs with Trillium network averages. Common baseline metrics should match closely. Raiku-specific uplift metrics can exceed baseline references.
+        </div>
+        <div style="margin:0 20px; background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow-x:auto; padding:0;">
+            <table class="qcp-table">
+                <thead>
+                    <tr>
+                        <th style="width:16%; padding-left:16px;">Metric</th>
+                        <th style="width:22%;">Raiku Simulator</th>
+                        <th style="width:20%;" id="qcp-ref1-hdr">Trillium<br><span style="font-size:10px; font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-mid);">Network avg · live</span></th>
+                        <th style="width:30%;">Interpretation</th>
+                        <th style="width:12%;">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="qcp-tbody">
+                    <tr><td colspan="5" class="qcp-nm" style="padding:14px 16px; font-size:12px;">Fetching Trillium reference data…</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="padding:10px 20px 16px; font-size:11px; color:var(--text-mid); line-height:1.7;">
+            <strong style="color:var(--text2);">Live source:</strong>
+            <a href="https://api.trillium.so/" target="_blank" style="color:var(--text-mid);">Trillium API</a> (network-level per-block, auto-fetched)
+            &nbsp;·&nbsp; Section A rows should match closely · Section B rows can exceed baseline when Raiku uplift is active
+        </div>
     </div>
-    <div style="font-size:11px; color:var(--text-mid); margin-top:10px; line-height:1.7;">
-        <strong style="color:var(--text2);">Live source:</strong>
-        <a href="https://api.trillium.so/" target="_blank" style="color:var(--text-mid);">Trillium API</a> (network-level per-block, auto-fetched) ·
-        <strong style="color:var(--text2);">Manual refs:</strong>
-        <a href="https://dashboards.validblocks.com/api-docs" target="_blank" style="color:var(--text-mid);">ValidBlocks</a> ·
-        <a href="https://schedulerwar.vercel.app/rewards-leaderboard" target="_blank" style="color:var(--text-mid);">Scheduler War</a> ·
-        <a href="https://blog.syndica.io/deep-dive-solana-onchain-activity-january-2026/" target="_blank" style="color:var(--text-mid);">Syndica Jan 2026</a> ·
-        <a href="https://api.rakurai.io:3000/dashboard" target="_blank" style="color:var(--text-mid);">Rakurai</a>
-        &nbsp;·&nbsp; Section A rows should match closely · Section B rows can exceed baseline when Raiku uplift is active
+</div>
+
+<!-- ── Validator Setup — Individual Level (placeholder) ──────────────── -->
+<div class="section fade-in fade-in-3" style="margin-top:4px; padding:0; overflow:hidden;">
+    <div onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none';this.querySelector('.vc-ph-caret').textContent=b.style.display==='none'?'▶':'▼';" style="display:flex; align-items:center; padding:14px 20px; cursor:pointer; user-select:none;">
+        <h2 style="margin:0; flex:1;">Validator Setup — Individual Level</h2>
+        <span class="vc-ph-caret" style="font-size:11px; color:var(--text-mid); font-family:var(--font-mono); margin-left:8px;">▶</span>
+    </div>
+    <div style="display:none; padding:0 20px 16px;">
+        <div style="font-size:12px; color:var(--text-mid); line-height:1.6; padding:16px; background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px;">
+            Enter your validator's stake (SOL or %) to compute its individual share of the protocol-level revenues shown above. Coming in a future patch.
+        </div>
+    </div>
+</div>
+
+<!-- ── Validator Yield — Individual Setup (placeholder) ──────────────── -->
+<div class="section fade-in fade-in-3" style="margin-top:4px; padding:0; overflow:hidden;">
+    <div onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'':'none';this.querySelector('.vc-ph-caret').textContent=b.style.display==='none'?'▶':'▼';" style="display:flex; align-items:center; padding:14px 20px; cursor:pointer; user-select:none;">
+        <h2 style="margin:0; flex:1;">Validator Yield — Individual Setup</h2>
+        <span class="vc-ph-caret" style="font-size:11px; color:var(--text-mid); font-family:var(--font-mono); margin-left:8px;">▶</span>
+    </div>
+    <div style="display:none; padding:0 20px 16px;">
+        <div style="font-size:12px; color:var(--text-mid); line-height:1.6; padding:16px; background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px;">
+            Detailed yield breakdown for a connected validator: issuance share, priority fee share, Raiku AOT/JIT bonus, epoch-based APY. Coming in a future patch.
+        </div>
     </div>
 </div>
 </div><!-- end tab-validator -->
@@ -2569,7 +2590,7 @@ function qcpFetch() {
                     epoch: e,
                     blocks: blocks,
                     iss:      (d.total_total_inflation_reward  || 0) / blocks,
-                    baseFees: (d.base_fees_sol != null) ? d.base_fees_sol / blocks : null,
+                    baseFees: (d.total_validator_signature_fees != null) ? d.total_validator_signature_fees / blocks : null,
                     fees:     (d.total_validator_priority_fees || 0) / blocks,
                     mev:      (d.total_mev_earned              || 0) / blocks,
                     total:    ((d.total_total_inflation_reward || 0) + (d.total_validator_priority_fees || 0) + (d.total_mev_earned || 0)) / blocks,
@@ -2586,7 +2607,16 @@ function qcpFetch() {
 
 function qcpFallback(msg) {
     var tb = document.getElementById('qcp-tbody');
-    if (tb) tb.innerHTML = '<tr><td colspan="7" class="qcp-nm" style="padding:14px 16px; font-size:12px;">Live fetch failed: ' + msg + '. Use manual source links below.</td></tr>';
+    if (tb) tb.innerHTML = '<tr><td colspan="5" class="qcp-nm" style="padding:14px 16px; font-size:12px;">Live fetch failed: ' + msg + '. Check <a href="https://api.trillium.so/" target="_blank" style="color:var(--text-mid);">api.trillium.so</a>.</td></tr>';
+}
+
+function qcpToggle() {
+    var b = document.getElementById('qcp-body');
+    var c = document.getElementById('qcp-caret');
+    if (!b) return;
+    var open = b.style.display !== 'none';
+    b.style.display = open ? 'none' : '';
+    if (c) c.textContent = open ? '▶' : '▼';
 }
 
 function qcpRender() {
@@ -2597,30 +2627,21 @@ function qcpRender() {
     if (!ref || !ref.epoch) { qcpFallback('Reference not yet loaded'); return; }
 
     var TRLURL = 'https://api.trillium.so/';
-    var VBLURL = 'https://dashboards.validblocks.com/api-docs';
-    var SWLURL = 'https://schedulerwar.vercel.app/rewards-leaderboard';
 
     function fSol(v) {
         if (v == null || isNaN(v)) return '—';
         return v < 0.001 ? v.toFixed(6) : v.toFixed(5);
     }
-    // Main value: monospace, bold, readable
     function mono(v) {
         if (v == null || isNaN(v)) return '<span class="qcp-nm">—</span>';
         return '<span style="font-family:var(--font-mono);font-size:12px;color:var(--text);font-weight:600;">' + fSol(v) + ' SOL</span>';
     }
-    // Secondary annotation line below a value
     function sub(txt) {
         return '<span style="font-size:11px;color:var(--text-mid);display:block;margin-top:3px;line-height:1.4;">' + txt + '</span>';
     }
-    // Inline source attribution badge: [Name ↗] next to a value
     function srcBadge(name, url) {
         return ' <a href="' + url + '" target="_blank" style="font-size:10px;color:#5a6575;border:1px solid #252a35;border-radius:3px;padding:1px 5px;text-decoration:none;font-family:var(--font-mono);vertical-align:middle;white-space:nowrap;">' + name + '\u00a0\u2197</a>';
     }
-    // Empty cell for unavailable manual sources
-    function empty() { return '<span class="qcp-nm">—</span>'; }
-
-    // Section A — strict validation status
     function statA(sv, rv) {
         if (sv == null || rv == null || !rv) return '<span class="qcp-sn">—</span>';
         var g = Math.abs((sv - rv) / rv * 100);
@@ -2629,7 +2650,6 @@ function qcpRender() {
         return '<span class="qcp-sr">Needs review</span>';
     }
     function statNc() { return '<span class="qcp-sn">Not comparable</span>'; }
-    // Section B — performance status
     function statB(sv, rv) {
         if (sv == null || rv == null || !rv) return '<span class="qcp-sn">—</span>';
         var g = (sv - rv) / rv * 100;
@@ -2638,16 +2658,14 @@ function qcpRender() {
         return '<span class="qcp-sr">Below baseline</span>';
     }
     function sectionRow(label) {
-        return '<tr style="background:#0b0d11;"><td colspan="7" style="padding:8px 16px 7px;font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.08);border-top:1px solid rgba(255,255,255,0.06);">' + label + '</td></tr>';
+        return '<tr style="background:#0b0d11;"><td colspan="5" style="padding:8px 16px 7px;font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.08);border-top:1px solid rgba(255,255,255,0.06);">' + label + '</td></tr>';
     }
-    // 7-column row: metric | sim | trillium | validblocks | schedulerwar | interp | status
-    function row(metric, simCell, trlCell, vblCell, swCell, interpTxt, statusCell) {
+    // 5-column row: metric | sim | trillium | interp | status
+    function row(metric, simCell, trlCell, interpTxt, statusCell) {
         return '<tr>'
             + '<td style="font-weight:600;color:var(--text);font-size:12px;padding-left:16px;">' + metric + '</td>'
             + '<td>' + simCell + '</td>'
             + '<td>' + trlCell + '</td>'
-            + '<td>' + vblCell + '</td>'
-            + '<td>' + swCell + '</td>'
             + '<td style="font-size:11px;color:var(--text-mid);line-height:1.5;">' + interpTxt + '</td>'
             + '<td>' + statusCell + '</td>'
             + '</tr>';
@@ -2659,84 +2677,66 @@ function qcpRender() {
     var lbl = document.getElementById('qcp-epoch-lbl');
     if (lbl) lbl.textContent = '— live ref: ' + ep + ' (' + Math.round(ref.blocks).toLocaleString() + ' blocks)';
 
-    // ── Row 1 — Issuance / block ─────────────────────────────────────────────
+    // ── Row 1 — Issuance / block ──────────────────────────────────────────
     var r1 = row('Issuance / block',
         mono(sim.iss),
         mono(ref.iss) + srcBadge('Trillium', TRLURL),
-        empty(),
-        empty(),
-        'Common inflation baseline. Both use the same epoch inflation rewards per block. Should match closely.',
+        'Common inflation baseline. Both use epoch inflation rewards per block. Should match closely.',
         statA(sim.iss, ref.iss)
     );
 
-    // ── Row 2 — Base fees / block ────────────────────────────────────────────
+    // ── Row 2 — Base (signature) fees / block ─────────────────────────────
     var r2 = row('Base fees / block',
         sub('Not modeled separately in simulator'),
         ref.baseFees != null
             ? mono(ref.baseFees) + srcBadge('Trillium', TRLURL)
             : sub('Not returned by Trillium for this epoch'),
-        empty(),
-        empty(),
         'Reference-only. Signature fees are not a separate component in the simulator. Shown to clarify the base-fee perimeter used in the Priority fees derivation below.',
         statNc()
     );
 
-    // ── Row 3 — Priority fees / block ────────────────────────────────────────
-    // Simulator "Network Fees" (blk) = base + priority fees combined.
-    // Derive priority-only by subtracting Trillium base_fees_sol.
+    // ── Row 3 — Priority fees / block ─────────────────────────────────────
+    // Simulator "Network Fees" (blk) = base + priority combined.
+    // Derive priority-only by subtracting Trillium total_validator_signature_fees.
     var simPri = (sim.blk != null && ref.baseFees != null) ? Math.max(0, sim.blk - ref.baseFees) : null;
     var simPriCell, r3status, r3interp;
     if (simPri != null) {
         simPriCell = mono(simPri)
             + sub(fSol(sim.blk) + ' (Net Fees) &minus; ' + fSol(ref.baseFees) + ' (base fees) = priority only');
-        r3interp = 'Derived from simulator Network Fees minus Trillium base fees. Network Fees benchmark (Marinade) includes base + priority; Trillium reports priority-only. Both should now be comparable.';
+        r3interp = 'Derived from simulator Network Fees minus Trillium signature fees. Both now report priority-only — directly comparable.';
         r3status = statA(simPri, ref.fees);
     } else if (sim.blk != null) {
         simPriCell = mono(sim.blk) + sub('Network Fees (base+priority combined)');
-        r3interp = 'Simulator Network Fees includes base + priority. Trillium reports priority-only. Base fees not available in this epoch — cannot derive priority-only estimate. Not directly comparable.';
+        r3interp = 'Simulator Network Fees includes base + priority. Base fees not available — cannot derive priority-only. Not directly comparable.';
         r3status = statNc();
     } else {
         simPriCell = sub('—');
         r3interp = 'No simulator value available.';
         r3status = '<span class="qcp-sn">—</span>';
     }
-    var r3 = row('Priority fees / block',
-        simPriCell,
-        mono(ref.fees) + srcBadge('Trillium', TRLURL),
-        empty(),
-        empty(),
-        r3interp,
-        r3status
-    );
+    var r3 = row('Priority fees / block', simPriCell, mono(ref.fees) + srcBadge('Trillium', TRLURL), r3interp, r3status);
 
-    // ── Row 4 — Jito MEV / block ─────────────────────────────────────────────
-    // Simulator uses Raiku JIT + Other JIT only (excludes AOT and Bonus — Jito-equivalent flows only)
+    // ── Row 4 — Jito MEV / block ───────────────────────────────────────────
     var r4 = row('Jito MEV / block',
         sim.jitMev != null ? mono(sim.jitMev) + sub('Raiku JIT + Other JIT only') : sub('—'),
         mono(ref.mev) + srcBadge('Trillium', TRLURL),
-        empty(),
-        empty(),
-        'Common Jito-style MEV baseline. Simulator uses Raiku JIT + Other JIT components only (excludes AOT and Validator Bonus). Both represent Jito-equivalent tip flows.',
+        'Jito-style MEV baseline. Simulator uses Raiku JIT + Other JIT only (excludes AOT and Validator Bonus — Jito-equivalent flows).',
         statA(sim.jitMev, ref.mev)
     );
 
-    // ── Row 5 — Total MEV / block ────────────────────────────────────────────
+    // ── Row 5 — Total MEV / block ──────────────────────────────────────────
     var r5 = row('Total MEV / block',
         sim.mev != null ? mono(sim.mev) + sub('AOT + JIT + Bonus + Other JIT') : sub('—'),
         mono(ref.mev) + srcBadge('Trillium', TRLURL) + sub('Jito MEV only, no AOT'),
-        empty(),
-        empty(),
-        'Full Raiku MEV vs Jito baseline. Simulator adds AOT and Validator Bonus on top of Jito flows. Being above the Trillium Jito baseline is expected and positive when Raiku is active.',
+        'Full Raiku MEV vs Jito baseline. AOT and Validator Bonus on top of Jito flows. Being above baseline is expected and positive when Raiku is active.',
         statB(sim.mev, ref.mev)
     );
 
-    // ── Row 6 — Total REV / block ────────────────────────────────────────────
+    // ── Row 6 — Total REV / block ──────────────────────────────────────────
     var r6 = row('Total REV / block',
         mono(sim.total),
         mono(ref.total) + srcBadge('Trillium', TRLURL) + sub('Iss + priority fees + Jito MEV'),
-        empty(),
-        empty(),
-        'Full validator revenue per block. Raiku uplift above the Trillium baseline is a positive signal. Note: Trillium reference excludes base fees; simulator includes them in the Network Fees component.',
+        'Full validator revenue per block. Raiku uplift above the Trillium baseline is a positive signal.',
         statB(sim.total, ref.total)
     );
 
