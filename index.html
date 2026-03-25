@@ -1817,12 +1817,7 @@ details[open] summary::before { transform:rotate(90deg); }
                     </table>
                 </div>
                 <div style="padding:6px 0 4px; font-size:11px; color:var(--text-mid); line-height:1.7;">
-                    <strong style="color:var(--text2);">Benchmarks:</strong> Epoch 945 · 762 validators (validator_benchmarks_epoch_945.json) &nbsp;·&nbsp;
-                    <strong style="color:var(--text2);">Live:</strong>
-                    <a href="https://api.trillium.so/" target="_blank" style="color:var(--text-mid);">Trillium API</a> &nbsp;·&nbsp;
-                    <strong style="color:var(--text2);">Manual:</strong>
-                    <a href="https://dashboards.validblocks.com/svp" target="_blank" style="color:var(--text-mid);">ValidBlocks</a>
-                    &nbsp;·&nbsp; Baseline: match network; Uplift: Raiku expected above P75
+                    <strong style="color:var(--text2);">Benchmarks:</strong> Epoch 945 · 762 validators · Primary source: <a href="https://trillium-dashboard.trillium.so/" target="_blank" style="color:var(--text-mid);">Trillium Dashboard</a> &nbsp;·&nbsp; Baseline rows should match network · Uplift rows expected above P75
                 </div>
             </div>
         </div>
@@ -2625,38 +2620,88 @@ function qcpRender() {
     function sub(txt) {
         return '<span style="font-size:10.5px;color:var(--text-mid);display:block;margin-top:2px;line-height:1.4;">' + txt + '</span>';
     }
-    function refLine(label, val, highlight) {
-        return '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:3px;">'
+    // refLine: label/value row with optional italic note below the value
+    function refLine(label, val, note) {
+        return '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:2px;">'
             + '<span style="font-size:10.5px;color:var(--text-mid);white-space:nowrap;">' + label + '</span>'
-            + '<span style="font-family:var(--font-mono);font-size:11px;color:' + (highlight ? '#C0FF38' : 'var(--text2)') + ';white-space:nowrap;">' + val + '</span>'
-            + '</div>';
+            + '<span style="font-family:var(--font-mono);font-size:11px;color:var(--text2);white-space:nowrap;">' + val + '</span>'
+            + '</div>'
+            + (note ? '<div style="font-size:9.5px;color:var(--text-mid);opacity:0.65;margin-bottom:3px;line-height:1.3;">' + note + '</div>' : '');
     }
+    // Standard reference block: mean · median · P25–P75 · top 50 (stake) · top 50 (MEV)
     function refBlock(key) {
         var m = bench[key];
         if (!m) return '<span class="qcp-nm">\u2014</span>';
         var p = m.percentiles, c = m.cohorts;
-        var fig = (bench.figment && bench.figment.metrics) ? bench.figment.metrics[key] : null;
-        return refLine('Network median', fSol(m.network.median) + ' SOL')
-            + refLine('P25\u2013P75', fSol(p.p25) + '\u2013' + fSol(p.p75) + ' SOL')
-            + refLine('Top 50 (stake)', fSol(c.top_50_by_stake.median) + ' SOL')
-            + refLine('Top 50 (MEV)', fSol(c.top_50_by_mev.median) + ' SOL')
-            + (fig != null ? refLine('Figment (Rakurai)', fSol(fig) + ' SOL', true) : '');
+        return refLine('Network mean',   fSol(m.network.mean)   + ' SOL')
+            + refLine('Network median',  fSol(m.network.median) + ' SOL')
+            + refLine('P25\u2013P75',    fSol(p.p25) + '\u2013' + fSol(p.p75) + ' SOL')
+            + refLine('Top 50 (stake)',  fSol(c.top_50_by_stake.median) + ' SOL')
+            + refLine('Top 50 (MEV)',    fSol(c.top_50_by_mev.median) + ' SOL');
     }
+    // MEV-specific reference block: attaches "biased low" note to mean line
+    function refBlockMev() {
+        var m = bench.mev;
+        if (!m) return '<span class="qcp-nm">\u2014</span>';
+        var p = m.percentiles, c = m.cohorts;
+        return refLine('Network mean',   fSol(m.network.mean)   + ' SOL', 'All validators incl. zero-MEV \u2014 biased low \u00b7 capture is highly skewed')
+            + refLine('Network median',  fSol(m.network.median) + ' SOL')
+            + refLine('P25\u2013P75',    fSol(p.p25) + '\u2013' + fSol(p.p75) + ' SOL')
+            + refLine('Top 50 (stake)',  fSol(c.top_50_by_stake.median) + ' SOL')
+            + refLine('Top 50 (MEV)',    fSol(c.top_50_by_mev.median)   + ' SOL');
+    }
+    // Reward reference block: derived as sum of sig_fees + priority_fees + mev component stats
+    function refBlockReward() {
+        var rs = bench.sig_fees, rp = bench.priority_fees, rm = bench.mev;
+        if (!rs || !rp || !rm) return '<span class="qcp-nm">\u2014</span>';
+        var ps = rs.percentiles, pp = rp.percentiles, pm = rm.percentiles;
+        var cs = rs.cohorts,     cp = rp.cohorts,     cm = rm.cohorts;
+        return refLine('Network mean (derived)',   fSol(rs.network.mean   + rp.network.mean   + rm.network.mean)   + ' SOL')
+            + refLine('Network median (derived)',  fSol(rs.network.median + rp.network.median + rm.network.median) + ' SOL', 'Sum of component medians \u2014 approximation')
+            + refLine('P25\u2013P75 (approx)',     fSol(ps.p25 + pp.p25 + pm.p25) + '\u2013' + fSol(ps.p75 + pp.p75 + pm.p75) + ' SOL')
+            + refLine('Top 50 (stake)',            fSol(cs.top_50_by_stake.median + cp.top_50_by_stake.median + cm.top_50_by_stake.median) + ' SOL')
+            + refLine('Top 50 (MEV)',              fSol(cs.top_50_by_mev.median   + cp.top_50_by_mev.median   + cm.top_50_by_mev.median)   + ' SOL');
+    }
+    // Baseline status: Aligned · Within network range · Above/Below network range
     function statBaseline(sv, key) {
         if (sv == null || !bench[key]) return '<span class="qcp-sn">\u2014</span>';
-        var gap = Math.abs((sv - bench[key].network.median) / bench[key].network.median * 100);
-        if (gap < 15) return '<span class="qcp-sa">Aligned</span>';
-        if (gap < 30) return '<span class="qcp-sc">Close</span>';
-        return '<span class="qcp-sr">Needs review</span>';
+        var m = bench[key], p = m.percentiles;
+        if (Math.abs((sv - m.network.median) / m.network.median) < 0.10) return '<span class="qcp-sa">Aligned</span>';
+        if (sv > p.p75)  return '<span class="qcp-sc">Above network range</span>';
+        if (sv >= p.p25) return '<span class="qcp-sn">Within network range</span>';
+        return '<span class="qcp-sr">Below network range</span>';
     }
+    // Uplift status (MEV): flags extreme overestimation as "Needs review"
+    function statUpliftMev(sv) {
+        if (sv == null || !bench.mev) return '<span class="qcp-sn">\u2014</span>';
+        var m = bench.mev, p = m.percentiles;
+        var top50mev = m.cohorts.top_50_by_mev.median;
+        if (sv > top50mev * 3) return '<span class="qcp-sr">Above benchmark range \u2014 verify model</span>';
+        if (sv > top50mev)     return '<span class="qcp-sa">Above top MEV cohort</span>';
+        if (sv > p.p75)        return '<span class="qcp-sc">Within top validator range</span>';
+        if (sv > p.p25)        return '<span class="qcp-sn">Near network median</span>';
+        return '<span class="qcp-sr">Below expected range</span>';
+    }
+    // Uplift status (general: reward, rev)
     function statUplift(sv, key) {
         if (sv == null || !bench[key]) return '<span class="qcp-sn">\u2014</span>';
         var m = bench[key], p = m.percentiles;
         var top50mev = m.cohorts.top_50_by_mev.median;
-        if (sv > top50mev)  return '<span class="qcp-sa">Above top MEV cohort</span>';
-        if (sv > p.p75)     return '<span class="qcp-sc">Within top validator range</span>';
-        if (sv > p.p50)     return '<span class="qcp-sc">Above network median</span>';
-        if (sv >= p.p25)    return '<span class="qcp-sn">Within network range</span>';
+        if (sv > top50mev) return '<span class="qcp-sa">Above top MEV cohort</span>';
+        if (sv > p.p75)    return '<span class="qcp-sc">Within top validator range</span>';
+        if (sv > p.p25)    return '<span class="qcp-sn">Near network median</span>';
+        return '<span class="qcp-sr">Below expected range</span>';
+    }
+    // Uplift status for reward (derived benchmark — uses component sums)
+    function statUpliftReward(sv) {
+        if (sv == null || !bench.sig_fees || !bench.priority_fees || !bench.mev) return '<span class="qcp-sn">\u2014</span>';
+        var refTop = bench.sig_fees.cohorts.top_50_by_mev.median + bench.priority_fees.cohorts.top_50_by_mev.median + bench.mev.cohorts.top_50_by_mev.median;
+        var p25    = bench.sig_fees.percentiles.p25 + bench.priority_fees.percentiles.p25 + bench.mev.percentiles.p25;
+        var p75    = bench.sig_fees.percentiles.p75 + bench.priority_fees.percentiles.p75 + bench.mev.percentiles.p75;
+        if (sv > refTop * 3) return '<span class="qcp-sr">Above benchmark range \u2014 verify model</span>';
+        if (sv > refTop)     return '<span class="qcp-sa">Above top MEV cohort</span>';
+        if (sv > p75)        return '<span class="qcp-sc">Within top validator range</span>';
+        if (sv > p25)        return '<span class="qcp-sn">Near network median</span>';
         return '<span class="qcp-sr">Below expected range</span>';
     }
     function sectionRow(label) {
@@ -2671,6 +2716,19 @@ function qcpRender() {
             + '</tr>';
     }
 
+    // ── Priority fees derivation ───────────────────────────────────────────
+    // sim.blk = Network Fees (base + priority). Subtract Ep.945 median sig fees to isolate priority.
+    var baseFeeRef = bench.sig_fees ? bench.sig_fees.network.median : null;
+    var simPri = (sim.blk != null && baseFeeRef != null) ? Math.max(0, sim.blk - baseFeeRef) : null;
+    var simPriCell = sim.blk != null
+        ? monoVal(simPri != null ? simPri : sim.blk)
+          + sub('= ' + fSol(sim.blk) + ' Network Fees \u2212 ' + (baseFeeRef != null ? fSol(baseFeeRef) + ' Base Fees (Ep.945 median)' : '\u2014'))
+        : '<span class="qcp-nm">\u2014</span>';
+
+    // ── Total reward / block = Fees + MEV (excludes inflation) ────────────
+    var simReward = (sim.blk != null && sim.mev != null) ? sim.blk + sim.mev : null;
+
+    // ── Rows ─────────────────────────────────────────────────────────────
     var r1 = row(
         'Inflation / block' + sub('Validator issuance reward'),
         monoVal(sim.iss),
@@ -2678,26 +2736,32 @@ function qcpRender() {
         statBaseline(sim.iss, 'inflation')
     );
     var r2 = row(
-        'Sig fees / block' + sub('5,000 lam/sig \u00b7 50% burned'),
+        'Base fees / block' + sub('Signature fees \u00b7 5,000 lam/sig'),
         '<span class="qcp-nm" style="font-size:11px;">Not modeled separately</span>',
         refBlock('sig_fees'),
         '<span class="qcp-sn">N/A</span>'
     );
     var r3 = row(
-        'Priority fees / block',
-        sim.blk != null ? monoVal(sim.blk) + sub('network fees (base + priority)') : '<span class="qcp-nm">\u2014</span>',
+        'Priority fees / block' + sub('Network Fees \u2212 Base Fees'),
+        simPriCell,
         refBlock('priority_fees'),
-        statBaseline(sim.blk, 'priority_fees')
+        statBaseline(simPri != null ? simPri : sim.blk, 'priority_fees')
     );
     var r4 = row(
-        'Total MEV / block' + sub('\u26a0 Network avg biased low \u00b7 skewed toward top validators'),
-        sim.mev != null ? monoVal(sim.mev) : '<span class="qcp-nm">\u2014</span>',
-        refBlock('mev'),
-        statUplift(sim.mev, 'mev')
+        'Total MEV / block',
+        sim.mev != null ? monoVal(sim.mev) + sub('AOT + JIT + Bonus + Other JIT') : '<span class="qcp-nm">\u2014</span>',
+        refBlockMev(),
+        statUpliftMev(sim.mev)
     );
     var r5 = row(
-        'Total REV / block',
-        sim.total != null ? monoVal(sim.total) + sub('Iss + fees + MEV') : '<span class="qcp-nm">\u2014</span>',
+        'Total reward / block' + sub('Base Fees + Priority Fees + MEV'),
+        simReward != null ? monoVal(simReward) + sub(fSol(sim.blk) + ' Fees + ' + fSol(sim.mev) + ' MEV') : '<span class="qcp-nm">\u2014</span>',
+        refBlockReward(),
+        statUpliftReward(simReward)
+    );
+    var r6 = row(
+        'Total REV / block' + sub('Inflation + Fees + MEV'),
+        sim.total != null ? monoVal(sim.total) : '<span class="qcp-nm">\u2014</span>',
         refBlock('rev'),
         statUplift(sim.total, 'rev')
     );
@@ -2705,7 +2769,7 @@ function qcpRender() {
     tb.innerHTML = sectionRow('Baseline metrics \u2014 should match network closely')
         + r1 + r2 + r3
         + sectionRow('Uplift metrics \u2014 Raiku expected above baseline')
-        + r4 + r5;
+        + r4 + r5 + r6;
 }
 
 function vcToggleIssuance() {
