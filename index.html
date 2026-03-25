@@ -1803,6 +1803,11 @@ details[open] summary::before { transform:rotate(90deg); }
                 <span id="qcp-epoch-lbl" style="font-size:10px; color:var(--text-mid); font-weight:400; letter-spacing:0; text-transform:none; margin-left:8px;"></span>
             </div>
             <div id="qcp-body" style="display:none; padding:0 20px 6px;">
+                <div style="padding:8px 0 10px; font-size:11px; color:var(--text-mid); line-height:1.9;">
+                    <div><span style="color:var(--text2);font-weight:600;">Primary source:</span> Trillium API — live fetch (current epoch) &amp; 12-month validator history</div>
+                    <div><span style="color:var(--text2);font-weight:600;">Reference dashboard:</span> <a href="https://trillium-dashboard.trillium.so/" target="_blank" style="color:var(--text-mid);text-decoration:underline;">trillium-dashboard.trillium.so</a> — human-readable</div>
+                    <div><span style="color:var(--text2);font-weight:600;">Manual cross-check:</span> <a href="https://validblocks.app" target="_blank" style="color:var(--text-mid);text-decoration:underline;">validblocks.app</a> — validator stats reference</div>
+                </div>
                 <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow-x:auto; padding:0;">
                     <table class="qcp-table">
                         <thead>
@@ -1810,8 +1815,8 @@ details[open] summary::before { transform:rotate(90deg); }
                                 <th style="width:12%; padding-left:16px;">Metric</th>
                                 <th style="width:13%;">Raiku Simulator</th>
                                 <th style="width:14%;">Latest epoch</th>
-                                <th style="width:17%;">12m all <span style="font-weight:400;color:var(--lime-soft);font-size:9px;text-transform:none;letter-spacing:0;">· main benchmark</span></th>
-                                <th style="width:16%;">12m elev.+extreme <span style="font-weight:400;color:var(--text-mid);font-size:9px;text-transform:none;letter-spacing:0;">· contextual</span></th>
+                                <th style="width:17%;">12m all <span style="font-weight:400;color:var(--lime-soft);font-size:9px;text-transform:none;letter-spacing:0;">· main benchmark</span> <span title="All epochs across the last 12 months (epochs 750–945). Main long-run benchmark." style="cursor:help;opacity:0.5;font-size:9px;margin-left:3px;">ⓘ</span></th>
+                                <th style="width:16%;">12m elev.+extreme <span style="font-weight:400;color:var(--text-mid);font-size:9px;text-transform:none;letter-spacing:0;">· contextual</span> <span title="Only epochs tagged elevated or extreme by the regime classifier. Contextual only — do not override the main 12M benchmark. Note: some extreme epochs had low absolute MEV due to relative baseline effects." style="cursor:help;opacity:0.5;font-size:9px;margin-left:3px;">ⓘ</span></th>
                                 <th style="width:14%;">Interpretation</th>
                                 <th style="width:14%;">Status</th>
                             </tr>
@@ -1820,9 +1825,6 @@ details[open] summary::before { transform:rotate(90deg); }
                             <tr><td colspan="7" class="qcp-nm" style="padding:14px 16px; font-size:12px;">Loading benchmarks…</td></tr>
                         </tbody>
                     </table>
-                </div>
-                <div style="padding:6px 0 4px; font-size:11px; color:var(--text-mid); line-height:1.7;">
-                    <strong style="color:var(--text2);">Benchmarks:</strong> Latest epoch (945) + 12-month validator-level history · Source: <a href="https://trillium-dashboard.trillium.so/" target="_blank" style="color:var(--text-mid);">Trillium Dashboard</a> &nbsp;·&nbsp; Baseline rows match network · Uplift rows compared to 12m distribution
                 </div>
             </div>
         </div>
@@ -2565,8 +2567,7 @@ function qcpFetch() {
                 var blocks = d.total_blocks_produced || 1;
                 window.QCP.ref = { epoch: e, blocks: blocks };
                 var lbl = document.getElementById('qcp-epoch-lbl');
-                var bEp = window.QCP.bench ? window.QCP.bench.meta.epoch : null;
-                if (lbl) lbl.textContent = '\u2014' + (bEp ? ' Ep.' + bEp + ' benchmarks \u00b7' : '') + ' live: Ep.' + e + ' (' + Math.round(blocks).toLocaleString() + ' blocks)';
+                if (lbl) lbl.textContent = '\u2014 Latest epoch: ' + e;
                 if (window.QCP.bench) qcpRender();
             })
             .catch(function() {
@@ -2588,7 +2589,7 @@ function qcpLoadBenchmarks() {
             window.QCP.bench = d;
             var lbl = document.getElementById('qcp-epoch-lbl');
             if (lbl && !window.QCP.ref) {
-                lbl.textContent = '\u2014 Ep.' + d.meta.epoch + ' benchmarks \u00b7 ' + d.meta.sample_size + ' validators';
+                lbl.textContent = '\u2014 Latest epoch: ' + d.meta.epoch;
             }
             if (window.QCP.sim && window.QCP.sim.iss != null) qcpRender();
         })
@@ -2632,7 +2633,7 @@ function qcpRender() {
     }
     function monoVal(v) {
         if (v == null || isNaN(v)) return '<span class="qcp-nm">\u2014</span>';
-        return '<span style="font-family:var(--font-mono);font-size:12px;color:var(--text);font-weight:600;">' + fSol(v) + ' SOL</span>';
+        return '<span style="font-family:var(--font-mono);font-size:12px;color:#E8E8E8;font-weight:700;">' + fSol(v) + ' SOL</span>';
     }
     function sub(txt) {
         return '<span style="font-size:10.5px;color:var(--text-mid);display:block;margin-top:2px;line-height:1.4;">' + txt + '</span>';
@@ -2735,15 +2736,15 @@ function qcpRender() {
     }
 
     // ── Row builders ───────────────────────────────────────────────────
-    // For baseline rows (r1, r2, r6): 4 logical cols; ref cell spans 4 physical cols
-    function rowBaseline(metric, simCell, refCell, statusCell) {
+    // For baseline rows (r1, r2): 4 logical cols; 12m cols show dash; interpCell shown
+    function rowBaseline(metric, simCell, refCell, interpCell, statusCell) {
         return '<tr>'
             + '<td style="font-weight:600;color:var(--text);font-size:12px;padding-left:16px;vertical-align:top;">' + metric + '</td>'
             + '<td style="vertical-align:top;">' + simCell + '</td>'
             + '<td style="vertical-align:top;">' + refCell + '</td>'
             + '<td style="vertical-align:top;text-align:center;color:var(--text-mid);opacity:0.35;font-size:11px;padding-top:11px;">\u2014</td>'
             + '<td style="vertical-align:top;text-align:center;color:var(--text-mid);opacity:0.35;font-size:11px;padding-top:11px;">\u2014</td>'
-            + '<td style="vertical-align:top;"></td>'
+            + '<td style="vertical-align:top;font-size:10.5px;color:var(--text-mid);">' + interpCell + '</td>'
             + '<td style="vertical-align:top;">' + statusCell + '</td>'
             + '</tr>';
     }
@@ -2768,7 +2769,7 @@ function qcpRender() {
     var simPri = (sim.blk != null && baseFeeRef != null) ? Math.max(0, sim.blk - baseFeeRef) : null;
     var simPriCell = sim.blk != null
         ? monoVal(simPri != null ? simPri : sim.blk)
-          + sub('= ' + fSol(sim.blk) + ' Network Fees \u2212 ' + (baseFeeRef != null ? fSol(baseFeeRef) + ' Base Fees (Ep.945 median)' : '\u2014'))
+          + sub('Network Fees ' + fSol(sim.blk) + ' \u2212 Sig. Fees ' + (baseFeeRef != null ? fSol(baseFeeRef) + ' (Ep.945 median)' : '\u2014'))
         : '<span class="qcp-nm">\u2014</span>';
 
     // ── Total reward / block = Fees + MEV ─────────────────────────────
@@ -2791,11 +2792,36 @@ function qcpRender() {
 
     // ── Build rows ─────────────────────────────────────────────────────
 
+    // ── timeCellTotalRev: derived 12m Total REV = total_reward + inflation (Ep.945) ──
+    function timeCellTotalRev(dataset) {
+        if (!timeBench) return '<span class="qcp-nm" style="font-size:10.5px;">Loading\u2026</span>';
+        var ds = timeBench[dataset];
+        if (!ds) return '<span class="qcp-nm">\u2014</span>';
+        var m = ds.metrics['total_reward'];
+        if (!m) return '<span class="qcp-nm">\u2014</span>';
+        var issBase = (bench && bench.inflation) ? bench.inflation.network.median : null;
+        var net = m.network, s50 = m.top_50_by_stake, m50 = m.top_50_by_mev;
+        var p25 = net.p25, p75 = net.p75;
+        var lines = '';
+        if (issBase != null) {
+            lines += '<div style="font-size:9.5px;color:var(--text-mid);opacity:0.6;margin-bottom:3px;line-height:1.3;">derived: reward + iss(Ep.945)</div>';
+        }
+        lines += refLine('Network median', fSol(issBase != null ? net.median + issBase : net.median) + ' SOL');
+        if (p25 != null && p75 != null)
+            lines += refLine('P25\u2013P75', fSol(issBase != null ? p25 + issBase : p25) + '\u2013' + fSol(issBase != null ? p75 + issBase : p75) + ' SOL');
+        if (s50 && s50.median != null)
+            lines += refLine('Top 50 (stake)', fSol(issBase != null ? s50.median + issBase : s50.median) + ' SOL');
+        if (m50 && m50.median != null)
+            lines += refLine('Top 50 (MEV)', fSol(issBase != null ? m50.median + issBase : m50.median) + ' SOL');
+        return lines;
+    }
+
     // r1 — Inflation (baseline, epoch-945 only)
     var r1 = rowBaseline(
         'Inflation / block' + sub('Validator issuance reward'),
         monoVal(sim.iss),
         refBlock('inflation'),
+        'Common inflation baseline, should match network closely',
         statBaseline(sim.iss, 'inflation')
     );
 
@@ -2804,21 +2830,22 @@ function qcpRender() {
         'Base fees / block' + sub('Signature fees \u00b7 5,000 lam/sig'),
         '<span class="qcp-nm" style="font-size:11px;">Not modeled separately</span>',
         refBlock('sig_fees'),
+        'Reference-only signature fee component, not modeled separately',
         '<span class="qcp-sn">N/A</span>'
     );
 
-    // r3 — Priority fees (temporal)
+    // r3 — Priority fees (temporal) — Section A: baseline metrics
     var r3 = rowTemporal(
-        'Priority fees / block' + sub('Network Fees \u2212 Base Fees'),
+        'Priority fees / block' + sub('Network Fees \u2212 Signature Fees (Base Fees)'),
         simPriCell,
         timeCell('latest_epoch',             'priority_fees', 'priority_fees'),
         timeCell('last_12m_all',             'priority_fees', null),
         timeCell('last_12m_elevated_extreme','priority_fees', null),
-        '\u2014',
+        'Baseline fee component derived from Network Fees minus Signature Fees',
         statTime(simPri != null ? simPri : sim.blk, 'priority_fees')
     );
 
-    // r4 — Total MEV (temporal)
+    // r4 — Total MEV (temporal) — Section B: MEV metrics
     var r4 = rowTemporal(
         'Total MEV / block',
         sim.mev != null ? monoVal(sim.mev) + sub('AOT + JIT + Bonus + Other JIT') : '<span class="qcp-nm">\u2014</span>',
@@ -2829,34 +2856,34 @@ function qcpRender() {
         statTime(sim.mev, 'mev')
     );
 
-    // r5 — Total reward (temporal)
+    // r5 — Total reward (temporal) — Section C: total metrics
     var r5 = rowTemporal(
         'Total reward / block' + sub('Base Fees + Priority Fees + MEV'),
         simRewardCell,
         timeCell('latest_epoch',             'total_reward', null),
         timeCell('last_12m_all',             'total_reward', null),
         timeCell('last_12m_elevated_extreme','total_reward', null),
-        '\u2014',
+        'Fees plus MEV \u2014 validator earning power before inflation',
         statTime(simReward, 'total_reward')
     );
 
-    // r6 — Total REV (baseline, epoch-945 only)
-    var r6 = rowBaseline(
+    // r6 — Total REV (temporal, 12m derived) — Section C: total metrics
+    var r6 = rowTemporal(
         'Total REV / block' + sub('Inflation + Fees + MEV'),
         sim.total != null ? monoVal(sim.total) : '<span class="qcp-nm">\u2014</span>',
         refBlock('rev'),
+        timeCellTotalRev('last_12m_all'),
+        timeCellTotalRev('last_12m_elevated_extreme'),
+        'Full validator revenue including inflation',
         statUplift(sim.total, 'rev')
     );
 
-    tb.innerHTML = sectionRow('Baseline metrics (epoch 945) \u2014 should match network closely')
-        + r1 + r2
-        + sectionRow('Priority fees & MEV \u2014 12-month per-validator benchmarks'
-            + '<span style="font-size:9.5px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-mid);padding-left:10px;">'
-            + 'Trillium /validator_rewards \u00b7 epochs 750\u2013945 \u00b7 ~760 validators/epoch \u00b7 cohorts re-ranked each epoch'
-            + '</span>')
-        + r3 + r4 + r5
-        + sectionRow('Total REV (epoch 945)')
-        + r6;
+    tb.innerHTML = sectionRow('Baseline metrics \u2014 should match network closely')
+        + r1 + r2 + r3
+        + sectionRow('MEV metrics')
+        + r4
+        + sectionRow('Total metrics')
+        + r5 + r6;
 }
 
 function vcToggleIssuance() {
