@@ -1553,7 +1553,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-context-value" id="validator-context-stake">10.0%</div>
             </div>
             <div class="validator-context-item">
-                <div class="validator-context-label">Network Fees APR</div>
+                <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">Network Fees APR <button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-blk')">?</button></div>
                 <div class="validator-context-value" id="validator-context-nfapr">0.50%</div>
             </div>
         </div>
@@ -2408,7 +2408,8 @@ const SOLANA_INFLATION_RATE          = 0.0394;  // Solana protocol inflation (al
 const ACTIVE_STAKING_RATIO_DEFAULT   = 0.677;   // Default: March 2026 ≈ 67.7%
 // Commission reference — NOT used in issuance formula (Tab 2 shows validator-level gross, not delegator net)
 const AVG_VALIDATOR_COMMISSION_REF   = 0.07;    // Network-avg commission, reference only; source: Trillium validator data
-// Network Fees APR (base + priority) — now user-configurable via sl-nfapr (default 0.50%; historical Marinade ref ≈ 0.54%)
+const NETWORK_FEES_APR_REF           = 0.0054;  // Marinade Block Rewards APR benchmark (base + priority fees, full-network); March 2026 data; display/reference only — model input is sl-nfapr
+// Network Fees APR (base + priority) — user-configurable via sl-nfapr (default 0.50%; benchmark ref above ≈ 0.54%)
 // Applied to residual block share only (Raiku AOT block share already in AOT revenue model)
 // Parity reference — NOT used as model input
 const RATED_DELEGATOR_APY_REFERENCE  = 0.0448;  // Rated Network 30d Delegator APY; includes commission; parity check only
@@ -2475,6 +2476,8 @@ function vcOpenExplainer(id) {
         var nfapr  = slNf ? +slNf.value/100 : 0.005;
         var residual = Math.max(0, 1 - bShare);
         var pAPR = nfapr * residual, pAPY = aprToApy(pAPR, APY_COMPOUNDING_PERIODS);
+        var refAdj = NETWORK_FEES_APR_REF * residual;
+        _e = document.getElementById('vc-blk-exp-ref-adj');   if(_e) _e.textContent = fmtValidatorRate(refAdj);
         _e = document.getElementById('vc-blk-exp-nfapr');     if(_e) _e.textContent = fmtValidatorRate(nfapr);
         _e = document.getElementById('vc-blk-exp-nfapr-inp'); if(_e) _e.textContent = fmtValidatorRate(nfapr);
         _e = document.getElementById('vc-blk-exp-bshare');    if(_e) _e.textContent = (bShare * 100).toFixed(0) + '%';
@@ -4839,6 +4842,10 @@ function update(){
     // ── Network Fees explainer live values ────────────────────────────────
     (function() {
         var _e;
+        var refAdj = NETWORK_FEES_APR_REF * residualBlockShare;
+        _e = document.getElementById('vc-blk-exp-ref-adj');   if(_e) _e.textContent = fmtValidatorRate(refAdj);
+        _e = document.getElementById('vc-blk-exp-nfapr');     if(_e) _e.textContent = fmtValidatorRate(p.nfapr);
+        _e = document.getElementById('vc-blk-exp-nfapr-inp'); if(_e) _e.textContent = fmtValidatorRate(p.nfapr);
         _e = document.getElementById('vc-blk-exp-bshare');    if(_e) _e.textContent = (p.b * 100).toFixed(0) + '%';
         _e = document.getElementById('vc-blk-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(priorityFeesApr);
         _e = document.getElementById('vc-blk-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(priorityFeesApy);
@@ -7108,11 +7115,11 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     <div class="vc-explainer-card">
         <button class="vc-explainer-close" onclick="vcCloseExplainer('vc-explainer-blk')">×</button>
         <div class="vc-explainer-title">Network Fees</div>
-        <div class="vc-explainer-subtitle">Ordinary validator fee yield on block space not reserved by Raiku AOT</div>
+        <div class="vc-explainer-subtitle">Base fees + priority fees on block space not reserved by Raiku AOT</div>
 
         <div class="vc-explainer-section">
-            <div class="vc-explainer-section-title">What it is</div>
-            <div class="vc-explainer-note">The benchmark is treated as reflecting prevailing network conditions, including the background JIT/MEV ecosystem already present in observed network fee data. Only Raiku AOT's reserved block share creates a double-count that must be removed here.</div>
+            <div class="vc-explainer-section-title">What it includes</div>
+            <div class="vc-explainer-note"><strong style="color:var(--text);">Base fees</strong> (signature fees, ~5,000 lamports/signature) and <strong style="color:var(--text);">priority fees</strong> (compute unit price bids set by tx senders). Together these are the fee revenues validators earn from ordinary block production. The full-network APR benchmark is sourced from Marinade Network Stats and reflects prevailing on-chain conditions, including background MEV activity already embedded in observed fee data — no separate MEV adjustment is needed. The only required adjustment is removing the Raiku AOT reserved block share, which is counted separately in the AOT component.</div>
         </div>
 
         <div class="vc-explainer-section">
@@ -7120,6 +7127,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             <div class="vc-explainer-formula">
                 <div>Network Fees APR = <span class="vc-ef-val" id="vc-blk-exp-nfapr">—</span> &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-apr">—</span></div>
                 <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-blk-exp-apy">—</span></div>
+                <div style="margin-top:8px; color:var(--text2); font-size:10px;">Marinade ref benchmark: 0.54% &times; residual = <span class="vc-ef-val" id="vc-blk-exp-ref-adj">—</span></div>
             </div>
         </div>
 
@@ -7127,7 +7135,13 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             <div class="vc-explainer-section-title">Live inputs</div>
             <div class="vc-explainer-inputs">
                 <div class="vc-explainer-input-row">
-                    <span class="vc-explainer-input-key">Network Fees APR (base + priority, user-set; default 0.50%)
+                    <span class="vc-explainer-input-key">Marinade benchmark (base + priority, full-network)
+                        <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade</a>
+                    </span>
+                    <span class="vc-explainer-input-val">0.54%</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Network Fees APR (user override — edit the cell to adjust)
                         <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ ref: Marinade</a>
                     </span>
                     <span class="vc-explainer-input-val" id="vc-blk-exp-nfapr-inp">0.50%</span>
@@ -7151,7 +7165,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Reference</div>
             <div class="vc-explainer-sources">
-                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (reference; default 0.50%, user-configurable)</a>
+                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (full-network benchmark ≈ 0.54%; model uses user-configurable override, default 0.50%)</a>
             </div>
         </div>
     </div>
