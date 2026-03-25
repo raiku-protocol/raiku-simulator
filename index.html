@@ -409,8 +409,10 @@ details[open] summary::before { transform:rotate(90deg); }
 
 /* ── External Validation panel ──────────────────────────────────────── */
 .qcp-table { width:100%; border-collapse:collapse; font-size:12px; }
-.qcp-table th { font-size:10.5px; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; padding:10px 12px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); background:#0a0c0f; font-weight:600; white-space:nowrap; }
-.qcp-table td { padding:9px 12px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; font-size:12px; color:var(--text); }
+.qcp-table th { font-size:10.5px; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; padding:10px 12px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); border-right:1px solid rgba(255,255,255,0.07); background:#0a0c0f; font-weight:600; white-space:nowrap; }
+.qcp-table th:last-child { border-right:none; }
+.qcp-table td { padding:9px 12px; border-bottom:1px solid rgba(255,255,255,0.04); border-right:1px solid rgba(255,255,255,0.04); vertical-align:top; font-size:12px; color:var(--text); }
+.qcp-table td:last-child { border-right:none; }
 .qcp-table tr:last-child td { border-bottom:none; }
 .qcp-sa { font-size:11px; font-weight:600; color:#4CAF50; }
 .qcp-sc { font-size:11px; font-weight:600; color:#8BC34A; }
@@ -2738,7 +2740,10 @@ function qcpRender() {
         return '<tr>'
             + '<td style="font-weight:600;color:var(--text);font-size:12px;padding-left:16px;vertical-align:top;">' + metric + '</td>'
             + '<td style="vertical-align:top;">' + simCell + '</td>'
-            + '<td colspan="4" style="vertical-align:top;">' + refCell + '</td>'
+            + '<td style="vertical-align:top;">' + refCell + '</td>'
+            + '<td style="vertical-align:top;text-align:center;color:var(--text-mid);opacity:0.35;font-size:11px;padding-top:11px;">\u2014</td>'
+            + '<td style="vertical-align:top;text-align:center;color:var(--text-mid);opacity:0.35;font-size:11px;padding-top:11px;">\u2014</td>'
+            + '<td style="vertical-align:top;"></td>'
             + '<td style="vertical-align:top;">' + statusCell + '</td>'
             + '</tr>';
     }
@@ -2843,11 +2848,14 @@ function qcpRender() {
         statUplift(sim.total, 'rev')
     );
 
-    tb.innerHTML = sectionRow('Baseline metrics \u2014 should match network closely')
+    tb.innerHTML = sectionRow('Baseline metrics (epoch 945) \u2014 should match network closely')
         + r1 + r2
-        + sectionRow('Uplift metrics \u2014 12m validator-level benchmarks')
+        + sectionRow('Priority fees & MEV \u2014 12-month per-validator benchmarks'
+            + '<span style="font-size:9.5px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-mid);padding-left:10px;">'
+            + 'Trillium /validator_rewards \u00b7 epochs 750\u2013945 \u00b7 ~760 validators/epoch \u00b7 cohorts re-ranked each epoch'
+            + '</span>')
         + r3 + r4 + r5
-        + sectionRow('Total REV')
+        + sectionRow('Total REV (epoch 945)')
         + r6;
 }
 
