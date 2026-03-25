@@ -1542,7 +1542,7 @@ details[open] summary::before { transform:rotate(90deg); }
                 <button class="scenario-btn" id="validator-btn-bull" onclick="applyScenario('bull')">Bull Case</button>
             </div>
         </div>
-        <!-- Market setup: SOL Price + Raiku Stake + Network Fees APR (2-col grid, wraps) -->
+        <!-- Market setup: SOL Price + Raiku Stake + Issuance APY + Network Fees APY (2-col grid) -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:20px;">
             <div class="validator-context-item">
                 <div class="validator-context-label">SOL Price</div>
@@ -1553,8 +1553,12 @@ details[open] summary::before { transform:rotate(90deg); }
                 <div class="validator-context-value" id="validator-context-stake">10.0%</div>
             </div>
             <div class="validator-context-item">
-                <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">Network Fees APR <button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-blk')">?</button></div>
-                <div class="validator-context-value" id="validator-context-nfapr">0.54%</div>
+                <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">Issuance APY <button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-iss')">?</button></div>
+                <div class="validator-context-value" id="validator-context-iss-apy">6.00%</div>
+            </div>
+            <div class="validator-context-item">
+                <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">Network Fees APY <button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-blk')">?</button></div>
+                <div class="validator-context-value" id="validator-context-nfapr">0.50%</div>
             </div>
         </div>
         <!-- Derived: Raiku Validator Stake -->
@@ -1597,7 +1601,8 @@ details[open] summary::before { transform:rotate(90deg); }
     <span id="validator-context-ojit" style="display:none;"></span>
     <!-- Base Network Yield inputs — hidden in this layout; controls appear in component expand rows (Patch 3) -->
     <input type="range" id="sl-staking-ratio" min="50" max="85" step="0.1" value="67.7" style="display:none;" oninput="update()">
-    <input type="range" id="sl-nfapr" min="0" max="2" step="0.01" value="0.54" style="display:none;" oninput="update()"><!-- value = NETWORK_FEES_APR_REF × 100; do not round separately -->
+    <input type="range" id="sl-nfapr" min="0" max="2" step="0.001" value="0.497" style="display:none;" oninput="update()"><!-- stores NF APY%; derive-first block in update() sets it to aprToApy(REF×residual,n) unless _vcOverrides.nf -->
+    <input type="range" id="sl-iss-apy" min="0" max="20" step="0.001" value="5.99" style="display:none;" oninput="update()"><!-- stores issuance APY%; derive-first block sets it to aprToApy(INFLATION/stakingRatio,n) unless _vcOverrides.iss -->
     <span id="validator-staked-value" style="display:none;"></span>
     <span id="validator-staked-source" style="display:none;"></span>
     <span id="validator-inflation-rate" style="display:none;"></span>
@@ -2394,6 +2399,7 @@ const SC = {
            desc:"Bull — high-payer stress case using active-payer P75 non-base fee/CU, displayed at 2.00 lam/CU."},
 };
 let _selectedScenario = 'base';
+let _vcOverrides = {nf: false, iss: false};  // true = user has manually edited the cell; scenario buttons reset these
 const STAKE_FALLBACK_SOL = 421562663; // Solana Compass snapshot, Mar 2026
 let _solanaStakeState = {
     sol: STAKE_FALLBACK_SOL,
@@ -2408,9 +2414,8 @@ const SOLANA_INFLATION_RATE          = 0.0394;  // Solana protocol inflation (al
 const ACTIVE_STAKING_RATIO_DEFAULT   = 0.677;   // Default: March 2026 ≈ 67.7%
 // Commission reference — NOT used in issuance formula (Tab 2 shows validator-level gross, not delegator net)
 const AVG_VALIDATOR_COMMISSION_REF   = 0.07;    // Network-avg commission, reference only; source: Trillium validator data
-const NETWORK_FEES_APR_REF           = 0.0054;  // Marinade Block Rewards APR benchmark (base + priority fees, full-network); March 2026 data; display/reference only — model input is sl-nfapr
-// Network Fees APR (base + priority) — user-configurable via sl-nfapr; initialized from NETWORK_FEES_APR_REF (0.54%) × 100; edit cell to override
-// Applied to residual block share only (Raiku AOT block share already in AOT revenue model)
+const NETWORK_FEES_APR_REF           = 0.0054;  // Marinade Block Rewards APR benchmark (base + priority fees, full-network); March 2026 data; used to derive NF APY default
+// Network Fees APY (base + priority, scenario-adjusted) — stored in sl-nfapr as %; derived by update() as aprToApy(NETWORK_FEES_APR_REF × residual, n) unless _vcOverrides.nf
 // Parity reference — NOT used as model input
 const RATED_DELEGATOR_APY_REFERENCE  = 0.0448;  // Rated Network 30d Delegator APY; includes commission; parity check only
 const APY_COMPOUNDING_PERIODS = EPOCHS_PER_YEAR; // epoch-based compounding (≈ 182 epochs/yr)
@@ -2473,16 +2478,16 @@ function vcOpenExplainer(id) {
         var slB = document.getElementById('sl-blk');
         var slNf = document.getElementById('sl-nfapr');
         var bShare = slB ? (+(slB.value) / 100) : 0.08;
-        var nfapr  = slNf ? +slNf.value/100 : 0.005;
         var residual = Math.max(0, 1 - bShare);
-        var pAPR = nfapr * residual, pAPY = aprToApy(pAPR, APY_COMPOUNDING_PERIODS);
-        var refAdj = NETWORK_FEES_APR_REF * residual;
-        _e = document.getElementById('vc-blk-exp-ref-adj');   if(_e) _e.textContent = fmtValidatorRate(refAdj);
-        _e = document.getElementById('vc-blk-exp-nfapr');     if(_e) _e.textContent = fmtValidatorRate(nfapr);
-        _e = document.getElementById('vc-blk-exp-nfapr-inp'); if(_e) _e.textContent = fmtValidatorRate(nfapr);
+        var refAPR = NETWORK_FEES_APR_REF * residual;
+        var nfApy = slNf ? +slNf.value/100 : aprToApy(refAPR, APY_COMPOUNDING_PERIODS);
+        var nfApr = apyToApr(nfApy, APY_COMPOUNDING_PERIODS);
+        _e = document.getElementById('vc-blk-exp-ref-adj');   if(_e) _e.textContent = fmtValidatorRate(refAPR);
+        _e = document.getElementById('vc-blk-exp-nfapr');     if(_e) _e.textContent = fmtValidatorRate(NETWORK_FEES_APR_REF);
+        _e = document.getElementById('vc-blk-exp-nfapr-inp'); if(_e) _e.textContent = fmtValidatorRate(nfApy);
         _e = document.getElementById('vc-blk-exp-bshare');    if(_e) _e.textContent = (bShare * 100).toFixed(0) + '%';
-        _e = document.getElementById('vc-blk-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(pAPR);
-        _e = document.getElementById('vc-blk-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(pAPY);
+        _e = document.getElementById('vc-blk-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(nfApr);
+        _e = document.getElementById('vc-blk-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(nfApy);
         _e = document.getElementById('vc-blk-exp-bshare2');   if(_e) _e.textContent = (bShare * 100).toFixed(0) + '%';
         _e = document.getElementById('vc-blk-exp-residual');  if(_e) _e.textContent = (residual * 100).toFixed(0) + '%';
     }
@@ -2705,11 +2710,12 @@ function getDisplayedScenarioName(){
 function getScenarioParams(key){
     const s = SC[key];
     if (!s) return null;
-    const slNf = document.getElementById('sl-nfapr');
+    const residual = Math.max(0, 1 - s.b/100);
     return {
         ca:s.ca, cj:s.cj, ra:s.ra, rj:s.rj, vb:s.vb,
         jm:s.jm, j:s.j/100, s:s.s/100, b:s.b/100, f:s.f, p:s.p,
-        nfapr: slNf ? +slNf.value/100 : 0.005
+        nfApy: aprToApy(NETWORK_FEES_APR_REF * residual, APY_COMPOUNDING_PERIODS),
+        issApy: aprToApy(SOLANA_INFLATION_RATE / ACTIVE_STAKING_RATIO_DEFAULT, APY_COMPOUNDING_PERIODS)
     };
 }
 
@@ -2719,7 +2725,7 @@ function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, p
     const rows = ['con','base','opt','bull'].map(function(key){
         const p = (key === _selectedScenario && liveP) ? liveP : getScenarioParams(key);
         const r = calc(p);
-        const cardPriorityApr = (p.nfapr || 0.005) * Math.max(0, 1 - p.b);
+        const cardPriorityApr = apyToApr(p.nfApy || 0.005, APY_COMPOUNDING_PERIODS);
         const basePlusPriorityApy = aprToApy(baseApr + cardPriorityApr, APY_COMPOUNDING_PERIODS);
         const connectedStakeSol = totalStakedSol * p.s;
         const aotApr   = connectedStakeSol > 0 ? r.aotValidatorBase / connectedStakeSol : 0;
@@ -2818,6 +2824,8 @@ function applyScenario(n){
     document.getElementById('sl-blk').value=s.b;
     document.getElementById('sl-fcu').value=s.f;
     document.getElementById('sl-price').value=s.p;
+    _vcOverrides.nf = false;
+    _vcOverrides.iss = false;
     document.getElementById('scenario-desc').textContent=s.desc;
     document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.scenario-card').forEach(c=>c.classList.remove('active'));
@@ -2955,7 +2963,8 @@ function gp(){return{
     b:+document.getElementById('sl-blk').value/100,
     f:+document.getElementById('sl-fcu').value,
     p:+document.getElementById('sl-price').value,
-    nfapr:+document.getElementById('sl-nfapr').value/100,  // Network Fees APR as decimal (e.g. 0.005 for 0.50%)
+    nfApy:+document.getElementById('sl-nfapr').value/100,  // Network Fees APY as decimal (final scenario-adjusted; stored in sl-nfapr)
+    issApy:(function(){ var el=document.getElementById('sl-iss-apy'); return el ? +el.value/100 : 0.0599; })(),  // Issuance APY as decimal
 };}
 
 function computeJitStats(windowEpochs) {
@@ -4637,6 +4646,18 @@ function adjStakingRatio(delta) {
 function _vcSet(id, val) { var el=document.getElementById(id); if(el&&!el.querySelector('input')) el.textContent=val; }
 
 function update(){
+    // Derive-first: update sl-nfapr and sl-iss-apy to scenario defaults unless user overrode
+    (function(){
+        var slNf  = document.getElementById('sl-nfapr');
+        var slIss = document.getElementById('sl-iss-apy');
+        var slBlk = document.getElementById('sl-blk');
+        var slSr  = document.getElementById('sl-staking-ratio');
+        var bShare = slBlk ? +(slBlk.value)/100 : 0.08;
+        var sr     = slSr  ? +(slSr.value)/100  : ACTIVE_STAKING_RATIO_DEFAULT;
+        var n = APY_COMPOUNDING_PERIODS;
+        if (!_vcOverrides.nf  && slNf)  slNf.value  = (aprToApy(NETWORK_FEES_APR_REF * Math.max(0, 1 - bShare), n) * 100).toFixed(4);
+        if (!_vcOverrides.iss && slIss) slIss.value = (aprToApy(SOLANA_INFLATION_RATE / sr, n) * 100).toFixed(4);
+    }());
     const p=gp(),r=calc(p);
     const tg = r.totalGross || 1;
     const totalStakedSol = getCurrentTotalSolanaStakedSol();
@@ -4648,15 +4669,15 @@ function update(){
     const capturedJitSol = p.jm * p.j;
     const stakingRatioSlider = document.getElementById('sl-staking-ratio');
     const stakingRatio = stakingRatioSlider ? (+(stakingRatioSlider.value) / 100 || ACTIVE_STAKING_RATIO_DEFAULT) : ACTIVE_STAKING_RATIO_DEFAULT;
-    // Validator-level gross: inflationRate / stakingRatio gives issuance APR (annual rate before compounding)
-    // No commission deduction — Tab 2 models the validator revenue pool, not delegator net yield
-    const issuanceAPR = SOLANA_INFLATION_RATE / stakingRatio;
-    const issuanceAPY = aprToApy(issuanceAPR, APY_COMPOUNDING_PERIODS);
+    // Issuance: APY comes directly from slider (derive-first block sets it unless overridden); back-compute APR
+    const issuanceAPY = p.issApy;
+    const issuanceAPR = apyToApr(issuanceAPY, APY_COMPOUNDING_PERIODS);
     const baseApr = issuanceAPR;
     const baseApy = issuanceAPY;
     const residualBlockShare = Math.max(0, 1 - p.b);
-    const priorityFeesApr = p.nfapr * residualBlockShare;
-    const priorityFeesApy = aprToApy(priorityFeesApr, APY_COMPOUNDING_PERIODS);
+    // Network Fees: final scenario-adjusted APY from slider (derive-first sets it unless overridden); back-compute APR
+    const priorityFeesApy = p.nfApy;
+    const priorityFeesApr = apyToApr(priorityFeesApy, APY_COMPOUNDING_PERIODS);
     const totalValidatorRevenueSol = r.totalValRev + r.otherJitRev; // Raiku JIT + Other JIT + AOT base + AOT bonus
     const totalValidatorRevenueUsd = totalValidatorRevenueSol * p.p;
     const incrementalAprUplift = connectedStakeSol > 0 ? totalValidatorRevenueSol / connectedStakeSol : 0;
@@ -4763,7 +4784,8 @@ function update(){
     document.getElementById('validator-scenario-name').textContent = getDisplayedScenarioName();
     _vcSet('validator-context-price', '$' + p.p);
     _vcSet('validator-context-stake', (p.s * 100).toFixed(1) + '%');
-    _vcSet('validator-context-nfapr', (p.nfapr * 100).toFixed(2) + '%');
+    _vcSet('validator-context-nfapr', fmtValidatorRate(p.nfApy));
+    _vcSet('validator-context-iss-apy', fmtValidatorRate(p.issApy));
     document.getElementById('validator-context-connected').textContent = fmt(connectedStakeSol, 'S');
     (function(){ var fEl=document.getElementById('validator-stake-formula'); if(!fEl) return;
         fEl.innerHTML = fmt(totalStakedSol,'S') + ' \u00d7 ' + (p.s*100).toFixed(1) + '% = ' + fmt(connectedStakeSol,'S') + ' \u00b7 <a href="https://solanacompass.com/tokenomics#staked" target="_blank" style="color:#4d5566;text-decoration:none;border-bottom:1px solid rgba(77,85,102,0.4);">Solana Compass</a> <span style="opacity:0.6;">(snapshot, Mar\u00a02026)</span>'; }());
@@ -4844,8 +4866,8 @@ function update(){
         var _e;
         var refAdj = NETWORK_FEES_APR_REF * residualBlockShare;
         _e = document.getElementById('vc-blk-exp-ref-adj');   if(_e) _e.textContent = fmtValidatorRate(refAdj);
-        _e = document.getElementById('vc-blk-exp-nfapr');     if(_e) _e.textContent = fmtValidatorRate(p.nfapr);
-        _e = document.getElementById('vc-blk-exp-nfapr-inp'); if(_e) _e.textContent = fmtValidatorRate(p.nfapr);
+        _e = document.getElementById('vc-blk-exp-nfapr');     if(_e) _e.textContent = fmtValidatorRate(NETWORK_FEES_APR_REF);  // Marinade benchmark (static)
+        _e = document.getElementById('vc-blk-exp-nfapr-inp'); if(_e) _e.textContent = fmtValidatorRate(p.nfApy);  // active NF APY
         _e = document.getElementById('vc-blk-exp-bshare');    if(_e) _e.textContent = (p.b * 100).toFixed(0) + '%';
         _e = document.getElementById('vc-blk-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(priorityFeesApr);
         _e = document.getElementById('vc-blk-exp-apy');       if(_e) _e.textContent = fmtValidatorRate(priorityFeesApy);
@@ -7005,7 +7027,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
 // Inline editable cells: click-to-edit for true input-backed setup parameters
 (function() {
-    function makeEditable(cellId, sliderId, min, max, step, fmtFn) {
+    function makeEditable(cellId, sliderId, min, max, step, fmtFn, onCommit) {
         var cell = document.getElementById(cellId);
         if (!cell) return;
         cell.classList.add('editable');
@@ -7025,6 +7047,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
                 var v = isNaN(raw) ? cur : Math.max(+min, Math.min(+max, raw));
                 if (slider) slider.value = v;
                 cell.textContent = fmtFn(v);
+                if (onCommit) onCommit(v);
                 update();
             };
             inp.addEventListener('blur', commit);
@@ -7036,7 +7059,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     }
     makeEditable('validator-context-price',    'sl-price',    10, 400, 5,    function(v){ return '$'+Math.round(v); });
     makeEditable('validator-context-stake',    'sl-stake',    0,  50,  0.1,  function(v){ return v.toFixed(1)+'%'; });
-    makeEditable('validator-context-nfapr',    'sl-nfapr',    0,  2,   0.01, function(v){ return v.toFixed(2)+'%'; });
+    makeEditable('validator-context-iss-apy',  'sl-iss-apy',  0, 20,   0.01,  function(v){ return fmtValidatorRate(v/100); }, function(){ _vcOverrides.iss = true; });
+    makeEditable('validator-context-nfapr',    'sl-nfapr',    0,  2,   0.001, function(v){ return fmtValidatorRate(v/100); }, function(){ _vcOverrides.nf = true; });
     makeEditable('validator-context-aot-take', 'sl-comm-aot', 0,  10,  0.25, function(v){ return v.toFixed(1)+'%'; });
     makeEditable('validator-context-jit-take', 'sl-comm-jit', 0,  10,  0.25, function(v){ return v.toFixed(1)+'%'; });
     makeEditable('validator-context-block',    'sl-blk',      0, 100,  0.1,  function(v){ return Math.round(v)+'%'; });
@@ -7125,9 +7149,9 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Live formula</div>
             <div class="vc-explainer-formula">
-                <div>Network Fees APR = <span class="vc-ef-val" id="vc-blk-exp-nfapr">—</span> &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-apr">—</span></div>
-                <div style="margin-top:4px;"><span class="vc-ef-dim">APY = epoch-compounded over 182 periods/yr</span> = <span class="vc-ef-val" id="vc-blk-exp-apy">—</span></div>
-                <div style="margin-top:8px; color:var(--text2); font-size:10px;">Marinade ref benchmark: 0.54% &times; residual = <span class="vc-ef-val" id="vc-blk-exp-ref-adj">—</span></div>
+                <div><span class="vc-ef-dim">Reference derivation:</span> <span class="vc-ef-val" id="vc-blk-exp-nfapr">—</span> &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-ref-adj">—</span> APR &rarr; epoch-compounded</div>
+                <div style="margin-top:4px;"><span class="vc-ef-dim">Active input (used in calculations):</span> <span class="vc-ef-val" id="vc-blk-exp-apy">—</span> APY &nbsp;&middot;&nbsp; <span class="vc-ef-val" id="vc-blk-exp-apr">—</span> APR</div>
+                <div style="margin-top:6px; font-size:10px; opacity:0.55;">Edit "Network Fees APY" cell to override; scenario buttons reset to reference value.</div>
             </div>
         </div>
 
@@ -7135,16 +7159,14 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             <div class="vc-explainer-section-title">Live inputs</div>
             <div class="vc-explainer-inputs">
                 <div class="vc-explainer-input-row">
-                    <span class="vc-explainer-input-key">Marinade benchmark (base + priority, full-network)
+                    <span class="vc-explainer-input-key">Marinade benchmark (base + priority APR, full-network)
                         <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade</a>
                     </span>
                     <span class="vc-explainer-input-val">0.54%</span>
                 </div>
                 <div class="vc-explainer-input-row">
-                    <span class="vc-explainer-input-key">Full-network source APR (active input — edit cell to override benchmark)
-                        <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ ref: Marinade</a>
-                    </span>
-                    <span class="vc-explainer-input-val" id="vc-blk-exp-nfapr-inp">0.50%</span>
+                    <span class="vc-explainer-input-key">Network Fees APY (active input — edit cell to override)</span>
+                    <span class="vc-explainer-input-val" id="vc-blk-exp-nfapr-inp">—</span>
                 </div>
                 <div class="vc-explainer-input-row">
                     <span class="vc-explainer-input-key">Raiku Block Share (active scenario)</span>
@@ -7165,7 +7187,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Reference</div>
             <div class="vc-explainer-sources">
-                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (full-network benchmark ≈ 0.54%; input initialized from this benchmark, editable to override)</a>
+                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (full-network benchmark ≈ 0.54%; Network Fees APY defaults to this benchmark adjusted by residual block share)</a>
             </div>
         </div>
     </div>
