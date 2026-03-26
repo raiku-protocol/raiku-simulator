@@ -215,7 +215,7 @@ details[open] summary::before { transform:rotate(90deg); }
 #tab-customer .control input[type=range]::-moz-range-thumb { width:14px; height:14px; border-width:2px; }
 #tab-customer .control input[type=range]::-moz-range-track { height:4px; }
 #tab-customer .control .val { font-size:12px; min-width:44px; }
-#tab-customer .stepper-input { width:72px; }
+#tab-customer .stepper-input { width:86px; }
 .sidebar .section-label { font-size:10px; margin-top:12px; padding-bottom:2px; border-bottom:1px solid #1e2028; margin-bottom:2px; }
 .sidebar .section-label:first-child { margin-top:0; }
 
@@ -2318,40 +2318,48 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 <div class="validator-layout">
 
 <!-- LEFT: sticky controls panel -->
-<div class="validator-side">
-  <div class="section fade-in fade-in-1" style="flex:1;margin-bottom:0;box-sizing:border-box;display:flex;flex-direction:column;gap:16px;">
+<div class="validator-side" style="overflow-y:auto;max-height:calc(100vh - 20px);">
+<div style="display:flex;flex-direction:column;gap:14px;padding-bottom:24px;">
 
-    <!-- Intro -->
-    <div>
-      <h2>Customer Economics</h2>
-      <p style="color:var(--text-mid);font-size:11px;line-height:1.6;margin-top:6px;">
-        Compare execution cost without Raiku vs. with Raiku, per block.
-        Category presets are editable starting points seeded from on-chain data.
-      </p>
-    </div>
+  <!-- Intro -->
+  <div class="section fade-in fade-in-1" style="margin-bottom:0;">
+    <h2 style="margin-bottom:4px;">Customer Profile</h2>
+    <p style="color:var(--text-mid);font-size:10px;line-height:1.6;margin-top:0;">
+      Configure a customer execution profile using editable category presets and block-level assumptions.
+      This is a scenario tool, not a claim about current customer costs.
+    </p>
+  </div>
+
+  <!-- Section 1: Customer demand -->
+  <div class="section fade-in fade-in-2" style="margin-bottom:0;display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--card-border);padding-bottom:4px;font-family:var(--font-mono);">Customer Demand</div>
 
     <!-- Category selector -->
-    <div class="control" style="gap:6px;">
-      <label>Customer Category</label>
-      <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:11px;width:100%;cursor:pointer;"></select>
-    </div>
-    <p style="color:var(--text2);font-size:10px;line-height:1.4;margin-top:-4px;">
-      Category defaults are editable starting points seeded from category medians and simple V1 route splits.
-    </p>
-
-    <!-- AOT route controls
-         CU/block  : range 0–1,500,000, step 1,000
-         Fee/CU (L): range 0–25, step 0.1 -->
     <div>
-      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--lime-soft);border-bottom:1px solid var(--card-border);padding-bottom:4px;margin-bottom:10px;">AOT</div>
+      <div class="control" style="gap:4px;">
+        <label>Category</label>
+        <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:11px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
+      </div>
+      <div id="cust-cat-info" style="margin-top:5px;padding:5px 8px;background:#0e0f14;border-radius:4px;border:1px solid var(--card-border);font-size:10px;color:var(--text2);font-family:var(--font-mono);line-height:1.5;min-height:20px;">—</div>
+    </div>
+
+    <!-- CU guardrail -->
+    <div id="cust-guardrail" style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:#1a1c22;border-radius:4px;border:1px solid var(--card-border);font-size:10px;font-family:var(--font-mono);">
+      <span style="color:var(--text2);">Total CU / block</span>
+      <span id="cust-guardrail-val" style="color:var(--text);">0 / 60M</span>
+    </div>
+
+    <!-- AOT -->
+    <div>
+      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--lime-soft);border-bottom:1px solid var(--card-border);padding-bottom:3px;margin-bottom:8px;">AOT</div>
       <div class="control">
         <label>CU / block</label>
         <div class="slider-row">
-          <input type="range" id="cust-aot-cu-sl" min="0" max="1500000" step="1000" value="0">
+          <input type="range" id="cust-aot-cu-sl" min="0" max="60000000" step="100000" value="0">
           <span class="val">0</span>
         </div>
       </div>
-      <div class="control" style="margin-top:8px;">
+      <div class="control" style="margin-top:6px;">
         <label>Fee / CU (L)</label>
         <div class="slider-row">
           <input type="range" id="cust-aot-fee-sl" min="0" max="25" step="0.1" value="0">
@@ -2360,19 +2368,17 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       </div>
     </div>
 
-    <!-- Raiku JIT route controls
-         CU/block  : range 0–1,500,000, step 1,000
-         Fee/CU (L): range 0–25, step 0.1 -->
+    <!-- Raiku JIT -->
     <div>
-      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#8bc4f5;border-bottom:1px solid var(--card-border);padding-bottom:4px;margin-bottom:10px;">Raiku JIT</div>
+      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#8bc4f5;border-bottom:1px solid var(--card-border);padding-bottom:3px;margin-bottom:8px;">Raiku JIT</div>
       <div class="control">
         <label>CU / block</label>
         <div class="slider-row">
-          <input type="range" id="cust-rjit-cu-sl" min="0" max="1500000" step="1000" value="0">
+          <input type="range" id="cust-rjit-cu-sl" min="0" max="60000000" step="100000" value="0">
           <span class="val">0</span>
         </div>
       </div>
-      <div class="control" style="margin-top:8px;">
+      <div class="control" style="margin-top:6px;">
         <label>Fee / CU (L)</label>
         <div class="slider-row">
           <input type="range" id="cust-rjit-fee-sl" min="0" max="25" step="0.1" value="0">
@@ -2381,19 +2387,17 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       </div>
     </div>
 
-    <!-- Non-Raiku JIT route controls
-         CU/block  : range 0–1,500,000, step 1,000
-         Fee/CU (L): range 0–25, step 0.1 -->
+    <!-- Non-Raiku JIT -->
     <div>
-      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--card-border);padding-bottom:4px;margin-bottom:10px;">Non-Raiku JIT</div>
+      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--card-border);padding-bottom:3px;margin-bottom:8px;">Non-Raiku JIT</div>
       <div class="control">
         <label>CU / block</label>
         <div class="slider-row">
-          <input type="range" id="cust-njit-cu-sl" min="0" max="1500000" step="1000" value="0">
+          <input type="range" id="cust-njit-cu-sl" min="0" max="60000000" step="100000" value="0">
           <span class="val">0</span>
         </div>
       </div>
-      <div class="control" style="margin-top:8px;">
+      <div class="control" style="margin-top:6px;">
         <label>Fee / CU (L)</label>
         <div class="slider-row">
           <input type="range" id="cust-njit-fee-sl" min="0" max="25" step="0.1" value="0">
@@ -2402,38 +2406,105 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       </div>
     </div>
 
-  </div><!-- end section -->
+  </div><!-- end demand section -->
+
+  <!-- Section 2: Capacity & Context -->
+  <div class="section fade-in fade-in-3" style="margin-bottom:0;display:flex;flex-direction:column;gap:8px;">
+    <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--card-border);padding-bottom:4px;font-family:var(--font-mono);">Capacity &amp; Context</div>
+
+    <!-- Block size (static) -->
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">Block size</span>
+      <span style="font-size:10px;color:var(--text);font-family:var(--font-mono);">60,000,000 CU</span>
+    </div>
+
+    <!-- AOT block share -->
+    <div class="control">
+      <label>AOT block share</label>
+      <div class="slider-row">
+        <input type="range" id="cust-ctx-aot-share" min="0" max="80" step="1" value="50">
+        <span class="val" id="cust-ctx-aot-share-val">50%</span>
+      </div>
+    </div>
+
+    <!-- Raiku stake -->
+    <div class="control">
+      <label>Raiku stake</label>
+      <div class="slider-row">
+        <input type="range" id="cust-ctx-stake" min="0" max="50" step="0.5" value="5">
+        <span class="val" id="cust-ctx-stake-val">5.0%</span>
+      </div>
+    </div>
+
+    <!-- SOL price -->
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">SOL price (USD)</span>
+      <input type="number" id="cust-ctx-sol" value="120" min="1" max="5000" step="1"
+        style="background:#141516;color:var(--text);border:1px solid #333;border-radius:3px;padding:2px 6px;font-size:10px;font-family:var(--font-mono);width:68px;text-align:right;outline:none;">
+    </div>
+
+    <!-- Blocks per epoch -->
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">Blocks / epoch</span>
+      <input type="number" id="cust-ctx-bpe" value="420000" min="100000" max="600000" step="1000"
+        style="background:#141516;color:var(--text);border:1px solid #333;border-radius:3px;padding:2px 6px;font-size:10px;font-family:var(--font-mono);width:68px;text-align:right;outline:none;">
+    </div>
+
+    <!-- Client target blocks/epoch -->
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">Client target (blk/epoch)</span>
+      <input type="number" id="cust-ctx-target" value="10000" min="0" max="600000" step="1000"
+        style="background:#141516;color:var(--text);border:1px solid #333;border-radius:3px;padding:2px 6px;font-size:10px;font-family:var(--font-mono);width:68px;text-align:right;outline:none;">
+    </div>
+
+  </div><!-- end context section -->
+
+</div><!-- end inner flex -->
 </div><!-- end validator-side -->
 
-<!-- RIGHT: results -->
+<!-- RIGHT: descriptive outputs -->
 <div style="overflow-y:auto;padding:4px 0;display:flex;flex-direction:column;gap:var(--gap);">
 
-  <!-- 5 KPI cards -->
-  <div class="kpi-row fade-in" id="cust-kpis">
+  <!-- KPI row 1: Block economics -->
+  <div class="kpi-row fade-in">
     <div class="kpi">
-      <div class="kpi-label">Without Raiku</div>
-      <div class="kpi-value white" id="cust-k-without">—</div>
-      <div class="kpi-sub">cost / block (lamports)</div>
+      <div class="kpi-label">Total CU / block</div>
+      <div class="kpi-value white" id="cust-k-total-cu">—</div>
+      <div class="kpi-sub">of 60M limit</div>
     </div>
     <div class="kpi">
-      <div class="kpi-label">With Raiku</div>
-      <div class="kpi-value white" id="cust-k-with">—</div>
-      <div class="kpi-sub">cost / block (lamports)</div>
+      <div class="kpi-label">Remaining CU</div>
+      <div class="kpi-value white" id="cust-k-remaining">—</div>
+      <div class="kpi-sub">available / block</div>
     </div>
     <div class="kpi">
-      <div class="kpi-label">Savings / block</div>
-      <div class="kpi-value blue" id="cust-k-savings">—</div>
+      <div class="kpi-label">Spend / block</div>
+      <div class="kpi-value white" id="cust-k-spend">—</div>
       <div class="kpi-sub">lamports</div>
     </div>
     <div class="kpi">
-      <div class="kpi-label">Savings %</div>
-      <div class="kpi-value blue" id="cust-k-pct">—</div>
-      <div class="kpi-sub">vs. non-Raiku baseline</div>
+      <div class="kpi-label">Blended fee / CU</div>
+      <div class="kpi-value white" id="cust-k-blended">—</div>
+      <div class="kpi-sub">L/CU all routes</div>
+    </div>
+  </div>
+
+  <!-- KPI row 2: Capacity -->
+  <div class="kpi-row fade-in">
+    <div class="kpi">
+      <div class="kpi-label">Raiku offerable</div>
+      <div class="kpi-value white" id="cust-k-offerable">—</div>
+      <div class="kpi-sub">blocks / epoch</div>
     </div>
     <div class="kpi">
-      <div class="kpi-label">Weighted fee / CU</div>
-      <div class="kpi-value white" id="cust-k-wfee">—</div>
-      <div class="kpi-sub">L/CU with Raiku</div>
+      <div class="kpi-label">Client target</div>
+      <div class="kpi-value white" id="cust-k-target">—</div>
+      <div class="kpi-sub">blocks / epoch</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Coverage ratio</div>
+      <div class="kpi-value white" id="cust-k-coverage">—</div>
+      <div class="kpi-sub">offerable / target</div>
     </div>
   </div>
 
@@ -2446,33 +2517,39 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <th style="text-align:left;padding:4px 0;font-weight:500;border-bottom:1px solid var(--card-border);">Route</th>
           <th style="text-align:right;padding:4px 8px;font-weight:500;border-bottom:1px solid var(--card-border);">CU / block</th>
           <th style="text-align:right;padding:4px 8px;font-weight:500;border-bottom:1px solid var(--card-border);">Fee / CU (L)</th>
-          <th style="text-align:right;padding:4px 0 4px 8px;font-weight:500;border-bottom:1px solid var(--card-border);">Cost / block (L)</th>
+          <th style="text-align:right;padding:4px 0 4px 8px;font-weight:500;border-bottom:1px solid var(--card-border);">Spend / block (L)</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td style="padding:7px 0;color:var(--lime-soft);">AOT</td>
-          <td style="text-align:right;padding:7px 8px;" id="cust-td-aot-cu">—</td>
-          <td style="text-align:right;padding:7px 8px;" id="cust-td-aot-fee">—</td>
-          <td style="text-align:right;padding:7px 0 7px 8px;" id="cust-td-aot-cost">—</td>
+          <td style="padding:6px 0;color:var(--lime-soft);">AOT</td>
+          <td style="text-align:right;padding:6px 8px;" id="cust-td-aot-cu">—</td>
+          <td style="text-align:right;padding:6px 8px;" id="cust-td-aot-fee">—</td>
+          <td style="text-align:right;padding:6px 0 6px 8px;" id="cust-td-aot-cost">—</td>
         </tr>
         <tr>
-          <td style="padding:7px 0;color:#8bc4f5;">Raiku JIT</td>
-          <td style="text-align:right;padding:7px 8px;" id="cust-td-rjit-cu">—</td>
-          <td style="text-align:right;padding:7px 8px;" id="cust-td-rjit-fee">—</td>
-          <td style="text-align:right;padding:7px 0 7px 8px;" id="cust-td-rjit-cost">—</td>
+          <td style="padding:6px 0;color:#8bc4f5;">Raiku JIT</td>
+          <td style="text-align:right;padding:6px 8px;" id="cust-td-rjit-cu">—</td>
+          <td style="text-align:right;padding:6px 8px;" id="cust-td-rjit-fee">—</td>
+          <td style="text-align:right;padding:6px 0 6px 8px;" id="cust-td-rjit-cost">—</td>
         </tr>
         <tr>
-          <td style="padding:7px 0;color:var(--text-mid);">Non-Raiku JIT</td>
-          <td style="text-align:right;padding:7px 8px;" id="cust-td-njit-cu">—</td>
-          <td style="text-align:right;padding:7px 8px;" id="cust-td-njit-fee">—</td>
-          <td style="text-align:right;padding:7px 0 7px 8px;" id="cust-td-njit-cost">—</td>
+          <td style="padding:6px 0;color:var(--text-mid);">Non-Raiku JIT</td>
+          <td style="text-align:right;padding:6px 8px;" id="cust-td-njit-cu">—</td>
+          <td style="text-align:right;padding:6px 8px;" id="cust-td-njit-fee">—</td>
+          <td style="text-align:right;padding:6px 0 6px 8px;" id="cust-td-njit-cost">—</td>
+        </tr>
+        <tr style="border-top:1px solid var(--card-border);">
+          <td style="padding:6px 0;color:var(--text);font-weight:600;">Total</td>
+          <td style="text-align:right;padding:6px 8px;color:var(--text);font-weight:600;" id="cust-td-total-cu">—</td>
+          <td style="text-align:right;padding:6px 8px;"></td>
+          <td style="text-align:right;padding:6px 0 6px 8px;color:var(--text);font-weight:600;" id="cust-td-total-cost">—</td>
         </tr>
       </tbody>
     </table>
     <p style="color:var(--text2);font-size:10px;margin-top:10px;line-height:1.5;">
-      V1 — per-block view only. Values are editable starting points seeded from median on-chain data.<br>
-      "Without Raiku" assumes all CU transact at the Non-Raiku JIT rate.
+      Values are editable starting points. Category seeding uses median on-chain data where available — no hidden route split logic.
+      This tool does not model or claim Raiku reduces execution cost.
     </p>
   </div>
 
@@ -3026,12 +3103,12 @@ const SLIDER_META = {
   'sl-fcu':        { nudge: 0.05, largeNudge: 0.5,   decimals: 2, unit: 'lam/CU', prefix: false },
   'sl-jit-market': { nudge: 100000, largeNudge: 500000, decimals: 0, unit: 'SOL/yr', prefix: false },
   'sl-jit':        { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
-  'cust-aot-cu-sl':   { nudge: 10000, largeNudge: 100000, decimals: 0, unit: 'CU',   prefix: false },
-  'cust-aot-fee-sl':  { nudge: 0.5,   largeNudge: 2,      decimals: 1, unit: 'L/CU', prefix: false },
-  'cust-rjit-cu-sl':  { nudge: 10000, largeNudge: 100000, decimals: 0, unit: 'CU',   prefix: false },
-  'cust-rjit-fee-sl': { nudge: 0.5,   largeNudge: 2,      decimals: 1, unit: 'L/CU', prefix: false },
-  'cust-njit-cu-sl':  { nudge: 10000, largeNudge: 100000, decimals: 0, unit: 'CU',   prefix: false },
-  'cust-njit-fee-sl': { nudge: 0.5,   largeNudge: 2,      decimals: 1, unit: 'L/CU', prefix: false },
+  'cust-aot-cu-sl':   { nudge: 500000,  largeNudge: 5000000, decimals: 0, unit: 'CU',   prefix: false },
+  'cust-aot-fee-sl':  { nudge: 0.5,     largeNudge: 2,       decimals: 1, unit: 'L/CU', prefix: false },
+  'cust-rjit-cu-sl':  { nudge: 500000,  largeNudge: 5000000, decimals: 0, unit: 'CU',   prefix: false },
+  'cust-rjit-fee-sl': { nudge: 0.5,     largeNudge: 2,       decimals: 1, unit: 'L/CU', prefix: false },
+  'cust-njit-cu-sl':  { nudge: 500000,  largeNudge: 5000000, decimals: 0, unit: 'CU',   prefix: false },
+  'cust-njit-fee-sl': { nudge: 0.5,     largeNudge: 2,       decimals: 1, unit: 'L/CU', prefix: false },
 };
 
 const SC = {
@@ -9212,44 +9289,109 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
 <script>
 // ─── Customer Economics Tab ──────────────────────────────────────────────────
-// V1 — per-block comparison only. Seeded from medianProfile as an editable
-// starting point. Not canonical protocol-level data logic.
+// Scenario configurator — neutral per-block profile tool.
+// No comparison framing, no hidden route split logic.
 
-var customerState = { aotCu:0, aotFee:0, rjitCu:0, rjitFee:0, njitCu:0, njitFee:0 };
+var CUST_BLOCK_SIZE = 60000000;
 
-// V1 local seeding multipliers — explicit and easy to revise later:
-//   AOT        : 50% of baseline CU, 80% of baseline fee (reserved slot, guaranteed = cheaper)
-//   Raiku JIT  : 30% of baseline CU, 100% of baseline fee (at-market via Raiku)
-//   Non-Raiku JIT: 20% of baseline CU, 150% of baseline fee (competitive, no guarantee)
+// Display order for this tab (Custom first, then arb_bot, then CORE_GROUP_SPECS order)
+var CUST_CAT_ORDER = [
+    { id: 'custom',    label: 'Custom',        isCustom: true },
+    { id: 'arb_bot',   label: 'Arbitrage Bot'  },
+    { id: 'prop_amm',  label: 'Prop AMM'       },
+    { id: 'cranker',   label: 'Cranker'        },
+    { id: 'oracle',    label: 'Oracle'         },
+    { id: 'payments',  label: 'Payments'       },
+    { id: 'dex',       label: 'DEX'            },
+    { id: 'lending',   label: 'Lending'        },
+    { id: 'perps',     label: 'Perps'          },
+    { id: 'bridge',    label: 'Bridge'         },
+    { id: 'nft',       label: 'NFT'            },
+    { id: 'gaming',    label: 'Gaming'         },
+    { id: 'depin',     label: 'Depin'          }
+];
+
+var customerState = {
+    aotCu:0, aotFee:0, rjitCu:0, rjitFee:0, njitCu:0, njitFee:0,
+    aotShare:0.5, raikuStake:0.05, solPrice:120, blocksPerEpoch:420000, clientTarget:10000
+};
+
+function _custGetProfile(catId) {
+    if(catId === 'custom') return null;
+    try {
+        var d = getBuilderCatData(catId, null);
+        return (d && d.medianProfile) ? d.medianProfile : null;
+    } catch(e) { return null; }
+}
+
+function _custGetSpec(catId) {
+    if(catId === 'arb_bot') return typeof BENCHMARK_GROUP_SPEC !== 'undefined' ? BENCHMARK_GROUP_SPEC : null;
+    return (typeof CORE_GROUP_SPECS !== 'undefined' ? CORE_GROUP_SPECS : []).find(function(g){ return g.id === catId; }) || null;
+}
+
+function _custDataTag(catId, prof) {
+    if(catId === 'custom') return '';
+    if(!prof || prof.cu <= 0) return 'No data';
+    var spec = _custGetSpec(catId);
+    return (spec && spec.lowData) ? 'Low data' : '';
+}
+
+function populateCustCategorySelect() {
+    var sel = document.getElementById('cust-cat-select');
+    if(!sel) return;
+    CUST_CAT_ORDER.forEach(function(cat) {
+        var prof = _custGetProfile(cat.id);
+        var tag  = _custDataTag(cat.id, prof);
+        var text = cat.label;
+        if(tag) text += '  \u2014  ' + tag;
+        var opt = document.createElement('option');
+        opt.value = cat.id;
+        opt.textContent = text;
+        sel.appendChild(opt);
+    });
+}
+
+function updateCustCatInfo(catId) {
+    var el = document.getElementById('cust-cat-info');
+    if(!el) return;
+    if(catId === 'custom') { el.textContent = 'Custom \u2014 enter values manually.'; return; }
+    var prof = _custGetProfile(catId);
+    var tag  = _custDataTag(catId, prof);
+    if(!prof || prof.cu <= 0) { el.textContent = 'No on-chain data available for this category.'; return; }
+    var fcu = prof.feePerCU != null ? prof.feePerCU.toFixed(1) : '\u2014';
+    var cu  = prof.cu > 0 ? (prof.cu >= 1000000 ? (prof.cu/1000000).toFixed(1)+'M' : Math.round(prof.cu/1000)+'K') : '\u2014';
+    var line = 'Median: ' + fcu + ' L/CU \u00b7 ' + cu + ' CU/blk';
+    if(tag) line += '  (' + tag + ')';
+    el.textContent = line;
+}
+
 function seedCustomerFromCategory(catId) {
-    var catData = null;
-    try { catData = getBuilderCatData(catId, null); } catch(e) {}
-    var prof = catData && catData.medianProfile ? catData.medianProfile : null;
-    var baseCu  = (prof && prof.cu  > 0) ? Math.round(prof.cu)  : 500000;
-    var baseFee = (prof && prof.feePerCU > 0) ? prof.feePerCU : 25;
-
-    customerState.aotCu   = Math.round(baseCu * 0.5);
-    customerState.aotFee  = +(baseFee * 0.8).toFixed(2);
-    customerState.rjitCu  = Math.round(baseCu * 0.3);
-    customerState.rjitFee = +(baseFee * 1.0).toFixed(2);
-    customerState.njitCu  = Math.round(baseCu * 0.2);
-    customerState.njitFee = +(baseFee * 1.5).toFixed(2);
-
-    syncCustomerInputsFromState();
+    updateCustCatInfo(catId);
+    if(catId !== 'custom') {
+        var prof = _custGetProfile(catId);
+        if(prof && prof.cu > 0) {
+            // Seed all routes directly from medianProfile — no split logic applied
+            var cu  = Math.round(prof.cu);
+            var fee = +(prof.feePerCU > 0 ? prof.feePerCU : 0).toFixed(1);
+            customerState.aotCu   = cu;   customerState.aotFee  = fee;
+            customerState.rjitCu  = cu;   customerState.rjitFee = fee;
+            customerState.njitCu  = cu;   customerState.njitFee = fee;
+        } else {
+            customerState.aotCu = customerState.aotFee = 0;
+            customerState.rjitCu = customerState.rjitFee = 0;
+            customerState.njitCu = customerState.njitFee = 0;
+        }
+        syncCustomerRouteSliders();
+    }
     updateCustomerCalcs();
 }
 
-function syncCustomerInputsFromState() {
+function syncCustomerRouteSliders() {
     var s = customerState;
-    var entries = [
-        ['cust-aot-cu-sl',   s.aotCu],
-        ['cust-aot-fee-sl',  s.aotFee],
-        ['cust-rjit-cu-sl',  s.rjitCu],
-        ['cust-rjit-fee-sl', s.rjitFee],
-        ['cust-njit-cu-sl',  s.njitCu],
-        ['cust-njit-fee-sl', s.njitFee]
-    ];
-    entries.forEach(function(e) {
+    [['cust-aot-cu-sl', s.aotCu], ['cust-aot-fee-sl', s.aotFee],
+     ['cust-rjit-cu-sl', s.rjitCu], ['cust-rjit-fee-sl', s.rjitFee],
+     ['cust-njit-cu-sl', s.njitCu], ['cust-njit-fee-sl', s.njitFee]
+    ].forEach(function(e) {
         var sl = document.getElementById(e[0]);
         if(!sl) return;
         sl.value = e[1];
@@ -9259,66 +9401,114 @@ function syncCustomerInputsFromState() {
 
 function readCustomerInputs() {
     function n(id){ var el=document.getElementById(id); return el ? parseFloat(el.value)||0 : 0; }
-    customerState.aotCu   = n('cust-aot-cu-sl');
-    customerState.aotFee  = n('cust-aot-fee-sl');
-    customerState.rjitCu  = n('cust-rjit-cu-sl');
-    customerState.rjitFee = n('cust-rjit-fee-sl');
-    customerState.njitCu  = n('cust-njit-cu-sl');
-    customerState.njitFee = n('cust-njit-fee-sl');
+    customerState.aotCu          = n('cust-aot-cu-sl');
+    customerState.aotFee         = n('cust-aot-fee-sl');
+    customerState.rjitCu         = n('cust-rjit-cu-sl');
+    customerState.rjitFee        = n('cust-rjit-fee-sl');
+    customerState.njitCu         = n('cust-njit-cu-sl');
+    customerState.njitFee        = n('cust-njit-fee-sl');
+    customerState.aotShare       = n('cust-ctx-aot-share') / 100;
+    customerState.raikuStake     = n('cust-ctx-stake') / 100;
+    customerState.solPrice       = n('cust-ctx-sol');
+    customerState.blocksPerEpoch = n('cust-ctx-bpe');
+    customerState.clientTarget   = n('cust-ctx-target');
 }
 
 function updateCustomerCalcs() {
     var s = customerState;
-    var totalCu = s.aotCu + s.rjitCu + s.njitCu;
-    var without = totalCu * s.njitFee;
-    var withR   = (s.aotCu * s.aotFee) + (s.rjitCu * s.rjitFee) + (s.njitCu * s.njitFee);
-    var savings = without - withR;
-    var savPct  = without > 0 ? (savings / without * 100) : 0;
-    var wFee    = totalCu > 0 ? (withR / totalCu) : 0;
+    var totalCu    = s.aotCu + s.rjitCu + s.njitCu;
+    var totalSpend = (s.aotCu * s.aotFee) + (s.rjitCu * s.rjitFee) + (s.njitCu * s.njitFee);
+    var blended    = totalCu > 0 ? totalSpend / totalCu : 0;
+    var remaining  = CUST_BLOCK_SIZE - totalCu;
+    var offerable  = Math.round(s.raikuStake * s.blocksPerEpoch);
+    var coverage   = s.clientTarget > 0 ? offerable / s.clientTarget : 0;
 
-    function fmtL(v){ return Math.round(v).toLocaleString(); }
-    function fmtF(v){ return v.toFixed(1); }
+    function fmtK(v) {
+        var a = Math.abs(v);
+        var s2 = a >= 1000000 ? (a/1000000).toFixed(1)+'M' : a >= 1000 ? (a/1000).toFixed(0)+'K' : Math.round(a).toString();
+        return v < 0 ? '-'+s2 : s2;
+    }
     function set(id, v){ var el=document.getElementById(id); if(el) el.textContent = v; }
+    function setColor(id, c){ var el=document.getElementById(id); if(el) el.style.color = c; }
 
-    set('cust-k-without', fmtL(without) + ' L');
-    set('cust-k-with',    fmtL(withR)   + ' L');
-    set('cust-k-savings', fmtL(savings) + ' L');
-    set('cust-k-pct',     savPct.toFixed(1) + '%');
-    set('cust-k-wfee',    fmtF(wFee) + ' L/CU');
+    // Guardrail
+    var gEl = document.getElementById('cust-guardrail');
+    var gVal = document.getElementById('cust-guardrail-val');
+    if(gEl && gVal) {
+        gVal.textContent = fmtK(totalCu) + ' / 60M';
+        if(totalCu > CUST_BLOCK_SIZE) {
+            gEl.style.background = '#2a1010'; gEl.style.borderColor = '#c44444';
+            gVal.style.color = '#ff6b6b';
+        } else if(totalCu > CUST_BLOCK_SIZE * 0.9) {
+            gEl.style.background = '#2a2010'; gEl.style.borderColor = '#c48844';
+            gVal.style.color = '#ffbb55';
+        } else {
+            gEl.style.background = '#1a1c22'; gEl.style.borderColor = 'var(--card-border)';
+            gVal.style.color = 'var(--text)';
+        }
+    }
+
+    // Context slider displays
+    set('cust-ctx-aot-share-val', (s.aotShare * 100).toFixed(0) + '%');
+    set('cust-ctx-stake-val',     (s.raikuStake * 100).toFixed(1) + '%');
+
+    // KPI row 1
+    set('cust-k-total-cu',  fmtK(totalCu));
+    setColor('cust-k-total-cu', totalCu > CUST_BLOCK_SIZE ? '#ff6b6b' : '');
+    set('cust-k-remaining', fmtK(remaining));
+    setColor('cust-k-remaining', remaining < 0 ? '#ff6b6b' : '');
+    set('cust-k-spend',   Math.round(totalSpend).toLocaleString() + ' L');
+    set('cust-k-blended', blended.toFixed(1) + ' L/CU');
+
+    // KPI row 2
+    set('cust-k-offerable', offerable.toLocaleString());
+    set('cust-k-target',    Math.round(s.clientTarget).toLocaleString());
+    set('cust-k-coverage',  s.clientTarget > 0 ? coverage.toFixed(2) + '\u00d7' : '\u2014');
 
     // Route breakdown table
-    function setRoute(prefix, cu, fee) {
-        set(prefix + '-cu',   Math.round(cu).toLocaleString());
-        set(prefix + '-fee',  fmtF(fee));
-        set(prefix + '-cost', fmtL(cu * fee));
+    function setRow(pfx, cu, fee) {
+        set(pfx+'-cu',   Math.round(cu).toLocaleString());
+        set(pfx+'-fee',  fee.toFixed(1));
+        set(pfx+'-cost', Math.round(cu * fee).toLocaleString());
     }
-    setRoute('cust-td-aot',  s.aotCu,  s.aotFee);
-    setRoute('cust-td-rjit', s.rjitCu, s.rjitFee);
-    setRoute('cust-td-njit', s.njitCu, s.njitFee);
+    setRow('cust-td-aot',  s.aotCu,  s.aotFee);
+    setRow('cust-td-rjit', s.rjitCu, s.rjitFee);
+    setRow('cust-td-njit', s.njitCu, s.njitFee);
+    set('cust-td-total-cu',   Math.round(totalCu).toLocaleString());
+    set('cust-td-total-cost', Math.round(totalSpend).toLocaleString());
 }
 
 function initCustomerTab() {
-    // Populate category select from CORE_GROUP_SPECS (always available, no async dependency)
+    populateCustCategorySelect();
     var sel = document.getElementById('cust-cat-select');
-    if(sel && typeof CORE_GROUP_SPECS !== 'undefined') {
-        CORE_GROUP_SPECS.forEach(function(g) {
-            var opt = document.createElement('option');
-            opt.value = g.id;
-            opt.textContent = g.label + (g.lowData ? ' \u26ac' : '');
-            sel.appendChild(opt);
-        });
-        sel.addEventListener('change', function(){ seedCustomerFromCategory(this.value); });
-        seedCustomerFromCategory(CORE_GROUP_SPECS[0].id); // default: prop_amm
-    }
-    // Wire slider input events → recalc (initHybridControls handles stepper-input ↔ slider sync)
+    if(sel) sel.addEventListener('change', function(){ seedCustomerFromCategory(this.value); });
+
+    // Demand sliders
     ['cust-aot-cu-sl','cust-aot-fee-sl','cust-rjit-cu-sl','cust-rjit-fee-sl','cust-njit-cu-sl','cust-njit-fee-sl'].forEach(function(id) {
         var sl = document.getElementById(id);
         if(sl) sl.addEventListener('input', function(){ readCustomerInputs(); updateCustomerCalcs(); });
     });
+
+    // Context sliders
+    ['cust-ctx-aot-share','cust-ctx-stake'].forEach(function(id) {
+        var sl = document.getElementById(id);
+        if(sl) sl.addEventListener('input', function(){ readCustomerInputs(); updateCustomerCalcs(); });
+    });
+
+    // Context number inputs
+    ['cust-ctx-sol','cust-ctx-bpe','cust-ctx-target'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if(el) el.addEventListener('input', function(){ readCustomerInputs(); updateCustomerCalcs(); });
+    });
+
+    // Initialize with Custom (blank start)
+    readCustomerInputs();
+    updateCustCatInfo('custom');
+    updateCustomerCalcs();
 }
 
 document.addEventListener('DOMContentLoaded', initCustomerTab);
-// ────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 </script>
 </body>
 </html>
