@@ -2371,9 +2371,12 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 <div class="validator-side" style="overflow-y:auto;max-height:calc(100vh - 20px);">
 <div style="display:flex;flex-direction:column;gap:12px;padding-bottom:24px;">
 
+  <h2 style="font-size:12px;font-weight:600;color:var(--lime-soft);text-transform:uppercase;letter-spacing:2px;font-family:var(--font-mono);margin:2px 0 0 0;">Customer Setup</h2>
+  <p style="color:var(--text2);font-size:9px;line-height:1.5;margin:0 0 4px;font-family:var(--font-mono);">Configure a customer execution profile using category presets seeded from on-chain data. This is a scenario tool — values are editable starting points, not cost guarantees.</p>
+
   <!-- Section 1: Customer demand -->
   <div class="section fade-in fade-in-2" style="margin-bottom:0;display:flex;flex-direction:column;gap:8px;">
-    <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--card-border);padding-bottom:4px;font-family:var(--font-mono);">Customer Demand</div>
+    <h2>Customer Demand</h2>
 
     <!-- Category selector -->
     <div class="control" style="gap:4px;">
@@ -2381,87 +2384,103 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
 
-    <!-- Raiku Blocks sub-group -->
-    <div id="cust-guardrail-raiku" style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:#1a1c22;border-radius:4px;border:1px solid var(--card-border);font-size:10px;font-family:var(--font-mono);">
-      <span style="color:var(--lime-soft);font-weight:600;letter-spacing:.06em;text-transform:uppercase;">Raiku Blocks &mdash; CU / block</span>
-      <span id="cust-guardrail-raiku-val" style="color:var(--text);">0 / 60,000,000</span>
-    </div>
+    <!-- Raiku Blocks group label -->
+    <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--lime-soft);font-family:var(--font-mono);margin-top:8px;padding-bottom:3px;border-bottom:1px solid #1c2030;">Raiku Blocks</div>
 
-    <!-- AOT -->
-    <div class="cust-route-card">
-      <div class="cust-route-title" style="color:var(--lime-soft);">AOT</div>
-      <div class="cust-route-grid">
-        <div class="control">
-          <label>CU / block</label>
-          <div class="slider-row">
-            <input type="range" id="cust-aot-cu-sl" min="0" max="60000000" step="100000" value="0">
-            <span class="val">0</span>
+    <!-- Raiku Blocks wrapper -->
+    <div style="display:flex;flex-direction:column;gap:6px;padding:10px;background:#090b10;border:1px solid #1c2030;border-radius:6px;">
+
+      <!-- Raiku Blocks sub-group -->
+      <div id="cust-guardrail-raiku" style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:#1a1c22;border-radius:4px;border:1px solid var(--card-border);font-size:10px;font-family:var(--font-mono);">
+        <span style="color:var(--lime-soft);font-weight:600;letter-spacing:.06em;text-transform:uppercase;">Raiku Blocks &mdash; CU / block</span>
+        <span id="cust-guardrail-raiku-val" style="color:var(--text);">0 / 60,000,000</span>
+      </div>
+
+      <!-- AOT -->
+      <div class="cust-route-card">
+        <div class="cust-route-title" style="color:var(--lime-soft);">Raiku AOT</div>
+        <div class="cust-route-grid">
+          <div class="control">
+            <label>CU / block</label>
+            <div class="slider-row">
+              <input type="range" id="cust-aot-cu-sl" min="0" max="60000000" step="100000" value="0">
+              <span class="val">0</span>
+            </div>
+          </div>
+          <div class="control">
+            <label>Fee / CU (L)</label>
+            <div class="slider-row">
+              <input type="range" id="cust-aot-fee-sl" min="0" max="25" step="0.1" value="0">
+              <span class="val">0</span>
+            </div>
           </div>
         </div>
-        <div class="control">
-          <label>Fee / CU (L)</label>
-          <div class="slider-row">
-            <input type="range" id="cust-aot-fee-sl" min="0" max="25" step="0.1" value="0">
-            <span class="val">0</span>
+        <div id="cust-aot-warn" class="cust-aot-warn">AOT CU exceeds allocation — max <span id="cust-aot-max-cu">—</span> CU at <span id="cust-aot-alloc-pct">—</span>% block share.</div>
+      </div>
+
+      <!-- Raiku JIT -->
+      <div class="cust-route-card">
+        <div class="cust-route-title" style="color:#8bc4f5;">Raiku JIT</div>
+        <div class="cust-route-grid">
+          <div class="control">
+            <label>CU / block</label>
+            <div class="slider-row">
+              <input type="range" id="cust-rjit-cu-sl" min="0" max="60000000" step="100000" value="0">
+              <span class="val">0</span>
+            </div>
+          </div>
+          <div class="control">
+            <label>Fee / CU (L)</label>
+            <div class="slider-row">
+              <input type="range" id="cust-rjit-fee-sl" min="0" max="25" step="0.1" value="0">
+              <span class="val">0</span>
+            </div>
           </div>
         </div>
       </div>
-      <div id="cust-aot-warn" class="cust-aot-warn">AOT CU exceeds allocation — max <span id="cust-aot-max-cu">—</span> CU at <span id="cust-aot-alloc-pct">—</span>% block share.</div>
-    </div>
 
-    <!-- Raiku JIT -->
-    <div class="cust-route-card">
-      <div class="cust-route-title" style="color:#8bc4f5;">Raiku JIT</div>
-      <div class="cust-route-grid">
-        <div class="control">
-          <label>CU / block</label>
-          <div class="slider-row">
-            <input type="range" id="cust-rjit-cu-sl" min="0" max="60000000" step="100000" value="0">
-            <span class="val">0</span>
+    </div><!-- end Raiku Blocks wrapper -->
+
+    <!-- Non-Raiku Blocks group label -->
+    <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text2);font-family:var(--font-mono);margin-top:12px;padding-bottom:3px;border-bottom:1px solid #1c2030;">Non-Raiku Blocks</div>
+
+    <!-- Non-Raiku Blocks wrapper -->
+    <div style="display:flex;flex-direction:column;gap:6px;padding:10px;background:#090b10;border:1px solid #1c2030;border-radius:6px;margin-top:4px;">
+
+      <!-- Non-Raiku Blocks sub-group -->
+      <div id="cust-guardrail-njit" style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:#1a1c22;border-radius:4px;border:1px solid var(--card-border);font-size:10px;font-family:var(--font-mono);">
+        <span style="color:var(--text2);font-weight:600;letter-spacing:.06em;text-transform:uppercase;">Non-Raiku Blocks &mdash; CU / block</span>
+        <span id="cust-guardrail-njit-val" style="color:var(--text);">0 / 60,000,000</span>
+      </div>
+
+      <!-- Other JIT -->
+      <div class="cust-route-card">
+        <div class="cust-route-title" style="color:var(--text2);">Other JIT</div>
+        <div class="cust-route-grid">
+          <div class="control">
+            <label>CU / block</label>
+            <div class="slider-row">
+              <input type="range" id="cust-njit-cu-sl" min="0" max="60000000" step="100000" value="0">
+              <span class="val">0</span>
+            </div>
           </div>
-        </div>
-        <div class="control">
-          <label>Fee / CU (L)</label>
-          <div class="slider-row">
-            <input type="range" id="cust-rjit-fee-sl" min="0" max="25" step="0.1" value="0">
-            <span class="val">0</span>
+          <div class="control">
+            <label>Fee / CU (L)</label>
+            <div class="slider-row">
+              <input type="range" id="cust-njit-fee-sl" min="0" max="25" step="0.1" value="0">
+              <span class="val">0</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Non-Raiku Blocks sub-group -->
-    <div id="cust-guardrail-njit" style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:#1a1c22;border-radius:4px;border:1px solid var(--card-border);font-size:10px;font-family:var(--font-mono);margin-top:4px;">
-      <span style="color:var(--text2);font-weight:600;letter-spacing:.06em;text-transform:uppercase;">Non-Raiku Blocks &mdash; CU / block</span>
-      <span id="cust-guardrail-njit-val" style="color:var(--text);">0 / 60,000,000</span>
-    </div>
-
-    <!-- Other JIT -->
-    <div class="cust-route-card">
-      <div class="cust-route-title" style="color:var(--text2);">Other JIT</div>
-      <div class="cust-route-grid">
-        <div class="control">
-          <label>CU / block</label>
-          <div class="slider-row">
-            <input type="range" id="cust-njit-cu-sl" min="0" max="60000000" step="100000" value="0">
-            <span class="val">0</span>
-          </div>
-        </div>
-        <div class="control">
-          <label>Fee / CU (L)</label>
-          <div class="slider-row">
-            <input type="range" id="cust-njit-fee-sl" min="0" max="25" step="0.1" value="0">
-            <span class="val">0</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    </div><!-- end Non-Raiku Blocks wrapper -->
 
   </div><!-- end demand section -->
 
   <!-- Section 2: Capacity & Context -->
   <div class="section fade-in fade-in-3" style="margin-bottom:0;display:flex;flex-direction:column;gap:6px;">
-    <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--card-border);padding-bottom:4px;font-family:var(--font-mono);">Capacity &amp; Context</div>
+    <h2>Capacity &amp; Context</h2>
 
     <!-- Raiku stake -->
     <div class="control">
@@ -2498,7 +2517,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
     <!-- AOT block share -->
     <div class="control" style="margin-top:4px;">
-      <label>AOT block allocation</label>
+      <label>Maximum AOT block allocation</label>
       <div class="slider-row">
         <input type="range" id="cust-ctx-aot-share" min="0" max="80" step="1" value="8">
         <span class="val" id="cust-ctx-aot-share-val">8%</span>
@@ -2513,11 +2532,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 <!-- RIGHT: descriptive outputs -->
 <div style="overflow-y:auto;padding:12px 16px 16px;background:var(--card);border:1px solid var(--card-border);border-radius:8px;display:flex;flex-direction:column;gap:14px;">
 
-  <!-- Intro -->
-  <p style="color:var(--text2);font-size:10px;line-height:1.6;margin:0;padding:0 2px;">
-    Configure a customer execution profile using category presets seeded from on-chain data.
-    This is a scenario tool — values are editable starting points, not cost guarantees.
-  </p>
+  <h2 style="font-size:12px;font-weight:600;color:var(--lime-soft);text-transform:uppercase;letter-spacing:2px;font-family:var(--font-mono);margin:0 0 4px 0;">Customer Results</h2>
 
   <!-- A. Spend — primary story, 3 explicit figures -->
   <div class="cust-panel-section fade-in">
