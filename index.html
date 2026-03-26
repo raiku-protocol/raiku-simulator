@@ -243,6 +243,23 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-summary-sub { font-size:9px; color:var(--text2); font-family:var(--font-mono); }
 .cust-coverage-text { font-size:10px; line-height:1.5; color:var(--text-mid); padding-top:5px; border-top:1px solid var(--card-border); margin-top:2px; }
 .cust-scenario-text { font-size:11px; line-height:1.75; color:var(--text2); padding:10px 14px; background:#0c0e13; border-left:2px solid #2a2e3a; border-radius:0 4px 4px 0; font-family:var(--font-mono); }
+/* Customer Economics — wider left panel */
+#tab-customer .validator-layout { grid-template-columns:460px 1fr; }
+#tab-customer .validator-side { width:460px; min-width:460px; }
+/* Route grid — 2 col side-by-side controls */
+.cust-route-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px 10px; }
+.cust-route-grid .control { margin-bottom:0; }
+#tab-customer .cust-route-grid .control label { font-size:9px; }
+#tab-customer .cust-route-grid .stepper-input { width:60px; }
+#tab-customer .cust-route-grid .stepper-unit { font-size:9px; }
+/* Context section rows */
+.cust-ctx-row { display:flex; justify-content:space-between; align-items:center; padding:3px 0; }
+.cust-ctx-label { font-size:9px; color:var(--text2); font-family:var(--font-mono); }
+.cust-ctx-static { font-size:9px; color:var(--text2); font-family:var(--font-mono); opacity:0.7; font-style:italic; }
+.cust-ctx-derived { font-size:10px; color:var(--text-mid); font-family:var(--font-mono); font-weight:600; }
+.cust-ctx-num { background:#141516; color:var(--text); border:1px solid #333; border-radius:3px; padding:2px 6px; font-size:10px; font-family:var(--font-mono); width:68px; text-align:right; outline:none; }
+/* AOT capacity warning */
+.cust-aot-warn { display:none; margin-top:4px; padding:5px 8px; background:#1e1005; border:1px solid #a05010; border-radius:4px; font-size:9px; font-family:var(--font-mono); color:#e8902a; line-height:1.5; }
 .sidebar .section-label { font-size:10px; margin-top:12px; padding-bottom:2px; border-bottom:1px solid #1e2028; margin-bottom:2px; }
 .sidebar .section-label:first-child { margin-top:0; }
 
@@ -2346,32 +2363,25 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
 <!-- LEFT: sticky controls panel -->
 <div class="validator-side" style="overflow-y:auto;max-height:calc(100vh - 20px);">
-<div style="display:flex;flex-direction:column;gap:14px;padding-bottom:24px;">
+<div style="display:flex;flex-direction:column;gap:12px;padding-bottom:24px;">
 
-  <!-- Intro -->
+  <!-- Header -->
   <div class="section fade-in fade-in-1" style="margin-bottom:0;">
-    <h2 style="margin-bottom:4px;">Customer Profile</h2>
-    <p style="color:var(--text-mid);font-size:10px;line-height:1.6;margin-top:0;">
-      Configure a customer execution profile using editable category presets and block-level assumptions.
-      This is a scenario tool, not a claim about current customer costs.
-    </p>
+    <h2 style="margin-bottom:0;">Customer Profile</h2>
   </div>
 
   <!-- Section 1: Customer demand -->
-  <div class="section fade-in fade-in-2" style="margin-bottom:0;display:flex;flex-direction:column;gap:10px;">
+  <div class="section fade-in fade-in-2" style="margin-bottom:0;display:flex;flex-direction:column;gap:8px;">
     <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--card-border);padding-bottom:4px;font-family:var(--font-mono);">Customer Demand</div>
 
     <!-- Category selector -->
-    <div>
-      <div class="control" style="gap:4px;">
-        <label>Category</label>
-        <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:11px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
-      </div>
-      <div id="cust-cat-info" style="margin-top:5px;padding:5px 8px;background:#0e0f14;border-radius:4px;border:1px solid var(--card-border);font-size:10px;color:var(--text2);font-family:var(--font-mono);line-height:1.5;min-height:20px;">—</div>
+    <div class="control" style="gap:4px;">
+      <label>Category</label>
+      <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
 
     <!-- CU guardrail -->
-    <div id="cust-guardrail" style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:#1a1c22;border-radius:4px;border:1px solid var(--card-border);font-size:10px;font-family:var(--font-mono);">
+    <div id="cust-guardrail" style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:#1a1c22;border-radius:4px;border:1px solid var(--card-border);font-size:10px;font-family:var(--font-mono);">
       <span style="color:var(--text2);">Total CU / block</span>
       <span id="cust-guardrail-val" style="color:var(--text);">0 / 60M</span>
     </div>
@@ -2379,37 +2389,42 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <!-- AOT -->
     <div class="cust-route-card">
       <div class="cust-route-title" style="color:var(--lime-soft);">AOT</div>
-      <div class="control">
-        <label>CU / block</label>
-        <div class="slider-row">
-          <input type="range" id="cust-aot-cu-sl" min="0" max="60000000" step="100000" value="0">
-          <span class="val">0</span>
+      <div class="cust-route-grid">
+        <div class="control">
+          <label>CU / block</label>
+          <div class="slider-row">
+            <input type="range" id="cust-aot-cu-sl" min="0" max="60000000" step="100000" value="0">
+            <span class="val">0</span>
+          </div>
+        </div>
+        <div class="control">
+          <label>Fee / CU (L)</label>
+          <div class="slider-row">
+            <input type="range" id="cust-aot-fee-sl" min="0" max="25" step="0.1" value="0">
+            <span class="val">0</span>
+          </div>
         </div>
       </div>
-      <div class="control">
-        <label>Fee / CU (L)</label>
-        <div class="slider-row">
-          <input type="range" id="cust-aot-fee-sl" min="0" max="25" step="0.1" value="0">
-          <span class="val">0</span>
-        </div>
-      </div>
+      <div id="cust-aot-warn" class="cust-aot-warn">AOT CU exceeds allocation — max <span id="cust-aot-max-cu">—</span> CU at <span id="cust-aot-alloc-pct">—</span>% block share.</div>
     </div>
 
     <!-- Raiku JIT -->
     <div class="cust-route-card">
       <div class="cust-route-title" style="color:#8bc4f5;">Raiku JIT</div>
-      <div class="control">
-        <label>CU / block</label>
-        <div class="slider-row">
-          <input type="range" id="cust-rjit-cu-sl" min="0" max="60000000" step="100000" value="0">
-          <span class="val">0</span>
+      <div class="cust-route-grid">
+        <div class="control">
+          <label>CU / block</label>
+          <div class="slider-row">
+            <input type="range" id="cust-rjit-cu-sl" min="0" max="60000000" step="100000" value="0">
+            <span class="val">0</span>
+          </div>
         </div>
-      </div>
-      <div class="control">
-        <label>Fee / CU (L)</label>
-        <div class="slider-row">
-          <input type="range" id="cust-rjit-fee-sl" min="0" max="25" step="0.1" value="0">
-          <span class="val">0</span>
+        <div class="control">
+          <label>Fee / CU (L)</label>
+          <div class="slider-row">
+            <input type="range" id="cust-rjit-fee-sl" min="0" max="25" step="0.1" value="0">
+            <span class="val">0</span>
+          </div>
         </div>
       </div>
     </div>
@@ -2417,18 +2432,20 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <!-- Non-Raiku JIT -->
     <div class="cust-route-card">
       <div class="cust-route-title" style="color:var(--text2);">Non-Raiku JIT</div>
-      <div class="control">
-        <label>CU / block</label>
-        <div class="slider-row">
-          <input type="range" id="cust-njit-cu-sl" min="0" max="60000000" step="100000" value="0">
-          <span class="val">0</span>
+      <div class="cust-route-grid">
+        <div class="control">
+          <label>CU / block</label>
+          <div class="slider-row">
+            <input type="range" id="cust-njit-cu-sl" min="0" max="60000000" step="100000" value="0">
+            <span class="val">0</span>
+          </div>
         </div>
-      </div>
-      <div class="control">
-        <label>Fee / CU (L)</label>
-        <div class="slider-row">
-          <input type="range" id="cust-njit-fee-sl" min="0" max="25" step="0.1" value="0">
-          <span class="val">0</span>
+        <div class="control">
+          <label>Fee / CU (L)</label>
+          <div class="slider-row">
+            <input type="range" id="cust-njit-fee-sl" min="0" max="25" step="0.1" value="0">
+            <span class="val">0</span>
+          </div>
         </div>
       </div>
     </div>
@@ -2436,52 +2453,49 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
   </div><!-- end demand section -->
 
   <!-- Section 2: Capacity & Context -->
-  <div class="section fade-in fade-in-3" style="margin-bottom:0;display:flex;flex-direction:column;gap:8px;">
+  <div class="section fade-in fade-in-3" style="margin-bottom:0;display:flex;flex-direction:column;gap:6px;">
     <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--card-border);padding-bottom:4px;font-family:var(--font-mono);">Capacity &amp; Context</div>
-
-    <!-- Block size (static) -->
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">Block size</span>
-      <span style="font-size:10px;color:var(--text);font-family:var(--font-mono);">60,000,000 CU</span>
-    </div>
-
-    <!-- AOT block share -->
-    <div class="control">
-      <label>AOT block share</label>
-      <div class="slider-row">
-        <input type="range" id="cust-ctx-aot-share" min="0" max="80" step="1" value="50">
-        <span class="val" id="cust-ctx-aot-share-val">50%</span>
-      </div>
-    </div>
 
     <!-- Raiku stake -->
     <div class="control">
       <label>Raiku stake</label>
       <div class="slider-row">
-        <input type="range" id="cust-ctx-stake" min="0" max="50" step="0.5" value="5">
-        <span class="val" id="cust-ctx-stake-val">5.0%</span>
+        <input type="range" id="cust-ctx-stake" min="0" max="50" step="0.5" value="10">
+        <span class="val" id="cust-ctx-stake-val">10.0%</span>
       </div>
     </div>
 
     <!-- SOL price -->
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-      <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">SOL price (USD)</span>
-      <input type="number" id="cust-ctx-sol" value="120" min="1" max="5000" step="1"
-        style="background:#141516;color:var(--text);border:1px solid #333;border-radius:3px;padding:2px 6px;font-size:10px;font-family:var(--font-mono);width:68px;text-align:right;outline:none;">
+    <div class="cust-ctx-row">
+      <span class="cust-ctx-label">SOL price (USD)</span>
+      <input type="number" id="cust-ctx-sol" value="120" min="1" max="5000" step="1" class="cust-ctx-num">
     </div>
 
-    <!-- Blocks per epoch -->
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-      <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">Blocks / epoch</span>
-      <input type="number" id="cust-ctx-bpe" value="420000" min="100000" max="600000" step="1000"
-        style="background:#141516;color:var(--text);border:1px solid #333;border-radius:3px;padding:2px 6px;font-size:10px;font-family:var(--font-mono);width:68px;text-align:right;outline:none;">
+    <!-- Blocks per epoch (static) -->
+    <div class="cust-ctx-row">
+      <span class="cust-ctx-label">Blocks / epoch</span>
+      <span class="cust-ctx-static">420,000</span>
+    </div>
+
+    <!-- Raiku blocks/epoch (derived) -->
+    <div class="cust-ctx-row">
+      <span class="cust-ctx-label">Raiku blocks / epoch</span>
+      <span class="cust-ctx-derived" id="cust-ctx-raiku-bpe">—</span>
     </div>
 
     <!-- Client target blocks/epoch -->
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-      <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">Client target (blk/epoch)</span>
-      <input type="number" id="cust-ctx-target" value="10000" min="0" max="600000" step="1000"
-        style="background:#141516;color:var(--text);border:1px solid #333;border-radius:3px;padding:2px 6px;font-size:10px;font-family:var(--font-mono);width:68px;text-align:right;outline:none;">
+    <div class="cust-ctx-row">
+      <span class="cust-ctx-label">Client target (blk/epoch)</span>
+      <input type="number" id="cust-ctx-target" value="10000" min="0" max="600000" step="1000" class="cust-ctx-num">
+    </div>
+
+    <!-- AOT block share -->
+    <div class="control" style="margin-top:4px;">
+      <label>AOT block allocation</label>
+      <div class="slider-row">
+        <input type="range" id="cust-ctx-aot-share" min="0" max="80" step="1" value="8">
+        <span class="val" id="cust-ctx-aot-share-val">8%</span>
+      </div>
     </div>
 
   </div><!-- end context section -->
@@ -2491,6 +2505,12 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
 <!-- RIGHT: descriptive outputs -->
 <div style="overflow-y:auto;padding:4px 0;display:flex;flex-direction:column;gap:14px;">
+
+  <!-- Intro -->
+  <p style="color:var(--text2);font-size:10px;line-height:1.6;margin:0;padding:0 2px;">
+    Configure a customer execution profile using category presets seeded from on-chain data.
+    This is a scenario tool — values are editable starting points, not cost guarantees.
+  </p>
 
   <!-- A. Block Capacity Visual -->
   <div class="cust-panel-section fade-in">
@@ -9395,7 +9415,7 @@ var CUST_CAT_ORDER = [
 
 var customerState = {
     aotCu:0, aotFee:0, rjitCu:0, rjitFee:0, njitCu:0, njitFee:0,
-    aotShare:0.5, raikuStake:0.05, solPrice:120, blocksPerEpoch:420000, clientTarget:10000
+    aotShare:0.08, raikuStake:0.10, solPrice:120, blocksPerEpoch:420000, clientTarget:10000
 };
 
 function _custGetProfile(catId) {
@@ -9425,7 +9445,12 @@ function populateCustCategorySelect() {
         var prof = _custGetProfile(cat.id);
         var tag  = _custDataTag(cat.id, prof);
         var text = cat.label;
-        if(tag) text += '  \u2014  ' + tag;
+        if(prof && prof.cu > 0) {
+            var cuK = prof.cu >= 1000000 ? (prof.cu/1000000).toFixed(1)+'M' : Math.round(prof.cu/1000)+'K';
+            text += '  \u2014  ' + prof.feePerCU.toFixed(1) + ' L/CU \u00b7 ' + cuK + ' CU/blk';
+        } else if(tag) {
+            text += '  \u2014  ' + tag;
+        }
         var opt = document.createElement('option');
         opt.value = cat.id;
         opt.textContent = text;
@@ -9492,7 +9517,6 @@ function readCustomerInputs() {
     customerState.aotShare       = n('cust-ctx-aot-share') / 100;
     customerState.raikuStake     = n('cust-ctx-stake') / 100;
     customerState.solPrice       = n('cust-ctx-sol');
-    customerState.blocksPerEpoch = n('cust-ctx-bpe');
     customerState.clientTarget   = n('cust-ctx-target');
 }
 
@@ -9533,6 +9557,20 @@ function updateCustomerCalcs() {
     // ── Context slider displays ──
     set('cust-ctx-aot-share-val', (s.aotShare * 100).toFixed(0) + '%');
     set('cust-ctx-stake-val',     (s.raikuStake * 100).toFixed(1) + '%');
+    set('cust-ctx-raiku-bpe',     offerable.toLocaleString());
+
+    // ── AOT capacity warning ──
+    var maxAotCu = s.aotShare * CUST_BLOCK_SIZE;
+    var aotWarnEl = document.getElementById('cust-aot-warn');
+    if(aotWarnEl) {
+        if(s.aotCu > maxAotCu) {
+            aotWarnEl.style.display = 'block';
+            set('cust-aot-max-cu',    Math.round(maxAotCu).toLocaleString());
+            set('cust-aot-alloc-pct', (s.aotShare * 100).toFixed(0));
+        } else {
+            aotWarnEl.style.display = 'none';
+        }
+    }
 
     // ── A. Block Capacity Bar ──
     var aotCapPct  = Math.min(100, s.aotCu  / CUST_BLOCK_SIZE * 100);
