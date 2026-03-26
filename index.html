@@ -2302,6 +2302,14 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
 </div><!-- end tab-validator -->
 
+<style>
+/* Customer Economics — editable number input paired with .slider-row */
+input.cust-val { background:#0e0f14; border:1px solid #1a1c22; border-radius:4px; padding:2px 6px; cursor:text; outline:none; -moz-appearance:textfield; }
+input.cust-val:focus { border-color:var(--lime); }
+input.cust-val::-webkit-outer-spin-button,
+input.cust-val::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+</style>
+
 <!-- ═══ TAB: CUSTOMER ECONOMICS ═══ -->
 <div class="tab-content" id="tab-customer">
 <div class="validator-layout">
@@ -2324,48 +2332,69 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       <label>Customer Category</label>
       <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:11px;width:100%;cursor:pointer;"></select>
     </div>
+    <p style="color:var(--text2);font-size:10px;line-height:1.4;margin-top:-4px;">
+      Category defaults are editable starting points seeded from category medians and simple V1 route splits.
+    </p>
 
-    <!-- AOT route inputs -->
+    <!-- AOT route controls
+         CU/block  : range 0–1,500,000, step 1,000
+         Fee/CU (L): range 0–25, step 0.1 -->
     <div>
-      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--lime-soft);border-bottom:1px solid var(--card-border);padding-bottom:4px;margin-bottom:8px;">AOT</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;">
-        <div class="validator-context-item">
-          <div class="validator-context-label">CU / block</div>
-          <input type="number" class="validator-context-value editable" id="cust-aot-cu" step="1000" min="0" value="0">
+      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--lime-soft);border-bottom:1px solid var(--card-border);padding-bottom:4px;margin-bottom:10px;">AOT</div>
+      <div class="control">
+        <label>CU / block</label>
+        <div class="slider-row">
+          <input type="range" id="cust-aot-cu-sl" min="0" max="1500000" step="1000" value="0">
+          <input type="number" id="cust-aot-cu" class="val cust-val" min="0" max="1500000" step="1000" value="0">
         </div>
-        <div class="validator-context-item">
-          <div class="validator-context-label">Fee / CU (L)</div>
-          <input type="number" class="validator-context-value editable" id="cust-aot-fee" step="0.1" min="0" value="0">
+      </div>
+      <div class="control" style="margin-top:8px;">
+        <label>Fee / CU (L)</label>
+        <div class="slider-row">
+          <input type="range" id="cust-aot-fee-sl" min="0" max="25" step="0.1" value="0">
+          <input type="number" id="cust-aot-fee" class="val cust-val" min="0" max="25" step="0.1" value="0">
         </div>
       </div>
     </div>
 
-    <!-- Raiku JIT route inputs -->
+    <!-- Raiku JIT route controls
+         CU/block  : range 0–1,500,000, step 1,000
+         Fee/CU (L): range 0–25, step 0.1 -->
     <div>
-      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#8bc4f5;border-bottom:1px solid var(--card-border);padding-bottom:4px;margin-bottom:8px;">Raiku JIT</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;">
-        <div class="validator-context-item">
-          <div class="validator-context-label">CU / block</div>
-          <input type="number" class="validator-context-value editable" id="cust-rjit-cu" step="1000" min="0" value="0">
+      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#8bc4f5;border-bottom:1px solid var(--card-border);padding-bottom:4px;margin-bottom:10px;">Raiku JIT</div>
+      <div class="control">
+        <label>CU / block</label>
+        <div class="slider-row">
+          <input type="range" id="cust-rjit-cu-sl" min="0" max="1500000" step="1000" value="0">
+          <input type="number" id="cust-rjit-cu" class="val cust-val" min="0" max="1500000" step="1000" value="0">
         </div>
-        <div class="validator-context-item">
-          <div class="validator-context-label">Fee / CU (L)</div>
-          <input type="number" class="validator-context-value editable" id="cust-rjit-fee" step="0.1" min="0" value="0">
+      </div>
+      <div class="control" style="margin-top:8px;">
+        <label>Fee / CU (L)</label>
+        <div class="slider-row">
+          <input type="range" id="cust-rjit-fee-sl" min="0" max="25" step="0.1" value="0">
+          <input type="number" id="cust-rjit-fee" class="val cust-val" min="0" max="25" step="0.1" value="0">
         </div>
       </div>
     </div>
 
-    <!-- Non-Raiku JIT route inputs -->
+    <!-- Non-Raiku JIT route controls
+         CU/block  : range 0–1,500,000, step 1,000
+         Fee/CU (L): range 0–25, step 0.1 -->
     <div>
-      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--card-border);padding-bottom:4px;margin-bottom:8px;">Non-Raiku JIT</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;">
-        <div class="validator-context-item">
-          <div class="validator-context-label">CU / block</div>
-          <input type="number" class="validator-context-value editable" id="cust-njit-cu" step="1000" min="0" value="0">
+      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--card-border);padding-bottom:4px;margin-bottom:10px;">Non-Raiku JIT</div>
+      <div class="control">
+        <label>CU / block</label>
+        <div class="slider-row">
+          <input type="range" id="cust-njit-cu-sl" min="0" max="1500000" step="1000" value="0">
+          <input type="number" id="cust-njit-cu" class="val cust-val" min="0" max="1500000" step="1000" value="0">
         </div>
-        <div class="validator-context-item">
-          <div class="validator-context-label">Fee / CU (L)</div>
-          <input type="number" class="validator-context-value editable" id="cust-njit-fee" step="0.1" min="0" value="0">
+      </div>
+      <div class="control" style="margin-top:8px;">
+        <label>Fee / CU (L)</label>
+        <div class="slider-row">
+          <input type="range" id="cust-njit-fee-sl" min="0" max="25" step="0.1" value="0">
+          <input type="number" id="cust-njit-fee" class="val cust-val" min="0" max="25" step="0.1" value="0">
         </div>
       </div>
     </div>
@@ -9203,11 +9232,20 @@ function seedCustomerFromCategory(catId) {
 
 function syncCustomerInputsFromState() {
     var s = customerState;
-    var map = { 'cust-aot-cu': s.aotCu, 'cust-aot-fee': s.aotFee,
-                'cust-rjit-cu': s.rjitCu, 'cust-rjit-fee': s.rjitFee,
-                'cust-njit-cu': s.njitCu, 'cust-njit-fee': s.njitFee };
-    Object.keys(map).forEach(function(id) {
-        var el = document.getElementById(id); if(el) el.value = map[id];
+    // Each entry: [numId, sliderSuffix, value]
+    var pairs = [
+        ['cust-aot-cu',   'cust-aot-cu-sl',   s.aotCu],
+        ['cust-aot-fee',  'cust-aot-fee-sl',  s.aotFee],
+        ['cust-rjit-cu',  'cust-rjit-cu-sl',  s.rjitCu],
+        ['cust-rjit-fee', 'cust-rjit-fee-sl', s.rjitFee],
+        ['cust-njit-cu',  'cust-njit-cu-sl',  s.njitCu],
+        ['cust-njit-fee', 'cust-njit-fee-sl', s.njitFee]
+    ];
+    pairs.forEach(function(p) {
+        var num = document.getElementById(p[0]);
+        var sl  = document.getElementById(p[1]);
+        if(num) num.value = p[2];
+        if(sl)  sl.value  = p[2];
     });
 }
 
@@ -9264,10 +9302,27 @@ function initCustomerTab() {
         sel.addEventListener('change', function(){ seedCustomerFromCategory(this.value); });
         seedCustomerFromCategory(CORE_GROUP_SPECS[0].id); // default: prop_amm
     }
-    // Wire all 6 number inputs
-    ['cust-aot-cu','cust-aot-fee','cust-rjit-cu','cust-rjit-fee','cust-njit-cu','cust-njit-fee'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if(el) el.addEventListener('input', function(){ readCustomerInputs(); updateCustomerCalcs(); });
+    // Wire slider ↔ number input pairs (both paths update state and calcs)
+    var custPairs = [
+        { slId: 'cust-aot-cu-sl',   numId: 'cust-aot-cu'   },
+        { slId: 'cust-aot-fee-sl',  numId: 'cust-aot-fee'  },
+        { slId: 'cust-rjit-cu-sl',  numId: 'cust-rjit-cu'  },
+        { slId: 'cust-rjit-fee-sl', numId: 'cust-rjit-fee' },
+        { slId: 'cust-njit-cu-sl',  numId: 'cust-njit-cu'  },
+        { slId: 'cust-njit-fee-sl', numId: 'cust-njit-fee' }
+    ];
+    custPairs.forEach(function(pair) {
+        var sl  = document.getElementById(pair.slId);
+        var num = document.getElementById(pair.numId);
+        if(!sl || !num) return;
+        sl.addEventListener('input', function() {
+            num.value = sl.value;
+            readCustomerInputs(); updateCustomerCalcs();
+        });
+        num.addEventListener('input', function() {
+            sl.value = num.value;
+            readCustomerInputs(); updateCustomerCalcs();
+        });
     });
 }
 
