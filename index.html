@@ -7997,16 +7997,19 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     } else {
       _viState.aotApr = _viState.bonusApr = _viState.jitApr = _viState.ojitApr = 0;
     }
-    _viState.issApy  = sp.issApy || 0;
+    // Read issApy from Protocol Level's sl-iss-apy slider to guarantee exact float64 parity
+    var slIssEl = document.getElementById('sl-iss-apy');
+    var issApyFinal = (slIssEl && parseFloat(slIssEl.value)) ? parseFloat(slIssEl.value) / 100 : (sp.issApy || 0);
+    _viState.issApy  = issApyFinal;
     _viState.blkApy  = sp.nfApy  || 0;
     _viState.scenario = n;
     // Update own Issuance APY and Network Fees APY raw inputs + display divs
     var issRaw = document.getElementById('vi-iss-apy-raw');
-    if (issRaw) issRaw.value = ((sp.issApy || 0) * 100).toFixed(4);
+    if (issRaw) issRaw.value = (issApyFinal * 100).toFixed(4);
     var blkRaw = document.getElementById('vi-blk-apy-raw');
     if (blkRaw) blkRaw.value = ((sp.nfApy  || 0) * 100).toFixed(4);
     var issDiv = document.getElementById('vi-iss-apy');
-    if (issDiv && !issDiv.querySelector('input')) issDiv.textContent = fmtValidatorRate(sp.issApy || 0);
+    if (issDiv && !issDiv.querySelector('input')) issDiv.textContent = fmtValidatorRate(issApyFinal);
     var blkDiv = document.getElementById('vi-blk-apy');
     if (blkDiv && !blkDiv.querySelector('input')) blkDiv.textContent = fmtValidatorRate(sp.nfApy  || 0);
     // Highlight only vi-btn-* buttons — isolated from Protocol Level .scenario-btn sweep
