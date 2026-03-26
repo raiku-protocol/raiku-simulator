@@ -8106,30 +8106,58 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var totalApy   = issApy + blkApy + (raikuOn ? raikuApy : 0);
     var raikuUplift = raikuOn ? raikuApy : 0;
 
-    // APY headline — use same fmtValidatorRate as Protocol Level
-    _set('vi-total-apy-display', fmtValidatorRate(totalApy));
-    _set('vi-raiku-apy-uplift',  '+' + fmtValidatorRate(raikuUplift));
+    // ── Yield display: mirror Protocol Level exactly when Raiku ON ──────────
+    // Root cause of previous mismatch: summing component APYs (e.g. 7.08%) ≠
+    // summing component APRs then compounding (e.g. 7.16%). The correct path
+    // is aprToApy(sum_of_APRs, n). When Raiku is ON, Protocol Level already
+    // holds this correctly computed value — mirror it directly.
     var badge = document.getElementById('vi-raiku-badge');
-    if (badge) badge.style.opacity = raikuOn ? '1' : '0.3';
-
-    // Mirror APY + APR text directly from Protocol Level (guarantees identical format)
+    if (raikuOn) {
+      // Raiku ON — mirror Protocol Level total APY, Raiku uplift, APR, and bar
+      var elTotalApy    = document.getElementById('vc-total-apy');
+      var elRaikuUplift = document.getElementById('vc-raiku-apy-uplift');
+      var elTotalApr    = document.getElementById('vc-total-apr');
+      _set('vi-total-apy-display', elTotalApy    ? elTotalApy.textContent    : fmtValidatorRate(totalApy));
+      _set('vi-raiku-apy-uplift',  elRaikuUplift ? elRaikuUplift.textContent : '+0.00%');
+      _set('vi-total-apr',         elTotalApr    ? elTotalApr.textContent    : '—');
+      if (badge) badge.style.opacity = '1';
+      // Mirror bar widths from Protocol Level
+      ['iss','blk','aot','bonus','jit','ojit'].forEach(function(k) {
+        var s = document.getElementById('validator-yield-' + k + '-seg');
+        var d = document.getElementById('vi-yield-' + k + '-seg');
+        if (s && d) d.style.width = s.style.width;
+      });
+    } else {
+      // Raiku OFF — compute base-only (Issuance + Network Fees) via APR compounding
+      // _parseApyEl works for APR elements too: parseFloat("5.82% APR") / 100 = 0.0582
+      var issApr2 = _parseApyEl('validator-decomp-iss-apr');
+      var blkApr2 = _parseApyEl('validator-decomp-blk-apr');
+      var baseApr = issApr2 + blkApr2;
+      var baseApy = Math.pow(1 + baseApr / APY_COMPOUNDING_PERIODS, APY_COMPOUNDING_PERIODS) - 1;
+      _set('vi-total-apy-display', fmtValidatorRate(baseApy));
+      _set('vi-raiku-apy-uplift',  '+0.00%');
+      _set('vi-total-apr',         fmtValidatorRate(baseApr));
+      if (badge) badge.style.opacity = '0.3';
+      // Bar: only Issuance + Network Fees segments; zero out Raiku
+      var bTotal = baseApr > 0 ? baseApr : 1;
+      var elI = document.getElementById('vi-yield-iss-seg');
+      var elB = document.getElementById('vi-yield-blk-seg');
+      if (elI) elI.style.width = (issApr2 / bTotal * 100).toFixed(2) + '%';
+      if (elB) elB.style.width = (blkApr2 / bTotal * 100).toFixed(2) + '%';
+      ['aot','bonus','jit','ojit'].forEach(function(k) {
+        var el = document.getElementById('vi-yield-' + k + '-seg');
+        if (el) el.style.width = '0%';
+      });
+    }
+    // Component APY + APR cards: always mirror Protocol Level text (same values)
     ['iss','blk','aot','jit','bonus','ojit'].forEach(function(k) {
-      var srcApy = document.getElementById('validator-decomp-' + k + '-apy');
-      var dstApy = document.getElementById('vi-decomp-' + k + '-apy');
-      if (srcApy && dstApy) dstApy.textContent = srcApy.textContent;
-      var srcApr = document.getElementById('validator-decomp-' + k + '-apr');
-      var dstApr = document.getElementById('vi-decomp-' + k + '-apr');
-      if (srcApr && dstApr) dstApr.textContent = srcApr.textContent;
+      var sA = document.getElementById('validator-decomp-' + k + '-apy');
+      var dA = document.getElementById('vi-decomp-' + k + '-apy');
+      if (sA && dA) dA.textContent = sA.textContent;
+      var sR = document.getElementById('validator-decomp-' + k + '-apr');
+      var dR = document.getElementById('vi-decomp-' + k + '-apr');
+      if (sR && dR) dR.textContent = sR.textContent;
     });
-    // Mirror stacked bar segment widths from Protocol Level
-    ['iss','blk','aot','bonus','jit','ojit'].forEach(function(k) {
-      var srcSeg = document.getElementById('validator-yield-' + k + '-seg');
-      var dstSeg = document.getElementById('vi-yield-' + k + '-seg');
-      if (srcSeg && dstSeg) dstSeg.style.width = srcSeg.style.width;
-    });
-    // Mirror total APR from Protocol Level
-    var srcAprEl = document.getElementById('vc-total-apr');
-    _set('vi-total-apr', srcAprEl ? srcAprEl.textContent : '—');
 
     // Annual SOL values
     var issAnnual   = stake * issApy;
