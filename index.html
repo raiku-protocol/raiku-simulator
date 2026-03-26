@@ -8160,7 +8160,12 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var dist = window.QCP && window.QCP.stakeDist;
     var CANVAS_H = 120;
     // Use parent container width for reliable full-width rendering
-    var W = canvas.parentElement ? canvas.parentElement.clientWidth : (canvas.offsetWidth || 900);
+    var W = canvas.parentElement ? canvas.parentElement.clientWidth : 0;
+    // Layout not yet settled (panel just shown or page still loading) — defer one frame
+    if (W < 100) {
+        requestAnimationFrame(function() { window.viRenderDistribution(userStake); });
+        return;
+    }
     if (!dist || !dist.stakes_sol) {
         var ctx0 = canvas.getContext('2d');
         if (ctx0) {
