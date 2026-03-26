@@ -272,6 +272,13 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-spend-card-label { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; font-family:var(--font-mono); color:var(--text2); }
 .cust-spend-card-value { font-size:16px; font-weight:700; color:var(--text); font-family:var(--font-mono); line-height:1.2; }
 .cust-spend-card-sub { font-size:9px; color:var(--text2); font-family:var(--font-mono); }
+/* Customer Economics — epoch distribution visuals */
+.cust-epoch-share-bar { height:18px; border-radius:3px; overflow:hidden; display:flex; background:#0e1016; }
+.cust-epoch-bar-raiku { background:var(--lime-soft); height:100%; transition:width 0.25s ease; min-width:2px; }
+.cust-epoch-bar-other { background:#1a1e2a; height:100%; flex:1; }
+.cust-cadence-grid { display:flex; gap:3px; flex-wrap:nowrap; }
+.cust-cadence-cell { width:18px; height:18px; border-radius:2px; flex-shrink:0; }
+.cust-cadence-note { font-size:9px; color:var(--text2); font-family:var(--font-mono); line-height:1.55; margin-top:6px; font-style:italic; }
 .sidebar .section-label { font-size:10px; margin-top:12px; padding-bottom:2px; border-bottom:1px solid #1e2028; margin-bottom:2px; }
 .sidebar .section-label:first-child { margin-top:0; }
 
@@ -2552,6 +2559,31 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     </div>
     <!-- Auto-generated scenario sentence -->
     <div class="cust-scenario-text" id="cust-scenario-text">Configure the demand and context inputs to generate a scenario summary.</div>
+  </div>
+
+  <!-- C. Block Distribution Visuals -->
+  <div class="cust-panel-section fade-in">
+    <div class="cust-panel-title">Block Distribution</div>
+
+    <!-- Visual A: Epoch Share -->
+    <div>
+      <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;">Epoch Share</div>
+      <div class="cust-epoch-share-bar">
+        <div class="cust-epoch-bar-raiku" id="cust-epoch-bar-raiku" style="width:10%;"></div>
+        <div class="cust-epoch-bar-other"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;font-family:var(--font-mono);">
+        <span style="color:var(--lime-soft);">Raiku&nbsp;<span id="cust-epoch-raiku-pct">10.0%</span>&nbsp;&mdash;&nbsp;<span id="cust-epoch-raiku-blks">43,200</span> blk</span>
+        <span style="color:var(--text2);">Non-Raiku&nbsp;<span id="cust-epoch-other-pct">90.0%</span>&nbsp;&mdash;&nbsp;<span id="cust-epoch-other-blks">388,800</span> blk</span>
+      </div>
+    </div>
+
+    <!-- Visual B: Illustrative Leader Cadence -->
+    <div style="margin-top:8px;">
+      <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;">Illustrative Leader Cadence</div>
+      <div class="cust-cadence-grid" id="cust-cadence-grid"><!-- populated by JS --></div>
+      <div class="cust-cadence-note">Each cell = 1 leader window (4 consecutive slots). Pattern assumes uniform distribution across the epoch. Illustrative only — not the actual validator schedule.</div>
+    </div>
   </div>
 
   <!-- D. Route Breakdown Table -->
@@ -9597,6 +9629,28 @@ function updateCustomerCalcs() {
     set('cust-k-stake-disp', (s.raikuStake * 100).toFixed(1) + '%');
     set('cust-k-offerable',  epochRaikuBlocks.toLocaleString('en-US'));
     set('cust-k-njit-bpe',   epochNonRaikuBlocks.toLocaleString('en-US'));
+
+    // ── C. Block Distribution Visuals ──
+    // Visual A: Epoch Share bar
+    var stakeBarEl = document.getElementById('cust-epoch-bar-raiku');
+    if(stakeBarEl) stakeBarEl.style.width = (s.raikuStake * 100).toFixed(2) + '%';
+    set('cust-epoch-raiku-pct',  (s.raikuStake * 100).toFixed(1) + '%');
+    set('cust-epoch-other-pct',  ((1 - s.raikuStake) * 100).toFixed(1) + '%');
+    set('cust-epoch-raiku-blks', epochRaikuBlocks.toLocaleString('en-US'));
+    set('cust-epoch-other-blks', epochNonRaikuBlocks.toLocaleString('en-US'));
+    // Visual B: Illustrative Leader Cadence (10 cells, each = 1 leader window = 4 slots)
+    var cadenceEl = document.getElementById('cust-cadence-grid');
+    if(cadenceEl) {
+        var raikuW = Math.min(10, Math.max(1, Math.round(s.raikuStake * 10)));
+        var positions = {};
+        for(var wi = 0; wi < raikuW; wi++) positions[Math.floor(wi * 10 / raikuW)] = true;
+        var ch = '';
+        for(var ci = 0; ci < 10; ci++) {
+            var isR = !!positions[ci];
+            ch += '<div class="cust-cadence-cell" style="background:' + (isR ? 'var(--lime-soft)' : '#1a1e2a;border:1px solid #2a2e3a') + ';" title="' + (isR ? 'Raiku' : 'Non-Raiku') + ' leader window (4 slots)"></div>';
+        }
+        cadenceEl.innerHTML = ch;
+    }
 
     // ── Auto-generated scenario sentence ──
     var raikuCu = s.aotCu + s.rjitCu;
