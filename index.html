@@ -256,7 +256,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-ctx-row { display:flex; justify-content:space-between; align-items:center; padding:3px 0; }
 .cust-ctx-label { font-size:9px; color:var(--text2); font-family:var(--font-mono); }
 .cust-ctx-static { font-size:9px; color:var(--text2); font-family:var(--font-mono); opacity:0.7; font-style:italic; }
-.cust-ctx-derived { font-size:10px; color:var(--text-mid); font-family:var(--font-mono); font-weight:600; }
+.cust-ctx-derived { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:600; }
 .cust-ctx-num { background:#141516; color:var(--text); border:1px solid #333; border-radius:3px; padding:2px 6px; font-size:10px; font-family:var(--font-mono); width:68px; text-align:right; outline:none; }
 /* AOT capacity warning */
 .cust-aot-warn { display:none; margin-top:4px; padding:5px 8px; background:#1e1005; border:1px solid #a05010; border-radius:4px; font-size:9px; font-family:var(--font-mono); color:#e8902a; line-height:1.5; }
@@ -2403,7 +2403,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <div class="control">
             <label>CU / block</label>
             <div class="slider-row">
-              <input type="range" id="cust-aot-cu-sl" min="0" max="60000000" step="100000" value="0">
+              <input type="range" id="cust-aot-cu-sl" min="0" max="60000000" step="10000" value="0">
               <span class="val">0</span>
             </div>
           </div>
@@ -2425,7 +2425,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <div class="control">
             <label>CU / block</label>
             <div class="slider-row">
-              <input type="range" id="cust-rjit-cu-sl" min="0" max="60000000" step="100000" value="0">
+              <input type="range" id="cust-rjit-cu-sl" min="0" max="60000000" step="10000" value="0">
               <span class="val">0</span>
             </div>
           </div>
@@ -2437,6 +2437,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             </div>
           </div>
         </div>
+        <div id="cust-rjit-warn" class="cust-aot-warn">Raiku JIT CU exceeds allocation &mdash; max <span id="cust-rjit-max-cu">&mdash;</span> CU at <span id="cust-rjit-alloc-pct">&mdash;</span>% block share.</div>
       </div>
 
     </div><!-- end Raiku Blocks wrapper -->
@@ -2460,7 +2461,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <div class="control">
             <label>CU / block</label>
             <div class="slider-row">
-              <input type="range" id="cust-njit-cu-sl" min="0" max="60000000" step="100000" value="0">
+              <input type="range" id="cust-njit-cu-sl" min="0" max="60000000" step="10000" value="0">
               <span class="val">0</span>
             </div>
           </div>
@@ -2521,6 +2522,13 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       <div class="slider-row">
         <input type="range" id="cust-ctx-aot-share" min="0" max="80" step="1" value="8">
         <span class="val" id="cust-ctx-aot-share-val">8%</span>
+      </div>
+    </div>
+    <div class="control" style="margin-top:4px;">
+      <label>Maximum Raiku JIT allocation</label>
+      <div class="slider-row">
+        <input type="range" id="cust-ctx-rjit-alloc" min="0" max="80" step="1" value="15">
+        <span class="val" id="cust-ctx-rjit-alloc-val">15%</span>
       </div>
     </div>
 
@@ -9392,7 +9400,7 @@ var CUST_CAT_ORDER = [
 
 var customerState = {
     aotCu:0, aotFee:0, rjitCu:0, rjitFee:0, njitCu:0, njitFee:0,
-    aotShare:0.08, raikuStake:0.10, solPrice:120, blocksPerEpoch:420000
+    aotShare:0.08, rjitShare:0.15, raikuStake:0.10, solPrice:120, blocksPerEpoch:420000
 };
 
 function _custGetProfile(catId) {
@@ -9492,6 +9500,7 @@ function readCustomerInputs() {
     customerState.njitCu         = n('cust-njit-cu-sl');
     customerState.njitFee        = n('cust-njit-fee-sl');
     customerState.aotShare       = n('cust-ctx-aot-share') / 100;
+    customerState.rjitShare      = n('cust-ctx-rjit-alloc') / 100;
     customerState.raikuStake     = n('cust-ctx-stake') / 100;
     customerState.solPrice       = n('cust-ctx-sol');
 }
@@ -9541,6 +9550,11 @@ function updateCustomerCalcs() {
 
     // ── AOT capacity warning ──
     var maxAotCu = s.aotShare * CUST_BLOCK_SIZE;
+    var maxRjitCu = s.rjitShare * CUST_BLOCK_SIZE;
+    var _aotSl = document.getElementById('cust-aot-cu-sl');
+    if(_aotSl) _aotSl.max = Math.round(maxAotCu);
+    var _rjitSl = document.getElementById('cust-rjit-cu-sl');
+    if(_rjitSl) _rjitSl.max = Math.round(maxRjitCu);
     var aotWarnEl = document.getElementById('cust-aot-warn');
     if(aotWarnEl) {
         if(s.aotCu > maxAotCu) {
@@ -9549,6 +9563,17 @@ function updateCustomerCalcs() {
             set('cust-aot-alloc-pct', (s.aotShare * 100).toFixed(0));
         } else {
             aotWarnEl.style.display = 'none';
+        }
+    }
+    set('cust-ctx-rjit-alloc-val', (s.rjitShare * 100).toFixed(0) + '%');
+    var rjitWarnEl = document.getElementById('cust-rjit-warn');
+    if(rjitWarnEl) {
+        if(s.rjitCu > maxRjitCu) {
+            rjitWarnEl.style.display = 'block';
+            set('cust-rjit-max-cu',    Math.round(maxRjitCu).toLocaleString());
+            set('cust-rjit-alloc-pct', (s.rjitShare * 100).toFixed(0));
+        } else {
+            rjitWarnEl.style.display = 'none';
         }
     }
 
@@ -9598,6 +9623,23 @@ function updateCustomerCalcs() {
     set('cust-td-total-cu',     '\u2014');
     set('cust-td-total-cu-pct', '\u2014');
     set('cust-td-total-cost',   epochTotalSol > 0 ? epochTotalSol.toFixed(4) + ' SOL / epoch' : '\u2014');
+
+    // Format slider .val spans
+    (function(){
+        function fmtSpan(slId, txt) {
+            var sl = document.getElementById(slId);
+            if(sl) { var sp = sl.parentElement.querySelector('.val'); if(sp) sp.textContent = txt; }
+        }
+        fmtSpan('cust-aot-cu-sl',  Math.round(s.aotCu).toLocaleString());
+        fmtSpan('cust-rjit-cu-sl', Math.round(s.rjitCu).toLocaleString());
+        fmtSpan('cust-njit-cu-sl', Math.round(s.njitCu).toLocaleString());
+        fmtSpan('cust-aot-fee-sl',  s.aotFee.toFixed(3));
+        fmtSpan('cust-rjit-fee-sl', s.rjitFee.toFixed(3));
+        fmtSpan('cust-njit-fee-sl', s.njitFee.toFixed(3));
+        fmtSpan('cust-ctx-aot-share', (s.aotShare * 100).toFixed(0) + '%');
+        fmtSpan('cust-ctx-rjit-alloc', (s.rjitShare * 100).toFixed(0) + '%');
+        fmtSpan('cust-ctx-stake', (s.raikuStake * 100).toFixed(1) + '%');
+    })();
 }
 
 function initCustomerTab() {
@@ -9612,7 +9654,7 @@ function initCustomerTab() {
     });
 
     // Context sliders
-    ['cust-ctx-aot-share','cust-ctx-stake'].forEach(function(id) {
+    ['cust-ctx-aot-share','cust-ctx-rjit-alloc','cust-ctx-stake'].forEach(function(id) {
         var sl = document.getElementById(id);
         if(sl) sl.addEventListener('input', function(){ readCustomerInputs(); updateCustomerCalcs(); });
     });
