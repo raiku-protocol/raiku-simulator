@@ -1926,11 +1926,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             Delegated Stake
             <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-stake')">?</button>
           </div>
-          <input class="validator-context-value" type="text" id="vi-stake"
-                 value="50,000 SOL"
-                 onfocus="this.value=this.value.replace(/[, ]+/g,'').replace('SOL','').trim()"
-                 onblur="if(!this.value.includes('SOL')){var n=parseFloat(this.value.replace(/,/g,''))||0;this.value=n.toLocaleString('en-US',{maximumFractionDigits:0})+' SOL';}"
-                 oninput="viHandleStakeInput()">
+          <div class="validator-context-value" id="vi-stake">50,000 SOL</div>
+          <input type="hidden" id="vi-stake-raw" value="50000">
         </div>
       </div>
 
@@ -1939,11 +1936,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <!-- Network Share: derived display, editable (updates stake) -->
         <div class="validator-context-item">
           <div class="validator-context-label">Network Share</div>
-          <input class="validator-context-value" type="text" id="vi-share"
-                 value="0.0119%"
-                 onfocus="this.value=this.value.replace('%','').trim()"
-                 onblur="if(!this.value.includes('%')){var n=parseFloat(this.value)||0;this.value=n.toFixed(4)+'%';}"
-                 oninput="viHandleShareInput()">
+          <div class="validator-context-value" id="vi-share">0.0119%</div>
+          <input type="hidden" id="vi-share-raw" value="0.0119">
         </div>
         <!-- Inflation Commission: editable text input -->
         <div class="validator-context-item">
@@ -1951,11 +1945,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             Commission
             <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-commission')">?</button>
           </div>
-          <input class="validator-context-value" type="text" id="vi-commission"
-                 value="7.0%"
-                 onfocus="this.value=this.value.replace('%','').trim()"
-                 onblur="if(!this.value.includes('%')){var n=parseFloat(this.value)||0;this.value=n.toFixed(1)+'%';}"
-                 oninput="viUpdate()">
+          <div class="validator-context-value" id="vi-commission">7.0%</div>
+          <input type="hidden" id="vi-commission-raw" value="7">
         </div>
       </div>
 
@@ -7838,13 +7829,28 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     makeEditable('validator-context-jit-take', 'sl-comm-jit', 0,  10,  0.25, function(v){ return v.toFixed(1)+'%'; });
     makeEditable('validator-context-block',    'sl-blk',      0, 100,  0.1,  function(v){ return Math.round(v)+'%'; });
     makeEditable('validator-context-fee',      'sl-fcu',      0,  25,  0.01, function(v){ return (v>=10?v.toFixed(1):v<0.1?v.toFixed(3):v.toFixed(2))+' L'; });
+    // ── Individual Level controls ──
+    makeEditable('vi-sol-price-display', 'sl-price', 10, 400, 5, function(v){ return '$'+Math.round(v); });
+    makeEditable('vi-stake', 'vi-stake-raw', 0, 50000000, 1000,
+      function(v){ return v.toLocaleString('en-US',{maximumFractionDigits:0})+' SOL'; },
+      function(v){
+        var total = (typeof getCurrentTotalSolanaStakedSol==='function') ? getCurrentTotalSolanaStakedSol() : STAKE_FALLBACK_SOL;
+        var shareRaw = document.getElementById('vi-share-raw');
+        if (shareRaw) shareRaw.value = total > 0 ? (v/total*100) : 0;
+      });
+    makeEditable('vi-share', 'vi-share-raw', 0, 100, 0.001,
+      function(v){ return v.toFixed(4)+'%'; },
+      function(v){
+        var total = (typeof getCurrentTotalSolanaStakedSol==='function') ? getCurrentTotalSolanaStakedSol() : STAKE_FALLBACK_SOL;
+        var stakeRaw = document.getElementById('vi-stake-raw');
+        if (stakeRaw) stakeRaw.value = Math.round(v/100*total);
+      });
+    makeEditable('vi-commission', 'vi-commission-raw', 0, 10, 0.1,
+      function(v){ return v.toFixed(1)+'%'; });
 }());
 
-// ── Individual Level: viUpdate, viToggle, viHandleStakeInput, viSyncPrice ───
+// ── Individual Level: viUpdate, viToggle, viSyncPrice ───
 (function(){
-  var _blockingStakeSync = false;
-  var _blockingShareSync = false;
-
   function _parseApyEl(id) {
     var el = document.getElementById(id);
     if (!el) return 0;
@@ -7884,31 +7890,6 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     window.viUpdate();
   };
 
-  window.viHandleStakeInput = function() {
-    if (_blockingStakeSync) return;
-    var raw = (document.getElementById('vi-stake').value || '').replace(/,/g, '').replace(/SOL/i, '').trim();
-    var stake = parseFloat(raw) || 0;
-    var total = _getTotalStake();
-    _blockingShareSync = true;
-    var shareEl = document.getElementById('vi-share');
-    if (shareEl) shareEl.value = (total > 0 ? (stake / total * 100) : 0).toFixed(4) + '%';
-    _blockingShareSync = false;
-    window.viUpdate();
-  };
-  window.viHandleShareInput = function() {
-    if (_blockingShareSync) return;
-    var raw = (document.getElementById('vi-share').value || '').replace(/%/g, '').trim();
-    var share = parseFloat(raw) || 0;
-    var total = _getTotalStake();
-    _blockingStakeSync = true;
-    var stakeEl = document.getElementById('vi-stake');
-    if (stakeEl) {
-      var stakeVal = Math.round(share / 100 * total);
-      stakeEl.value = stakeVal.toLocaleString('en-US', {maximumFractionDigits: 0}) + ' SOL';
-    }
-    _blockingStakeSync = false;
-    window.viUpdate();
-  };
 
   window.viToggle = function(group) {
     var children = document.querySelectorAll('.vi-child-' + group);
@@ -7922,35 +7903,27 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   };
 
   window.viUpdate = function() {
-    var stakeEl = document.getElementById('vi-stake');
-    var commEl  = document.getElementById('vi-commission');
-    var raikuEl = document.getElementById('vi-raiku-on');
-    if (!stakeEl || !commEl || !raikuEl) return;
+    var stakeRawEl = document.getElementById('vi-stake-raw');
+    var commRawEl  = document.getElementById('vi-commission-raw');
+    var raikuEl    = document.getElementById('vi-raiku-on');
+    if (!stakeRawEl || !commRawEl || !raikuEl) return;
 
-    // Parse stake from text input (may have commas and " SOL" suffix)
-    var stakeRaw = (stakeEl.value || '').replace(/,/g, '').replace(/SOL/i, '').trim();
-    var stake   = parseFloat(stakeRaw)  || 0;
-    var commPct = parseFloat((commEl.value || '').replace('%', '')) || 0;
+    var stake   = parseFloat(stakeRawEl.value) || 0;
+    var commPct = parseFloat(commRawEl.value)  || 0;
     var raikuOn = raikuEl.checked;
     var comm    = commPct / 100;
     var total   = _getTotalStake();
+    var solPrice = parseFloat((document.getElementById('sl-price') || {}).value) || 100;
 
-    // SOL price: read from global sl-price slider (no local slider)
-    var globalPriceEl = document.getElementById('sl-price');
-    var solPrice = parseFloat((globalPriceEl || {}).value) || 100;
+    // Sync display divs (only when makeEditable is not active)
+    var commDiv = document.getElementById('vi-commission');
+    if (commDiv && !commDiv.querySelector('input')) commDiv.textContent = commPct.toFixed(1)+'%';
 
-    // Update display boxes
+    var stakeDiv = document.getElementById('vi-stake');
+    if (stakeDiv && !stakeDiv.querySelector('input')) stakeDiv.textContent = stake.toLocaleString('en-US',{maximumFractionDigits:0})+' SOL';
+
+    // Update SOL price display box
     _set('vi-sol-price-display', '$' + Math.round(solPrice));
-    // commission is now a number input — no separate display div to update
-
-    // Reformat stake with " SOL" suffix when not being actively edited
-    if (document.activeElement !== stakeEl) {
-      stakeEl.value = stake.toLocaleString('en-US', {maximumFractionDigits: 0}) + ' SOL';
-    }
-    // Reformat commission with "%" suffix when not being actively edited
-    if (document.activeElement !== commEl) {
-      commEl.value = commPct.toFixed(1) + '%';
-    }
 
     // Summary row: short USD value on the right, full breakdown below
     var stakeUsd = stake * solPrice;
@@ -7959,11 +7932,12 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
          stake.toLocaleString('en-US', {maximumFractionDigits:0}) +
          ' SOL · ' + _fmtUsd(stakeUsd));
 
-    var shareEl = document.getElementById('vi-share');
-    if (shareEl && document.activeElement !== shareEl && !_blockingShareSync) {
-      var netShare = total > 0 ? (stake / total * 100) : 0;
-      shareEl.value = netShare.toFixed(4) + '%';
-    }
+    // Compute netShare and sync share raw + display
+    var netShare = total > 0 ? (stake / total * 100) : 0;
+    var shareRawEl = document.getElementById('vi-share-raw');
+    if (shareRawEl) shareRawEl.value = netShare;
+    var shareDiv = document.getElementById('vi-share');
+    if (shareDiv && !shareDiv.querySelector('input')) shareDiv.textContent = netShare.toFixed(4)+'%';
 
     // Read component APYs from Protocol Level decomp (ground truth)
     var issApyRaw  = _parseApyEl('validator-decomp-iss-apy');   // gross issuance APY (before commission)
@@ -7998,7 +7972,6 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var bonusAnnual = stake * bonusApy;
     var raikuAnnual = raikuOn ? (aotAnnual + jitAnnual + bonusAnnual) : 0;
     var totalAnnual = brAnnual + raikuAnnual;
-    var netShare    = total > 0 ? (stake / total * 100) : 0;
 
     // Compact KPI row
     _set('vi-kpi-annual',     _fmtUsd(totalAnnual * solPrice));
@@ -8460,11 +8433,18 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   <div class="vc-explainer-card">
     <button class="vc-explainer-close" onclick="vcCloseExplainer('vi-explainer-stake')">✕</button>
     <div class="vc-explainer-title">Delegated Stake</div>
-    <div class="vc-explainer-body">
-      <p>Total SOL delegated to this validator — including staker delegations and the validator's own self-stake.</p>
-      <p>All revenue streams scale linearly with stake: issuance rewards, block fees, and Raiku MEV are all proportional to your share of total network stake.</p>
-      <p><strong>Network Share</strong> = Your Stake ÷ Total Network Staked × 100.</p>
-      <p>Reference: total active stake ~421M SOL (Solana Compass, Mar 2026). Changing stake automatically updates the Network Share field and vice versa.</p>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">Total SOL delegated to this validator — including staker delegations and the validator's own self-stake.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">All revenue streams scale linearly with stake: issuance rewards, block fees, and Raiku MEV are all proportional to your share of total network stake.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">FORMULA</div>
+      <div class="vc-explainer-note">Network Share = Your Stake ÷ Total Network Staked × 100</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">Reference: total active stake ~421M SOL (Solana Compass, Mar 2026). Changing stake automatically updates the Network Share field and vice versa.</div>
     </div>
   </div>
 </div>
@@ -8474,11 +8454,18 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   <div class="vc-explainer-card">
     <button class="vc-explainer-close" onclick="vcCloseExplainer('vi-explainer-commission')">✕</button>
     <div class="vc-explainer-title">Inflation Commission</div>
-    <div class="vc-explainer-body">
-      <p>The percentage of inflation staking rewards that the validator keeps. The remainder flows to delegators.</p>
-      <p><strong>Applies to issuance only.</strong> Block priority fees and Raiku MEV revenue flow 100% to the validator — commission has no effect on these streams.</p>
-      <p>Network average: ~7%. Practical range for most validators: 0–10%.</p>
-      <p>Formula: <code>Issuance Revenue = Stake × Issuance APY × Commission</code></p>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">The percentage of inflation staking rewards that the validator keeps. The remainder flows to delegators.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">Applies to issuance only. Block priority fees and Raiku MEV revenue flow 100% to the validator — commission has no effect on these streams.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">Network average: ~7%. Practical range for most validators: 0–10%.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">FORMULA</div>
+      <div class="vc-explainer-note">Issuance Revenue = Stake × Issuance APY × Commission</div>
     </div>
   </div>
 </div>
@@ -8488,12 +8475,18 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   <div class="vc-explainer-card">
     <button class="vc-explainer-close" onclick="vcCloseExplainer('vi-explainer-total-yield')">✕</button>
     <div class="vc-explainer-title">Total Yield (APY)</div>
-    <div class="vc-explainer-body">
-      <p>The validator's total annualized yield as a percentage of delegated stake.</p>
-      <p><strong>Formula:</strong><br>
-      <code>Total APY = Issuance APY × Commission + Network Fees APY + Raiku APY (if enabled)</code></p>
-      <p>APY components are inherited from the Protocol Level Validator Yield decomposition above. Commission scales only the Issuance component — block fees and Raiku MEV are not reduced by commission.</p>
-      <p>Toggle "+ Raiku" to compare yield with and without Raiku participation.</p>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">The validator's total annualized yield as a percentage of delegated stake.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">FORMULA</div>
+      <div class="vc-explainer-note">Total APY = Issuance APY × Commission + Network Fees APY + Raiku APY (if enabled)</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">APY components are inherited from the Protocol Level Validator Yield decomposition above. Commission scales only the Issuance component — block fees and Raiku MEV are not reduced by commission.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">Toggle "+ Raiku" to compare yield with and without Raiku participation.</div>
     </div>
   </div>
 </div>
@@ -8503,11 +8496,17 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   <div class="vc-explainer-card">
     <button class="vc-explainer-close" onclick="vcCloseExplainer('vi-explainer-raiku')">✕</button>
     <div class="vc-explainer-title">Raiku Participation</div>
-    <div class="vc-explainer-body">
-      <p>Toggle whether this validator participates in the Raiku protocol.</p>
-      <p><strong>On:</strong> includes AOT + JIT + Validator Bonus revenue in all totals.</p>
-      <p><strong>Off:</strong> shows baseline yield from issuance and network fees only, without Raiku participation.</p>
-      <p>Use this toggle to compare the Raiku uplift vs the baseline for your specific stake size and commission rate.</p>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">Toggle whether this validator participates in the Raiku protocol.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">On: includes AOT + JIT + Validator Bonus revenue in all totals.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">Off: shows baseline yield from issuance and network fees only, without Raiku participation.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">Use this toggle to compare the Raiku uplift vs the baseline for your specific stake size and commission rate.</div>
     </div>
   </div>
 </div>
@@ -8517,15 +8516,18 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   <div class="vc-explainer-card">
     <button class="vc-explainer-close" onclick="vcCloseExplainer('vi-explainer-annual-rev')">✕</button>
     <div class="vc-explainer-title">Revenue Breakdown</div>
-    <div class="vc-explainer-body">
-      <p>Detailed revenue breakdown by source for this validator.</p>
-      <p><strong>Formula:</strong><br>
-      <code>Annual = Stake × (Issuance APY × Commission)<br>
-            + Stake × Network Fees APY<br>
-            + Stake × Raiku APY</code></p>
-      <p>Per-epoch = Annual ÷ ~182 epochs/year.<br>
-      Per-month = Annual ÷ 12.</p>
-      <p>SOL price is read from the Protocol Level price slider. Click row headers to expand/collapse sub-items.</p>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">Detailed revenue breakdown by source for this validator.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-section-title">FORMULA</div>
+      <div class="vc-explainer-note">Annual = Stake × (Issuance APY × Commission) + Stake × Network Fees APY + Stake × Raiku APY</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">Per-epoch = Annual ÷ ~182 epochs/year. Per-month = Annual ÷ 12.</div>
+    </div>
+    <div class="vc-explainer-section">
+      <div class="vc-explainer-note">SOL price is read from the Protocol Level price slider. Click row headers to expand/collapse sub-items.</div>
     </div>
   </div>
 </div>
