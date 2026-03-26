@@ -859,18 +859,18 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
   .vi-kpi-grid { grid-template-columns:repeat(2,1fr); }
 }
 /* ── Individual Level scenario buttons (isolated from Protocol Level sweep) ── */
-.vi-scenario-btn { background:#141516; border:1px solid #2a2d32; border-radius:5px;
+/* 2×2 grid — matches .validator-btns-2x2 layout from Protocol Level */
+.vi-btns-2x2 { display:grid; grid-template-columns:repeat(2,1fr); gap:5px; margin-top:10px; }
+.vi-btns-2x2 .vi-scenario-btn { padding:7px 6px; font-size:11px; border-radius:5px;
+                                 border-width:1px; text-align:center; width:100%; }
+.vi-scenario-btn { background:#111315; border:1px solid #2a2d32; border-radius:5px;
                    padding:7px 8px; font-size:11px; cursor:pointer; color:var(--text);
                    font-weight:600; transition:all 0.15s; text-align:center; }
 .vi-scenario-btn:hover { border-color:#444; }
 .vi-scenario-btn.active { background:var(--lime-dim); border-color:var(--lime); color:var(--lime); }
-.vi-reset-btn { background:transparent; border:1px solid #22262e; border-radius:5px;
-                padding:7px 8px; font-size:10px; cursor:pointer; color:#5a6272;
-                font-family:var(--font-mono); transition:all 0.15s; white-space:nowrap; }
-.vi-reset-btn:hover { border-color:#4a5060; color:var(--text-mid); }
-.vi-param-reset { background:none; border:none; color:#2e3445; font-size:9px; cursor:pointer;
+.vi-param-reset { background:none; border:none; color:#6e7585; font-size:9px; cursor:pointer;
                   padding:0 0 0 3px; line-height:1; vertical-align:middle; transition:color 0.1s; }
-.vi-param-reset:hover { color:#6e7585; }
+.vi-param-reset:hover { color:#b0b8cc; }
 </style>
 </head>
 <body>
@@ -1936,8 +1936,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <div class="section fade-in" style="flex:1; margin-bottom:0; display:flex; flex-direction:column;">
       <h2>Validator Setup (Individual Level)</h2>
 
-      <!-- Scenario selection (mirrors Protocol Level placement) -->
-      <div style="display:flex; gap:4px; margin-top:10px; flex-wrap:wrap;">
+      <!-- Scenario selection: 2×2 grid, mirrors Protocol Level -->
+      <div class="vi-btns-2x2">
         <button class="vi-scenario-btn" id="vi-btn-con"  onclick="viApplyScenario('con')">Conservative</button>
         <button class="vi-scenario-btn active" id="vi-btn-base" onclick="viApplyScenario('base')">Base Case</button>
         <button class="vi-scenario-btn" id="vi-btn-opt"  onclick="viApplyScenario('opt')">Optimistic</button>
@@ -2068,32 +2068,30 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <div style="margin-top:6px; font-size:10px; font-family:var(--font-mono); color:#6e7585;">
           Source: Trillium API, epoch 945 · 762 validators with active stake
         </div>
-        <!-- Comparative positioning bar -->
-        <div class="vi-pos-refs">
+        <!-- Ordinal rank reference points (sorted by stake, largest = #1) -->
+        <div class="vi-pos-refs" style="grid-template-columns:repeat(4,1fr); margin-top:12px;">
           <div class="vi-pos-ref">
-            <div class="vi-pos-ref-label">Your stake</div>
-            <div class="vi-pos-ref-value" id="vi-pos-your-stake">—</div>
+            <div class="vi-pos-ref-label">#50 largest</div>
+            <div class="vi-pos-ref-value" id="vi-rank-50">—</div>
           </div>
           <div class="vi-pos-ref">
-            <div class="vi-pos-ref-label">50th largest (ep. 945)</div>
-            <div class="vi-pos-ref-value" id="vi-pos-top50">—</div>
+            <div class="vi-pos-ref-label">#100</div>
+            <div class="vi-pos-ref-value" id="vi-rank-100">—</div>
           </div>
           <div class="vi-pos-ref">
-            <div class="vi-pos-ref-label">Largest (ep. 945)</div>
-            <div class="vi-pos-ref-value" id="vi-pos-largest">—</div>
+            <div class="vi-pos-ref-label">#250</div>
+            <div class="vi-pos-ref-value" id="vi-rank-250">—</div>
+          </div>
+          <div class="vi-pos-ref">
+            <div class="vi-pos-ref-label">#500</div>
+            <div class="vi-pos-ref-value" id="vi-rank-500">—</div>
           </div>
         </div>
-        <div class="vi-pos-track">
-          <div class="vi-pos-fill" id="vi-pos-fill" style="width:0%;"></div>
-          <div class="vi-pos-thumb" id="vi-pos-thumb" style="left:0%;"></div>
-        </div>
-        <div class="vi-pos-axis">
-          <span>1 SOL</span>
-          <span id="vi-pos-axis-mid">—</span>
-          <span id="vi-pos-axis-max">—</span>
-        </div>
+        <div id="vi-rank-position" style="margin-top:6px; padding:8px 10px; background:#04060a;
+             border:1px solid #16191f; border-radius:5px;
+             font-size:10px; font-family:var(--font-mono); color:#8a93a8; line-height:1.6;">—</div>
         <div style="font-size:9px; color:#5a6272; font-family:var(--font-mono); margin-top:4px;">
-          Log scale · 1 SOL → largest validator
+          Ep. 945 · 762 validators · Ranked by delegated stake, #1 = largest
         </div>
       </div>
     </div>
@@ -8148,24 +8146,25 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     if (!canvas) return;
     var dist = window.QCP && window.QCP.stakeDist;
     var CANVAS_H = 120;
+    // Use parent container width for reliable full-width rendering
+    var W = canvas.parentElement ? canvas.parentElement.clientWidth : (canvas.offsetWidth || 900);
     if (!dist || !dist.stakes_sol) {
         var ctx0 = canvas.getContext('2d');
         if (ctx0) {
-            canvas.width = canvas.offsetWidth || 860;
+            canvas.width  = W || 900;
             canvas.height = CANVAS_H;
             ctx0.fillStyle = '#4a5060';
             ctx0.font = '10px monospace';
             ctx0.textAlign = 'center';
-            ctx0.fillText('Loading distribution\u2026', canvas.width/2, CANVAS_H/2 + 4);
+            ctx0.fillText('Loading distribution\u2026', (W||900)/2, CANVAS_H/2 + 4);
         }
         return;
     }
-    var W = canvas.offsetWidth || 860;
     if (W < 10) return; // panel hidden, skip
     var dpr = window.devicePixelRatio || 1;
     canvas.width  = Math.round(W * dpr);
     canvas.height = Math.round(CANVAS_H * dpr);
-    canvas.style.width  = W + 'px';
+    // Keep width:100% from CSS — only fix height
     canvas.style.height = CANVAS_H + 'px';
     var ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
@@ -8287,33 +8286,32 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             'Max ' + fmtK(d.max_sol) + ' SOL';
     }
 
-    // Comparative positioning bar (uses QCP.bench top-50 data)
-    var bench = window.QCP && window.QCP.bench;
-    var top50 = bench && bench.top_validators_by_stake;
-    if (top50 && top50.length >= 50) {
-        var largest    = top50[0].actual_stake_sol;
-        var boundary50 = top50[49].actual_stake_sol;
-        function _fmtSolB(v) {
-            if (v >= 1e6) return (v/1e6).toFixed(2)+'M SOL';
-            if (v >= 1e3) return (v/1e3).toFixed(v>=100e3?1:2)+'K SOL';
-            return Math.round(v)+' SOL';
-        }
-        _set('vi-pos-your-stake', _fmtSolB(userStake));
-        _set('vi-pos-top50',      _fmtSolB(boundary50) + ' (#50)');
-        _set('vi-pos-largest',    _fmtSolB(largest));
-        // Log-scale midpoint: 10^(logMax/2) — the geometric center of the axis
-        var logMax = Math.log10(largest + 1);
-        var logMid = Math.round(Math.pow(10, logMax / 2));
-        _set('vi-pos-axis-mid',   _fmtSolB(logMid) + ' (mid)');
-        _set('vi-pos-axis-max',   _fmtSolB(largest));
-        var logVal = userStake > 0 ? Math.log10(userStake + 1) : 0;
-        var pct = Math.max(0, Math.min(100, logVal / logMax * 100));
-        var fillEl  = document.getElementById('vi-pos-fill');
-        var thumbEl = document.getElementById('vi-pos-thumb');
-        if (fillEl)  fillEl.style.width = pct + '%';
-        if (thumbEl) thumbEl.style.left  = pct + '%';
-    } else {
-        _set('vi-pos-your-stake', _fmtSol(userStake));
+    // Ordinal rank reference points (uses dist.stakes_sol, sorted ascending, rank #1 = largest)
+    var n = stakes.length;
+    function stakeAtRank(rank) {
+        var idx = n - rank;
+        return (idx >= 0 && idx < n) ? stakes[idx] : 0;
+    }
+    function _fmtSolB(v) {
+        if (v >= 1e6) return (v/1e6).toFixed(2)+'M SOL';
+        if (v >= 1e3) return (v/1e3).toFixed(v>=100e3?1:2)+'K SOL';
+        return Math.round(v)+' SOL';
+    }
+    _set('vi-rank-50',  _fmtSolB(stakeAtRank(50)));
+    _set('vi-rank-100', _fmtSolB(stakeAtRank(100)));
+    _set('vi-rank-250', _fmtSolB(stakeAtRank(250)));
+    _set('vi-rank-500', _fmtSolB(stakeAtRank(500)));
+
+    // User rank: count how many validators have stake >= userStake
+    var userRank = 0;
+    for (var ri = 0; ri < n; ri++) {
+        if (stakes[ri] >= userStake) { userRank = n - ri; break; }
+    }
+    if (!userRank) userRank = 1; // largest
+    var rankEl = document.getElementById('vi-rank-position');
+    if (rankEl) {
+        rankEl.textContent = 'Your stake: ' + _fmtSolB(userStake) +
+            '  ·  approx. rank #' + userRank + ' of ' + n + ' validators';
     }
   };
 
