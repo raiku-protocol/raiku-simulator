@@ -782,6 +782,81 @@ details[open] summary::before { transform:rotate(90deg); }
 .ppc-cell .pool-usage { font-size:9px; color:var(--text2); margin-top:2px; line-height:1.3; }
 /* model-params-price (sl-price): slightly wider input */
 .model-params-price .stepper-input { width:72px; }
+
+/* ── Individual Level: divider ── */
+.vi-divider { margin:32px 0 18px; padding-top:22px; border-top:2px solid #1a1e27;
+              display:flex; align-items:center; gap:10px; }
+.vi-divider-label { font-size:11px; font-weight:700; color:var(--text-mid);
+                    text-transform:uppercase; letter-spacing:0.9px;
+                    font-family:var(--font-mono); white-space:nowrap; }
+.vi-divider-line { flex:1; height:1px; background:#1a1e27; }
+
+/* ── Layout: mirrors .validator-layout ── */
+.vi-layout { display:grid; grid-template-columns:340px 1fr; column-gap:var(--gap); align-items:start; }
+.vi-side { width:340px; position:sticky; top:10px; display:flex; flex-direction:column; }
+.vi-main { display:flex; flex-direction:column; gap:var(--gap); }
+
+/* ── Left panel inputs ── */
+.vi-field { display:flex; flex-direction:column; gap:4px; margin-bottom:16px; }
+.vi-field-header { display:flex; justify-content:space-between; align-items:center; }
+.vi-field-label { font-size:10px; color:#a8aebf; text-transform:uppercase; letter-spacing:0.55px; }
+.vi-field-value { font-size:13px; font-family:var(--font-mono); font-weight:700; color:var(--text); }
+.vi-field-sub { font-size:10px; color:#5a6272; line-height:1.5; margin-top:1px; }
+.vi-number-input { background:#060809; border:1px solid #20252c; border-radius:5px;
+                   color:var(--text); font-family:var(--font-mono); font-size:12px; font-weight:600;
+                   padding:7px 10px; width:100%; box-sizing:border-box; }
+.vi-number-input:focus { border-color:#3a4252; outline:none; }
+.vi-linked-inputs { display:grid; grid-template-columns:1fr auto 1fr; gap:4px; align-items:center; margin-top:6px; }
+.vi-linked-sep { font-size:10px; color:#4a5060; text-align:center; font-family:var(--font-mono); }
+.vi-linked-unit { font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.5px;
+                  margin-top:2px; font-family:var(--font-mono); text-align:center; }
+
+/* ── KPI grid (4 cards, matches .validator-kpi style) ── */
+.vi-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
+.vi-kpi { background:#111213; border:1px solid #1f232b; border-radius:8px; padding:10px 12px; }
+.vi-kpi-label { font-size:9px; color:var(--text2); text-transform:uppercase;
+                letter-spacing:0.6px; margin-bottom:4px; line-height:1.4; }
+.vi-kpi-value { font-size:20px; color:var(--text); font-family:var(--font-mono);
+                font-weight:700; line-height:1.15; }
+.vi-kpi-sub { font-size:10px; color:var(--text-mid); margin-top:3px; line-height:1.4;
+              font-family:var(--font-mono); }
+
+/* ── Unit toggle ── */
+.vi-unit-toggle { display:flex; gap:3px; }
+.vi-unit-btn { font-size:10px; font-family:var(--font-mono); color:var(--text2);
+               background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+               border-radius:4px; padding:3px 8px; cursor:pointer; letter-spacing:0.2px; }
+.vi-unit-btn.active { color:var(--text); background:rgba(255,255,255,0.1);
+                      border-color:rgba(255,255,255,0.25); }
+
+/* ── Raiku toggle inline (in results header) ── */
+.vi-raiku-row { display:flex; align-items:center; gap:6px; }
+.vi-raiku-label { font-size:10px; font-family:var(--font-mono); color:var(--text2);
+                  letter-spacing:0.3px; white-space:nowrap; }
+
+/* ── Network positioning ── */
+.vi-pos-refs { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
+.vi-pos-ref { background:#060809; border:1px solid #16191f; border-radius:5px; padding:8px 10px; }
+.vi-pos-ref-label { font-size:9px; color:#6e7585; text-transform:uppercase;
+                    letter-spacing:0.5px; margin-bottom:3px; }
+.vi-pos-ref-value { font-size:12px; font-family:var(--font-mono); font-weight:600; color:var(--text); }
+.vi-pos-track { height:6px; background:#0e1117; border-radius:3px; position:relative;
+                margin:10px 0 4px; }
+.vi-pos-fill { height:100%; border-radius:3px;
+               background:linear-gradient(90deg,#2a3848,#C0FF38); pointer-events:none; }
+.vi-pos-thumb { position:absolute; top:-4px; width:14px; height:14px; background:#C0FF38;
+                border-radius:50%; transform:translateX(-50%);
+                box-shadow:0 0 6px rgba(192,255,56,0.4); }
+.vi-pos-axis { display:flex; justify-content:space-between; font-size:9px;
+               color:#4a5060; font-family:var(--font-mono); }
+
+/* ── Responsive ── */
+@media(max-width:1100px) {
+  .vi-layout { grid-template-columns:1fr; }
+  .vi-side { width:100%; position:static; }
+  .vi-kpi-grid { grid-template-columns:repeat(2,1fr); }
+  .vi-pos-refs { grid-template-columns:repeat(2,1fr); }
+}
 </style>
 </head>
 <body>
@@ -1833,6 +1908,227 @@ details[open] summary::before { transform:rotate(90deg); }
 
 </div>
 </div>
+
+<!-- ═══ INDIVIDUAL LEVEL ═══ -->
+<div class="vi-divider">
+  <span class="vi-divider-label">Individual Level</span>
+  <div class="vi-divider-line"></div>
+</div>
+
+<div class="vi-layout">
+
+  <!-- ─── LEFT: Validator Setup ─────────────────────────────── -->
+  <div class="vi-side">
+    <div class="section fade-in" style="flex:1; margin-bottom:0; display:flex; flex-direction:column;">
+      <h2>Validator Setup</h2>
+
+      <!-- Delegated Stake ↔ Network Share (linked) -->
+      <div class="vi-field" style="margin-top:16px;">
+        <div class="vi-field-header">
+          <label class="vi-field-label" for="vi-stake">
+            Delegated Stake
+            <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-stake')">?</button>
+          </label>
+        </div>
+        <div class="vi-linked-inputs">
+          <div>
+            <input class="vi-number-input" type="number" id="vi-stake"
+                   min="0" max="50000000" step="1000" value="50000"
+                   oninput="viHandleStakeInput()">
+            <div class="vi-linked-unit">SOL</div>
+          </div>
+          <div class="vi-linked-sep">↔</div>
+          <div>
+            <input class="vi-number-input" type="number" id="vi-share"
+                   min="0" max="100" step="0.001" value="0.012"
+                   oninput="viHandleShareInput()">
+            <div class="vi-linked-unit">% of network</div>
+          </div>
+        </div>
+        <div class="vi-field-sub" id="vi-stake-usd">≈ — at current price</div>
+        <div class="vi-field-sub" style="color:#3e4555; margin-top:1px;">
+          Total active stake delegated to this validator
+        </div>
+      </div>
+
+      <!-- Inflation Commission -->
+      <div class="vi-field">
+        <div class="vi-field-header">
+          <label class="vi-field-label" for="vi-commission">
+            Inflation Commission
+            <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-commission')">?</button>
+          </label>
+          <span class="vi-field-value" id="vi-commission-val">7.0%</span>
+        </div>
+        <input type="range" id="vi-commission" min="0" max="10" step="0.1" value="7"
+               oninput="viUpdate()">
+        <div class="vi-field-sub">
+          % of inflation staking rewards kept by the validator · Network avg ~7%
+        </div>
+      </div>
+
+      <!-- Spacer -->
+      <div style="flex:1; min-height:12px;"></div>
+
+      <!-- Footer -->
+      <div class="validator-note" style="font-size:11px; color:#5a6272; line-height:1.6;">
+        Block fees and Raiku MEV flow 100% to the validator.
+        Commission only reduces the validator's share of inflation rewards.
+      </div>
+    </div>
+  </div><!-- end vi-side -->
+
+  <!-- ─── RIGHT: Results ──────────────────────────────────────── -->
+  <div class="vi-main">
+
+    <!-- ① My Validator: 4 KPIs + Raiku comparison toggle -->
+    <div class="section fade-in fade-in-1">
+      <div style="display:flex; justify-content:space-between; align-items:center;
+                  flex-wrap:wrap; gap:8px; margin-bottom:0;">
+        <h2 style="margin-bottom:0;">
+          My Validator
+          <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-total-yield')">?</button>
+        </h2>
+        <div class="vi-raiku-row">
+          <span class="vi-raiku-label">+ Raiku</span>
+          <label class="bb-arb-switch" title="Include Raiku MEV revenue">
+            <input type="checkbox" id="vi-raiku-on" checked onchange="viUpdate()">
+            <span class="bb-arb-slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="vi-kpi-grid">
+        <div class="vi-kpi">
+          <div class="vi-kpi-label">Total Yield</div>
+          <div class="vi-kpi-value" id="vi-kpi-apy">—</div>
+          <div class="vi-kpi-sub">APY</div>
+        </div>
+        <div class="vi-kpi">
+          <div class="vi-kpi-label">Annual Revenue</div>
+          <div class="vi-kpi-value" id="vi-kpi-annual">—</div>
+          <div class="vi-kpi-sub" id="vi-kpi-annual-sol">— SOL/yr</div>
+        </div>
+        <div class="vi-kpi">
+          <div class="vi-kpi-label">Per-Epoch Revenue</div>
+          <div class="vi-kpi-value" id="vi-kpi-epoch">—</div>
+          <div class="vi-kpi-sub" id="vi-kpi-epoch-sol">— SOL/epoch</div>
+        </div>
+        <div class="vi-kpi">
+          <div class="vi-kpi-label">Network Share</div>
+          <div class="vi-kpi-value" id="vi-kpi-share">—</div>
+          <div class="vi-kpi-sub">of total stake</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② Revenue Breakdown (aligned with Protocol Level hierarchy) -->
+    <div class="section fade-in fade-in-2" style="padding-bottom:0;">
+      <div style="display:flex; justify-content:space-between; align-items:center;
+                  flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+        <h2 style="margin-bottom:0;">
+          Revenue Breakdown
+          <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-annual-rev')">?</button>
+        </h2>
+        <div class="vi-unit-toggle">
+          <button class="vi-unit-btn active" id="vi-u-epoch" onclick="viSetUnit('epoch')">Per epoch</button>
+          <button class="vi-unit-btn" id="vi-u-month"  onclick="viSetUnit('month')">Per month</button>
+          <button class="vi-unit-btn" id="vi-u-year"   onclick="viSetUnit('year')">Per year</button>
+        </div>
+      </div>
+      <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px;
+                  overflow:hidden; padding:0 14px; margin-bottom:14px;">
+        <table class="vpr-table">
+          <thead>
+            <tr>
+              <th style="width:38%;">Revenue Source</th>
+              <th id="vi-thead-unit" style="min-width:80px;">Per Epoch</th>
+              <th style="min-width:80px;">SOL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Block Rewards: expandable parent -->
+            <tr class="vpr-tr-group" onclick="viToggle('br')">
+              <td>Block Rewards <span class="vpr-chevron" id="vi-chev-br">▾</span></td>
+              <td id="vi-br-usd">—</td>
+              <td id="vi-br-sol">—</td>
+            </tr>
+            <tr class="vpr-tr-child vi-child-br" style="display:none;">
+              <td>Issuance</td>
+              <td id="vi-iss-usd">—</td>
+              <td id="vi-iss-sol">—</td>
+            </tr>
+            <tr class="vpr-tr-child vi-child-br" style="display:none;">
+              <td>Network Fees</td>
+              <td id="vi-blk-usd">—</td>
+              <td id="vi-blk-sol">—</td>
+            </tr>
+            <!-- Raiku MEV: lime group row, expandable (hidden when Raiku toggle OFF) -->
+            <tr class="vpr-tr-group vpr-tr-mev" id="vi-raiku-group-row" onclick="viToggle('mev')">
+              <td>Raiku MEV <span class="vpr-chevron" id="vi-chev-mev">▾</span></td>
+              <td id="vi-mev-usd">—</td>
+              <td id="vi-mev-sol">—</td>
+            </tr>
+            <tr class="vpr-tr-child vi-child-mev" id="vi-aot-row" style="display:none;">
+              <td>Raiku AOT</td>
+              <td id="vi-aot-usd">—</td>
+              <td id="vi-aot-sol">—</td>
+            </tr>
+            <tr class="vpr-tr-child vi-child-mev" id="vi-jit-row" style="display:none;">
+              <td>Raiku JIT</td>
+              <td id="vi-jit-usd">—</td>
+              <td id="vi-jit-sol">—</td>
+            </tr>
+            <tr class="vpr-tr-child vi-child-mev" id="vi-bonus-row" style="display:none;">
+              <td>Validator Bonus</td>
+              <td id="vi-bonus-usd">—</td>
+              <td id="vi-bonus-sol">—</td>
+            </tr>
+            <!-- Total -->
+            <tr class="vpr-tr-total">
+              <td>Total Validator Revenue</td>
+              <td id="vi-total-usd">—</td>
+              <td id="vi-total-sol">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ③ Network Positioning -->
+    <div class="section fade-in fade-in-3" style="padding-bottom:14px;">
+      <h2>Network Positioning</h2>
+      <div class="vi-pos-refs">
+        <div class="vi-pos-ref">
+          <div class="vi-pos-ref-label">Your stake</div>
+          <div class="vi-pos-ref-value" id="vi-pos-your-stake">—</div>
+        </div>
+        <div class="vi-pos-ref">
+          <div class="vi-pos-ref-label">50th largest (ep. 945)</div>
+          <div class="vi-pos-ref-value" id="vi-pos-top50">loading…</div>
+        </div>
+        <div class="vi-pos-ref">
+          <div class="vi-pos-ref-label">Largest (ep. 945)</div>
+          <div class="vi-pos-ref-value" id="vi-pos-largest">loading…</div>
+        </div>
+      </div>
+      <div class="vi-pos-track">
+        <div class="vi-pos-fill" id="vi-pos-fill" style="width:0%;"></div>
+        <div class="vi-pos-thumb" id="vi-pos-thumb" style="left:0%;"></div>
+      </div>
+      <div class="vi-pos-axis">
+        <span>0 SOL</span>
+        <span id="vi-pos-axis-mid">—</span>
+        <span id="vi-pos-axis-max">—</span>
+      </div>
+      <div class="validator-note" style="margin-top:10px;">
+        Bar shows position on a log scale relative to the top-50 validators by stake (epoch 945, from loaded benchmark data).
+        Full network percentile distribution pending a future upstream artifact.
+      </div>
+    </div>
+
+  </div><!-- end vi-main -->
+</div><!-- end vi-layout -->
+
 </div><!-- end tab-validator -->
 
 <!-- ═══ TAB 2: BLOCK SIMULATION ═══ -->
@@ -5574,6 +5870,7 @@ function update(){
     buildMatrix(p);
     if(typeof updateSimAssumptions==='function') updateSimAssumptions();
     if(typeof renderBlockBuilder==='function') renderBlockBuilder();
+    if (typeof window.viUpdate === 'function') window.viUpdate();
 }
 
 // ── Hybrid controls: numeric input + stepper buttons ─────────────────────
@@ -7498,6 +7795,177 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     makeEditable('validator-context-block',    'sl-blk',      0, 100,  0.1,  function(v){ return Math.round(v)+'%'; });
     makeEditable('validator-context-fee',      'sl-fcu',      0,  25,  0.01, function(v){ return (v>=10?v.toFixed(1):v<0.1?v.toFixed(3):v.toFixed(2))+' L'; });
 }());
+
+// ── Individual Level: viUpdate, viSetUnit, viToggle, viHandleStakeInput ────
+(function(){
+  var _unit = 'epoch';
+  var _blockingStakeSync = false;
+  var _blockingShareSync = false;
+
+  function _parseApyEl(id) {
+    var el = document.getElementById(id);
+    if (!el) return 0;
+    return parseFloat(el.textContent) / 100 || 0;
+  }
+  function _fmtUsd(v) {
+    var a = Math.abs(v);
+    if (a >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+    if (a >= 1e3) return '$' + (v/1e3).toFixed(a >= 100e3 ? 0 : 1) + 'K';
+    if (a >= 0.01) return '$' + v.toFixed(2);
+    return '$' + v.toFixed(4);
+  }
+  function _fmtSol(v) {
+    var a = Math.abs(v);
+    if (a >= 1e6) return (v/1e6).toFixed(2) + 'M SOL';
+    if (a >= 1e3) return (v/1e3).toFixed(a >= 100e3 ? 1 : 2) + 'K SOL';
+    return v.toFixed(a < 0.001 ? 5 : a < 0.1 ? 4 : 2) + ' SOL';
+  }
+  function _set(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
+  function _getTotalStake() {
+    return (typeof getCurrentTotalSolanaStakedSol === 'function')
+           ? getCurrentTotalSolanaStakedSol() : STAKE_FALLBACK_SOL;
+  }
+
+  window.viHandleStakeInput = function() {
+    if (_blockingStakeSync) return;
+    var stake = parseFloat(document.getElementById('vi-stake').value) || 0;
+    var total = _getTotalStake();
+    _blockingShareSync = true;
+    var shareEl = document.getElementById('vi-share');
+    if (shareEl) shareEl.value = (total > 0 ? (stake / total * 100) : 0).toFixed(4);
+    _blockingShareSync = false;
+    window.viUpdate();
+  };
+  window.viHandleShareInput = function() {
+    if (_blockingShareSync) return;
+    var share = parseFloat(document.getElementById('vi-share').value) || 0;
+    var total = _getTotalStake();
+    _blockingStakeSync = true;
+    var stakeEl = document.getElementById('vi-stake');
+    if (stakeEl) stakeEl.value = Math.round(share / 100 * total);
+    _blockingStakeSync = false;
+    window.viUpdate();
+  };
+
+  window.viToggle = function(group) {
+    var children = document.querySelectorAll('.vi-child-' + group);
+    var chev = document.getElementById('vi-chev-' + group);
+    if (!children.length) return;
+    var expanded = children[0].style.display !== 'none';
+    for (var i = 0; i < children.length; i++) {
+      children[i].style.display = expanded ? 'none' : '';
+    }
+    if (chev) chev.textContent = expanded ? '▾' : '▴';
+  };
+
+  window.viSetUnit = function(u) {
+    _unit = u;
+    ['epoch','month','year'].forEach(function(k) {
+      var btn = document.getElementById('vi-u-' + k);
+      if (btn) btn.classList.toggle('active', k === u);
+    });
+    var th = document.getElementById('vi-thead-unit');
+    if (th) th.textContent = {epoch:'Per Epoch', month:'Per Month', year:'Per Year'}[u] || 'Per Epoch';
+    window.viUpdate();
+  };
+
+  window.viUpdate = function() {
+    var stakeEl = document.getElementById('vi-stake');
+    var commEl  = document.getElementById('vi-commission');
+    var raikuEl = document.getElementById('vi-raiku-on');
+    if (!stakeEl || !commEl || !raikuEl) return;
+
+    var stake   = parseFloat(stakeEl.value)  || 0;
+    var commPct = parseFloat(commEl.value)   || 0;
+    var raikuOn = raikuEl.checked;
+    var comm    = commPct / 100;
+    var total   = _getTotalStake();
+    var solPrice = parseFloat((document.getElementById('sl-price') || {}).value) || 100;
+
+    _set('vi-commission-val', commPct.toFixed(1) + '%');
+    _set('vi-stake-usd', '≈ ' + _fmtUsd(stake * solPrice) + ' · ' + _fmtSol(stake));
+
+    var shareEl = document.getElementById('vi-share');
+    if (shareEl && document.activeElement !== shareEl && !_blockingShareSync) {
+      shareEl.value = (total > 0 ? (stake / total * 100) : 0).toFixed(4);
+    }
+
+    var issApy   = _parseApyEl('validator-decomp-iss-apy');
+    var blkApy   = _parseApyEl('validator-decomp-blk-apy');
+    var aotApy   = _parseApyEl('validator-decomp-aot-apy');
+    var jitApy   = _parseApyEl('validator-decomp-jit-apy');
+    var bonusApy = _parseApyEl('validator-decomp-bonus-apy');
+    var raikuApy = aotApy + jitApy + bonusApy;
+    var totalApy = issApy * comm + blkApy + (raikuOn ? raikuApy : 0);
+
+    var issAnnual   = stake * issApy * comm;
+    var blkAnnual   = stake * blkApy;
+    var brAnnual    = issAnnual + blkAnnual;
+    var aotAnnual   = stake * aotApy;
+    var jitAnnual   = stake * jitApy;
+    var bonusAnnual = stake * bonusApy;
+    var raikuAnnual = raikuOn ? (aotAnnual + jitAnnual + bonusAnnual) : 0;
+    var totalAnnual = brAnnual + raikuAnnual;
+    var netShare    = total > 0 ? (stake / total * 100) : 0;
+
+    _set('vi-kpi-apy',    (totalApy * 100).toFixed(2) + '%');
+    _set('vi-kpi-annual', _fmtUsd(totalAnnual * solPrice));
+    _set('vi-kpi-annual-sol', _fmtSol(totalAnnual) + '/yr');
+    _set('vi-kpi-epoch',  _fmtUsd(totalAnnual / EPOCHS_PER_YEAR * solPrice));
+    _set('vi-kpi-epoch-sol', _fmtSol(totalAnnual / EPOCHS_PER_YEAR) + '/epoch');
+    _set('vi-kpi-share',  netShare < 0.001 ? '<0.001%' : netShare.toFixed(3) + '%');
+
+    var div = {epoch: EPOCHS_PER_YEAR, month: 12, year: 1}[_unit] || EPOCHS_PER_YEAR;
+    function _row(annualSol) {
+      var sol = annualSol / div;
+      return { usd: _fmtUsd(sol * solPrice), sol: _fmtSol(sol) };
+    }
+    var rows = {
+      br:    _row(brAnnual),
+      iss:   _row(issAnnual),
+      blk:   _row(blkAnnual),
+      mev:   _row(raikuAnnual),
+      aot:   _row(aotAnnual),
+      jit:   _row(jitAnnual),
+      bonus: _row(bonusAnnual),
+      total: _row(totalAnnual)
+    };
+    ['br','iss','blk','mev','aot','jit','bonus','total'].forEach(function(k) {
+      _set('vi-' + k + '-usd', rows[k].usd);
+      _set('vi-' + k + '-sol', rows[k].sol);
+    });
+
+    ['vi-raiku-group-row','vi-aot-row','vi-jit-row','vi-bonus-row'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = raikuOn ? '' : 'none';
+    });
+
+    var bench = window.QCP && window.QCP.bench;
+    var top50 = bench && bench.top_validators_by_stake;
+    if (top50 && top50.length >= 50) {
+      var largest    = top50[0].actual_stake_sol;
+      var boundary50 = top50[49].actual_stake_sol;
+      _set('vi-pos-your-stake', _fmtSol(stake));
+      _set('vi-pos-top50',     _fmtSol(boundary50) + ' (#50)');
+      _set('vi-pos-largest',   _fmtSol(largest));
+      _set('vi-pos-axis-mid',  _fmtSol(Math.round(largest / 2)));
+      _set('vi-pos-axis-max',  _fmtSol(largest));
+      var logMax = Math.log10(largest + 1);
+      var logVal = stake > 0 ? Math.log10(stake + 1) : 0;
+      var pct = Math.max(0, Math.min(100, logVal / logMax * 100));
+      var fillEl  = document.getElementById('vi-pos-fill');
+      var thumbEl = document.getElementById('vi-pos-thumb');
+      if (fillEl)  fillEl.style.width = pct + '%';
+      if (thumbEl) thumbEl.style.left  = pct + '%';
+    } else {
+      _set('vi-pos-your-stake', _fmtSol(stake));
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(window.viUpdate, 300);
+  });
+}());
 </script>
 <!-- ── Issuance Explainer Modal ──────────────────────────────────────── -->
 <div class="vc-explainer-overlay" id="vc-explainer-iss" onclick="if(event.target===this)vcCloseExplainer('vc-explainer-iss')">
@@ -7883,6 +8351,81 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
       <div class="vc-explainer-sources">
         <a class="vc-explainer-source-link" href="https://api.trillium.so" target="_blank">Trillium API — /validator_rewards/{epoch}</a>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── vi-explainer-stake ── -->
+<div class="vc-explainer-overlay" id="vi-explainer-stake" onclick="if(event.target===this)vcCloseExplainer('vi-explainer-stake')">
+  <div class="vc-explainer-card">
+    <button class="vc-explainer-close" onclick="vcCloseExplainer('vi-explainer-stake')">✕</button>
+    <div class="vc-explainer-title">Delegated Stake</div>
+    <div class="vc-explainer-body">
+      <p>Total SOL delegated to this validator — including staker delegations and the validator's own self-stake.</p>
+      <p>All revenue streams scale linearly with stake: issuance rewards, block fees, and Raiku MEV are all proportional to your share of total network stake.</p>
+      <p><strong>Network Share</strong> = Your Stake ÷ Total Network Staked × 100.</p>
+      <p>Reference: total active stake ~421M SOL (Solana Compass, Mar 2026). Changing stake automatically updates the Network Share field and vice versa.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── vi-explainer-commission ── -->
+<div class="vc-explainer-overlay" id="vi-explainer-commission" onclick="if(event.target===this)vcCloseExplainer('vi-explainer-commission')">
+  <div class="vc-explainer-card">
+    <button class="vc-explainer-close" onclick="vcCloseExplainer('vi-explainer-commission')">✕</button>
+    <div class="vc-explainer-title">Inflation Commission</div>
+    <div class="vc-explainer-body">
+      <p>The percentage of inflation staking rewards that the validator keeps. The remainder flows to delegators.</p>
+      <p><strong>Applies to issuance only.</strong> Block priority fees and Raiku MEV revenue flow 100% to the validator — commission has no effect on these streams.</p>
+      <p>Network average: ~7%. Practical range for most validators: 0–10%.</p>
+      <p>Formula: <code>Issuance Revenue = Stake × Issuance APY × Commission</code></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── vi-explainer-total-yield ── -->
+<div class="vc-explainer-overlay" id="vi-explainer-total-yield" onclick="if(event.target===this)vcCloseExplainer('vi-explainer-total-yield')">
+  <div class="vc-explainer-card">
+    <button class="vc-explainer-close" onclick="vcCloseExplainer('vi-explainer-total-yield')">✕</button>
+    <div class="vc-explainer-title">Total Yield (APY)</div>
+    <div class="vc-explainer-body">
+      <p>The validator's total annualized yield as a percentage of delegated stake.</p>
+      <p><strong>Formula:</strong><br>
+      <code>Total APY = Issuance APY × Commission + Network Fees APY + Raiku APY (if enabled)</code></p>
+      <p>APY components are inherited from the Protocol Level Validator Yield decomposition above. Commission scales only the Issuance component — block fees and Raiku MEV are not reduced by commission.</p>
+      <p>Toggle "+ Raiku" to compare yield with and without Raiku participation.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── vi-explainer-raiku ── -->
+<div class="vc-explainer-overlay" id="vi-explainer-raiku" onclick="if(event.target===this)vcCloseExplainer('vi-explainer-raiku')">
+  <div class="vc-explainer-card">
+    <button class="vc-explainer-close" onclick="vcCloseExplainer('vi-explainer-raiku')">✕</button>
+    <div class="vc-explainer-title">Raiku Participation</div>
+    <div class="vc-explainer-body">
+      <p>Toggle whether this validator participates in the Raiku protocol.</p>
+      <p><strong>On:</strong> includes AOT + JIT + Validator Bonus revenue in all totals.</p>
+      <p><strong>Off:</strong> shows baseline yield from issuance and network fees only, without Raiku participation.</p>
+      <p>Use this toggle to compare the Raiku uplift vs the baseline for your specific stake size and commission rate.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── vi-explainer-annual-rev ── -->
+<div class="vc-explainer-overlay" id="vi-explainer-annual-rev" onclick="if(event.target===this)vcCloseExplainer('vi-explainer-annual-rev')">
+  <div class="vc-explainer-card">
+    <button class="vc-explainer-close" onclick="vcCloseExplainer('vi-explainer-annual-rev')">✕</button>
+    <div class="vc-explainer-title">Revenue Breakdown</div>
+    <div class="vc-explainer-body">
+      <p>Detailed revenue breakdown by source for this validator.</p>
+      <p><strong>Formula:</strong><br>
+      <code>Annual = Stake × (Issuance APY × Commission)<br>
+            + Stake × Network Fees APY<br>
+            + Stake × Raiku APY</code></p>
+      <p>Per-epoch = Annual ÷ ~182 epochs/year.<br>
+      Per-month = Annual ÷ 12.</p>
+      <p>SOL price is read from the Protocol Level price slider. Click row headers to expand/collapse sub-items.</p>
     </div>
   </div>
 </div>
