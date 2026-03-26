@@ -841,6 +841,16 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
   .vi-side { width:100%; position:static; }
   .vi-kpi-grid { grid-template-columns:repeat(2,1fr); }
 }
+/* ── Individual Level scenario buttons (isolated from Protocol Level sweep) ── */
+.vi-scenario-btn { background:#141516; border:1px solid #2a2d32; border-radius:5px;
+                   padding:7px 8px; font-size:11px; cursor:pointer; color:var(--text);
+                   font-weight:600; transition:all 0.15s; text-align:center; }
+.vi-scenario-btn:hover { border-color:#444; }
+.vi-scenario-btn.active { background:var(--lime-dim); border-color:var(--lime); color:var(--lime); }
+.vi-reset-btn { background:transparent; border:1px solid #22262e; border-radius:5px;
+                padding:7px 8px; font-size:10px; cursor:pointer; color:#5a6272;
+                font-family:var(--font-mono); transition:all 0.15s; white-space:nowrap; }
+.vi-reset-btn:hover { border-color:#4a5060; color:var(--text-mid); }
 </style>
 </head>
 <body>
@@ -1919,8 +1929,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             Delegated Stake
             <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-stake')">?</button>
           </div>
-          <div class="validator-context-value" id="vi-stake">50,000 SOL</div>
-          <input type="hidden" id="vi-stake-raw" value="50000">
+          <div class="validator-context-value" id="vi-stake">152,908 SOL</div>
+          <input type="hidden" id="vi-stake-raw" value="152908">
         </div>
       </div>
 
@@ -1929,17 +1939,31 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <!-- Network Share: derived display, editable (updates stake) -->
         <div class="validator-context-item">
           <div class="validator-context-label">Network Share</div>
-          <div class="validator-context-value" id="vi-share">0.0119%</div>
-          <input type="hidden" id="vi-share-raw" value="0.0119">
+          <div class="validator-context-value" id="vi-share">0.0363%</div>
+          <input type="hidden" id="vi-share-raw" value="0.0363">
         </div>
-        <!-- Inflation Commission: editable text input -->
+        <!-- Inflation Commission: editable text input; default 0% -->
         <div class="validator-context-item">
           <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
             Commission
             <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-commission')">?</button>
           </div>
-          <div class="validator-context-value" id="vi-commission">7.0%</div>
-          <input type="hidden" id="vi-commission-raw" value="7">
+          <div class="validator-context-value" id="vi-commission">0.0%</div>
+          <input type="hidden" id="vi-commission-raw" value="0">
+        </div>
+      </div>
+
+      <!-- Row 3: Issuance APY | Network Fees APY (own inputs — scenario-initialized) -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:6px;">
+        <div class="validator-context-item">
+          <div class="validator-context-label">Issuance APY</div>
+          <div class="validator-context-value" id="vi-iss-apy">5.995%</div>
+          <input type="hidden" id="vi-iss-apy-raw" value="5.995">
+        </div>
+        <div class="validator-context-item">
+          <div class="validator-context-label">Network Fees APY</div>
+          <div class="validator-context-value" id="vi-blk-apy">0.498%</div>
+          <input type="hidden" id="vi-blk-apy-raw" value="0.498">
         </div>
       </div>
 
@@ -2010,11 +2034,12 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           </label>
         </div>
       </div>
-      <div style="display:flex; gap:4px; margin-top:6px; flex-wrap:wrap;">
-        <button class="scenario-btn" id="validator-btn-con"  onclick="applyScenario('con')">Conservative</button>
-        <button class="scenario-btn active" id="validator-btn-base" onclick="applyScenario('base')">Base Case</button>
-        <button class="scenario-btn" id="validator-btn-opt"  onclick="applyScenario('opt')">Optimistic</button>
-        <button class="scenario-btn" id="validator-btn-bull" onclick="applyScenario('bull')">Bull Case</button>
+      <div style="display:flex; gap:4px; margin-top:6px; flex-wrap:wrap; align-items:center;">
+        <button class="vi-scenario-btn" id="vi-btn-con"  onclick="viApplyScenario('con')">Conservative</button>
+        <button class="vi-scenario-btn active" id="vi-btn-base" onclick="viApplyScenario('base')">Base Case</button>
+        <button class="vi-scenario-btn" id="vi-btn-opt"  onclick="viApplyScenario('opt')">Optimistic</button>
+        <button class="vi-scenario-btn" id="vi-btn-bull" onclick="viApplyScenario('bull')">Bull Case</button>
+        <button class="vi-reset-btn" onclick="viResetToDefaults()">↺ Reset</button>
       </div>
       <div class="validator-decomp-card" style="margin-top:10px;">
         <!-- Top summary band: APY headline · APR (mirrors Protocol Level) -->
@@ -7881,16 +7906,31 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         if (stakeRaw) stakeRaw.value = Math.round(v/100*total);
       });
     makeEditable('vi-commission', 'vi-commission-raw', 0, 10, 0.1,
-      function(v){ return v.toFixed(1)+'%'; });
+      function(v){ return v.toFixed(1)+'%'; },
+      function(){ if (typeof window.viUpdate === 'function') window.viUpdate(); });
+    // Issuance APY and Network Fees APY: own Individual Level inputs.
+    // onCommit updates _viState via public setter functions (defined in second IIFE).
+    makeEditable('vi-iss-apy', 'vi-iss-apy-raw', 0, 30, 0.001,
+      function(v){ return typeof fmtValidatorRate === 'function' ? fmtValidatorRate(v/100) : v.toFixed(3)+'%'; },
+      function(v){ if (typeof window.viSetIssApy === 'function') window.viSetIssApy(v/100); });
+    makeEditable('vi-blk-apy', 'vi-blk-apy-raw', 0, 5, 0.001,
+      function(v){ return typeof fmtValidatorRate === 'function' ? fmtValidatorRate(v/100) : v.toFixed(3)+'%'; },
+      function(v){ if (typeof window.viSetBlkApy === 'function') window.viSetBlkApy(v/100); });
 }());
 
-// ── Individual Level: viUpdate, viToggle, viSyncPrice ───
+// ── Individual Level: self-contained state + calculations (no Protocol Level live reads) ───
 (function(){
-  function _parseApyEl(id) {
-    var el = document.getElementById(id);
-    if (!el) return 0;
-    return parseFloat(el.textContent) / 100 || 0;
-  }
+  // ── Own state: Raiku APRs + scenario-scoped APYs, initialized once per scenario change ──
+  var _viState = {
+    issApy:   0,    // from own Issuance APY input (decimal, e.g. 0.0599)
+    blkApy:   0,    // from own Network Fees APY input (decimal, e.g. 0.00498)
+    aotApr:   0,    // Raiku AOT — from scenario calc, per SOL of connected stake
+    jitApr:   0,    // Raiku JIT — from scenario calc
+    bonusApr: 0,    // Raiku Validator Bonus — from scenario calc
+    ojitApr:  0,    // Other JIT (non-Raiku bypass) — from scenario calc
+    scenario: 'base'
+  };
+
   function _fmtUsd(v) {
     var a = Math.abs(v);
     if (a >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B';
@@ -7917,6 +7957,53 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     return (typeof getCurrentTotalSolanaStakedSol === 'function')
            ? getCurrentTotalSolanaStakedSol() : STAKE_FALLBACK_SOL;
   }
+
+  // ── Public setters for Issuance APY and Network Fees APY (called from first-IIFE makeEditable) ──
+  window.viSetIssApy = function(apy) { _viState.issApy = apy; window.viUpdate(); };
+  window.viSetBlkApy = function(apy) { _viState.blkApy = apy; window.viUpdate(); };
+
+  // ── Apply scenario: initialize _viState from scenario params + update own inputs ──
+  // SOL Price and Delegated Stake / Network Share are NOT touched.
+  window.viApplyScenario = function(n) {
+    if (typeof getScenarioParams !== 'function' || typeof calc !== 'function') return;
+    var sp = getScenarioParams(n);
+    if (!sp) return;
+    var r        = calc(sp);
+    var totalSol = _getTotalStake();
+    var connectedSol = totalSol * (sp.s || 0);
+    // Raiku APRs: per SOL staked in Raiku-connected validators (same for all validators in scenario)
+    if (connectedSol > 0) {
+      _viState.aotApr   = (r.aotValidatorBase  || 0) / connectedSol;
+      _viState.bonusApr = ((r.aotValBonus || 0) + (r.jitValBonus || 0)) / connectedSol;
+      _viState.jitApr   = (r.jitValidatorBase  || 0) / connectedSol;
+      _viState.ojitApr  = (r.otherJitRev       || 0) / connectedSol;
+    } else {
+      _viState.aotApr = _viState.bonusApr = _viState.jitApr = _viState.ojitApr = 0;
+    }
+    _viState.issApy  = sp.issApy || 0;
+    _viState.blkApy  = sp.nfApy  || 0;
+    _viState.scenario = n;
+    // Update own Issuance APY and Network Fees APY raw inputs + display divs
+    var issRaw = document.getElementById('vi-iss-apy-raw');
+    if (issRaw) issRaw.value = ((sp.issApy || 0) * 100).toFixed(4);
+    var blkRaw = document.getElementById('vi-blk-apy-raw');
+    if (blkRaw) blkRaw.value = ((sp.nfApy  || 0) * 100).toFixed(4);
+    var issDiv = document.getElementById('vi-iss-apy');
+    if (issDiv && !issDiv.querySelector('input')) issDiv.textContent = fmtValidatorRate(sp.issApy || 0);
+    var blkDiv = document.getElementById('vi-blk-apy');
+    if (blkDiv && !blkDiv.querySelector('input')) blkDiv.textContent = fmtValidatorRate(sp.nfApy  || 0);
+    // Highlight only vi-btn-* buttons — isolated from Protocol Level .scenario-btn sweep
+    ['con','base','opt','bull'].forEach(function(k) {
+      var btn = document.getElementById('vi-btn-' + k);
+      if (btn) btn.classList.toggle('active', k === n);
+    });
+    window.viUpdate();
+  };
+
+  // ── Reset to defaults: restore scenario-scoped inputs without touching stake/share/commission/price ──
+  window.viResetToDefaults = function() {
+    window.viApplyScenario(_viState.scenario || 'base');
+  };
 
   // Sync the vi-sol-price slider when the global sl-price changes
   window.viSyncPrice = function(val) {
@@ -8057,6 +8144,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   };
 
   window.viUpdate = function() {
+    var N = APY_COMPOUNDING_PERIODS;
     var stakeRawEl = document.getElementById('vi-stake-raw');
     var commRawEl  = document.getElementById('vi-commission-raw');
     var raikuEl    = document.getElementById('vi-raiku-on');
@@ -8072,94 +8160,82 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     // Sync display divs (only when makeEditable is not active)
     var commDiv = document.getElementById('vi-commission');
     if (commDiv && !commDiv.querySelector('input')) commDiv.textContent = commPct.toFixed(1)+'%';
-
     var stakeDiv = document.getElementById('vi-stake');
     if (stakeDiv && !stakeDiv.querySelector('input')) stakeDiv.textContent = stake.toLocaleString('en-US',{maximumFractionDigits:0})+' SOL';
-
-    // Update SOL price display box
     _set('vi-sol-price-display', '$' + Math.round(solPrice));
-
-    // Summary row: short USD value on the right, full breakdown below
     var stakeUsd = stake * solPrice;
     _set('vi-stake-usd', _fmtUsd(stakeUsd));
-    _set('vi-stake-summary',
-         stake.toLocaleString('en-US', {maximumFractionDigits:0}) +
-         ' SOL · ' + _fmtUsd(stakeUsd));
-
-    // Compute netShare and sync share raw + display
+    _set('vi-stake-summary', stake.toLocaleString('en-US',{maximumFractionDigits:0}) + ' SOL · ' + _fmtUsd(stakeUsd));
     var netShare = total > 0 ? (stake / total * 100) : 0;
     var shareRawEl = document.getElementById('vi-share-raw');
     if (shareRawEl) shareRawEl.value = netShare;
     var shareDiv = document.getElementById('vi-share');
     if (shareDiv && !shareDiv.querySelector('input')) shareDiv.textContent = netShare.toFixed(4)+'%';
 
-    // Read component APYs from Protocol Level decomp (ground truth)
-    // Commission is temporarily ignored — Individual Level uses gross APYs directly
-    // to allow exact reconciliation with Protocol Level at matching stake fractions.
-    var issApy   = _parseApyEl('validator-decomp-iss-apy');
-    var blkApy   = _parseApyEl('validator-decomp-blk-apy');
-    var aotApy   = _parseApyEl('validator-decomp-aot-apy');
-    var jitApy   = _parseApyEl('validator-decomp-jit-apy');
-    var bonusApy = _parseApyEl('validator-decomp-bonus-apy');
-    var ojitApy  = _parseApyEl('validator-decomp-ojit-apy');   // Other JIT (non-Raiku)
-    var raikuApy   = aotApy + jitApy + bonusApy + ojitApy;
-    var totalApy   = issApy + blkApy + (raikuOn ? raikuApy : 0);
-    var raikuUplift = raikuOn ? raikuApy : 0;
+    // ── APR derivation from own state — zero Protocol Level DOM reads ────────────
+    // Commission scales issuance only; block fees and Raiku flow 100% to the validator.
+    var _toApr = function(apy) { return typeof apyToApr === 'function' ? apyToApr(apy, N) : apy; };
+    var _toApy = function(apr) { return typeof aprToApy === 'function' ? aprToApy(apr, N) : apr; };
+    // Also read own Issuance APY and Network Fees APY raw inputs (user may have edited them)
+    var issApyRaw = parseFloat((document.getElementById('vi-iss-apy-raw') || {}).value) / 100 || _viState.issApy;
+    var blkApyRaw = parseFloat((document.getElementById('vi-blk-apy-raw') || {}).value) / 100 || _viState.blkApy;
+    // Keep _viState in sync if inputs differ (handles makeEditable commits and direct edits)
+    _viState.issApy = issApyRaw;
+    _viState.blkApy = blkApyRaw;
+    var issAprGross = _toApr(_viState.issApy);   // gross Issuance APR (before commission)
+    var issApr      = issAprGross * comm;          // commission applied — validator keeps comm% of issuance
+    var blkApr      = _toApr(_viState.blkApy);    // Network Fees APR — no commission
+    var aotApr      = _viState.aotApr;
+    var jitApr      = _viState.jitApr;
+    var bonusApr    = _viState.bonusApr;
+    var ojitApr     = _viState.ojitApr;
+    var raikuApr    = raikuOn ? (aotApr + jitApr + bonusApr + ojitApr) : 0;
+    var totalApr    = issApr + blkApr + raikuApr;
 
-    // ── Yield display: mirror Protocol Level exactly when Raiku ON ──────────
-    // Root cause of previous mismatch: summing component APYs (e.g. 7.08%) ≠
-    // summing component APRs then compounding (e.g. 7.16%). The correct path
-    // is aprToApy(sum_of_APRs, n). When Raiku is ON, Protocol Level already
-    // holds this correctly computed value — mirror it directly.
+    // ── APY derivation: compound each component from its APR; total from sum of APRs ──
+    var issApy      = _toApy(issApr);       // effective issuance APY (commission-scaled)
+    var blkApy      = _toApy(blkApr);
+    var aotApy      = _toApy(aotApr);
+    var jitApy      = _toApy(jitApr);
+    var bonusApy    = _toApy(bonusApr);
+    var ojitApy     = _toApy(ojitApr);
+    var totalApy    = _toApy(totalApr);     // correct: compound the sum of APRs once
+    var basePlusBLkApy   = _toApy(issApr + blkApr);
+    var raikuApyUplift   = raikuOn ? Math.max(0, totalApy - basePlusBLkApy) : 0;
+
+    // ── Yield display: computed entirely from own state ──────────────────────────
     var badge = document.getElementById('vi-raiku-badge');
-    if (raikuOn) {
-      // Raiku ON — mirror Protocol Level total APY, Raiku uplift, APR, and bar
-      var elTotalApy    = document.getElementById('vc-total-apy');
-      var elRaikuUplift = document.getElementById('vc-raiku-apy-uplift');
-      var elTotalApr    = document.getElementById('vc-total-apr');
-      _set('vi-total-apy-display', elTotalApy    ? elTotalApy.textContent    : fmtValidatorRate(totalApy));
-      _set('vi-raiku-apy-uplift',  elRaikuUplift ? elRaikuUplift.textContent : '+0.00%');
-      _set('vi-total-apr',         elTotalApr    ? elTotalApr.textContent    : '—');
-      if (badge) badge.style.opacity = '1';
-      // Mirror bar widths from Protocol Level
-      ['iss','blk','aot','bonus','jit','ojit'].forEach(function(k) {
-        var s = document.getElementById('validator-yield-' + k + '-seg');
-        var d = document.getElementById('vi-yield-' + k + '-seg');
-        if (s && d) d.style.width = s.style.width;
-      });
-    } else {
-      // Raiku OFF — compute base-only (Issuance + Network Fees) via APR compounding
-      // _parseApyEl works for APR elements too: parseFloat("5.82% APR") / 100 = 0.0582
-      var issApr2 = _parseApyEl('validator-decomp-iss-apr');
-      var blkApr2 = _parseApyEl('validator-decomp-blk-apr');
-      var baseApr = issApr2 + blkApr2;
-      var baseApy = Math.pow(1 + baseApr / APY_COMPOUNDING_PERIODS, APY_COMPOUNDING_PERIODS) - 1;
-      _set('vi-total-apy-display', fmtValidatorRate(baseApy));
-      _set('vi-raiku-apy-uplift',  '+0.00%');
-      _set('vi-total-apr',         fmtValidatorRate(baseApr));
-      if (badge) badge.style.opacity = '0.3';
-      // Bar: only Issuance + Network Fees segments; zero out Raiku
-      var bTotal = baseApr > 0 ? baseApr : 1;
-      var elI = document.getElementById('vi-yield-iss-seg');
-      var elB = document.getElementById('vi-yield-blk-seg');
-      if (elI) elI.style.width = (issApr2 / bTotal * 100).toFixed(2) + '%';
-      if (elB) elB.style.width = (blkApr2 / bTotal * 100).toFixed(2) + '%';
-      ['aot','bonus','jit','ojit'].forEach(function(k) {
-        var el = document.getElementById('vi-yield-' + k + '-seg');
-        if (el) el.style.width = '0%';
-      });
-    }
-    // Component APY + APR cards: always mirror Protocol Level text (same values)
-    ['iss','blk','aot','jit','bonus','ojit'].forEach(function(k) {
-      var sA = document.getElementById('validator-decomp-' + k + '-apy');
-      var dA = document.getElementById('vi-decomp-' + k + '-apy');
-      if (sA && dA) dA.textContent = sA.textContent;
-      var sR = document.getElementById('validator-decomp-' + k + '-apr');
-      var dR = document.getElementById('vi-decomp-' + k + '-apr');
-      if (sR && dR) dR.textContent = sR.textContent;
-    });
+    _set('vi-total-apy-display', fmtValidatorRate(totalApy));
+    _set('vi-raiku-apy-uplift',  '+' + fmtValidatorRate(raikuApyUplift));
+    _set('vi-total-apr',         fmtValidatorRate(totalApr));
+    if (badge) badge.style.opacity = raikuOn ? '1' : '0.3';
 
-    // Annual SOL values
+    // Bar widths (APR basis — proportional to each component's APR contribution)
+    var totalAprForBar = totalApr > 0 ? totalApr : 1;
+    function _seg(id, apr) {
+      var el = document.getElementById(id);
+      if (el) el.style.width = (Math.max(0, apr) / totalAprForBar * 100).toFixed(2) + '%';
+    }
+    _seg('vi-yield-iss-seg',   issApr);
+    _seg('vi-yield-blk-seg',   blkApr);
+    _seg('vi-yield-aot-seg',   raikuOn ? aotApr   : 0);
+    _seg('vi-yield-bonus-seg', raikuOn ? bonusApr  : 0);
+    _seg('vi-yield-jit-seg',   raikuOn ? jitApr    : 0);
+    _seg('vi-yield-ojit-seg',  raikuOn ? ojitApr   : 0);
+
+    // Component legend: APY + APR (computed from own state, same grammar as Protocol Level)
+    function _compLegend(k, apy, apr) {
+      _set('vi-decomp-' + k + '-apy', fmtValidatorRate(apy) + ' APY');
+      _set('vi-decomp-' + k + '-apr', fmtValidatorRate(apr) + ' APR');
+    }
+    _compLegend('iss',   issApy,   issApr);
+    _compLegend('blk',   blkApy,   blkApr);
+    _compLegend('aot',   aotApy,   aotApr);
+    _compLegend('jit',   jitApy,   jitApr);
+    _compLegend('bonus', bonusApy, bonusApr);
+    _compLegend('ojit',  ojitApy,  ojitApr);
+
+    // ── Revenue (annual SOL values from own APYs) ────────────────────────────────
     var issAnnual   = stake * issApy;
     var blkAnnual   = stake * blkApy;
     var brAnnual    = issAnnual + blkAnnual;
@@ -8178,11 +8254,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     _set('vi-kpi-share',      netShare < 0.001 ? '<0.001%' : netShare.toFixed(3) + '%');
 
     // 4-column revenue table
-    // Per-block denominator: SY slots/yr × individual stake fraction
-    // Individual validator gets blocks proportional to their stake fraction
     var stakeFrac = total > 0 ? stake / total : 0;
-    var blocksPerYear = SY * stakeFrac;  // expected blocks produced per year
-    // Guard: avoid division by zero for tiny stakes
+    var blocksPerYear = SY * stakeFrac;
     var _EPY = EPOCHS_PER_YEAR;
     var sources = [
       ['vi-iss',   issAnnual],
@@ -8233,8 +8306,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   };
 
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialise Individual Level display
-    setTimeout(window.viUpdate, 300);
+    // Initialize Individual Level: apply Base Case scenario defaults, then render
+    setTimeout(function() { window.viApplyScenario('base'); }, 300);
   });
 }());
 </script>
