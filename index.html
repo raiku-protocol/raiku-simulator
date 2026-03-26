@@ -253,10 +253,10 @@ details[open] summary::before { transform:rotate(90deg); }
 #tab-customer .cust-route-grid .stepper-input { width:60px; }
 #tab-customer .cust-route-grid .stepper-unit { font-size:9px; }
 /* Context section rows */
-.cust-ctx-row { display:flex; justify-content:space-between; align-items:center; padding:3px 0; }
-.cust-ctx-label { font-size:9px; color:var(--text2); font-family:var(--font-mono); }
-.cust-ctx-static { font-size:9px; color:var(--text2); font-family:var(--font-mono); opacity:0.7; font-style:italic; }
-.cust-ctx-derived { font-size:12px; color:var(--text); font-family:var(--font-mono); font-weight:600; }
+.cust-ctx-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; }
+.cust-ctx-label { font-size:10px; color:var(--text2); font-family:var(--font-mono); }
+.cust-ctx-static { font-size:13px; color:var(--text); font-family:var(--font-mono); font-weight:600; }
+.cust-ctx-derived { font-size:13px; color:var(--text); font-family:var(--font-mono); font-weight:600; }
 .cust-ctx-num { background:#141516; color:var(--text); border:1px solid #333; border-radius:3px; padding:2px 6px; font-size:10px; font-family:var(--font-mono); width:68px; text-align:right; outline:none; }
 /* AOT capacity warning */
 .cust-aot-warn { display:none; margin-top:4px; padding:5px 8px; background:#1e1005; border:1px solid #a05010; border-radius:4px; font-size:9px; font-family:var(--font-mono); color:#e8902a; line-height:1.5; }
@@ -2371,7 +2371,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 <div class="validator-side" style="overflow-y:auto;max-height:calc(100vh - 20px);">
 <div class="section fade-in fade-in-1" style="display:flex;flex-direction:column;gap:0;padding-bottom:8px;">
 
-  <h2 style="margin-bottom:8px;display:flex;align-items:center;gap:6px;">Customer Setup<span style="font-size:10px;font-weight:400;color:var(--text2);cursor:help;text-transform:none;letter-spacing:0;font-family:var(--font-mono);border-bottom:1px dotted #444;" title="Configure a customer execution profile using category presets seeded from on-chain data. This is a scenario tool — values are editable starting points, not cost guarantees.">?</span></h2>
+  <h2 style="margin-bottom:8px;display:flex;align-items:center;gap:6px;">Customer Setup<button class="vc-info-btn" onclick="vcOpenExplainer('cust-explainer-setup')">?</button></h2>
 
   <!-- A. MODEL PARAMETERS -->
   <div class="fade-in fade-in-2" style="border-top:1px solid var(--card-border);padding-top:10px;margin-top:0;display:flex;flex-direction:column;gap:6px;">
@@ -2409,13 +2409,17 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       <label>Maximum Raiku JIT allocation</label>
       <div class="slider-row"><input type="range" id="cust-ctx-rjit-alloc" min="0" max="80" step="1" value="15"><span class="val" id="cust-ctx-rjit-alloc-val">15%</span></div>
     </div>
+    <div class="control">
+      <label>Maximum Other JIT allocation</label>
+      <div class="slider-row"><input type="range" id="cust-ctx-njit-alloc" min="0" max="100" step="1" value="40"><span class="val" id="cust-ctx-njit-alloc-val">40%</span></div>
+    </div>
   </div>
 
   <!-- C. CUSTOMER DEMAND -->
   <div class="fade-in fade-in-4" style="border-top:1px solid var(--card-border);padding-top:10px;margin-top:8px;display:flex;flex-direction:column;gap:6px;">
     <h2 style="margin-bottom:4px;">Customer Demand</h2>
     <div class="control" style="gap:4px;">
-      <label style="display:flex;align-items:center;gap:5px;">Category<span style="font-size:10px;font-weight:400;color:var(--text2);cursor:help;text-transform:none;letter-spacing:0;font-family:var(--font-mono);border-bottom:1px dotted #444;" title="Default seeding: Raiku block CU total = Non-Raiku block CU (same baseline). Within Raiku blocks, split 50/50 between AOT and JIT. Fee/CU is the same for all routes. All values are editable.">?</span></label>
+      <label style="display:flex;align-items:center;gap:5px;">Category<button class="vc-info-btn" onclick="vcOpenExplainer('cust-explainer-cat')">?</button></label>
       <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
 
@@ -3136,12 +3140,17 @@ const SLIDER_META = {
   'sl-fcu':        { nudge: 0.05, largeNudge: 0.5,   decimals: 2, unit: 'lam/CU', prefix: false },
   'sl-jit-market': { nudge: 100000, largeNudge: 500000, decimals: 0, unit: 'SOL/yr', prefix: false },
   'sl-jit':        { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
-  'cust-aot-cu-sl':   { nudge: 500000,  largeNudge: 5000000, decimals: 0, unit: 'CU',   prefix: false },
-  'cust-aot-fee-sl':  { nudge: 0.5,     largeNudge: 2,       decimals: 1, unit: 'L/CU', prefix: false },
-  'cust-rjit-cu-sl':  { nudge: 500000,  largeNudge: 5000000, decimals: 0, unit: 'CU',   prefix: false },
-  'cust-rjit-fee-sl': { nudge: 0.5,     largeNudge: 2,       decimals: 1, unit: 'L/CU', prefix: false },
-  'cust-njit-cu-sl':  { nudge: 500000,  largeNudge: 5000000, decimals: 0, unit: 'CU',   prefix: false },
-  'cust-njit-fee-sl': { nudge: 0.5,     largeNudge: 2,       decimals: 1, unit: 'L/CU', prefix: false },
+  'cust-aot-cu-sl':       { nudge: 500000, largeNudge: 5000000, decimals: 0, unit: 'CU',    prefix: false },
+  'cust-aot-fee-sl':      { nudge: 0.1,    largeNudge: 1,       decimals: 3, unit: 'L/CU',  prefix: false },
+  'cust-rjit-cu-sl':      { nudge: 500000, largeNudge: 5000000, decimals: 0, unit: 'CU',    prefix: false },
+  'cust-rjit-fee-sl':     { nudge: 0.1,    largeNudge: 1,       decimals: 3, unit: 'L/CU',  prefix: false },
+  'cust-njit-cu-sl':      { nudge: 500000, largeNudge: 5000000, decimals: 0, unit: 'CU',    prefix: false },
+  'cust-njit-fee-sl':     { nudge: 0.1,    largeNudge: 1,       decimals: 3, unit: 'L/CU',  prefix: false },
+  'cust-ctx-sol':         { nudge: 5,      largeNudge: 25,      decimals: 0, unit: '$',      prefix: true  },
+  'cust-ctx-stake':       { nudge: 0.5,    largeNudge: 2,       decimals: 1, unit: '%',      prefix: false },
+  'cust-ctx-aot-share':   { nudge: 1,      largeNudge: 5,       decimals: 0, unit: '%',      prefix: false },
+  'cust-ctx-rjit-alloc':  { nudge: 1,      largeNudge: 5,       decimals: 0, unit: '%',      prefix: false },
+  'cust-ctx-njit-alloc':  { nudge: 1,      largeNudge: 5,       decimals: 0, unit: '%',      prefix: false },
 };
 
 const SC = {
@@ -6382,7 +6391,7 @@ function initHybridControls() {
 
         // Display formatter: thousands-separated for sl-jit-market, fixed decimals for others
         function fmtDisplay(n) {
-            if (id === 'sl-jit-market') return Math.round(n).toLocaleString('en-US');
+            if (meta.decimals === 0) return Math.round(n).toLocaleString('en-US');
             return n.toFixed(meta.decimals);
         }
 
@@ -9320,6 +9329,30 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   </div>
 </div>
 
+<!-- ── Customer Setup explainer ─────────────────────────────────────────── -->
+<div class="vc-explainer-overlay" id="cust-explainer-setup" onclick="if(event.target===this)vcCloseExplainer('cust-explainer-setup')">
+    <div class="vc-explainer-card">
+        <button class="vc-explainer-close" onclick="vcCloseExplainer('cust-explainer-setup')">×</button>
+        <div class="vc-explainer-title">Customer Setup</div>
+        <div class="vc-explainer-subtitle">Configure a customer execution profile using category presets seeded from on-chain data.</div>
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-note">This is a scenario tool — values are editable starting points, not cost guarantees. Select a category to seed median CU and fee/CU from on-chain benchmarks, then adjust freely.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Customer Category explainer ──────────────────────────────────────── -->
+<div class="vc-explainer-overlay" id="cust-explainer-cat" onclick="if(event.target===this)vcCloseExplainer('cust-explainer-cat')">
+    <div class="vc-explainer-card">
+        <button class="vc-explainer-close" onclick="vcCloseExplainer('cust-explainer-cat')">×</button>
+        <div class="vc-explainer-title">Category Seeding</div>
+        <div class="vc-explainer-subtitle">Presets seed median CU and fee/CU from on-chain Dune data for this program category.</div>
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-note">Default seeding: Raiku block CU total = Non-Raiku block CU (same baseline). Within Raiku blocks, split 50/50 between AOT and JIT. Fee/CU is the same for all routes. All values are editable after seeding.</div>
+        </div>
+    </div>
+</div>
+
 <script>
 // ─── Customer Economics Tab ──────────────────────────────────────────────────
 // Scenario configurator — neutral per-block profile tool.
@@ -9346,7 +9379,7 @@ var CUST_CAT_ORDER = [
 
 var customerState = {
     aotCu:0, aotFee:0, rjitCu:0, rjitFee:0, njitCu:0, njitFee:0,
-    aotShare:0.08, rjitShare:0.15, raikuStake:0.10, solPrice:120, blocksPerEpoch:432000
+    aotShare:0.08, rjitShare:0.15, njitShare:0.40, raikuStake:0.10, solPrice:120, blocksPerEpoch:432000
 };
 
 function _custGetProfile(catId) {
@@ -9448,6 +9481,7 @@ function readCustomerInputs() {
     customerState.njitFee        = n('cust-njit-fee-sl');
     customerState.aotShare       = n('cust-ctx-aot-share') / 100;
     customerState.rjitShare      = n('cust-ctx-rjit-alloc') / 100;
+    customerState.njitShare      = n('cust-ctx-njit-alloc') / 100;
     customerState.raikuStake     = n('cust-ctx-stake') / 100;
     customerState.solPrice       = n('cust-ctx-sol');
 }
@@ -9474,7 +9508,7 @@ function updateCustomerCalcs() {
         var gEl  = document.getElementById(elId);
         var gVal = document.getElementById(valId);
         if(!gEl || !gVal) return;
-        gVal.textContent = Math.round(cu).toLocaleString() + ' / 60,000,000';
+        gVal.textContent = Math.round(cu).toLocaleString('en-US') + ' / 60,000,000';
         if(cu > CUST_BLOCK_SIZE) {
             gEl.style.background = '#2a1010'; gEl.style.borderColor = '#c44444';
             gVal.style.color = '#ff6b6b';
@@ -9492,8 +9526,8 @@ function updateCustomerCalcs() {
     // ── Context slider displays ──
     set('cust-ctx-aot-share-val', (s.aotShare * 100).toFixed(0) + '%');
     set('cust-ctx-stake-val',     (s.raikuStake * 100).toFixed(1) + '%');
-    set('cust-ctx-raiku-bpe',     epochRaikuBlocks.toLocaleString());
-    set('cust-ctx-njit-bpe',      epochNonRaikuBlocks.toLocaleString());
+    set('cust-ctx-raiku-bpe',     epochRaikuBlocks.toLocaleString('en-US'));
+    set('cust-ctx-njit-bpe',      epochNonRaikuBlocks.toLocaleString('en-US'));
 
     // ── AOT capacity warning ──
     var maxAotCu = s.aotShare * CUST_BLOCK_SIZE;
@@ -9506,7 +9540,7 @@ function updateCustomerCalcs() {
     if(aotWarnEl) {
         if(s.aotCu > maxAotCu) {
             aotWarnEl.style.display = 'block';
-            set('cust-aot-max-cu',    Math.round(maxAotCu).toLocaleString());
+            set('cust-aot-max-cu',    Math.round(maxAotCu).toLocaleString('en-US'));
             set('cust-aot-alloc-pct', (s.aotShare * 100).toFixed(0));
         } else {
             aotWarnEl.style.display = 'none';
@@ -9517,7 +9551,7 @@ function updateCustomerCalcs() {
     if(rjitWarnEl) {
         if(s.rjitCu > maxRjitCu) {
             rjitWarnEl.style.display = 'block';
-            set('cust-rjit-max-cu',    Math.round(maxRjitCu).toLocaleString());
+            set('cust-rjit-max-cu',    Math.round(maxRjitCu).toLocaleString('en-US'));
             set('cust-rjit-alloc-pct', (s.rjitShare * 100).toFixed(0));
         } else {
             rjitWarnEl.style.display = 'none';
@@ -9525,26 +9559,26 @@ function updateCustomerCalcs() {
     }
 
     // ── A. Spend cards ──
-    set('cust-k-raiku-spend', Math.round(raikuBlockSpend).toLocaleString());
-    set('cust-k-njit-spend',  Math.round(nonRaikuBlockSpend).toLocaleString());
+    set('cust-k-raiku-spend', Math.round(raikuBlockSpend).toLocaleString('en-US'));
+    set('cust-k-njit-spend',  Math.round(nonRaikuBlockSpend).toLocaleString('en-US'));
     set('cust-k-epoch-sol',   epochTotalSol.toFixed(4));
     set('cust-k-epoch-usd',   '$' + epochTotalUsd.toLocaleString(undefined, {maximumFractionDigits:0}));
 
     // ── B. Network ──
     set('cust-k-stake-disp', (s.raikuStake * 100).toFixed(1) + '%');
-    set('cust-k-offerable',  epochRaikuBlocks.toLocaleString());
-    set('cust-k-njit-bpe',   epochNonRaikuBlocks.toLocaleString());
+    set('cust-k-offerable',  epochRaikuBlocks.toLocaleString('en-US'));
+    set('cust-k-njit-bpe',   epochNonRaikuBlocks.toLocaleString('en-US'));
 
     // ── Auto-generated scenario sentence ──
     var raikuCu = s.aotCu + s.rjitCu;
     var sent = '';
     if(raikuCu > 0) {
-        sent += 'In each Raiku block, the customer uses ' + Math.round(raikuCu).toLocaleString()
-            + ' CU at ' + Math.round(raikuBlockSpend).toLocaleString() + ' L / block.';
+        sent += 'In each Raiku block, the customer uses ' + Math.round(raikuCu).toLocaleString('en-US')
+            + ' CU at ' + Math.round(raikuBlockSpend).toLocaleString('en-US') + ' L / block.';
     }
     if(s.njitCu > 0) {
-        sent += (sent ? ' ' : '') + 'In each Non-Raiku block, the customer uses ' + Math.round(s.njitCu).toLocaleString()
-            + ' CU at ' + Math.round(nonRaikuBlockSpend).toLocaleString() + ' L / block.';
+        sent += (sent ? ' ' : '') + 'In each Non-Raiku block, the customer uses ' + Math.round(s.njitCu).toLocaleString('en-US')
+            + ' CU at ' + Math.round(nonRaikuBlockSpend).toLocaleString('en-US') + ' L / block.';
     }
     if((raikuCu > 0 || s.njitCu > 0) && s.raikuStake > 0) {
         sent += ' At ' + (s.raikuStake * 100).toFixed(1) + '% Raiku stake, estimated epoch total: '
@@ -9557,10 +9591,10 @@ function updateCustomerCalcs() {
     var raikuTotalCu = s.aotCu + s.rjitCu;
     function setRow(pfx, cu, fee, baseCu, baseSpend) {
         var cost = cu * fee;
-        set(pfx+'-cu',        Math.round(cu).toLocaleString());
+        set(pfx+'-cu',        Math.round(cu).toLocaleString('en-US'));
         set(pfx+'-cu-pct',    baseCu    > 0 ? (cu   / baseCu    * 100).toFixed(1) + '%' : '\u2014');
         set(pfx+'-fee',       fee.toFixed(3));
-        set(pfx+'-cost',      Math.round(cost).toLocaleString());
+        set(pfx+'-cost',      Math.round(cost).toLocaleString('en-US'));
         set(pfx+'-spend-pct', baseSpend > 0 ? (cost / baseSpend * 100).toFixed(1) + '%' : '\u2014');
     }
     // AOT/Raiku JIT: CU share within Raiku block; Other JIT: CU share within Non-Raiku block (60M)
@@ -9577,9 +9611,9 @@ function updateCustomerCalcs() {
             var sl = document.getElementById(slId);
             if(sl) { var sp = sl.parentElement.querySelector('.val'); if(sp) sp.textContent = txt; }
         }
-        fmtSpan('cust-aot-cu-sl',  Math.round(s.aotCu).toLocaleString());
-        fmtSpan('cust-rjit-cu-sl', Math.round(s.rjitCu).toLocaleString());
-        fmtSpan('cust-njit-cu-sl', Math.round(s.njitCu).toLocaleString());
+        fmtSpan('cust-aot-cu-sl',  Math.round(s.aotCu).toLocaleString('en-US'));
+        fmtSpan('cust-rjit-cu-sl', Math.round(s.rjitCu).toLocaleString('en-US'));
+        fmtSpan('cust-njit-cu-sl', Math.round(s.njitCu).toLocaleString('en-US'));
         fmtSpan('cust-aot-fee-sl',  s.aotFee.toFixed(3));
         fmtSpan('cust-rjit-fee-sl', s.rjitFee.toFixed(3));
         fmtSpan('cust-njit-fee-sl', s.njitFee.toFixed(3));
@@ -9602,7 +9636,7 @@ function initCustomerTab() {
     });
 
     // Context sliders (sol price is now a range slider)
-    ['cust-ctx-aot-share','cust-ctx-rjit-alloc','cust-ctx-stake','cust-ctx-sol'].forEach(function(id) {
+    ['cust-ctx-aot-share','cust-ctx-rjit-alloc','cust-ctx-njit-alloc','cust-ctx-stake','cust-ctx-sol'].forEach(function(id) {
         var sl = document.getElementById(id);
         if(sl) sl.addEventListener('input', function(){ readCustomerInputs(); updateCustomerCalcs(); });
     });
