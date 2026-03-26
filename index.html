@@ -2383,6 +2383,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       <label>Category</label>
       <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
+    <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);line-height:1.5;padding:5px 8px;background:#0c0e13;border-left:2px solid var(--card-border);border-radius:0 3px 3px 0;">Default seeding: Raiku block CU total = Non-Raiku block CU (same baseline). Within Raiku blocks, split 50/50 between AOT and JIT. Fee/CU is the same for all routes. All values are editable.</div>
 
     <!-- Raiku Blocks group label -->
     <div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--lime-soft);font-family:var(--font-mono);margin-top:8px;padding-bottom:3px;border-bottom:1px solid #1c2030;">Raiku Blocks</div>
@@ -9465,9 +9466,10 @@ function seedCustomerFromCategory(catId) {
             // Seed all routes directly from medianProfile — no split logic applied
             var cu  = Math.round(prof.cu);
             var fee = +(prof.feePerCU > 0 ? prof.feePerCU : 0).toFixed(1);
-            customerState.aotCu   = cu;   customerState.aotFee  = fee;
-            customerState.rjitCu  = cu;   customerState.rjitFee = fee;
-            customerState.njitCu  = cu;   customerState.njitFee = fee;
+            var halfCu = Math.round(cu * 0.5);
+            customerState.aotCu   = halfCu; customerState.aotFee  = fee;
+            customerState.rjitCu  = halfCu; customerState.rjitFee = fee;
+            customerState.njitCu  = cu;     customerState.njitFee = fee;
         } else {
             customerState.aotCu = customerState.aotFee = 0;
             customerState.rjitCu = customerState.rjitFee = 0;
