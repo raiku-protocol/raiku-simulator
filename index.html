@@ -2010,6 +2010,12 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           </label>
         </div>
       </div>
+      <div style="display:flex; gap:4px; margin-top:6px; flex-wrap:wrap;">
+        <button class="scenario-btn" id="validator-btn-con"  onclick="applyScenario('con')">Conservative</button>
+        <button class="scenario-btn active" id="validator-btn-base" onclick="applyScenario('base')">Base Case</button>
+        <button class="scenario-btn" id="validator-btn-opt"  onclick="applyScenario('opt')">Optimistic</button>
+        <button class="scenario-btn" id="validator-btn-bull" onclick="applyScenario('bull')">Bull Case</button>
+      </div>
       <div class="validator-decomp-card" style="margin-top:10px;">
         <!-- APY headline -->
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
@@ -2020,12 +2026,12 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             <span style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">Raiku APY</span>
           </span>
         </div>
-        <!-- APY component legend — 5 columns -->
-        <div class="validator-decomp-legend" style="grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px 8px; margin-top:8px;">
+        <!-- APY component legend — 6 columns (matches Protocol Level) -->
+        <div class="validator-decomp-legend" style="grid-template-columns:repeat(6,minmax(0,1fr)); gap:4px 8px; margin-top:8px;">
           <div class="validator-decomp-item">
             <div class="validator-decomp-label"><span class="validator-decomp-dot base"></span>Issuance</div>
             <div class="validator-decomp-value" id="vi-decomp-iss-apy">0.00%</div>
-            <div class="validator-decomp-sub">commission-adj.</div>
+            <div class="validator-decomp-sub">APY</div>
           </div>
           <div class="validator-decomp-item">
             <div class="validator-decomp-label"><span class="validator-decomp-dot priority"></span>Network Fees</div>
@@ -2045,6 +2051,11 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <div class="validator-decomp-item">
             <div class="validator-decomp-label"><span class="validator-decomp-dot bonus"></span>Val. Bonus</div>
             <div class="validator-decomp-value" id="vi-decomp-bonus-apy">0.00%</div>
+            <div class="validator-decomp-sub">APY</div>
+          </div>
+          <div class="validator-decomp-item">
+            <div class="validator-decomp-label"><span class="validator-decomp-dot other-jit"></span>Other JIT</div>
+            <div class="validator-decomp-value" id="vi-decomp-ojit-apy">0.00%</div>
             <div class="validator-decomp-sub">APY</div>
           </div>
         </div>
@@ -2141,6 +2152,13 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
               <td id="vi-bonus-epoch">—</td>
               <td id="vi-bonus-month">—</td>
               <td id="vi-bonus-year">—</td>
+            </tr>
+            <tr class="vpr-tr-child vi-child-mev" id="vi-ojit-row" style="display:none;">
+              <td>Other JIT</td>
+              <td id="vi-ojit-block">—</td>
+              <td id="vi-ojit-epoch">—</td>
+              <td id="vi-ojit-month">—</td>
+              <td id="vi-ojit-year">—</td>
             </tr>
           </tbody>
         </table>
@@ -8060,13 +8078,15 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     if (shareDiv && !shareDiv.querySelector('input')) shareDiv.textContent = netShare.toFixed(4)+'%';
 
     // Read component APYs from Protocol Level decomp (ground truth)
-    var issApyRaw  = _parseApyEl('validator-decomp-iss-apy');   // gross issuance APY (before commission)
-    var blkApy     = _parseApyEl('validator-decomp-blk-apy');
-    var aotApy     = _parseApyEl('validator-decomp-aot-apy');
-    var jitApy     = _parseApyEl('validator-decomp-jit-apy');
-    var bonusApy   = _parseApyEl('validator-decomp-bonus-apy');
-    var issApy     = issApyRaw * comm;  // commission-adjusted
-    var raikuApy   = aotApy + jitApy + bonusApy;
+    // Commission is temporarily ignored — Individual Level uses gross APYs directly
+    // to allow exact reconciliation with Protocol Level at matching stake fractions.
+    var issApy   = _parseApyEl('validator-decomp-iss-apy');
+    var blkApy   = _parseApyEl('validator-decomp-blk-apy');
+    var aotApy   = _parseApyEl('validator-decomp-aot-apy');
+    var jitApy   = _parseApyEl('validator-decomp-jit-apy');
+    var bonusApy = _parseApyEl('validator-decomp-bonus-apy');
+    var ojitApy  = _parseApyEl('validator-decomp-ojit-apy');   // Other JIT (non-Raiku)
+    var raikuApy   = aotApy + jitApy + bonusApy + ojitApy;
     var totalApy   = issApy + blkApy + (raikuOn ? raikuApy : 0);
     var raikuUplift = raikuOn ? raikuApy : 0;
 
@@ -8076,12 +8096,13 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var badge = document.getElementById('vi-raiku-badge');
     if (badge) badge.style.opacity = raikuOn ? '1' : '0.3';
 
-    // APY component legend
+    // APY component legend (6 columns, matching Protocol Level)
     _set('vi-decomp-iss-apy',   (issApy   * 100).toFixed(2) + '%');
     _set('vi-decomp-blk-apy',   (blkApy   * 100).toFixed(2) + '%');
     _set('vi-decomp-aot-apy',   (aotApy   * 100).toFixed(2) + '%');
     _set('vi-decomp-jit-apy',   (jitApy   * 100).toFixed(2) + '%');
     _set('vi-decomp-bonus-apy', (bonusApy * 100).toFixed(2) + '%');
+    _set('vi-decomp-ojit-apy',  (ojitApy  * 100).toFixed(2) + '%');
 
     // Annual SOL values
     var issAnnual   = stake * issApy;
@@ -8090,7 +8111,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var aotAnnual   = stake * aotApy;
     var jitAnnual   = stake * jitApy;
     var bonusAnnual = stake * bonusApy;
-    var raikuAnnual = raikuOn ? (aotAnnual + jitAnnual + bonusAnnual) : 0;
+    var ojitAnnual  = stake * ojitApy;
+    var raikuAnnual = raikuOn ? (aotAnnual + jitAnnual + bonusAnnual + ojitAnnual) : 0;
     var totalAnnual = brAnnual + raikuAnnual;
 
     // Compact KPI row
@@ -8114,6 +8136,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
       ['vi-aot',   aotAnnual],
       ['vi-jit',   jitAnnual],
       ['vi-bonus', bonusAnnual],
+      ['vi-ojit',  ojitAnnual],
       ['vi-mev',   raikuAnnual],
       ['vi-total', totalAnnual]
     ];
@@ -8126,7 +8149,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     });
 
     // Show/hide Raiku MEV rows
-    ['vi-raiku-group-row','vi-aot-row','vi-jit-row','vi-bonus-row'].forEach(function(id) {
+    ['vi-raiku-group-row','vi-aot-row','vi-jit-row','vi-bonus-row','vi-ojit-row'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.style.display = raikuOn ? '' : 'none';
     });
