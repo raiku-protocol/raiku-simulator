@@ -258,9 +258,10 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-ctx-label { font-size:10px; color:var(--text2); font-family:var(--font-mono); }
 .cust-ctx-static { font-size:11px; color:var(--text); font-family:var(--font-mono); font-weight:500; }
 .cust-ctx-derived { font-size:11px; color:var(--text); font-family:var(--font-mono); font-weight:600; }
-.cust-alloc-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
+.cust-alloc-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; }
+.cust-alloc-grid .cust-ctx-card { padding:5px 6px; }
 #tab-customer .cust-alloc-grid .control label { font-size:9px; }
-#tab-customer .cust-alloc-grid .stepper-input { width:40px; }
+#tab-customer .cust-alloc-grid .stepper-input { width:36px; }
 #tab-customer .cust-alloc-grid .stepper-unit { font-size:9px; }
 .cust-ctx-num { background:#141516; color:var(--text); border:1px solid #333; border-radius:3px; padding:2px 6px; font-size:10px; font-family:var(--font-mono); width:68px; text-align:right; outline:none; }
 /* AOT capacity warning */
@@ -2396,20 +2397,15 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         </div>
       </div>
     </div>
-    <!-- Blocks info card -->
-    <div class="cust-ctx-card" style="display:flex;flex-direction:column;gap:2px;">
-      <div class="cust-ctx-row">
-        <span class="cust-ctx-label">Blocks / epoch</span>
-        <span class="cust-ctx-static">432,000</span>
-      </div>
-      <div class="cust-ctx-row">
-        <span class="cust-ctx-label">Raiku blocks / epoch</span>
-        <span class="cust-ctx-derived" id="cust-ctx-raiku-bpe">—</span>
-      </div>
-      <div class="cust-ctx-row">
-        <span class="cust-ctx-label">Non-Raiku blocks / epoch</span>
-        <span class="cust-ctx-derived" id="cust-ctx-njit-bpe">—</span>
-      </div>
+    <!-- Blocks info — single inline line -->
+    <div class="cust-ctx-card" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+      <span class="cust-ctx-label" style="white-space:nowrap;">432,000 total</span>
+      <span class="cust-ctx-label" style="color:#3a4060;">·</span>
+      <span class="cust-ctx-derived" id="cust-ctx-raiku-bpe" style="font-size:10px;">—</span>
+      <span class="cust-ctx-label" style="color:#3a4060;">Raiku</span>
+      <span class="cust-ctx-label" style="color:#3a4060;">·</span>
+      <span class="cust-ctx-derived" id="cust-ctx-njit-bpe" style="font-size:10px;">—</span>
+      <span class="cust-ctx-label" style="color:#3a4060;">non-Raiku</span>
     </div>
     <!-- Row 2: Max AOT + Max Raiku JIT + Max Other JIT (3-col) -->
     <div class="cust-alloc-grid">
