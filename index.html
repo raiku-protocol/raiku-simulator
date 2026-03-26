@@ -2017,7 +2017,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <button class="scenario-btn" id="validator-btn-bull" onclick="applyScenario('bull')">Bull Case</button>
       </div>
       <div class="validator-decomp-card" style="margin-top:10px;">
-        <!-- APY headline -->
+        <!-- Top summary band: APY headline · APR (mirrors Protocol Level) -->
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
           <span id="vi-total-apy-display" style="font-family:var(--font-mono); font-size:24px; font-weight:700; color:#C0FF38; line-height:1;">0.00%</span>
           <span style="font-size:11px; color:#C0FF38; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Total APY</span>
@@ -2025,38 +2025,54 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             <span id="vi-raiku-apy-uplift" style="font-family:var(--font-mono); font-size:13px; font-weight:600; color:#C0FF38;">+0.00%</span>
             <span style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">Raiku APY</span>
           </span>
+          <span style="opacity:0.25; font-size:12px; margin:0 1px;">·</span>
+          <span style="display:inline-flex; align-items:baseline; gap:4px;">
+            <span id="vi-total-apr" style="font-family:var(--font-mono); font-size:14px; color:var(--text-mid); font-weight:500;">0.00%</span>
+            <span style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">APR</span>
+          </span>
+          <span style="font-size:9px; color:var(--text2); padding-left:6px; opacity:0.8;">* Component APYs individually compounded from APR — don't sum exactly to Total APY</span>
         </div>
-        <!-- APY component legend — 6 columns (matches Protocol Level) -->
+        <!-- 6-segment composition bar (mirrors Protocol Level) -->
+        <div class="validator-decomp-bar" style="margin-bottom:8px;">
+          <div class="validator-decomp-seg base"      id="vi-yield-iss-seg"   style="width:0%"></div>
+          <div class="validator-decomp-seg priority"  id="vi-yield-blk-seg"   style="width:0%"></div>
+          <div class="validator-decomp-seg aot"       id="vi-yield-aot-seg"   style="width:0%"></div>
+          <div class="validator-decomp-seg bonus"     id="vi-yield-bonus-seg" style="width:0%"></div>
+          <div class="validator-decomp-seg jit"       id="vi-yield-jit-seg"   style="width:0%"></div>
+          <div class="validator-decomp-seg other-jit" id="vi-yield-ojit-seg"  style="width:0%"></div>
+        </div>
+        <!-- Component legend — 6 columns, APY + APR (mirrors Protocol Level) -->
         <div class="validator-decomp-legend" style="grid-template-columns:repeat(6,minmax(0,1fr)); gap:4px 8px; margin-top:8px;">
           <div class="validator-decomp-item">
             <div class="validator-decomp-label"><span class="validator-decomp-dot base"></span>Issuance</div>
-            <div class="validator-decomp-value" id="vi-decomp-iss-apy">0.00%</div>
-            <div class="validator-decomp-sub">APY</div>
+            <div class="validator-decomp-value" id="vi-decomp-iss-apy">0.00% APY</div>
+            <div class="validator-decomp-sub"   id="vi-decomp-iss-apr">0.00% APR</div>
           </div>
           <div class="validator-decomp-item">
             <div class="validator-decomp-label"><span class="validator-decomp-dot priority"></span>Network Fees</div>
-            <div class="validator-decomp-value" id="vi-decomp-blk-apy">0.00%</div>
-            <div class="validator-decomp-sub">APY</div>
+            <div style="font-size:8px; color:var(--text2); margin-bottom:2px; line-height:1.3;">base + priority fees</div>
+            <div class="validator-decomp-value" id="vi-decomp-blk-apy">0.00% APY</div>
+            <div class="validator-decomp-sub"   id="vi-decomp-blk-apr">0.00% APR</div>
           </div>
           <div class="validator-decomp-item">
             <div class="validator-decomp-label"><span class="validator-decomp-dot aot"></span>Raiku AOT</div>
-            <div class="validator-decomp-value" id="vi-decomp-aot-apy">0.00%</div>
-            <div class="validator-decomp-sub">APY</div>
+            <div class="validator-decomp-value" id="vi-decomp-aot-apy">0.00% APY</div>
+            <div class="validator-decomp-sub"   id="vi-decomp-aot-apr">0.00% APR</div>
           </div>
           <div class="validator-decomp-item">
             <div class="validator-decomp-label"><span class="validator-decomp-dot jit"></span>Raiku JIT</div>
-            <div class="validator-decomp-value" id="vi-decomp-jit-apy">0.00%</div>
-            <div class="validator-decomp-sub">APY</div>
+            <div class="validator-decomp-value" id="vi-decomp-jit-apy">0.00% APY</div>
+            <div class="validator-decomp-sub"   id="vi-decomp-jit-apr">0.00% APR</div>
           </div>
           <div class="validator-decomp-item">
-            <div class="validator-decomp-label"><span class="validator-decomp-dot bonus"></span>Val. Bonus</div>
-            <div class="validator-decomp-value" id="vi-decomp-bonus-apy">0.00%</div>
-            <div class="validator-decomp-sub">APY</div>
+            <div class="validator-decomp-label"><span class="validator-decomp-dot bonus"></span>Validator Bonus</div>
+            <div class="validator-decomp-value" id="vi-decomp-bonus-apy">0.00% APY</div>
+            <div class="validator-decomp-sub"   id="vi-decomp-bonus-apr">0.00% APR</div>
           </div>
           <div class="validator-decomp-item">
             <div class="validator-decomp-label"><span class="validator-decomp-dot other-jit"></span>Other JIT</div>
-            <div class="validator-decomp-value" id="vi-decomp-ojit-apy">0.00%</div>
-            <div class="validator-decomp-sub">APY</div>
+            <div class="validator-decomp-value" id="vi-decomp-ojit-apy">0.00% APY</div>
+            <div class="validator-decomp-sub"   id="vi-decomp-ojit-apr">0.00% APR</div>
           </div>
         </div>
         <!-- Compact secondary KPIs: annual + per-epoch -->
@@ -8090,19 +8106,30 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var totalApy   = issApy + blkApy + (raikuOn ? raikuApy : 0);
     var raikuUplift = raikuOn ? raikuApy : 0;
 
-    // APY headline
-    _set('vi-total-apy-display', (totalApy * 100).toFixed(2) + '%');
-    _set('vi-raiku-apy-uplift',  '+' + (raikuUplift * 100).toFixed(2) + '%');
+    // APY headline — use same fmtValidatorRate as Protocol Level
+    _set('vi-total-apy-display', fmtValidatorRate(totalApy));
+    _set('vi-raiku-apy-uplift',  '+' + fmtValidatorRate(raikuUplift));
     var badge = document.getElementById('vi-raiku-badge');
     if (badge) badge.style.opacity = raikuOn ? '1' : '0.3';
 
-    // APY component legend (6 columns, matching Protocol Level)
-    _set('vi-decomp-iss-apy',   (issApy   * 100).toFixed(2) + '%');
-    _set('vi-decomp-blk-apy',   (blkApy   * 100).toFixed(2) + '%');
-    _set('vi-decomp-aot-apy',   (aotApy   * 100).toFixed(2) + '%');
-    _set('vi-decomp-jit-apy',   (jitApy   * 100).toFixed(2) + '%');
-    _set('vi-decomp-bonus-apy', (bonusApy * 100).toFixed(2) + '%');
-    _set('vi-decomp-ojit-apy',  (ojitApy  * 100).toFixed(2) + '%');
+    // Mirror APY + APR text directly from Protocol Level (guarantees identical format)
+    ['iss','blk','aot','jit','bonus','ojit'].forEach(function(k) {
+      var srcApy = document.getElementById('validator-decomp-' + k + '-apy');
+      var dstApy = document.getElementById('vi-decomp-' + k + '-apy');
+      if (srcApy && dstApy) dstApy.textContent = srcApy.textContent;
+      var srcApr = document.getElementById('validator-decomp-' + k + '-apr');
+      var dstApr = document.getElementById('vi-decomp-' + k + '-apr');
+      if (srcApr && dstApr) dstApr.textContent = srcApr.textContent;
+    });
+    // Mirror stacked bar segment widths from Protocol Level
+    ['iss','blk','aot','bonus','jit','ojit'].forEach(function(k) {
+      var srcSeg = document.getElementById('validator-yield-' + k + '-seg');
+      var dstSeg = document.getElementById('vi-yield-' + k + '-seg');
+      if (srcSeg && dstSeg) dstSeg.style.width = srcSeg.style.width;
+    });
+    // Mirror total APR from Protocol Level
+    var srcAprEl = document.getElementById('vc-total-apr');
+    _set('vi-total-apr', srcAprEl ? srcAprEl.textContent : '—');
 
     // Annual SOL values
     var issAnnual   = stake * issApy;
