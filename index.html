@@ -306,6 +306,12 @@ details[open] summary::before { transform:rotate(90deg); }
 .validator-context-value.readonly { opacity:0.5; cursor:default; background:#030405; border-color:#161a1f; }
 .validator-context-value.editable { cursor:text; }
 .validator-context-value.editable:hover { border-color:#2c3240; background:#0a0d10; }
+/* Allow input[type=number] to share the same visual grammar as value boxes */
+input.validator-context-value { width:100%; box-sizing:border-box; cursor:text; }
+input.validator-context-value:focus { outline:none; border-color:#3a4252; }
+input.validator-context-value::-webkit-outer-spin-button,
+input.validator-context-value::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+input.validator-context-value[type=number] { -moz-appearance:textfield; }
 .validator-btns-2x2 { display:grid; grid-template-columns:repeat(2,1fr); gap:5px; margin-top:10px; }
 .validator-btns-2x2 .scenario-btn { padding:7px 6px; font-size:11px; border-radius:5px; border-width:1px; text-align:center; width:100%; border-color:#2a2d32; background:#111315; }
 .validator-btns-2x2 .scenario-btn:hover { border-color:#444; }
@@ -795,21 +801,6 @@ details[open] summary::before { transform:rotate(90deg); }
 .vi-layout { display:grid; grid-template-columns:340px 1fr; column-gap:var(--gap); align-items:start; }
 .vi-side { width:340px; position:sticky; top:10px; display:flex; flex-direction:column; }
 .vi-main { display:flex; flex-direction:column; gap:var(--gap); }
-
-/* ── Left panel inputs ── */
-.vi-field { display:flex; flex-direction:column; gap:4px; margin-bottom:16px; }
-.vi-field-header { display:flex; justify-content:space-between; align-items:center; }
-.vi-field-label { font-size:10px; color:#a8aebf; text-transform:uppercase; letter-spacing:0.55px; }
-.vi-field-value { font-size:13px; font-family:var(--font-mono); font-weight:700; color:var(--text); }
-.vi-field-sub { font-size:10px; color:#5a6272; line-height:1.5; margin-top:1px; }
-.vi-number-input { background:#060809; border:1px solid #20252c; border-radius:5px;
-                   color:var(--text); font-family:var(--font-mono); font-size:12px; font-weight:600;
-                   padding:7px 10px; width:100%; box-sizing:border-box; }
-.vi-number-input:focus { border-color:#3a4252; outline:none; }
-.vi-linked-inputs { display:grid; grid-template-columns:1fr auto 1fr; gap:4px; align-items:center; margin-top:6px; }
-.vi-linked-sep { font-size:10px; color:#4a5060; text-align:center; font-family:var(--font-mono); }
-.vi-linked-unit { font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.5px;
-                  margin-top:2px; font-family:var(--font-mono); text-align:center; }
 
 /* ── KPI grid (4 cards, matches .validator-kpi style) ── */
 .vi-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
@@ -1920,51 +1911,59 @@ details[open] summary::before { transform:rotate(90deg); }
   <!-- ─── LEFT: Validator Setup ─────────────────────────────── -->
   <div class="vi-side">
     <div class="section fade-in" style="flex:1; margin-bottom:0; display:flex; flex-direction:column;">
-      <h2>Validator Setup</h2>
+      <h2>Validator Setup (Individual Level)</h2>
 
-      <!-- Delegated Stake ↔ Network Share (linked) -->
-      <div class="vi-field" style="margin-top:16px;">
-        <div class="vi-field-header">
-          <label class="vi-field-label" for="vi-stake">
+      <!-- Row 1: SOL Price | Delegated Stake -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:20px;">
+        <!-- SOL Price: read-only display, synced to global sl-price -->
+        <div class="validator-context-item">
+          <div class="validator-context-label">SOL Price</div>
+          <div class="validator-context-value" id="vi-sol-price-display">$100</div>
+          <div style="font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.5px; text-align:center; margin-top:3px;">USD / SOL</div>
+        </div>
+        <!-- Delegated Stake: editable, styled as boxed value -->
+        <div class="validator-context-item">
+          <div class="validator-context-label" style="display:flex; align-items:center; justify-content:center; gap:3px;">
             Delegated Stake
             <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-stake')">?</button>
-          </label>
-        </div>
-        <div class="vi-linked-inputs">
-          <div>
-            <input class="vi-number-input" type="number" id="vi-stake"
-                   min="0" max="50000000" step="1000" value="50000"
-                   oninput="viHandleStakeInput()">
-            <div class="vi-linked-unit">SOL</div>
           </div>
-          <div class="vi-linked-sep">↔</div>
-          <div>
-            <input class="vi-number-input" type="number" id="vi-share"
-                   min="0" max="100" step="0.001" value="0.012"
-                   oninput="viHandleShareInput()">
-            <div class="vi-linked-unit">% of network</div>
-          </div>
-        </div>
-        <div class="vi-field-sub" id="vi-stake-usd">≈ — at current price</div>
-        <div class="vi-field-sub" style="color:#3e4555; margin-top:1px;">
-          Total active stake delegated to this validator
+          <input class="validator-context-value" type="number" id="vi-stake"
+                 min="0" max="50000000" step="1000" value="50000"
+                 oninput="viHandleStakeInput()">
+          <div style="font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.5px; text-align:center; margin-top:3px;">SOL</div>
         </div>
       </div>
 
-      <!-- Inflation Commission -->
-      <div class="vi-field">
-        <div class="vi-field-header">
-          <label class="vi-field-label" for="vi-commission">
-            Inflation Commission
+      <!-- Row 2: Network Share | Inflation Commission -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:6px;">
+        <!-- Network Share: derived display, editable (updates stake) -->
+        <div class="validator-context-item">
+          <div class="validator-context-label">Network Share</div>
+          <input class="validator-context-value" type="number" id="vi-share"
+                 min="0" max="100" step="0.001" value="0.012"
+                 oninput="viHandleShareInput()">
+          <div style="font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.5px; text-align:center; margin-top:3px;">% of network</div>
+        </div>
+        <!-- Inflation Commission: boxed value display + slider below -->
+        <div class="validator-context-item">
+          <div class="validator-context-label" style="display:flex; align-items:center; justify-content:center; gap:3px;">
+            Commission
             <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-commission')">?</button>
-          </label>
-          <span class="vi-field-value" id="vi-commission-val">7.0%</span>
+          </div>
+          <div class="validator-context-value" id="vi-commission-val">7.0%</div>
+          <input type="range" id="vi-commission" min="0" max="10" step="0.1" value="7"
+                 style="width:100%; margin-top:5px; accent-color:#4a5568;"
+                 oninput="viUpdate()">
         </div>
-        <input type="range" id="vi-commission" min="0" max="10" step="0.1" value="7"
-               oninput="viUpdate()">
-        <div class="vi-field-sub">
-          % of inflation staking rewards kept by the validator · Network avg ~7%
+      </div>
+
+      <!-- Summary row: stake in SOL + USD equivalent -->
+      <div style="margin-top:10px; padding:8px 10px; background:#04060a; border:1px solid #16191f; border-radius:5px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.6px;">Staked Value</span>
+          <span style="font-size:12px; font-family:var(--font-mono); font-weight:600; color:#8a93a8;" id="vi-stake-usd">—</span>
         </div>
+        <div id="vi-stake-summary" style="font-size:10px; color:#5a6272; margin-top:3px; line-height:1.5; font-family:var(--font-mono);">—</div>
       </div>
 
       <!-- Spacer -->
@@ -1981,12 +1980,11 @@ details[open] summary::before { transform:rotate(90deg); }
   <!-- ─── RIGHT: Results ──────────────────────────────────────── -->
   <div class="vi-main">
 
-    <!-- ① My Validator: 4 KPIs + Raiku comparison toggle -->
-    <div class="section fade-in fade-in-1">
-      <div style="display:flex; justify-content:space-between; align-items:center;
-                  flex-wrap:wrap; gap:8px; margin-bottom:0;">
+    <!-- ① Validator Yield (Individual Level) -->
+    <div class="section fade-in fade-in-1" style="padding-bottom:0; margin-bottom:0; position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:0;">
         <h2 style="margin-bottom:0;">
-          My Validator
+          Validator Yield (Individual Level)
           <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-total-yield')">?</button>
         </h2>
         <div class="vi-raiku-row">
@@ -1997,97 +1995,137 @@ details[open] summary::before { transform:rotate(90deg); }
           </label>
         </div>
       </div>
-      <div class="vi-kpi-grid">
-        <div class="vi-kpi">
-          <div class="vi-kpi-label">Total Yield</div>
-          <div class="vi-kpi-value" id="vi-kpi-apy">—</div>
-          <div class="vi-kpi-sub">APY</div>
+      <div class="validator-decomp-card" style="margin-top:10px;">
+        <!-- APY headline -->
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+          <span id="vi-total-apy-display" style="font-family:var(--font-mono); font-size:24px; font-weight:700; color:#C0FF38; line-height:1;">0.00%</span>
+          <span style="font-size:11px; color:#C0FF38; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Total APY</span>
+          <span id="vi-raiku-badge" style="display:inline-flex; align-items:center; gap:5px; background:rgba(192,255,56,0.07); border:1px solid rgba(192,255,56,0.2); border-radius:5px; padding:2px 8px;">
+            <span id="vi-raiku-apy-uplift" style="font-family:var(--font-mono); font-size:13px; font-weight:600; color:#C0FF38;">+0.00%</span>
+            <span style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.4px;">Raiku APY</span>
+          </span>
         </div>
-        <div class="vi-kpi">
-          <div class="vi-kpi-label">Annual Revenue</div>
-          <div class="vi-kpi-value" id="vi-kpi-annual">—</div>
-          <div class="vi-kpi-sub" id="vi-kpi-annual-sol">— SOL/yr</div>
+        <!-- APY component legend — 5 columns -->
+        <div class="validator-decomp-legend" style="grid-template-columns:repeat(5,minmax(0,1fr)); gap:4px 8px; margin-top:8px;">
+          <div class="validator-decomp-item">
+            <div class="validator-decomp-label"><span class="validator-decomp-dot base"></span>Issuance</div>
+            <div class="validator-decomp-value" id="vi-decomp-iss-apy">0.00%</div>
+            <div class="validator-decomp-sub">commission-adj.</div>
+          </div>
+          <div class="validator-decomp-item">
+            <div class="validator-decomp-label"><span class="validator-decomp-dot priority"></span>Network Fees</div>
+            <div class="validator-decomp-value" id="vi-decomp-blk-apy">0.00%</div>
+            <div class="validator-decomp-sub">APY</div>
+          </div>
+          <div class="validator-decomp-item">
+            <div class="validator-decomp-label"><span class="validator-decomp-dot aot"></span>Raiku AOT</div>
+            <div class="validator-decomp-value" id="vi-decomp-aot-apy">0.00%</div>
+            <div class="validator-decomp-sub">APY</div>
+          </div>
+          <div class="validator-decomp-item">
+            <div class="validator-decomp-label"><span class="validator-decomp-dot jit"></span>Raiku JIT</div>
+            <div class="validator-decomp-value" id="vi-decomp-jit-apy">0.00%</div>
+            <div class="validator-decomp-sub">APY</div>
+          </div>
+          <div class="validator-decomp-item">
+            <div class="validator-decomp-label"><span class="validator-decomp-dot bonus"></span>Val. Bonus</div>
+            <div class="validator-decomp-value" id="vi-decomp-bonus-apy">0.00%</div>
+            <div class="validator-decomp-sub">APY</div>
+          </div>
         </div>
-        <div class="vi-kpi">
-          <div class="vi-kpi-label">Per-Epoch Revenue</div>
-          <div class="vi-kpi-value" id="vi-kpi-epoch">—</div>
-          <div class="vi-kpi-sub" id="vi-kpi-epoch-sol">— SOL/epoch</div>
-        </div>
-        <div class="vi-kpi">
-          <div class="vi-kpi-label">Network Share</div>
-          <div class="vi-kpi-value" id="vi-kpi-share">—</div>
-          <div class="vi-kpi-sub">of total stake</div>
+        <!-- Compact secondary KPIs: annual + per-epoch -->
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.05);">
+          <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:5px; padding:7px 10px;">
+            <div style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Annual Revenue</div>
+            <div style="font-size:13px; font-family:var(--font-mono); font-weight:700; color:var(--text);" id="vi-kpi-annual">—</div>
+            <div style="font-size:10px; color:var(--text-mid); margin-top:2px;" id="vi-kpi-annual-sol">— SOL/yr</div>
+          </div>
+          <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:5px; padding:7px 10px;">
+            <div style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Per-Epoch Revenue</div>
+            <div style="font-size:13px; font-family:var(--font-mono); font-weight:700; color:var(--text);" id="vi-kpi-epoch">—</div>
+            <div style="font-size:10px; color:var(--text-mid); margin-top:2px;" id="vi-kpi-epoch-sol">— SOL/epoch</div>
+          </div>
+          <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:5px; padding:7px 10px;">
+            <div style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Network Share</div>
+            <div style="font-size:13px; font-family:var(--font-mono); font-weight:700; color:var(--text);" id="vi-kpi-share">—</div>
+            <div style="font-size:10px; color:var(--text-mid); margin-top:2px;">of total stake</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ② Revenue Breakdown (aligned with Protocol Level hierarchy) -->
-    <div class="section fade-in fade-in-2" style="padding-bottom:0;">
-      <div style="display:flex; justify-content:space-between; align-items:center;
-                  flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-        <h2 style="margin-bottom:0;">
-          Revenue Breakdown
-          <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-annual-rev')">?</button>
-        </h2>
-        <div class="vi-unit-toggle">
-          <button class="vi-unit-btn active" id="vi-u-epoch" onclick="viSetUnit('epoch')">Per epoch</button>
-          <button class="vi-unit-btn" id="vi-u-month"  onclick="viSetUnit('month')">Per month</button>
-          <button class="vi-unit-btn" id="vi-u-year"   onclick="viSetUnit('year')">Per year</button>
-        </div>
-      </div>
-      <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px;
-                  overflow:hidden; padding:0 14px; margin-bottom:14px;">
+    <!-- ② Validator Revenue (Individual Level) — 4-column table matching Protocol Level -->
+    <div class="section fade-in fade-in-2" style="padding-top:10px; padding-bottom:0;">
+      <h2>Validator Revenue (Individual Level)
+        <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-annual-rev')">?</button>
+      </h2>
+      <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow:hidden; padding:0 14px;">
         <table class="vpr-table">
           <thead>
             <tr>
-              <th style="width:38%;">Revenue Source</th>
-              <th id="vi-thead-unit" style="min-width:80px;">Per Epoch</th>
-              <th style="min-width:80px;">SOL</th>
+              <th style="width:28%;">Metric</th>
+              <th>Per block</th>
+              <th>Per epoch</th>
+              <th>Per month</th>
+              <th>Per year</th>
             </tr>
           </thead>
           <tbody>
-            <!-- Block Rewards: expandable parent -->
+            <tr class="vpr-tr-total">
+              <td>Total Validator Revenue</td>
+              <td id="vi-total-block">—</td>
+              <td id="vi-total-epoch">—</td>
+              <td id="vi-total-month">—</td>
+              <td id="vi-total-year">—</td>
+            </tr>
             <tr class="vpr-tr-group" onclick="viToggle('br')">
               <td>Block Rewards <span class="vpr-chevron" id="vi-chev-br">▾</span></td>
-              <td id="vi-br-usd">—</td>
-              <td id="vi-br-sol">—</td>
+              <td id="vi-br-block">—</td>
+              <td id="vi-br-epoch">—</td>
+              <td id="vi-br-month">—</td>
+              <td id="vi-br-year">—</td>
             </tr>
             <tr class="vpr-tr-child vi-child-br" style="display:none;">
               <td>Issuance</td>
-              <td id="vi-iss-usd">—</td>
-              <td id="vi-iss-sol">—</td>
+              <td id="vi-iss-block">—</td>
+              <td id="vi-iss-epoch">—</td>
+              <td id="vi-iss-month">—</td>
+              <td id="vi-iss-year">—</td>
             </tr>
             <tr class="vpr-tr-child vi-child-br" style="display:none;">
               <td>Network Fees</td>
-              <td id="vi-blk-usd">—</td>
-              <td id="vi-blk-sol">—</td>
+              <td id="vi-blk-block">—</td>
+              <td id="vi-blk-epoch">—</td>
+              <td id="vi-blk-month">—</td>
+              <td id="vi-blk-year">—</td>
             </tr>
-            <!-- Raiku MEV: lime group row, expandable (hidden when Raiku toggle OFF) -->
             <tr class="vpr-tr-group vpr-tr-mev" id="vi-raiku-group-row" onclick="viToggle('mev')">
               <td>Raiku MEV <span class="vpr-chevron" id="vi-chev-mev">▾</span></td>
-              <td id="vi-mev-usd">—</td>
-              <td id="vi-mev-sol">—</td>
+              <td id="vi-mev-block">—</td>
+              <td id="vi-mev-epoch">—</td>
+              <td id="vi-mev-month">—</td>
+              <td id="vi-mev-year">—</td>
             </tr>
             <tr class="vpr-tr-child vi-child-mev" id="vi-aot-row" style="display:none;">
               <td>Raiku AOT</td>
-              <td id="vi-aot-usd">—</td>
-              <td id="vi-aot-sol">—</td>
+              <td id="vi-aot-block">—</td>
+              <td id="vi-aot-epoch">—</td>
+              <td id="vi-aot-month">—</td>
+              <td id="vi-aot-year">—</td>
             </tr>
             <tr class="vpr-tr-child vi-child-mev" id="vi-jit-row" style="display:none;">
               <td>Raiku JIT</td>
-              <td id="vi-jit-usd">—</td>
-              <td id="vi-jit-sol">—</td>
+              <td id="vi-jit-block">—</td>
+              <td id="vi-jit-epoch">—</td>
+              <td id="vi-jit-month">—</td>
+              <td id="vi-jit-year">—</td>
             </tr>
             <tr class="vpr-tr-child vi-child-mev" id="vi-bonus-row" style="display:none;">
               <td>Validator Bonus</td>
-              <td id="vi-bonus-usd">—</td>
-              <td id="vi-bonus-sol">—</td>
-            </tr>
-            <!-- Total -->
-            <tr class="vpr-tr-total">
-              <td>Total Validator Revenue</td>
-              <td id="vi-total-usd">—</td>
-              <td id="vi-total-sol">—</td>
+              <td id="vi-bonus-block">—</td>
+              <td id="vi-bonus-epoch">—</td>
+              <td id="vi-bonus-month">—</td>
+              <td id="vi-bonus-year">—</td>
             </tr>
           </tbody>
         </table>
@@ -7800,9 +7838,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     makeEditable('validator-context-fee',      'sl-fcu',      0,  25,  0.01, function(v){ return (v>=10?v.toFixed(1):v<0.1?v.toFixed(3):v.toFixed(2))+' L'; });
 }());
 
-// ── Individual Level: viUpdate, viSetUnit, viToggle, viHandleStakeInput ────
+// ── Individual Level: viUpdate, viToggle, viHandleStakeInput, viSyncPrice ───
 (function(){
-  var _unit = 'epoch';
   var _blockingStakeSync = false;
   var _blockingShareSync = false;
 
@@ -7813,7 +7850,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   }
   function _fmtUsd(v) {
     var a = Math.abs(v);
-    if (a >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+    if (a >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B';
+    if (a >= 1e6) return '$' + (v/1e6).toFixed(a >= 10e6 ? 1 : 2) + 'M';
     if (a >= 1e3) return '$' + (v/1e3).toFixed(a >= 100e3 ? 0 : 1) + 'K';
     if (a >= 0.01) return '$' + v.toFixed(2);
     return '$' + v.toFixed(4);
@@ -7824,11 +7862,25 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     if (a >= 1e3) return (v/1e3).toFixed(a >= 100e3 ? 1 : 2) + 'K SOL';
     return v.toFixed(a < 0.001 ? 5 : a < 0.1 ? 4 : 2) + ' SOL';
   }
+  // Format cell as "SOL (USD)" matching Protocol Level vpr-cell style
+  function _viCell(annualSol, periods, px) {
+    var sol = annualSol / periods;
+    return '<span class="vpr-sol">' + _fmtSol(sol) + '</span>' +
+           '<span class="vpr-usd">(' + _fmtUsd(sol * px) + ')</span>';
+  }
   function _set(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
+  function _setHtml(id, v) { var e = document.getElementById(id); if (e) e.innerHTML = v; }
   function _getTotalStake() {
     return (typeof getCurrentTotalSolanaStakedSol === 'function')
            ? getCurrentTotalSolanaStakedSol() : STAKE_FALLBACK_SOL;
   }
+
+  // Sync the vi-sol-price slider when the global sl-price changes
+  window.viSyncPrice = function(val) {
+    // No local price slider — just update the display box and recompute
+    _set('vi-sol-price-display', '$' + Math.round(parseFloat(val)));
+    window.viUpdate();
+  };
 
   window.viHandleStakeInput = function() {
     if (_blockingStakeSync) return;
@@ -7862,17 +7914,6 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     if (chev) chev.textContent = expanded ? '▾' : '▴';
   };
 
-  window.viSetUnit = function(u) {
-    _unit = u;
-    ['epoch','month','year'].forEach(function(k) {
-      var btn = document.getElementById('vi-u-' + k);
-      if (btn) btn.classList.toggle('active', k === u);
-    });
-    var th = document.getElementById('vi-thead-unit');
-    if (th) th.textContent = {epoch:'Per Epoch', month:'Per Month', year:'Per Year'}[u] || 'Per Epoch';
-    window.viUpdate();
-  };
-
   window.viUpdate = function() {
     var stakeEl = document.getElementById('vi-stake');
     var commEl  = document.getElementById('vi-commission');
@@ -7884,25 +7925,53 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var raikuOn = raikuEl.checked;
     var comm    = commPct / 100;
     var total   = _getTotalStake();
-    var solPrice = parseFloat((document.getElementById('sl-price') || {}).value) || 100;
 
+    // SOL price: read from global sl-price slider (no local slider)
+    var globalPriceEl = document.getElementById('sl-price');
+    var solPrice = parseFloat((globalPriceEl || {}).value) || 100;
+
+    // Update display boxes
+    _set('vi-sol-price-display', '$' + Math.round(solPrice));
     _set('vi-commission-val', commPct.toFixed(1) + '%');
-    _set('vi-stake-usd', '≈ ' + _fmtUsd(stake * solPrice) + ' · ' + _fmtSol(stake));
+
+    // Summary row: short USD value on the right, full breakdown below
+    var stakeUsd = stake * solPrice;
+    _set('vi-stake-usd', _fmtUsd(stakeUsd));
+    _set('vi-stake-summary',
+         Number(stake).toLocaleString('en-US', {maximumFractionDigits:0}) +
+         ' SOL · ' + _fmtUsd(stakeUsd));
 
     var shareEl = document.getElementById('vi-share');
     if (shareEl && document.activeElement !== shareEl && !_blockingShareSync) {
       shareEl.value = (total > 0 ? (stake / total * 100) : 0).toFixed(4);
     }
 
-    var issApy   = _parseApyEl('validator-decomp-iss-apy');
-    var blkApy   = _parseApyEl('validator-decomp-blk-apy');
-    var aotApy   = _parseApyEl('validator-decomp-aot-apy');
-    var jitApy   = _parseApyEl('validator-decomp-jit-apy');
-    var bonusApy = _parseApyEl('validator-decomp-bonus-apy');
-    var raikuApy = aotApy + jitApy + bonusApy;
-    var totalApy = issApy * comm + blkApy + (raikuOn ? raikuApy : 0);
+    // Read component APYs from Protocol Level decomp (ground truth)
+    var issApyRaw  = _parseApyEl('validator-decomp-iss-apy');   // gross issuance APY (before commission)
+    var blkApy     = _parseApyEl('validator-decomp-blk-apy');
+    var aotApy     = _parseApyEl('validator-decomp-aot-apy');
+    var jitApy     = _parseApyEl('validator-decomp-jit-apy');
+    var bonusApy   = _parseApyEl('validator-decomp-bonus-apy');
+    var issApy     = issApyRaw * comm;  // commission-adjusted
+    var raikuApy   = aotApy + jitApy + bonusApy;
+    var totalApy   = issApy + blkApy + (raikuOn ? raikuApy : 0);
+    var raikuUplift = raikuOn ? raikuApy : 0;
 
-    var issAnnual   = stake * issApy * comm;
+    // APY headline
+    _set('vi-total-apy-display', (totalApy * 100).toFixed(2) + '%');
+    _set('vi-raiku-apy-uplift',  '+' + (raikuUplift * 100).toFixed(2) + '%');
+    var badge = document.getElementById('vi-raiku-badge');
+    if (badge) badge.style.opacity = raikuOn ? '1' : '0.3';
+
+    // APY component legend
+    _set('vi-decomp-iss-apy',   (issApy   * 100).toFixed(2) + '%');
+    _set('vi-decomp-blk-apy',   (blkApy   * 100).toFixed(2) + '%');
+    _set('vi-decomp-aot-apy',   (aotApy   * 100).toFixed(2) + '%');
+    _set('vi-decomp-jit-apy',   (jitApy   * 100).toFixed(2) + '%');
+    _set('vi-decomp-bonus-apy', (bonusApy * 100).toFixed(2) + '%');
+
+    // Annual SOL values
+    var issAnnual   = stake * issApy;
     var blkAnnual   = stake * blkApy;
     var brAnnual    = issAnnual + blkAnnual;
     var aotAnnual   = stake * aotApy;
@@ -7912,38 +7981,45 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var totalAnnual = brAnnual + raikuAnnual;
     var netShare    = total > 0 ? (stake / total * 100) : 0;
 
-    _set('vi-kpi-apy',    (totalApy * 100).toFixed(2) + '%');
-    _set('vi-kpi-annual', _fmtUsd(totalAnnual * solPrice));
+    // Compact KPI row
+    _set('vi-kpi-annual',     _fmtUsd(totalAnnual * solPrice));
     _set('vi-kpi-annual-sol', _fmtSol(totalAnnual) + '/yr');
-    _set('vi-kpi-epoch',  _fmtUsd(totalAnnual / EPOCHS_PER_YEAR * solPrice));
-    _set('vi-kpi-epoch-sol', _fmtSol(totalAnnual / EPOCHS_PER_YEAR) + '/epoch');
-    _set('vi-kpi-share',  netShare < 0.001 ? '<0.001%' : netShare.toFixed(3) + '%');
+    _set('vi-kpi-epoch',      _fmtUsd(totalAnnual / EPOCHS_PER_YEAR * solPrice));
+    _set('vi-kpi-epoch-sol',  _fmtSol(totalAnnual / EPOCHS_PER_YEAR) + '/epoch');
+    _set('vi-kpi-share',      netShare < 0.001 ? '<0.001%' : netShare.toFixed(3) + '%');
 
-    var div = {epoch: EPOCHS_PER_YEAR, month: 12, year: 1}[_unit] || EPOCHS_PER_YEAR;
-    function _row(annualSol) {
-      var sol = annualSol / div;
-      return { usd: _fmtUsd(sol * solPrice), sol: _fmtSol(sol) };
-    }
-    var rows = {
-      br:    _row(brAnnual),
-      iss:   _row(issAnnual),
-      blk:   _row(blkAnnual),
-      mev:   _row(raikuAnnual),
-      aot:   _row(aotAnnual),
-      jit:   _row(jitAnnual),
-      bonus: _row(bonusAnnual),
-      total: _row(totalAnnual)
-    };
-    ['br','iss','blk','mev','aot','jit','bonus','total'].forEach(function(k) {
-      _set('vi-' + k + '-usd', rows[k].usd);
-      _set('vi-' + k + '-sol', rows[k].sol);
+    // 4-column revenue table
+    // Per-block denominator: SY slots/yr × individual stake fraction
+    // Individual validator gets blocks proportional to their stake fraction
+    var stakeFrac = total > 0 ? stake / total : 0;
+    var blocksPerYear = SY * stakeFrac;  // expected blocks produced per year
+    // Guard: avoid division by zero for tiny stakes
+    var _EPY = EPOCHS_PER_YEAR;
+    var sources = [
+      ['vi-iss',   issAnnual],
+      ['vi-blk',   blkAnnual],
+      ['vi-br',    brAnnual],
+      ['vi-aot',   aotAnnual],
+      ['vi-jit',   jitAnnual],
+      ['vi-bonus', bonusAnnual],
+      ['vi-mev',   raikuAnnual],
+      ['vi-total', totalAnnual]
+    ];
+    sources.forEach(function(row) {
+      var _id = row[0], _ann = row[1];
+      _setHtml(_id + '-block', blocksPerYear > 0 ? _viCell(_ann, blocksPerYear, solPrice) : '<span class="vpr-sol">—</span>');
+      _setHtml(_id + '-epoch', _viCell(_ann, _EPY, solPrice));
+      _setHtml(_id + '-month', _viCell(_ann, 12,   solPrice));
+      _setHtml(_id + '-year',  _viCell(_ann, 1,    solPrice));
     });
 
+    // Show/hide Raiku MEV rows
     ['vi-raiku-group-row','vi-aot-row','vi-jit-row','vi-bonus-row'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.style.display = raikuOn ? '' : 'none';
     });
 
+    // Network Positioning
     var bench = window.QCP && window.QCP.bench;
     var top50 = bench && bench.top_validators_by_stake;
     if (top50 && top50.length >= 50) {
@@ -7967,6 +8043,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   };
 
   document.addEventListener('DOMContentLoaded', function() {
+    // Initialise Individual Level display
     setTimeout(window.viUpdate, 300);
   });
 }());
