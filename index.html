@@ -798,8 +798,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 .vi-divider-line { flex:1; height:1px; background:#1a1e27; }
 
 /* ── Layout: mirrors .validator-layout ── */
-.vi-layout { display:grid; grid-template-columns:340px 1fr; column-gap:var(--gap); align-items:start; }
-.vi-side { width:340px; position:sticky; top:10px; display:flex; flex-direction:column; }
+.vi-layout { display:grid; grid-template-columns:340px 1fr; column-gap:var(--gap); align-items:stretch; }
+.vi-side { width:340px; display:flex; flex-direction:column; }
 .vi-main { display:flex; flex-direction:column; gap:var(--gap); }
 
 /* ── KPI grid (4 cards, matches .validator-kpi style) ── */
@@ -832,8 +832,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
   border-radius:4px; padding:4px 10px; cursor:pointer; letter-spacing:0.3px;
 }
 .vi-dist-toggle:hover { color:var(--text); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2); }
-.vi-pos-sum-chip { font-size:11px; font-family:var(--font-mono); color:var(--text2); }
-.vi-pos-pct-tag { font-size:10px; font-family:var(--font-mono); color:#8a93a8; white-space:nowrap; }
+.vi-pos-sum-chip { font-size:11px; font-family:var(--font-mono); color:#a8aebf; }
+.vi-pos-pct-tag { font-size:10px; font-family:var(--font-mono); color:#a0a8bc; white-space:nowrap; }
 
 /* ── Network Positioning: comparative bar ── */
 .vi-pos-refs { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:12px; }
@@ -844,7 +844,10 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 .vi-pos-fill  { height:100%; border-radius:3px; background:linear-gradient(90deg,#2a3848,#C0FF38); pointer-events:none; }
 .vi-pos-thumb { position:absolute; top:-4px; width:14px; height:14px; background:#C0FF38;
                 border-radius:50%; transform:translateX(-50%); box-shadow:0 0 6px rgba(192,255,56,0.4); }
-.vi-pos-axis  { display:flex; justify-content:space-between; font-size:9px; color:#4a5060; font-family:var(--font-mono); }
+.vi-pos-axis  { display:flex; justify-content:space-between; font-size:10px; color:#8a93a8; font-family:var(--font-mono); font-weight:600; }
+.vi-stat-legend { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+.vi-stat-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:3px; vertical-align:middle; }
+.vi-stat-item { font-size:10px; font-family:var(--font-mono); color:#8a93a8; white-space:nowrap; }
 
 /* ── Commission: disabled / not available in this version ── */
 .vi-commission-disabled { pointer-events:none; opacity:0.35; cursor:default; }
@@ -1933,6 +1936,17 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <div class="section fade-in" style="flex:1; margin-bottom:0; display:flex; flex-direction:column;">
       <h2>Validator Setup (Individual Level)</h2>
 
+      <!-- Scenario selection (mirrors Protocol Level placement) -->
+      <div style="display:flex; gap:4px; margin-top:10px; flex-wrap:wrap;">
+        <button class="vi-scenario-btn" id="vi-btn-con"  onclick="viApplyScenario('con')">Conservative</button>
+        <button class="vi-scenario-btn active" id="vi-btn-base" onclick="viApplyScenario('base')">Base Case</button>
+        <button class="vi-scenario-btn" id="vi-btn-opt"  onclick="viApplyScenario('opt')">Optimistic</button>
+        <button class="vi-scenario-btn" id="vi-btn-bull" onclick="viApplyScenario('bull')">Bull Case</button>
+      </div>
+
+      <!-- divider -->
+      <div style="height:1px; background:#1a1e27; margin:14px 0 12px;"></div>
+
       <!-- Row 1: Delegated Stake | Network Share -->
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:20px;">
         <!-- Delegated Stake: editable -->
@@ -2039,12 +2053,19 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
       <!-- Distribution panel (open by default) -->
       <div id="vi-dist-panel" style="display:block; margin-top:14px;">
-        <canvas id="vi-dist-canvas" height="100"
+        <canvas id="vi-dist-canvas" height="120"
                 style="width:100%; display:block; cursor:default;"></canvas>
-        <div id="vi-dist-stats" style="margin-top:8px; padding:8px 10px;
+        <div class="vi-stat-legend" id="vi-stat-legend">
+          <span class="vi-stat-item"><span class="vi-stat-dot" style="background:#5a8fc4;"></span>P25</span>
+          <span class="vi-stat-item"><span class="vi-stat-dot" style="background:#c4c45a;"></span>Median</span>
+          <span class="vi-stat-item"><span class="vi-stat-dot" style="background:#c45a5a;"></span>P75</span>
+          <span class="vi-stat-item"><span class="vi-stat-dot" style="background:#9a5ac4;"></span>Mean</span>
+          <span class="vi-stat-item" style="color:#5a6272;">· Your position highlighted in green</span>
+        </div>
+        <div id="vi-dist-stats" style="margin-top:6px; padding:8px 10px;
              background:#04060a; border:1px solid #16191f; border-radius:5px;
              font-size:10px; font-family:var(--font-mono); color:#8a93a8; line-height:1.8;"></div>
-        <div class="validator-note" style="margin-top:8px; font-size:10px; color:#6e7585;">
+        <div style="margin-top:6px; font-size:10px; font-family:var(--font-mono); color:#6e7585;">
           Source: Trillium API, epoch 945 · 762 validators with active stake
         </div>
         <!-- Comparative positioning bar -->
@@ -2067,9 +2088,12 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <div class="vi-pos-thumb" id="vi-pos-thumb" style="left:0%;"></div>
         </div>
         <div class="vi-pos-axis">
-          <span>0 SOL</span>
+          <span>1 SOL</span>
           <span id="vi-pos-axis-mid">—</span>
           <span id="vi-pos-axis-max">—</span>
+        </div>
+        <div style="font-size:9px; color:#5a6272; font-family:var(--font-mono); margin-top:4px;">
+          Log scale · 1 SOL → largest validator
         </div>
       </div>
     </div>
@@ -2088,12 +2112,6 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             <span class="bb-arb-slider"></span>
           </label>
         </div>
-      </div>
-      <div style="display:flex; gap:4px; margin-top:6px; flex-wrap:wrap; align-items:center;">
-        <button class="vi-scenario-btn" id="vi-btn-con"  onclick="viApplyScenario('con')">Conservative</button>
-        <button class="vi-scenario-btn active" id="vi-btn-base" onclick="viApplyScenario('base')">Base Case</button>
-        <button class="vi-scenario-btn" id="vi-btn-opt"  onclick="viApplyScenario('opt')">Optimistic</button>
-        <button class="vi-scenario-btn" id="vi-btn-bull" onclick="viApplyScenario('bull')">Bull Case</button>
       </div>
       <div class="validator-decomp-card" style="margin-top:10px;">
         <!-- Top summary band: APY headline · APR (mirrors Protocol Level) -->
@@ -8129,33 +8147,40 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var canvas = document.getElementById('vi-dist-canvas');
     if (!canvas) return;
     var dist = window.QCP && window.QCP.stakeDist;
+    var CANVAS_H = 120;
     if (!dist || !dist.stakes_sol) {
         var ctx0 = canvas.getContext('2d');
         if (ctx0) {
-            canvas.width = canvas.offsetWidth || 460;
-            canvas.height = 100;
+            canvas.width = canvas.offsetWidth || 860;
+            canvas.height = CANVAS_H;
             ctx0.fillStyle = '#4a5060';
             ctx0.font = '10px monospace';
             ctx0.textAlign = 'center';
-            ctx0.fillText('Loading distribution\u2026', canvas.width/2, 54);
+            ctx0.fillText('Loading distribution\u2026', canvas.width/2, CANVAS_H/2 + 4);
         }
         return;
     }
-    var W = canvas.offsetWidth || 460;
+    var W = canvas.offsetWidth || 860;
     if (W < 10) return; // panel hidden, skip
     var dpr = window.devicePixelRatio || 1;
     canvas.width  = Math.round(W * dpr);
-    canvas.height = Math.round(100 * dpr);
+    canvas.height = Math.round(CANVAS_H * dpr);
     canvas.style.width  = W + 'px';
-    canvas.style.height = '100px';
+    canvas.style.height = CANVAS_H + 'px';
     var ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
 
     var stakes = dist.stakes_sol; // sorted ascending
-    var NUM_B  = 20;
-    var LOG_MIN = 3.0;   // log10(1,000)
-    var LOG_MAX = 7.3;   // log10(~20M)
+    var NUM_B  = 24;
+    var LOG_MIN = 3.0;   // log10(1,000) — exclude tiny validators
+    // Dynamic LOG_MAX: fit the data tightly (max stake + small margin)
+    var LOG_MAX = Math.ceil(Math.log10(dist.max_sol) * 5) / 5 + 0.1;
     var bucketW_log = (LOG_MAX - LOG_MIN) / NUM_B;
+
+    // Compute mean from stakes array
+    var stakeSum = 0;
+    for (var si = 0; si < stakes.length; si++) stakeSum += stakes[si];
+    var meanSol = stakes.length > 0 ? stakeSum / stakes.length : 0;
 
     // Build histogram counts
     var counts = new Array(NUM_B).fill(0);
@@ -8168,11 +8193,16 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     }
     var maxC = Math.max.apply(null, counts);
 
-    // Layout
-    var PAD_T = 6, PAD_B = 22, PAD_L = 0, PAD_R = 0;
+    // Layout — extra top padding for stat marker labels
+    var PAD_T = 18, PAD_B = 24, PAD_L = 0, PAD_R = 0;
     var chartW = W - PAD_L - PAD_R;
-    var chartH = 100 - PAD_T - PAD_B;
+    var chartH = CANVAS_H - PAD_T - PAD_B;
     var bW = chartW / NUM_B;
+
+    // Helper: log position → canvas x
+    function logX(sol) {
+        return PAD_L + ((Math.log10(Math.max(1, sol)) - LOG_MIN) / (LOG_MAX - LOG_MIN)) * chartW;
+    }
 
     // User stake log position
     var uLog = (userStake > 0) ? Math.log10(Math.max(1, userStake)) : -1;
@@ -8191,9 +8221,34 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         ctx.fillRect(bX + 1, bY, bW - 2, bH);
     }
 
-    // User position marker (dashed vertical line)
+    // Statistical marker lines: P25, Median, P75, Mean
+    var statMarkers = [
+        { sol: dist.p25_sol, color: '#5a8fc4', label: 'P25' },
+        { sol: dist.p50_sol, color: '#c4c45a', label: 'P50' },
+        { sol: dist.p75_sol, color: '#c45a5a', label: 'P75' },
+        { sol: meanSol,      color: '#9a5ac4', label: 'Avg' }
+    ];
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 3]);
+    ctx.font = 'bold 9px monospace';
+    ctx.textAlign = 'center';
+    for (var mi = 0; mi < statMarkers.length; mi++) {
+        var m = statMarkers[mi];
+        var mx = logX(m.sol);
+        if (mx < 0 || mx > W) continue;
+        ctx.strokeStyle = m.color;
+        ctx.beginPath();
+        ctx.moveTo(mx, PAD_T);
+        ctx.lineTo(mx, PAD_T + chartH);
+        ctx.stroke();
+        ctx.fillStyle = m.color;
+        ctx.fillText(m.label, mx, PAD_T - 4);
+    }
+    ctx.setLineDash([]);
+
+    // User position marker (solid lime line, on top)
     if (uLog >= LOG_MIN && uLog <= LOG_MAX) {
-        ctx.strokeStyle = 'rgba(192,255,56,0.9)';
+        ctx.strokeStyle = 'rgba(192,255,56,0.95)';
         ctx.lineWidth   = 1.5;
         ctx.setLineDash([3, 3]);
         ctx.beginPath();
@@ -8203,14 +8258,16 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         ctx.setLineDash([]);
     }
 
-    // X axis labels
-    var axLabels = [{l:3,t:'1K'},{l:4,t:'10K'},{l:5,t:'100K'},{l:6,t:'1M'},{l:7,t:'10M'}];
+    // X axis labels (dynamic — only ticks that fall within LOG_MIN..LOG_MAX)
+    var allAxLabels = [{l:3,t:'1K'},{l:4,t:'10K'},{l:5,t:'100K'},{l:6,t:'1M'},{l:7,t:'10M'}];
     ctx.fillStyle  = '#b0b8cc';
     ctx.font       = 'bold 10px monospace';
     ctx.textAlign  = 'center';
-    for (var ai = 0; ai < axLabels.length; ai++) {
-        var ax = PAD_L + ((axLabels[ai].l - LOG_MIN) / (LOG_MAX - LOG_MIN)) * chartW;
-        ctx.fillText(axLabels[ai].t, ax, PAD_T + chartH + 16);
+    for (var ai = 0; ai < allAxLabels.length; ai++) {
+        var al = allAxLabels[ai];
+        if (al.l < LOG_MIN || al.l > LOG_MAX) continue;
+        var ax = PAD_L + ((al.l - LOG_MIN) / (LOG_MAX - LOG_MIN)) * chartW;
+        ctx.fillText(al.t, ax, PAD_T + chartH + 17);
     }
 
     // Stats strip
@@ -8244,9 +8301,11 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         _set('vi-pos-your-stake', _fmtSolB(userStake));
         _set('vi-pos-top50',      _fmtSolB(boundary50) + ' (#50)');
         _set('vi-pos-largest',    _fmtSolB(largest));
-        _set('vi-pos-axis-mid',   _fmtSolB(Math.round(largest / 2)));
-        _set('vi-pos-axis-max',   _fmtSolB(largest));
+        // Log-scale midpoint: 10^(logMax/2) — the geometric center of the axis
         var logMax = Math.log10(largest + 1);
+        var logMid = Math.round(Math.pow(10, logMax / 2));
+        _set('vi-pos-axis-mid',   _fmtSolB(logMid) + ' (mid)');
+        _set('vi-pos-axis-max',   _fmtSolB(largest));
         var logVal = userStake > 0 ? Math.log10(userStake + 1) : 0;
         var pct = Math.max(0, Math.min(100, logVal / logMax * 100));
         var fillEl  = document.getElementById('vi-pos-fill');
