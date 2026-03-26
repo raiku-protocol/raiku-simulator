@@ -851,6 +851,9 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
                 padding:7px 8px; font-size:10px; cursor:pointer; color:#5a6272;
                 font-family:var(--font-mono); transition:all 0.15s; white-space:nowrap; }
 .vi-reset-btn:hover { border-color:#4a5060; color:var(--text-mid); }
+.vi-param-reset { background:none; border:none; color:#2e3445; font-size:9px; cursor:pointer;
+                  padding:0 0 0 3px; line-height:1; vertical-align:middle; transition:color 0.1s; }
+.vi-param-reset:hover { color:#6e7585; }
 </style>
 </head>
 <body>
@@ -1916,53 +1919,67 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <div class="section fade-in" style="flex:1; margin-bottom:0; display:flex; flex-direction:column;">
       <h2>Validator Setup (Individual Level)</h2>
 
-      <!-- Row 1: SOL Price | Delegated Stake -->
+      <!-- Row 1: Delegated Stake | Network Share -->
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:20px;">
-        <!-- SOL Price: local to Individual Level; default $100; not linked to Protocol Level -->
-        <div class="validator-context-item">
-          <div class="validator-context-label">SOL Price</div>
-          <div class="validator-context-value" id="vi-sol-price-display">$100</div>
-          <input type="hidden" id="vi-sol-price-raw" value="100">
-        </div>
-        <!-- Delegated Stake: editable, styled as boxed value -->
+        <!-- Delegated Stake: editable -->
         <div class="validator-context-item">
           <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
             Delegated Stake
             <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-stake')">?</button>
+            <button class="vi-param-reset" onclick="viResetStake()" title="Reset to P50 median (152,908 SOL)">↺</button>
           </div>
           <div class="validator-context-value" id="vi-stake">152,908 SOL</div>
           <input type="hidden" id="vi-stake-raw" value="152908">
         </div>
-      </div>
-
-      <!-- Row 2: Network Share | Inflation Commission -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:6px;">
-        <!-- Network Share: derived display, editable (updates stake) -->
+        <!-- Network Share: derived, editable (updates stake) -->
         <div class="validator-context-item">
-          <div class="validator-context-label">Network Share</div>
+          <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
+            Network Share
+            <button class="vi-param-reset" onclick="viResetStake()" title="Reset stake to P50 median">↺</button>
+          </div>
           <div class="validator-context-value" id="vi-share">0.0363%</div>
           <input type="hidden" id="vi-share-raw" value="0.0363">
         </div>
-        <!-- Inflation Commission: editable text input; default 0% -->
+      </div>
+
+      <!-- Row 2: SOL Price | Commission -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:6px;">
+        <!-- SOL Price: local to Individual Level; default $100; not linked to Protocol Level -->
+        <div class="validator-context-item">
+          <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
+            SOL Price
+            <button class="vi-param-reset" onclick="viResetSolPrice()" title="Reset to $100">↺</button>
+          </div>
+          <div class="validator-context-value" id="vi-sol-price-display">$100</div>
+          <input type="hidden" id="vi-sol-price-raw" value="100">
+        </div>
+        <!-- Inflation Commission: editable; default 0% -->
         <div class="validator-context-item">
           <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
             Commission
             <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-commission')">?</button>
+            <button class="vi-param-reset" onclick="viResetCommission()" title="Reset to 0%">↺</button>
           </div>
           <div class="validator-context-value" id="vi-commission">0.0%</div>
           <input type="hidden" id="vi-commission-raw" value="0">
         </div>
       </div>
 
-      <!-- Row 3: Issuance APY | Network Fees APY (own inputs — scenario-initialized) -->
+      <!-- Row 3: Issuance APY | Network Fees APY (scenario-initialized, user-adjustable) -->
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:6px;">
         <div class="validator-context-item">
-          <div class="validator-context-label">Issuance APY</div>
+          <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
+            Issuance APY
+            <button class="vi-param-reset" onclick="viResetIssApy()" title="Reset to active scenario default">↺</button>
+          </div>
           <div class="validator-context-value" id="vi-iss-apy">5.995%</div>
           <input type="hidden" id="vi-iss-apy-raw" value="5.995">
         </div>
         <div class="validator-context-item">
-          <div class="validator-context-label">Network Fees APY</div>
+          <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
+            Network Fees APY
+            <button class="vi-param-reset" onclick="viResetBlkApy()" title="Reset to active scenario default">↺</button>
+          </div>
           <div class="validator-context-value" id="vi-blk-apy">0.498%</div>
           <input type="hidden" id="vi-blk-apy-raw" value="0.498">
         </div>
@@ -1975,11 +1992,6 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <span style="font-size:12px; font-family:var(--font-mono); font-weight:600; color:#8a93a8;" id="vi-stake-usd">—</span>
         </div>
         <div id="vi-stake-summary" style="font-size:10px; color:#5a6272; margin-top:3px; line-height:1.5; font-family:var(--font-mono);">—</div>
-      </div>
-
-      <!-- Reset button -->
-      <div style="margin-top:10px;">
-        <button class="vi-reset-btn" onclick="viResetToDefaults()" style="width:100%; padding:8px 10px;">↺ Reset to scenario defaults</button>
       </div>
 
       <!-- Spacer -->
@@ -8005,7 +8017,44 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     window.viUpdate();
   };
 
-  // ── Reset to defaults: restore scenario-scoped inputs without touching stake/share/commission/price ──
+  // ── Per-parameter resets ──────────────────────────────────────────────────────
+  window.viResetStake = function() {
+    var el = document.getElementById('vi-stake-raw');
+    if (el) el.value = 152908;
+    window.viUpdate();
+  };
+  window.viResetSolPrice = function() {
+    var el = document.getElementById('vi-sol-price-raw');
+    if (el) el.value = 100;
+    window.viUpdate();
+  };
+  window.viResetCommission = function() {
+    var el = document.getElementById('vi-commission-raw');
+    if (el) el.value = 0;
+    window.viUpdate();
+  };
+  window.viResetIssApy = function() {
+    var sp = typeof getScenarioParams === 'function' ? getScenarioParams(_viState.scenario || 'base') : null;
+    if (!sp) return;
+    _viState.issApy = sp.issApy || 0;
+    var raw = document.getElementById('vi-iss-apy-raw');
+    if (raw) raw.value = (_viState.issApy * 100).toFixed(4);
+    var div = document.getElementById('vi-iss-apy');
+    if (div && !div.querySelector('input')) div.textContent = typeof fmtValidatorRate === 'function' ? fmtValidatorRate(_viState.issApy) : (_viState.issApy * 100).toFixed(3) + '%';
+    window.viUpdate();
+  };
+  window.viResetBlkApy = function() {
+    var sp = typeof getScenarioParams === 'function' ? getScenarioParams(_viState.scenario || 'base') : null;
+    if (!sp) return;
+    _viState.blkApy = sp.nfApy || 0;
+    var raw = document.getElementById('vi-blk-apy-raw');
+    if (raw) raw.value = (_viState.blkApy * 100).toFixed(4);
+    var div = document.getElementById('vi-blk-apy');
+    if (div && !div.querySelector('input')) div.textContent = typeof fmtValidatorRate === 'function' ? fmtValidatorRate(_viState.blkApy) : (_viState.blkApy * 100).toFixed(3) + '%';
+    window.viUpdate();
+  };
+
+  // ── Global reset (full scenario re-apply) — kept for internal use ─────────
   window.viResetToDefaults = function() {
     window.viApplyScenario(_viState.scenario || 'base');
   };
