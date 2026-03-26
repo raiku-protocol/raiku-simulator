@@ -2221,6 +2221,13 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             </tr>
           </thead>
           <tbody>
+            <tr class="vpr-tr-cadence">
+              <td>Expected slots</td>
+              <td>1</td>
+              <td id="vi-slots-epoch">—</td>
+              <td id="vi-slots-month">—</td>
+              <td id="vi-slots-year">—</td>
+            </tr>
             <tr class="vpr-tr-total">
               <td>Total Validator Revenue</td>
               <td id="vi-total-block">—</td>
@@ -8375,6 +8382,17 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     if (shareRawEl) shareRawEl.value = netShare;
     var shareDiv = document.getElementById('vi-share');
     if (shareDiv && !shareDiv.querySelector('input')) shareDiv.textContent = netShare.toFixed(4)+'%';
+
+    // Expected slots (scales with validator's network share fraction)
+    var _fmtSlots = function(n) {
+        if (n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+        if (n >= 1e3) return (n/1e3).toFixed(n >= 100e3 ? 1 : 2) + 'K';
+        return Math.round(n).toString();
+    };
+    var shareFrac = netShare / 100;
+    _set('vi-slots-epoch', _fmtSlots(432000 * shareFrac));
+    _set('vi-slots-month', _fmtSlots(SY / 12  * shareFrac));
+    _set('vi-slots-year',  _fmtSlots(SY       * shareFrac));
 
     // ── APR derivation from own state — zero Protocol Level DOM reads ────────────
     var _toApr = function(apy) { return typeof apyToApr === 'function' ? apyToApr(apy, N) : apy; };
