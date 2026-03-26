@@ -260,6 +260,12 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-ctx-num { background:#141516; color:var(--text); border:1px solid #333; border-radius:3px; padding:2px 6px; font-size:10px; font-family:var(--font-mono); width:68px; text-align:right; outline:none; }
 /* AOT capacity warning */
 .cust-aot-warn { display:none; margin-top:4px; padding:5px 8px; background:#1e1005; border:1px solid #a05010; border-radius:4px; font-size:9px; font-family:var(--font-mono); color:#e8902a; line-height:1.5; }
+/* Customer Economics — spend cards (3-col) */
+.cust-spend-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.cust-spend-card { background:#0c0e13; border:1px solid var(--card-border); border-radius:6px; padding:10px 12px; display:flex; flex-direction:column; gap:3px; }
+.cust-spend-card-label { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; font-family:var(--font-mono); color:var(--text2); }
+.cust-spend-card-value { font-size:16px; font-weight:700; color:var(--text); font-family:var(--font-mono); line-height:1.2; }
+.cust-spend-card-sub { font-size:9px; color:var(--text2); font-family:var(--font-mono); }
 .sidebar .section-label { font-size:10px; margin-top:12px; padding-bottom:2px; border-bottom:1px solid #1e2028; margin-bottom:2px; }
 .sidebar .section-label:first-child { margin-top:0; }
 
@@ -2380,10 +2386,10 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
 
-    <!-- CU guardrail -->
-    <div id="cust-guardrail" style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:#1a1c22;border-radius:4px;border:1px solid var(--card-border);font-size:10px;font-family:var(--font-mono);">
-      <span style="color:var(--text2);">Total CU / block</span>
-      <span id="cust-guardrail-val" style="color:var(--text);">0 / 60M</span>
+    <!-- Raiku Blocks sub-group -->
+    <div id="cust-guardrail-raiku" style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:#1a1c22;border-radius:4px;border:1px solid var(--card-border);font-size:10px;font-family:var(--font-mono);">
+      <span style="color:var(--lime-soft);font-weight:600;letter-spacing:.06em;text-transform:uppercase;">Raiku Blocks &mdash; CU / block</span>
+      <span id="cust-guardrail-raiku-val" style="color:var(--text);">0 / 60,000,000</span>
     </div>
 
     <!-- AOT -->
@@ -2429,9 +2435,15 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       </div>
     </div>
 
-    <!-- Non-Raiku JIT -->
+    <!-- Non-Raiku Blocks sub-group -->
+    <div id="cust-guardrail-njit" style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:#1a1c22;border-radius:4px;border:1px solid var(--card-border);font-size:10px;font-family:var(--font-mono);margin-top:4px;">
+      <span style="color:var(--text2);font-weight:600;letter-spacing:.06em;text-transform:uppercase;">Non-Raiku Blocks &mdash; CU / block</span>
+      <span id="cust-guardrail-njit-val" style="color:var(--text);">0 / 60,000,000</span>
+    </div>
+
+    <!-- Other JIT -->
     <div class="cust-route-card">
-      <div class="cust-route-title" style="color:var(--text2);">Non-Raiku JIT</div>
+      <div class="cust-route-title" style="color:var(--text2);">Other JIT</div>
       <div class="cust-route-grid">
         <div class="control">
           <label>CU / block</label>
@@ -2483,10 +2495,10 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       <span class="cust-ctx-derived" id="cust-ctx-raiku-bpe">—</span>
     </div>
 
-    <!-- Client target blocks/epoch -->
+    <!-- Non-Raiku blocks/epoch (derived) -->
     <div class="cust-ctx-row">
-      <span class="cust-ctx-label">Client target (blk/epoch)</span>
-      <input type="number" id="cust-ctx-target" value="10000" min="0" max="600000" step="1000" class="cust-ctx-num">
+      <span class="cust-ctx-label">Non-Raiku blocks / epoch</span>
+      <span class="cust-ctx-derived" id="cust-ctx-njit-bpe">—</span>
     </div>
 
     <!-- AOT block share -->
@@ -2512,95 +2524,50 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     This is a scenario tool — values are editable starting points, not cost guarantees.
   </p>
 
-  <!-- A. Block Capacity Visual -->
+  <!-- A. Spend — primary story, 3 explicit figures -->
   <div class="cust-panel-section fade-in">
-    <div class="cust-panel-title">Block Capacity Usage &mdash; 60,000,000 CU per block</div>
-    <div class="cust-bar-track">
-      <div class="cust-bar-seg" id="cust-cap-aot"    style="background:var(--lime-soft);width:0%"></div>
-      <div class="cust-bar-seg" id="cust-cap-rjit"   style="background:#8bc4f5;width:0%"></div>
-      <div class="cust-bar-seg" id="cust-cap-njit"   style="background:#7b8794;width:0%"></div>
-      <div class="cust-bar-seg" id="cust-cap-unused" style="flex:1;background:#0e1016;"></div>
-    </div>
-    <div class="cust-bar-legend">
-      <div class="cust-bar-legend-item"><div class="cust-bar-dot" style="background:var(--lime-soft)"></div><span style="color:var(--lime-soft)">AOT</span>&nbsp;<span id="cust-cap-aot-val" style="color:var(--text)">—</span></div>
-      <div class="cust-bar-legend-item"><div class="cust-bar-dot" style="background:#8bc4f5"></div><span style="color:#8bc4f5">Raiku JIT</span>&nbsp;<span id="cust-cap-rjit-val" style="color:var(--text)">—</span></div>
-      <div class="cust-bar-legend-item"><div class="cust-bar-dot" style="background:#7b8794"></div><span>Non-Raiku JIT</span>&nbsp;<span id="cust-cap-njit-val" style="color:var(--text)">—</span></div>
-      <div class="cust-bar-legend-item"><div class="cust-bar-dot" style="background:#1e2128"></div><span>Unused</span>&nbsp;<span id="cust-cap-unused-val" style="color:var(--text2)">—</span></div>
-    </div>
-    <div class="cust-bar-stat">Used: <span id="cust-cap-used-cu" style="color:var(--text)">0</span> CU &nbsp;&middot;&nbsp; <span id="cust-cap-used-pct" style="color:var(--text)">0.0%</span> of block capacity</div>
-  </div>
-
-  <!-- B. Spend Composition Visual -->
-  <div class="cust-panel-section fade-in">
-    <div class="cust-panel-title">Spend Composition &mdash; lamports per block</div>
-    <div class="cust-bar-track" id="cust-spend-bar">
-      <div class="cust-bar-seg" id="cust-sp-aot"  style="background:var(--lime-soft);width:0%"></div>
-      <div class="cust-bar-seg" id="cust-sp-rjit" style="background:#8bc4f5;width:0%"></div>
-      <div class="cust-bar-seg" id="cust-sp-njit" style="background:#7b8794;width:0%"></div>
-    </div>
-    <div class="cust-bar-legend">
-      <div class="cust-bar-legend-item"><div class="cust-bar-dot" style="background:var(--lime-soft)"></div><span style="color:var(--lime-soft)">AOT</span>&nbsp;<span id="cust-sp-aot-val" style="color:var(--text)">—</span></div>
-      <div class="cust-bar-legend-item"><div class="cust-bar-dot" style="background:#8bc4f5"></div><span style="color:#8bc4f5">Raiku JIT</span>&nbsp;<span id="cust-sp-rjit-val" style="color:var(--text)">—</span></div>
-      <div class="cust-bar-legend-item"><div class="cust-bar-dot" style="background:#7b8794"></div><span>Non-Raiku JIT</span>&nbsp;<span id="cust-sp-njit-val" style="color:var(--text)">—</span></div>
-    </div>
-    <div class="cust-bar-stat">Total: <span id="cust-sp-total" style="color:var(--text)">0</span> lamports / block</div>
-  </div>
-
-  <!-- C. Scenario Summary -->
-  <div class="cust-panel-section fade-in">
-    <div class="cust-panel-title">Scenario Summary</div>
-    <div class="cust-summary-groups">
-      <!-- Demand -->
-      <div class="cust-summary-group">
-        <div class="cust-summary-group-title" style="color:var(--lime-soft)">Demand</div>
-        <div class="cust-summary-metric">
-          <div class="cust-summary-label">Total CU / block</div>
-          <div class="cust-summary-value" id="cust-k-total-cu">—</div>
-        </div>
-        <div class="cust-summary-metric">
-          <div class="cust-summary-label">Spend / block</div>
-          <div class="cust-summary-value" id="cust-k-spend">—</div>
-          <div class="cust-summary-sub">lamports</div>
-        </div>
-        <div class="cust-summary-metric">
-          <div class="cust-summary-label">Blended fee / CU</div>
-          <div class="cust-summary-value" id="cust-k-blended">—</div>
-        </div>
+    <div class="cust-panel-title">Spend</div>
+    <div class="cust-spend-cards">
+      <div class="cust-spend-card">
+        <div class="cust-spend-card-label" style="color:var(--lime-soft);">Raiku block</div>
+        <div class="cust-spend-card-value" id="cust-k-raiku-spend">—</div>
+        <div class="cust-spend-card-sub">L / Raiku block</div>
       </div>
-      <!-- Capacity -->
-      <div class="cust-summary-group">
-        <div class="cust-summary-group-title" style="color:#8bc4f5">Capacity</div>
+      <div class="cust-spend-card">
+        <div class="cust-spend-card-label" style="color:var(--text2);">Non-Raiku block</div>
+        <div class="cust-spend-card-value" id="cust-k-njit-spend">—</div>
+        <div class="cust-spend-card-sub">L / Non-Raiku block</div>
+      </div>
+      <div class="cust-spend-card">
+        <div class="cust-spend-card-label" style="color:#8bc4f5;">Epoch total</div>
+        <div class="cust-spend-card-value" id="cust-k-epoch-sol">—</div>
+        <div class="cust-spend-card-sub">SOL / epoch</div>
+        <div class="cust-spend-card-sub" id="cust-k-epoch-usd" style="color:var(--text-mid);">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B. Network + scenario sentence -->
+  <div class="cust-panel-section fade-in">
+    <div class="cust-panel-title">Network</div>
+    <div class="cust-summary-groups" style="grid-template-columns:1fr;">
+      <div class="cust-summary-group" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
         <div class="cust-summary-metric">
           <div class="cust-summary-label">Raiku stake</div>
           <div class="cust-summary-value" id="cust-k-stake-disp">—</div>
         </div>
         <div class="cust-summary-metric">
-          <div class="cust-summary-label">Offerable blk / epoch</div>
+          <div class="cust-summary-label">Raiku blk / epoch</div>
           <div class="cust-summary-value" id="cust-k-offerable">—</div>
         </div>
         <div class="cust-summary-metric">
-          <div class="cust-summary-label">Client target</div>
-          <div class="cust-summary-value" id="cust-k-target">—</div>
-          <div class="cust-summary-sub">blk / epoch</div>
+          <div class="cust-summary-label">Non-Raiku blk / epoch</div>
+          <div class="cust-summary-value" id="cust-k-njit-bpe">—</div>
         </div>
-      </div>
-      <!-- Coverage -->
-      <div class="cust-summary-group">
-        <div class="cust-summary-group-title" style="color:#f59e0b">Coverage</div>
-        <div class="cust-summary-metric">
-          <div class="cust-summary-label">Coverage ratio</div>
-          <div class="cust-summary-value" id="cust-k-coverage">—</div>
-        </div>
-        <div class="cust-summary-metric">
-          <div class="cust-summary-label">Surplus / shortfall</div>
-          <div class="cust-summary-value" id="cust-k-surplus">—</div>
-          <div class="cust-summary-sub">blk / epoch</div>
-        </div>
-        <div class="cust-coverage-text" id="cust-k-coverage-text">—</div>
       </div>
     </div>
     <!-- Auto-generated scenario sentence -->
-    <div class="cust-scenario-text" id="cust-scenario-text">Configure the demand and capacity inputs to generate a scenario summary.</div>
+    <div class="cust-scenario-text" id="cust-scenario-text">Configure the demand and context inputs to generate a scenario summary.</div>
   </div>
 
   <!-- D. Route Breakdown Table -->
@@ -2635,7 +2602,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <td style="text-align:right;padding:8px 0 8px 6px;color:var(--text2);" id="cust-td-rjit-spend-pct">—</td>
         </tr>
         <tr style="border-bottom:1px solid #181b22;">
-          <td style="padding:8px 6px 8px 0;color:var(--text-mid);">Non-Raiku JIT</td>
+          <td style="padding:8px 6px 8px 0;color:var(--text-mid);">Other JIT</td>
           <td style="text-align:right;padding:8px 6px;" id="cust-td-njit-cu">—</td>
           <td style="text-align:right;padding:8px 6px;color:var(--text2);" id="cust-td-njit-cu-pct">—</td>
           <td style="text-align:right;padding:8px 6px;" id="cust-td-njit-fee">—</td>
@@ -9415,7 +9382,7 @@ var CUST_CAT_ORDER = [
 
 var customerState = {
     aotCu:0, aotFee:0, rjitCu:0, rjitFee:0, njitCu:0, njitFee:0,
-    aotShare:0.08, raikuStake:0.10, solPrice:120, blocksPerEpoch:420000, clientTarget:10000
+    aotShare:0.08, raikuStake:0.10, solPrice:120, blocksPerEpoch:420000
 };
 
 function _custGetProfile(catId) {
@@ -9517,35 +9484,35 @@ function readCustomerInputs() {
     customerState.aotShare       = n('cust-ctx-aot-share') / 100;
     customerState.raikuStake     = n('cust-ctx-stake') / 100;
     customerState.solPrice       = n('cust-ctx-sol');
-    customerState.clientTarget   = n('cust-ctx-target');
 }
 
 function updateCustomerCalcs() {
     var s = customerState;
-    var totalCu    = s.aotCu + s.rjitCu + s.njitCu;
     var aotSpend   = s.aotCu  * s.aotFee;
     var rjitSpend  = s.rjitCu * s.rjitFee;
     var njitSpend  = s.njitCu * s.njitFee;
-    var totalSpend = aotSpend + rjitSpend + njitSpend;
-    var blended    = totalCu > 0 ? totalSpend / totalCu : 0;
-    var remaining  = CUST_BLOCK_SIZE - totalCu;
-    var offerable  = Math.round(s.raikuStake * s.blocksPerEpoch);
-    var coverage   = s.clientTarget > 0 ? offerable / s.clientTarget : 0;
-    var surplus    = offerable - Math.round(s.clientTarget);
+    var raikuBlockSpend    = aotSpend + rjitSpend;
+    var nonRaikuBlockSpend = njitSpend;
+
+    var epochRaikuBlocks    = Math.round(s.raikuStake * s.blocksPerEpoch);
+    var epochNonRaikuBlocks = s.blocksPerEpoch - epochRaikuBlocks;
+    var epochTotalLamports  = epochRaikuBlocks * raikuBlockSpend
+                            + epochNonRaikuBlocks * nonRaikuBlockSpend;
+    var epochTotalSol = epochTotalLamports / 1e9;
+    var epochTotalUsd = epochTotalSol * s.solPrice;
 
     function set(id, v){ var el=document.getElementById(id); if(el) el.textContent = v; }
-    function setColor(id, c){ var el=document.getElementById(id); if(el) el.style.color = c; }
-    function setWidth(id, pct){ var el=document.getElementById(id); if(el) el.style.width = pct + '%'; }
 
-    // ── Guardrail ──
-    var gEl = document.getElementById('cust-guardrail');
-    var gVal = document.getElementById('cust-guardrail-val');
-    if(gEl && gVal) {
-        gVal.textContent = Math.round(totalCu).toLocaleString() + ' / 60,000,000';
-        if(totalCu > CUST_BLOCK_SIZE) {
+    // ── Guardrails — one per block type ──
+    function updateGuardrail(elId, valId, cu) {
+        var gEl  = document.getElementById(elId);
+        var gVal = document.getElementById(valId);
+        if(!gEl || !gVal) return;
+        gVal.textContent = Math.round(cu).toLocaleString() + ' / 60,000,000';
+        if(cu > CUST_BLOCK_SIZE) {
             gEl.style.background = '#2a1010'; gEl.style.borderColor = '#c44444';
             gVal.style.color = '#ff6b6b';
-        } else if(totalCu > CUST_BLOCK_SIZE * 0.9) {
+        } else if(cu > CUST_BLOCK_SIZE * 0.9) {
             gEl.style.background = '#2a2010'; gEl.style.borderColor = '#c48844';
             gVal.style.color = '#ffbb55';
         } else {
@@ -9553,11 +9520,14 @@ function updateCustomerCalcs() {
             gVal.style.color = 'var(--text)';
         }
     }
+    updateGuardrail('cust-guardrail-raiku', 'cust-guardrail-raiku-val', s.aotCu + s.rjitCu);
+    updateGuardrail('cust-guardrail-njit',  'cust-guardrail-njit-val',  s.njitCu);
 
     // ── Context slider displays ──
     set('cust-ctx-aot-share-val', (s.aotShare * 100).toFixed(0) + '%');
     set('cust-ctx-stake-val',     (s.raikuStake * 100).toFixed(1) + '%');
-    set('cust-ctx-raiku-bpe',     offerable.toLocaleString());
+    set('cust-ctx-raiku-bpe',     epochRaikuBlocks.toLocaleString());
+    set('cust-ctx-njit-bpe',      epochNonRaikuBlocks.toLocaleString());
 
     // ── AOT capacity warning ──
     var maxAotCu = s.aotShare * CUST_BLOCK_SIZE;
@@ -9572,107 +9542,52 @@ function updateCustomerCalcs() {
         }
     }
 
-    // ── A. Block Capacity Bar ──
-    var aotCapPct  = Math.min(100, s.aotCu  / CUST_BLOCK_SIZE * 100);
-    var rjitCapPct = Math.min(100, s.rjitCu / CUST_BLOCK_SIZE * 100);
-    var njitCapPct = Math.min(100, s.njitCu / CUST_BLOCK_SIZE * 100);
-    var usedCapPct = Math.min(100, totalCu / CUST_BLOCK_SIZE * 100);
-    // clamp sum to avoid rounding overflow
-    var capSum = aotCapPct + rjitCapPct + njitCapPct;
-    if(capSum > 100) { var f = 100/capSum; aotCapPct*=f; rjitCapPct*=f; njitCapPct*=f; }
-    setWidth('cust-cap-aot',  aotCapPct);
-    setWidth('cust-cap-rjit', rjitCapPct);
-    setWidth('cust-cap-njit', njitCapPct);
-    // unused uses flex:1 — no width needed
+    // ── A. Spend cards ──
+    set('cust-k-raiku-spend', Math.round(raikuBlockSpend).toLocaleString());
+    set('cust-k-njit-spend',  Math.round(nonRaikuBlockSpend).toLocaleString());
+    set('cust-k-epoch-sol',   epochTotalSol.toFixed(4));
+    set('cust-k-epoch-usd',   '$' + epochTotalUsd.toLocaleString(undefined, {maximumFractionDigits:0}));
 
-    var fmtCapLeg = function(cu) {
-        return Math.round(cu).toLocaleString() + ' CU (' + (cu / CUST_BLOCK_SIZE * 100).toFixed(1) + '%)';
-    };
-    set('cust-cap-aot-val',    fmtCapLeg(s.aotCu));
-    set('cust-cap-rjit-val',   fmtCapLeg(s.rjitCu));
-    set('cust-cap-njit-val',   fmtCapLeg(s.njitCu));
-    set('cust-cap-unused-val', fmtCapLeg(Math.max(0, remaining)));
-    set('cust-cap-used-cu',  Math.round(totalCu).toLocaleString());
-    set('cust-cap-used-pct', usedCapPct.toFixed(1) + '%');
-
-    // ── B. Spend Composition Bar ──
-    var aotSpPct  = totalSpend > 0 ? aotSpend  / totalSpend * 100 : 0;
-    var rjitSpPct = totalSpend > 0 ? rjitSpend / totalSpend * 100 : 0;
-    var njitSpPct = totalSpend > 0 ? 100 - aotSpPct - rjitSpPct   : 0;
-    setWidth('cust-sp-aot',  aotSpPct);
-    setWidth('cust-sp-rjit', rjitSpPct);
-    setWidth('cust-sp-njit', njitSpPct);
-
-    var fmtSpLeg = function(sp) {
-        return totalSpend > 0
-            ? Math.round(sp).toLocaleString() + ' L (' + (sp / totalSpend * 100).toFixed(1) + '%)'
-            : '— L';
-    };
-    set('cust-sp-aot-val',  fmtSpLeg(aotSpend));
-    set('cust-sp-rjit-val', fmtSpLeg(rjitSpend));
-    set('cust-sp-njit-val', fmtSpLeg(njitSpend));
-    set('cust-sp-total', Math.round(totalSpend).toLocaleString());
-
-    // ── C. Scenario Summary groups ──
-    set('cust-k-total-cu', Math.round(totalCu).toLocaleString());
-    setColor('cust-k-total-cu', totalCu > CUST_BLOCK_SIZE ? '#ff6b6b' : '');
-    set('cust-k-spend',   Math.round(totalSpend).toLocaleString());
-    set('cust-k-blended', blended.toFixed(3) + ' L/CU');
+    // ── B. Network ──
     set('cust-k-stake-disp', (s.raikuStake * 100).toFixed(1) + '%');
-    set('cust-k-offerable', offerable.toLocaleString());
-    set('cust-k-target',    Math.round(s.clientTarget).toLocaleString());
-    set('cust-k-coverage',  s.clientTarget > 0 ? coverage.toFixed(2) + '\u00d7' : '\u2014');
-
-    if(s.clientTarget > 0) {
-        var surpSign = surplus >= 0 ? '+' : '';
-        set('cust-k-surplus', surpSign + surplus.toLocaleString());
-        setColor('cust-k-surplus', surplus < 0 ? '#ff6b6b' : surplus > 0 ? 'var(--lime-soft)' : '');
-    } else {
-        set('cust-k-surplus', '\u2014'); setColor('cust-k-surplus', '');
-    }
-
-    var covText = '\u2014';
-    if(s.clientTarget > 0) {
-        if     (coverage >= 1.5) covText = 'Raiku can comfortably cover the configured client demand under these assumptions.';
-        else if(coverage >= 1.0) covText = 'Raiku can cover the configured client demand under these assumptions.';
-        else if(coverage >= 0.5) covText = 'Configured client demand partially exceeds current Raiku offerable capacity under these assumptions.';
-        else                     covText = 'Configured client demand significantly exceeds current Raiku offerable capacity under these assumptions.';
-    }
-    set('cust-k-coverage-text', covText);
+    set('cust-k-offerable',  epochRaikuBlocks.toLocaleString());
+    set('cust-k-njit-bpe',   epochNonRaikuBlocks.toLocaleString());
 
     // ── Auto-generated scenario sentence ──
+    var raikuCu = s.aotCu + s.rjitCu;
     var sent = '';
-    if(totalCu > 0) {
-        sent += 'Under this setup, the customer requests ' + Math.round(totalCu).toLocaleString()
-            + ' CU per block (' + (totalCu / CUST_BLOCK_SIZE * 100).toFixed(1) + '% of block capacity)';
-        sent += totalSpend > 0
-            ? ', for an estimated spend of ' + Math.round(totalSpend).toLocaleString() + ' lamports per block.'
-            : '.';
+    if(raikuCu > 0) {
+        sent += 'In each Raiku block, the customer uses ' + Math.round(raikuCu).toLocaleString()
+            + ' CU at ' + Math.round(raikuBlockSpend).toLocaleString() + ' L / block.';
     }
-    if(s.raikuStake > 0 && s.blocksPerEpoch > 0) {
-        sent += (sent ? ' ' : '') + 'At ' + (s.raikuStake * 100).toFixed(1) + '% Raiku stake, the network can offer approximately '
-            + offerable.toLocaleString() + ' blocks per epoch';
-        sent += s.clientTarget > 0
-            ? ' versus a client target of ' + Math.round(s.clientTarget).toLocaleString() + ', implying ' + coverage.toFixed(2) + '\u00d7 coverage.'
-            : '.';
+    if(s.njitCu > 0) {
+        sent += (sent ? ' ' : '') + 'In each Non-Raiku block, the customer uses ' + Math.round(s.njitCu).toLocaleString()
+            + ' CU at ' + Math.round(nonRaikuBlockSpend).toLocaleString() + ' L / block.';
     }
-    set('cust-scenario-text', sent || 'Configure the demand and capacity inputs to generate a scenario summary.');
+    if((raikuCu > 0 || s.njitCu > 0) && s.raikuStake > 0) {
+        sent += ' At ' + (s.raikuStake * 100).toFixed(1) + '% Raiku stake, estimated epoch total: '
+            + epochTotalSol.toFixed(4) + ' SOL ($'
+            + epochTotalUsd.toLocaleString(undefined, {maximumFractionDigits:0}) + ').';
+    }
+    set('cust-scenario-text', sent || 'Configure the demand and context inputs to generate a scenario summary.');
 
     // ── D. Route Breakdown Table ──
-    function setRow(pfx, cu, fee) {
+    var raikuTotalCu = s.aotCu + s.rjitCu;
+    function setRow(pfx, cu, fee, baseCu, baseSpend) {
         var cost = cu * fee;
         set(pfx+'-cu',        Math.round(cu).toLocaleString());
-        set(pfx+'-cu-pct',    totalCu    > 0 ? (cu   / totalCu    * 100).toFixed(1) + '%' : '\u2014');
+        set(pfx+'-cu-pct',    baseCu    > 0 ? (cu   / baseCu    * 100).toFixed(1) + '%' : '\u2014');
         set(pfx+'-fee',       fee.toFixed(3));
         set(pfx+'-cost',      Math.round(cost).toLocaleString());
-        set(pfx+'-spend-pct', totalSpend > 0 ? (cost / totalSpend * 100).toFixed(1) + '%' : '\u2014');
+        set(pfx+'-spend-pct', baseSpend > 0 ? (cost / baseSpend * 100).toFixed(1) + '%' : '\u2014');
     }
-    setRow('cust-td-aot',  s.aotCu,  s.aotFee);
-    setRow('cust-td-rjit', s.rjitCu, s.rjitFee);
-    setRow('cust-td-njit', s.njitCu, s.njitFee);
-    set('cust-td-total-cu',     Math.round(totalCu).toLocaleString());
-    set('cust-td-total-cu-pct', totalCu > 0 ? '100%' : '\u2014');
-    set('cust-td-total-cost',   Math.round(totalSpend).toLocaleString());
+    // AOT/Raiku JIT: CU share within Raiku block; Other JIT: CU share within Non-Raiku block (60M)
+    setRow('cust-td-aot',  s.aotCu,  s.aotFee,  raikuTotalCu,    raikuBlockSpend);
+    setRow('cust-td-rjit', s.rjitCu, s.rjitFee, raikuTotalCu,    raikuBlockSpend);
+    setRow('cust-td-njit', s.njitCu, s.njitFee, CUST_BLOCK_SIZE, nonRaikuBlockSpend);
+    set('cust-td-total-cu',     '\u2014');
+    set('cust-td-total-cu-pct', '\u2014');
+    set('cust-td-total-cost',   epochTotalSol > 0 ? epochTotalSol.toFixed(4) + ' SOL / epoch' : '\u2014');
 }
 
 function initCustomerTab() {
@@ -9693,7 +9608,7 @@ function initCustomerTab() {
     });
 
     // Context number inputs
-    ['cust-ctx-sol','cust-ctx-bpe','cust-ctx-target'].forEach(function(id) {
+    ['cust-ctx-sol'].forEach(function(id) {
         var el = document.getElementById(id);
         if(el) el.addEventListener('input', function(){ readCustomerInputs(); updateCustomerCalcs(); });
     });
