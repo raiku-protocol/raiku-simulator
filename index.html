@@ -833,7 +833,21 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 }
 .vi-dist-toggle:hover { color:var(--text); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2); }
 .vi-pos-sum-chip { font-size:11px; font-family:var(--font-mono); color:var(--text2); }
-.vi-pos-pct-tag { font-size:10px; font-family:var(--font-mono); color:#5a6272; white-space:nowrap; }
+.vi-pos-pct-tag { font-size:10px; font-family:var(--font-mono); color:#8a93a8; white-space:nowrap; }
+
+/* ── Network Positioning: comparative bar ── */
+.vi-pos-refs { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:12px; }
+.vi-pos-ref { background:#060809; border:1px solid #16191f; border-radius:5px; padding:7px 10px; }
+.vi-pos-ref-label { font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px; }
+.vi-pos-ref-value { font-size:12px; font-family:var(--font-mono); font-weight:600; color:var(--text); }
+.vi-pos-track { height:6px; background:#0e1117; border-radius:3px; position:relative; margin:10px 0 4px; }
+.vi-pos-fill  { height:100%; border-radius:3px; background:linear-gradient(90deg,#2a3848,#C0FF38); pointer-events:none; }
+.vi-pos-thumb { position:absolute; top:-4px; width:14px; height:14px; background:#C0FF38;
+                border-radius:50%; transform:translateX(-50%); box-shadow:0 0 6px rgba(192,255,56,0.4); }
+.vi-pos-axis  { display:flex; justify-content:space-between; font-size:9px; color:#4a5060; font-family:var(--font-mono); }
+
+/* ── Commission: disabled / not available in this version ── */
+.vi-commission-disabled { pointer-events:none; opacity:0.35; cursor:default; }
 
 /* ── Responsive ── */
 @media(max-width:1100px) {
@@ -1953,14 +1967,13 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <div class="validator-context-value" id="vi-sol-price-display">$100</div>
           <input type="hidden" id="vi-sol-price-raw" value="100">
         </div>
-        <!-- Inflation Commission: editable; default 0% -->
-        <div class="validator-context-item">
+        <!-- Inflation Commission: disabled in this version -->
+        <div class="validator-context-item vi-commission-disabled">
           <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
             Commission
-            <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-commission')">?</button>
-            <button class="vi-param-reset" onclick="viResetCommission()" title="Reset to 0%">↺</button>
+            <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-commission')" style="pointer-events:auto; opacity:1;">?</button>
           </div>
-          <div class="validator-context-value" id="vi-commission">0.0%</div>
+          <div class="validator-context-value" id="vi-commission">—</div>
           <input type="hidden" id="vi-commission-raw" value="0">
         </div>
       </div>
@@ -2012,7 +2025,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <div class="section fade-in fade-in-1" style="padding-bottom:14px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:0;">
         <h2 style="margin-bottom:0;">Network Positioning</h2>
-        <button class="vi-dist-toggle" id="vi-dist-toggle-btn" onclick="viToggleDist()">View distribution ▾</button>
+        <button class="vi-dist-toggle" id="vi-dist-toggle-btn" onclick="viToggleDist()">Hide distribution ▴</button>
       </div>
 
       <!-- Compact summary line -->
@@ -2024,15 +2037,39 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <span class="vi-pos-pct-tag" id="vi-pos-pct-tag">—</span>
       </div>
 
-      <!-- Collapsible distribution panel (starts hidden) -->
-      <div id="vi-dist-panel" style="display:none; margin-top:14px;">
+      <!-- Distribution panel (open by default) -->
+      <div id="vi-dist-panel" style="display:block; margin-top:14px;">
         <canvas id="vi-dist-canvas" height="100"
                 style="width:100%; display:block; cursor:default;"></canvas>
         <div id="vi-dist-stats" style="margin-top:8px; padding:8px 10px;
              background:#04060a; border:1px solid #16191f; border-radius:5px;
-             font-size:10px; font-family:var(--font-mono); color:#6e7585; line-height:1.8;"></div>
-        <div class="validator-note" style="margin-top:8px; font-size:10px;">
+             font-size:10px; font-family:var(--font-mono); color:#8a93a8; line-height:1.8;"></div>
+        <div class="validator-note" style="margin-top:8px; font-size:10px; color:#6e7585;">
           Source: Trillium API, epoch 945 · 762 validators with active stake
+        </div>
+        <!-- Comparative positioning bar -->
+        <div class="vi-pos-refs">
+          <div class="vi-pos-ref">
+            <div class="vi-pos-ref-label">Your stake</div>
+            <div class="vi-pos-ref-value" id="vi-pos-your-stake">—</div>
+          </div>
+          <div class="vi-pos-ref">
+            <div class="vi-pos-ref-label">50th largest (ep. 945)</div>
+            <div class="vi-pos-ref-value" id="vi-pos-top50">—</div>
+          </div>
+          <div class="vi-pos-ref">
+            <div class="vi-pos-ref-label">Largest (ep. 945)</div>
+            <div class="vi-pos-ref-value" id="vi-pos-largest">—</div>
+          </div>
+        </div>
+        <div class="vi-pos-track">
+          <div class="vi-pos-fill" id="vi-pos-fill" style="width:0%;"></div>
+          <div class="vi-pos-thumb" id="vi-pos-thumb" style="left:0%;"></div>
+        </div>
+        <div class="vi-pos-axis">
+          <span>0 SOL</span>
+          <span id="vi-pos-axis-mid">—</span>
+          <span id="vi-pos-axis-max">—</span>
         </div>
       </div>
     </div>
@@ -7922,9 +7959,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         var stakeRaw = document.getElementById('vi-stake-raw');
         if (stakeRaw) stakeRaw.value = Math.round(v/100*total);
       });
-    makeEditable('vi-commission', 'vi-commission-raw', 0, 10, 0.1,
-      function(v){ return v.toFixed(1)+'%'; },
-      function(){ if (typeof window.viUpdate === 'function') window.viUpdate(); });
+    // Commission is disabled in this version — makeEditable not registered
     // Issuance APY and Network Fees APY: own Individual Level inputs.
     // onCommit updates _viState via public setter functions (defined in second IIFE).
     makeEditable('vi-iss-apy', 'vi-iss-apy-raw', 0, 30, 0.001,
@@ -8170,12 +8205,12 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
     // X axis labels
     var axLabels = [{l:3,t:'1K'},{l:4,t:'10K'},{l:5,t:'100K'},{l:6,t:'1M'},{l:7,t:'10M'}];
-    ctx.fillStyle  = '#3a4050';
-    ctx.font       = '9px monospace';
+    ctx.fillStyle  = '#b0b8cc';
+    ctx.font       = 'bold 10px monospace';
     ctx.textAlign  = 'center';
     for (var ai = 0; ai < axLabels.length; ai++) {
         var ax = PAD_L + ((axLabels[ai].l - LOG_MIN) / (LOG_MAX - LOG_MIN)) * chartW;
-        ctx.fillText(axLabels[ai].t, ax, PAD_T + chartH + 15);
+        ctx.fillText(axLabels[ai].t, ax, PAD_T + chartH + 16);
     }
 
     // Stats strip
@@ -8194,6 +8229,33 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             'P75 ' + fmtK(d.p75_sol) + '  \u00b7  ' +
             'Max ' + fmtK(d.max_sol) + ' SOL';
     }
+
+    // Comparative positioning bar (uses QCP.bench top-50 data)
+    var bench = window.QCP && window.QCP.bench;
+    var top50 = bench && bench.top_validators_by_stake;
+    if (top50 && top50.length >= 50) {
+        var largest    = top50[0].actual_stake_sol;
+        var boundary50 = top50[49].actual_stake_sol;
+        function _fmtSolB(v) {
+            if (v >= 1e6) return (v/1e6).toFixed(2)+'M SOL';
+            if (v >= 1e3) return (v/1e3).toFixed(v>=100e3?1:2)+'K SOL';
+            return Math.round(v)+' SOL';
+        }
+        _set('vi-pos-your-stake', _fmtSolB(userStake));
+        _set('vi-pos-top50',      _fmtSolB(boundary50) + ' (#50)');
+        _set('vi-pos-largest',    _fmtSolB(largest));
+        _set('vi-pos-axis-mid',   _fmtSolB(Math.round(largest / 2)));
+        _set('vi-pos-axis-max',   _fmtSolB(largest));
+        var logMax = Math.log10(largest + 1);
+        var logVal = userStake > 0 ? Math.log10(userStake + 1) : 0;
+        var pct = Math.max(0, Math.min(100, logVal / logMax * 100));
+        var fillEl  = document.getElementById('vi-pos-fill');
+        var thumbEl = document.getElementById('vi-pos-thumb');
+        if (fillEl)  fillEl.style.width = pct + '%';
+        if (thumbEl) thumbEl.style.left  = pct + '%';
+    } else {
+        _set('vi-pos-your-stake', _fmtSol(userStake));
+    }
   };
 
   window.viUpdate = function() {
@@ -8210,9 +8272,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var total   = _getTotalStake();
     var solPrice = parseFloat((document.getElementById('vi-sol-price-raw') || {}).value) || 100;
 
+    // Commission display is frozen (disabled in this version) — do not sync
     // Sync display divs (only when makeEditable is not active)
-    var commDiv = document.getElementById('vi-commission');
-    if (commDiv && !commDiv.querySelector('input')) commDiv.textContent = commPct.toFixed(1)+'%';
     var stakeDiv = document.getElementById('vi-stake');
     if (stakeDiv && !stakeDiv.querySelector('input')) stakeDiv.textContent = stake.toLocaleString('en-US',{maximumFractionDigits:0})+' SOL';
     _set('vi-sol-price-display', '$' + Math.round(solPrice));
@@ -8358,7 +8419,12 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
   document.addEventListener('DOMContentLoaded', function() {
     // Initialize Individual Level: apply Base Case scenario defaults, then render
-    setTimeout(function() { window.viApplyScenario('base'); }, 300);
+    setTimeout(function() {
+      window.viApplyScenario('base');
+      // Panel is open by default — render histogram immediately after data loads
+      var stakeRaw = document.getElementById('vi-stake-raw');
+      window.viRenderDistribution(stakeRaw ? parseFloat(stakeRaw.value) || 0 : 0);
+    }, 300);
   });
 }());
 </script>
@@ -8775,19 +8841,16 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 <div class="vc-explainer-overlay" id="vi-explainer-commission" onclick="if(event.target===this)vcCloseExplainer('vi-explainer-commission')">
   <div class="vc-explainer-card">
     <button class="vc-explainer-close" onclick="vcCloseExplainer('vi-explainer-commission')">✕</button>
-    <div class="vc-explainer-title">Inflation Commission</div>
+    <div class="vc-explainer-title">Commission</div>
     <div class="vc-explainer-section">
-      <div class="vc-explainer-note">The percentage of inflation staking rewards that the validator keeps. The remainder flows to delegators.</div>
+      <div class="vc-explainer-note">This version does not currently include validator commission fees. Issuance APY is shown gross — no commission deduction is applied.</div>
     </div>
     <div class="vc-explainer-section">
-      <div class="vc-explainer-note">Applies to issuance only. Block priority fees and Raiku MEV revenue flow 100% to the validator — commission has no effect on these streams.</div>
+      <div class="vc-explainer-note">Commission on Raiku MEV and non-Raiku MEV is also not modeled in this version.</div>
     </div>
     <div class="vc-explainer-section">
-      <div class="vc-explainer-note">Network average: ~7%. Practical range for most validators: 0–10%.</div>
-    </div>
-    <div class="vc-explainer-section">
-      <div class="vc-explainer-section-title">FORMULA</div>
-      <div class="vc-explainer-note">Issuance Revenue = Stake × Issuance APY × Commission</div>
+      <div class="vc-explainer-section-title">FUTURE VERSIONS</div>
+      <div class="vc-explainer-note">Future versions may include additional controls such as validator commission, operating costs, and other advanced inputs similar to those found in dashboards like Trillium.</div>
     </div>
   </div>
 </div>
