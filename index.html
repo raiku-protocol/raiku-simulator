@@ -1919,18 +1919,18 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <div class="validator-context-item">
           <div class="validator-context-label">SOL Price</div>
           <div class="validator-context-value" id="vi-sol-price-display">$100</div>
-          <div style="font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.5px; text-align:center; margin-top:3px;">USD / SOL</div>
         </div>
         <!-- Delegated Stake: editable, styled as boxed value -->
         <div class="validator-context-item">
-          <div class="validator-context-label" style="display:flex; align-items:center; justify-content:center; gap:3px;">
+          <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
             Delegated Stake
             <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-stake')">?</button>
           </div>
           <input class="validator-context-value" type="text" id="vi-stake"
-                 value="50,000"
+                 value="50,000 SOL"
+                 onfocus="this.value=this.value.replace(/[, ]+/g,'').replace('SOL','').trim()"
+                 onblur="if(!this.value.includes('SOL')){var n=parseFloat(this.value.replace(/,/g,''))||0;this.value=n.toLocaleString('en-US',{maximumFractionDigits:0})+' SOL';}"
                  oninput="viHandleStakeInput()">
-          <div style="font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.5px; text-align:center; margin-top:3px;">SOL</div>
         </div>
       </div>
 
@@ -1941,19 +1941,21 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <div class="validator-context-label">Network Share</div>
           <input class="validator-context-value" type="text" id="vi-share"
                  value="0.0119%"
+                 onfocus="this.value=this.value.replace('%','').trim()"
+                 onblur="if(!this.value.includes('%')){var n=parseFloat(this.value)||0;this.value=n.toFixed(4)+'%';}"
                  oninput="viHandleShareInput()">
-          <div style="font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.5px; text-align:center; margin-top:3px;">% OF NETWORK</div>
         </div>
-        <!-- Inflation Commission: editable number input, no slider -->
+        <!-- Inflation Commission: editable text input -->
         <div class="validator-context-item">
-          <div class="validator-context-label" style="display:flex; align-items:center; justify-content:center; gap:3px;">
+          <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
             Commission
             <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-commission')">?</button>
           </div>
-          <input class="validator-context-value" type="number" id="vi-commission"
-                 min="0" max="10" step="0.1" value="7"
+          <input class="validator-context-value" type="text" id="vi-commission"
+                 value="7.0%"
+                 onfocus="this.value=this.value.replace('%','').trim()"
+                 onblur="if(!this.value.includes('%')){var n=parseFloat(this.value)||0;this.value=n.toFixed(1)+'%';}"
                  oninput="viUpdate()">
-          <div style="font-size:9px; color:#6e7585; text-transform:uppercase; letter-spacing:0.5px; text-align:center; margin-top:3px;">%</div>
         </div>
       </div>
 
@@ -7884,7 +7886,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
   window.viHandleStakeInput = function() {
     if (_blockingStakeSync) return;
-    var raw = (document.getElementById('vi-stake').value || '').replace(/,/g, '');
+    var raw = (document.getElementById('vi-stake').value || '').replace(/,/g, '').replace(/SOL/i, '').trim();
     var stake = parseFloat(raw) || 0;
     var total = _getTotalStake();
     _blockingShareSync = true;
@@ -7895,14 +7897,14 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   };
   window.viHandleShareInput = function() {
     if (_blockingShareSync) return;
-    var raw = (document.getElementById('vi-share').value || '').replace(/%/g, '');
+    var raw = (document.getElementById('vi-share').value || '').replace(/%/g, '').trim();
     var share = parseFloat(raw) || 0;
     var total = _getTotalStake();
     _blockingStakeSync = true;
     var stakeEl = document.getElementById('vi-stake');
     if (stakeEl) {
       var stakeVal = Math.round(share / 100 * total);
-      stakeEl.value = stakeVal.toLocaleString('en-US', {maximumFractionDigits: 0});
+      stakeEl.value = stakeVal.toLocaleString('en-US', {maximumFractionDigits: 0}) + ' SOL';
     }
     _blockingStakeSync = false;
     window.viUpdate();
@@ -7925,10 +7927,10 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var raikuEl = document.getElementById('vi-raiku-on');
     if (!stakeEl || !commEl || !raikuEl) return;
 
-    // Parse stake from text input (may have commas)
-    var stakeRaw = (stakeEl.value || '').replace(/,/g, '');
+    // Parse stake from text input (may have commas and " SOL" suffix)
+    var stakeRaw = (stakeEl.value || '').replace(/,/g, '').replace(/SOL/i, '').trim();
     var stake   = parseFloat(stakeRaw)  || 0;
-    var commPct = parseFloat(commEl.value)   || 0;
+    var commPct = parseFloat((commEl.value || '').replace('%', '')) || 0;
     var raikuOn = raikuEl.checked;
     var comm    = commPct / 100;
     var total   = _getTotalStake();
@@ -7941,9 +7943,13 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     _set('vi-sol-price-display', '$' + Math.round(solPrice));
     // commission is now a number input — no separate display div to update
 
-    // Reformat stake as comma-separated when not being actively edited
+    // Reformat stake with " SOL" suffix when not being actively edited
     if (document.activeElement !== stakeEl) {
-      stakeEl.value = stake.toLocaleString('en-US', {maximumFractionDigits: 0});
+      stakeEl.value = stake.toLocaleString('en-US', {maximumFractionDigits: 0}) + ' SOL';
+    }
+    // Reformat commission with "%" suffix when not being actively edited
+    if (document.activeElement !== commEl) {
+      commEl.value = commPct.toFixed(1) + '%';
     }
 
     // Summary row: short USD value on the right, full breakdown below
@@ -7955,7 +7961,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
     var shareEl = document.getElementById('vi-share');
     if (shareEl && document.activeElement !== shareEl && !_blockingShareSync) {
-      shareEl.value = (total > 0 ? (stake / total * 100) : 0).toFixed(4) + '%';
+      var netShare = total > 0 ? (stake / total * 100) : 0;
+      shareEl.value = netShare.toFixed(4) + '%';
     }
 
     // Read component APYs from Protocol Level decomp (ground truth)
