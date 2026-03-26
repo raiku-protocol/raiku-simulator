@@ -8337,8 +8337,9 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
     var rankEl = document.getElementById('vi-rank-position');
     if (rankEl) {
-        rankEl.textContent = 'Your stake: ' + _fmtSolB(userStake) +
-            '  ·  approx. rank #' + userRank + ' of ' + n + ' validators';
+        rankEl.innerHTML = '<span style="color:#8a93a8;font-size:10px;">Your stake: ' + _fmtSolB(userStake) + '  ·  approx. rank </span>' +
+            '<span style="color:#e8ecf8;font-size:13px;font-weight:700;">#' + userRank + ' of ' + n + '</span>' +
+            '<span style="color:#8a93a8;font-size:10px;"> validators</span>';
     }
   };
 
