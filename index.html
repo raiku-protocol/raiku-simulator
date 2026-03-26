@@ -2369,14 +2369,14 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
 <!-- LEFT: sticky controls panel -->
 <div class="validator-side" style="overflow-y:auto;max-height:calc(100vh - 20px);">
-<div style="display:flex;flex-direction:column;gap:12px;padding-bottom:24px;">
+<div class="section fade-in fade-in-1" style="display:flex;flex-direction:column;gap:0;padding-bottom:8px;">
 
-  <h2 style="font-size:12px;font-weight:600;color:var(--lime-soft);text-transform:uppercase;letter-spacing:2px;font-family:var(--font-mono);margin:2px 0 0 0;">Customer Setup</h2>
+  <h2 style="margin-bottom:4px;">Customer Setup</h2>
   <p style="color:var(--text2);font-size:9px;line-height:1.5;margin:0 0 4px;font-family:var(--font-mono);">Configure a customer execution profile using category presets seeded from on-chain data. This is a scenario tool — values are editable starting points, not cost guarantees.</p>
 
   <!-- Section 1: Customer demand -->
-  <div class="section fade-in fade-in-2" style="margin-bottom:0;display:flex;flex-direction:column;gap:8px;">
-    <h2>Customer Demand</h2>
+  <div class="fade-in fade-in-2" style="border-top:1px solid var(--card-border);padding-top:12px;margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+    <h2 style="margin-bottom:6px;">Customer Demand</h2>
 
     <!-- Category selector -->
     <div class="control" style="gap:4px;">
@@ -2479,8 +2479,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
   </div><!-- end demand section -->
 
   <!-- Section 2: Capacity & Context -->
-  <div class="section fade-in fade-in-3" style="margin-bottom:0;display:flex;flex-direction:column;gap:6px;">
-    <h2>Capacity &amp; Context</h2>
+  <div class="fade-in fade-in-3" style="border-top:1px solid var(--card-border);padding-top:12px;margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+    <h2 style="margin-bottom:6px;">Capacity &amp; Context</h2>
 
     <!-- Raiku stake -->
     <div class="control">
@@ -2526,7 +2526,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
   </div><!-- end context section -->
 
-</div><!-- end inner flex -->
+</div><!-- end section card -->
 </div><!-- end validator-side -->
 
 <!-- RIGHT: descriptive outputs -->
