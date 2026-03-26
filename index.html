@@ -2302,14 +2302,6 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
 </div><!-- end tab-validator -->
 
-<style>
-/* Customer Economics — editable number input paired with .slider-row */
-input.cust-val { background:#0e0f14; border:1px solid #1a1c22; border-radius:4px; padding:2px 6px; cursor:text; outline:none; -moz-appearance:textfield; }
-input.cust-val:focus { border-color:var(--lime); }
-input.cust-val::-webkit-outer-spin-button,
-input.cust-val::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
-</style>
-
 <!-- ═══ TAB: CUSTOMER ECONOMICS ═══ -->
 <div class="tab-content" id="tab-customer">
 <div class="validator-layout">
@@ -2345,14 +2337,14 @@ input.cust-val::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
         <label>CU / block</label>
         <div class="slider-row">
           <input type="range" id="cust-aot-cu-sl" min="0" max="1500000" step="1000" value="0">
-          <input type="number" id="cust-aot-cu" class="val cust-val" min="0" max="1500000" step="1000" value="0">
+          <span class="val">0</span>
         </div>
       </div>
       <div class="control" style="margin-top:8px;">
         <label>Fee / CU (L)</label>
         <div class="slider-row">
           <input type="range" id="cust-aot-fee-sl" min="0" max="25" step="0.1" value="0">
-          <input type="number" id="cust-aot-fee" class="val cust-val" min="0" max="25" step="0.1" value="0">
+          <span class="val">0</span>
         </div>
       </div>
     </div>
@@ -2366,14 +2358,14 @@ input.cust-val::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
         <label>CU / block</label>
         <div class="slider-row">
           <input type="range" id="cust-rjit-cu-sl" min="0" max="1500000" step="1000" value="0">
-          <input type="number" id="cust-rjit-cu" class="val cust-val" min="0" max="1500000" step="1000" value="0">
+          <span class="val">0</span>
         </div>
       </div>
       <div class="control" style="margin-top:8px;">
         <label>Fee / CU (L)</label>
         <div class="slider-row">
           <input type="range" id="cust-rjit-fee-sl" min="0" max="25" step="0.1" value="0">
-          <input type="number" id="cust-rjit-fee" class="val cust-val" min="0" max="25" step="0.1" value="0">
+          <span class="val">0</span>
         </div>
       </div>
     </div>
@@ -2387,14 +2379,14 @@ input.cust-val::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
         <label>CU / block</label>
         <div class="slider-row">
           <input type="range" id="cust-njit-cu-sl" min="0" max="1500000" step="1000" value="0">
-          <input type="number" id="cust-njit-cu" class="val cust-val" min="0" max="1500000" step="1000" value="0">
+          <span class="val">0</span>
         </div>
       </div>
       <div class="control" style="margin-top:8px;">
         <label>Fee / CU (L)</label>
         <div class="slider-row">
           <input type="range" id="cust-njit-fee-sl" min="0" max="25" step="0.1" value="0">
-          <input type="number" id="cust-njit-fee" class="val cust-val" min="0" max="25" step="0.1" value="0">
+          <span class="val">0</span>
         </div>
       </div>
     </div>
@@ -3023,6 +3015,12 @@ const SLIDER_META = {
   'sl-fcu':        { nudge: 0.05, largeNudge: 0.5,   decimals: 2, unit: 'lam/CU', prefix: false },
   'sl-jit-market': { nudge: 100000, largeNudge: 500000, decimals: 0, unit: 'SOL/yr', prefix: false },
   'sl-jit':        { nudge: 0.5,  largeNudge: 5,     decimals: 1, unit: '%',  prefix: false },
+  'cust-aot-cu-sl':   { nudge: 10000, largeNudge: 100000, decimals: 0, unit: 'CU',   prefix: false },
+  'cust-aot-fee-sl':  { nudge: 0.5,   largeNudge: 2,      decimals: 1, unit: 'L/CU', prefix: false },
+  'cust-rjit-cu-sl':  { nudge: 10000, largeNudge: 100000, decimals: 0, unit: 'CU',   prefix: false },
+  'cust-rjit-fee-sl': { nudge: 0.5,   largeNudge: 2,      decimals: 1, unit: 'L/CU', prefix: false },
+  'cust-njit-cu-sl':  { nudge: 10000, largeNudge: 100000, decimals: 0, unit: 'CU',   prefix: false },
+  'cust-njit-fee-sl': { nudge: 0.5,   largeNudge: 2,      decimals: 1, unit: 'L/CU', prefix: false },
 };
 
 const SC = {
@@ -9232,31 +9230,30 @@ function seedCustomerFromCategory(catId) {
 
 function syncCustomerInputsFromState() {
     var s = customerState;
-    // Each entry: [numId, sliderSuffix, value]
-    var pairs = [
-        ['cust-aot-cu',   'cust-aot-cu-sl',   s.aotCu],
-        ['cust-aot-fee',  'cust-aot-fee-sl',  s.aotFee],
-        ['cust-rjit-cu',  'cust-rjit-cu-sl',  s.rjitCu],
-        ['cust-rjit-fee', 'cust-rjit-fee-sl', s.rjitFee],
-        ['cust-njit-cu',  'cust-njit-cu-sl',  s.njitCu],
-        ['cust-njit-fee', 'cust-njit-fee-sl', s.njitFee]
+    var entries = [
+        ['cust-aot-cu-sl',   s.aotCu],
+        ['cust-aot-fee-sl',  s.aotFee],
+        ['cust-rjit-cu-sl',  s.rjitCu],
+        ['cust-rjit-fee-sl', s.rjitFee],
+        ['cust-njit-cu-sl',  s.njitCu],
+        ['cust-njit-fee-sl', s.njitFee]
     ];
-    pairs.forEach(function(p) {
-        var num = document.getElementById(p[0]);
-        var sl  = document.getElementById(p[1]);
-        if(num) num.value = p[2];
-        if(sl)  sl.value  = p[2];
+    entries.forEach(function(e) {
+        var sl = document.getElementById(e[0]);
+        if(!sl) return;
+        sl.value = e[1];
+        sl.dispatchEvent(new Event('input', { bubbles: true }));
     });
 }
 
 function readCustomerInputs() {
     function n(id){ var el=document.getElementById(id); return el ? parseFloat(el.value)||0 : 0; }
-    customerState.aotCu   = n('cust-aot-cu');
-    customerState.aotFee  = n('cust-aot-fee');
-    customerState.rjitCu  = n('cust-rjit-cu');
-    customerState.rjitFee = n('cust-rjit-fee');
-    customerState.njitCu  = n('cust-njit-cu');
-    customerState.njitFee = n('cust-njit-fee');
+    customerState.aotCu   = n('cust-aot-cu-sl');
+    customerState.aotFee  = n('cust-aot-fee-sl');
+    customerState.rjitCu  = n('cust-rjit-cu-sl');
+    customerState.rjitFee = n('cust-rjit-fee-sl');
+    customerState.njitCu  = n('cust-njit-cu-sl');
+    customerState.njitFee = n('cust-njit-fee-sl');
 }
 
 function updateCustomerCalcs() {
@@ -9302,27 +9299,10 @@ function initCustomerTab() {
         sel.addEventListener('change', function(){ seedCustomerFromCategory(this.value); });
         seedCustomerFromCategory(CORE_GROUP_SPECS[0].id); // default: prop_amm
     }
-    // Wire slider ↔ number input pairs (both paths update state and calcs)
-    var custPairs = [
-        { slId: 'cust-aot-cu-sl',   numId: 'cust-aot-cu'   },
-        { slId: 'cust-aot-fee-sl',  numId: 'cust-aot-fee'  },
-        { slId: 'cust-rjit-cu-sl',  numId: 'cust-rjit-cu'  },
-        { slId: 'cust-rjit-fee-sl', numId: 'cust-rjit-fee' },
-        { slId: 'cust-njit-cu-sl',  numId: 'cust-njit-cu'  },
-        { slId: 'cust-njit-fee-sl', numId: 'cust-njit-fee' }
-    ];
-    custPairs.forEach(function(pair) {
-        var sl  = document.getElementById(pair.slId);
-        var num = document.getElementById(pair.numId);
-        if(!sl || !num) return;
-        sl.addEventListener('input', function() {
-            num.value = sl.value;
-            readCustomerInputs(); updateCustomerCalcs();
-        });
-        num.addEventListener('input', function() {
-            sl.value = num.value;
-            readCustomerInputs(); updateCustomerCalcs();
-        });
+    // Wire slider input events → recalc (initHybridControls handles stepper-input ↔ slider sync)
+    ['cust-aot-cu-sl','cust-aot-fee-sl','cust-rjit-cu-sl','cust-rjit-fee-sl','cust-njit-cu-sl','cust-njit-fee-sl'].forEach(function(id) {
+        var sl = document.getElementById(id);
+        if(sl) sl.addEventListener('input', function(){ readCustomerInputs(); updateCustomerCalcs(); });
     });
 }
 
