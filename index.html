@@ -3685,7 +3685,7 @@ function gp(){return{
     gba:(function(){ var ca=+document.getElementById('sl-comm-aot').value, ra=+document.getElementById('sl-rebate-aot').value, vb=+document.getElementById('sl-val-bonus').value; return Math.min(+document.getElementById('sl-gb-aot').value, Math.max(0, ca-ra-vb)); })(),
     gbj:(function(){ var cj=+document.getElementById('sl-comm-jit').value, rj=+document.getElementById('sl-rebate-jit').value, jvb=+(document.getElementById('sl-val-bonus-jit')||{value:0}).value; return Math.min(+document.getElementById('sl-gb-jit').value, Math.max(0, cj-rj-jvb)); })(),
     jm:+document.getElementById('sl-jit-market').value, // JIT total market (SOL/yr)
-    j:+document.getElementById('sl-jit').value/100,
+    j:+document.getElementById('sl-stake').value/100*0.8, // derived: Raiku JIT Market Share = 80% × Raiku Stake %
     s:+document.getElementById('sl-stake').value/100,
     b:+document.getElementById('sl-blk').value/100,
     f:+document.getElementById('sl-fcu').value,
@@ -5384,6 +5384,10 @@ function update(){
         var n = APY_COMPOUNDING_PERIODS;
         if (!_vcOverrides.nf  && slNf)  slNf.value  = (aprToApy(NETWORK_FEES_APR_REF * Math.max(0, 1 - bShare), n) * 100).toFixed(4);
         if (!_vcOverrides.iss && slIss) slIss.value = (aprToApy(SOLANA_INFLATION_RATE / sr, n) * 100).toFixed(4);
+        // Sync sl-jit to derived value: Raiku JIT Market Share = 80% × Raiku Stake %
+        var slStk = document.getElementById('sl-stake');
+        var slJit = document.getElementById('sl-jit');
+        if (slStk && slJit) slJit.value = (+slStk.value * 0.8).toFixed(1);
     }());
     const p=gp(),r=calc(p);
     const tg = r.totalGross || 1;
