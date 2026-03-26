@@ -1918,10 +1918,11 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
       <!-- Row 1: SOL Price | Delegated Stake -->
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; margin-top:20px;">
-        <!-- SOL Price: read-only display, synced to global sl-price -->
+        <!-- SOL Price: local to Individual Level; default $100; not linked to Protocol Level -->
         <div class="validator-context-item">
           <div class="validator-context-label">SOL Price</div>
           <div class="validator-context-value" id="vi-sol-price-display">$100</div>
+          <input type="hidden" id="vi-sol-price-raw" value="100">
         </div>
         <!-- Delegated Stake: editable, styled as boxed value -->
         <div class="validator-context-item">
@@ -1976,13 +1977,18 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <div id="vi-stake-summary" style="font-size:10px; color:#5a6272; margin-top:3px; line-height:1.5; font-family:var(--font-mono);">—</div>
       </div>
 
+      <!-- Reset button -->
+      <div style="margin-top:10px;">
+        <button class="vi-reset-btn" onclick="viResetToDefaults()" style="width:100%; padding:8px 10px;">↺ Reset to scenario defaults</button>
+      </div>
+
       <!-- Spacer -->
       <div style="flex:1; min-height:12px;"></div>
 
       <!-- Footer -->
       <div class="validator-note" style="font-size:11px; color:#5a6272; line-height:1.6;">
         Block fees and Raiku MEV flow 100% to the validator.
-        Commission only reduces the validator's share of inflation rewards.
+        Issuance APY and Network Fees APY are initialized from the selected scenario and can be adjusted.
       </div>
     </div>
   </div><!-- end vi-side -->
@@ -2039,7 +2045,6 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <button class="vi-scenario-btn active" id="vi-btn-base" onclick="viApplyScenario('base')">Base Case</button>
         <button class="vi-scenario-btn" id="vi-btn-opt"  onclick="viApplyScenario('opt')">Optimistic</button>
         <button class="vi-scenario-btn" id="vi-btn-bull" onclick="viApplyScenario('bull')">Bull Case</button>
-        <button class="vi-reset-btn" onclick="viResetToDefaults()">↺ Reset</button>
       </div>
       <div class="validator-decomp-card" style="margin-top:10px;">
         <!-- Top summary band: APY headline · APR (mirrors Protocol Level) -->
@@ -7890,7 +7895,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     makeEditable('validator-context-block',    'sl-blk',      0, 100,  0.1,  function(v){ return Math.round(v)+'%'; });
     makeEditable('validator-context-fee',      'sl-fcu',      0,  25,  0.01, function(v){ return (v>=10?v.toFixed(1):v<0.1?v.toFixed(3):v.toFixed(2))+' L'; });
     // ── Individual Level controls ──
-    makeEditable('vi-sol-price-display', 'sl-price', 10, 400, 5, function(v){ return '$'+Math.round(v); });
+    makeEditable('vi-sol-price-display', 'vi-sol-price-raw', 10, 400, 5, function(v){ return '$'+Math.round(v); });
     makeEditable('vi-stake', 'vi-stake-raw', 0, 50000000, 1000,
       function(v){ return v.toLocaleString('en-US',{maximumFractionDigits:0})+' SOL'; },
       function(v){
@@ -8005,12 +8010,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     window.viApplyScenario(_viState.scenario || 'base');
   };
 
-  // Sync the vi-sol-price slider when the global sl-price changes
-  window.viSyncPrice = function(val) {
-    // No local price slider — just update the display box and recompute
-    _set('vi-sol-price-display', '$' + Math.round(parseFloat(val)));
-    window.viUpdate();
-  };
+  // SOL Price is now local to Individual Level (vi-sol-price-raw). viSyncPrice is a no-op.
+  window.viSyncPrice = function() {};
 
 
   window.viToggle = function(group) {
@@ -8155,7 +8156,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var raikuOn = raikuEl.checked;
     var comm    = commPct / 100;
     var total   = _getTotalStake();
-    var solPrice = parseFloat((document.getElementById('sl-price') || {}).value) || 100;
+    var solPrice = parseFloat((document.getElementById('vi-sol-price-raw') || {}).value) || 100;
 
     // Sync display divs (only when makeEditable is not active)
     var commDiv = document.getElementById('vi-commission');
@@ -8173,7 +8174,6 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     if (shareDiv && !shareDiv.querySelector('input')) shareDiv.textContent = netShare.toFixed(4)+'%';
 
     // ── APR derivation from own state — zero Protocol Level DOM reads ────────────
-    // Commission scales issuance only; block fees and Raiku flow 100% to the validator.
     var _toApr = function(apy) { return typeof apyToApr === 'function' ? apyToApr(apy, N) : apy; };
     var _toApy = function(apr) { return typeof aprToApy === 'function' ? aprToApy(apr, N) : apr; };
     // Also read own Issuance APY and Network Fees APY raw inputs (user may have edited them)
@@ -8182,9 +8182,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     // Keep _viState in sync if inputs differ (handles makeEditable commits and direct edits)
     _viState.issApy = issApyRaw;
     _viState.blkApy = blkApyRaw;
-    var issAprGross = _toApr(_viState.issApy);   // gross Issuance APR (before commission)
-    var issApr      = issAprGross * comm;          // commission applied — validator keeps comm% of issuance
-    var blkApr      = _toApr(_viState.blkApy);    // Network Fees APR — no commission
+    var issApr = _toApr(_viState.issApy);          // vi-iss-apy is the validator's effective issuance yield — used directly, no commission scaling
+    var blkApr = _toApr(_viState.blkApy);          // Network Fees APR
     var aotApr      = _viState.aotApr;
     var jitApr      = _viState.jitApr;
     var bonusApr    = _viState.bonusApr;
@@ -8193,7 +8192,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var totalApr    = issApr + blkApr + raikuApr;
 
     // ── APY derivation: compound each component from its APR; total from sum of APRs ──
-    var issApy      = _toApy(issApr);       // effective issuance APY (commission-scaled)
+    var issApy      = _toApy(issApr);
     var blkApy      = _toApy(blkApr);
     var aotApy      = _toApy(aotApr);
     var jitApy      = _toApy(jitApr);
