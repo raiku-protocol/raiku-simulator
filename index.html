@@ -272,13 +272,35 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-spend-card-label { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; font-family:var(--font-mono); color:var(--text2); }
 .cust-spend-card-value { font-size:16px; font-weight:700; color:var(--text); font-family:var(--font-mono); line-height:1.2; }
 .cust-spend-card-sub { font-size:9px; color:var(--text2); font-family:var(--font-mono); }
+/* Customer Economics — spend composition bars */
+.cust-comp-block { display:flex; flex-direction:column; gap:5px; padding-top:8px; border-top:1px solid #181b22; }
+.cust-comp-block:first-child { border-top:none; padding-top:0; }
+.cust-comp-view-label { font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-family:var(--font-mono); margin-bottom:2px; }
+.cust-comp-bar-track { height:14px; border-radius:3px; overflow:hidden; display:flex; background:#0a0c12; }
+.cust-comp-seg { height:100%; flex-shrink:0; transition:width .2s ease; }
+.cust-comp-legend-row { display:flex; flex-wrap:wrap; gap:4px 12px; font-size:9px; font-family:var(--font-mono); color:var(--text2); align-items:center; }
+.cust-comp-leg-item { display:flex; align-items:center; gap:4px; }
+.cust-comp-leg-dot { width:6px; height:6px; border-radius:1px; flex-shrink:0; }
+.cust-comp-total-label { margin-left:auto; font-size:10px; font-weight:600; color:var(--text); font-family:var(--font-mono); }
 /* Customer Economics — epoch distribution visuals */
 .cust-epoch-share-bar { height:18px; border-radius:3px; overflow:hidden; display:flex; background:#0e1016; }
 .cust-epoch-bar-raiku { background:var(--lime-soft); height:100%; transition:width 0.25s ease; min-width:2px; }
 .cust-epoch-bar-other { background:#1a1e2a; height:100%; flex:1; }
+/* 432-cell compressed epoch map */
+.cust-cell-grid { display:grid; grid-template-columns:repeat(36,1fr); gap:2px; }
+.cust-cell { height:6px; border-radius:1px; }
 .cust-cadence-grid { display:flex; gap:3px; flex-wrap:nowrap; }
 .cust-cadence-cell { width:18px; height:18px; border-radius:2px; flex-shrink:0; }
 .cust-cadence-note { font-size:9px; color:var(--text2); font-family:var(--font-mono); line-height:1.55; margin-top:6px; font-style:italic; }
+/* Results matrix */
+.cust-mx-table { width:100%; border-collapse:collapse; font-family:var(--font-mono); min-width:540px; }
+.cust-mx-table th { font-size:8px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text2); white-space:nowrap; padding:4px 4px 2px; }
+.cust-mx-table .cust-mx-subrow th { font-weight:600; text-align:right; padding:2px 4px 5px; border-bottom:2px solid var(--card-border); }
+.cust-mx-table .cust-mx-subrow th:first-child { text-align:left; }
+.cust-mx-group-h { text-align:center !important; border-left:1px solid #1e2130; border-bottom:1px solid #1e2130; }
+.cust-mx-table td { padding:5px 4px; font-size:10px; color:var(--text); white-space:nowrap; border-bottom:1px solid #181b22; }
+.cust-mx-table td:not(:first-child) { text-align:right; }
+.cust-mx-route-cell { font-weight:600; padding-right:8px !important; font-size:10px; }
 .sidebar .section-label { font-size:10px; margin-top:12px; padding-bottom:2px; border-bottom:1px solid #1e2028; margin-bottom:2px; }
 .sidebar .section-label:first-child { margin-top:0; }
 
@@ -2515,128 +2537,143 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
   <h2 style="font-size:12px;font-weight:600;color:var(--lime-soft);text-transform:uppercase;letter-spacing:2px;font-family:var(--font-mono);margin:0 0 4px 0;">Customer Results</h2>
 
-  <!-- A. Spend — primary story, 3 explicit figures -->
+  <!-- 1. SPEND COMPOSITION — 3 views -->
   <div class="cust-panel-section fade-in">
-    <div class="cust-panel-title">Spend</div>
-    <div class="cust-spend-cards">
-      <div class="cust-spend-card">
-        <div class="cust-spend-card-label" style="color:var(--lime-soft);">Raiku block</div>
-        <div class="cust-spend-card-value" id="cust-k-raiku-spend">—</div>
-        <div class="cust-spend-card-sub">L / Raiku block</div>
+    <div class="cust-panel-title" style="display:flex;align-items:baseline;gap:8px;">
+      Spend Composition
+      <span style="font-size:9px;font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;color:var(--text2);">configured AOT / JIT spend · base fees not separately modeled</span>
+    </div>
+
+    <!-- View A: Per Raiku block -->
+    <div class="cust-comp-block">
+      <div class="cust-comp-view-label" style="color:var(--lime-soft);">Per Raiku block</div>
+      <div class="cust-comp-bar-track">
+        <div class="cust-comp-seg" id="cust-comp-aot-seg" style="background:var(--lime-soft);width:0%;"></div>
+        <div class="cust-comp-seg" id="cust-comp-rjit-seg" style="background:#8bc4f5;width:0%;"></div>
       </div>
-      <div class="cust-spend-card">
-        <div class="cust-spend-card-label" style="color:var(--text2);">Non-Raiku block</div>
-        <div class="cust-spend-card-value" id="cust-k-njit-spend">—</div>
-        <div class="cust-spend-card-sub">L / Non-Raiku block</div>
+      <div class="cust-comp-legend-row">
+        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:var(--lime-soft);"></span>AOT: <span id="cust-comp-aot-l">—</span> L</span>
+        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:#8bc4f5;"></span>Raiku JIT: <span id="cust-comp-rjit-l">—</span> L</span>
+        <span class="cust-comp-total-label">Total: <span id="cust-comp-raiku-total">—</span> L</span>
       </div>
-      <div class="cust-spend-card">
-        <div class="cust-spend-card-label" style="color:#8bc4f5;">Epoch total</div>
-        <div class="cust-spend-card-value" id="cust-k-epoch-sol">—</div>
-        <div class="cust-spend-card-sub">SOL / epoch</div>
-        <div class="cust-spend-card-sub" id="cust-k-epoch-usd" style="color:var(--text-mid);">—</div>
+    </div>
+
+    <!-- View B: Per Non-Raiku block -->
+    <div class="cust-comp-block">
+      <div class="cust-comp-view-label" style="color:var(--text2);">Per Non-Raiku block</div>
+      <div class="cust-comp-bar-track">
+        <div class="cust-comp-seg" id="cust-comp-njit-seg" style="background:#4a5568;width:0%;"></div>
+      </div>
+      <div class="cust-comp-legend-row">
+        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:#4a5568;"></span>Other JIT: <span id="cust-comp-njit-l">—</span> L</span>
+        <span class="cust-comp-total-label">Total: <span id="cust-comp-njit-total">—</span> L</span>
+      </div>
+    </div>
+
+    <!-- View C: Per epoch -->
+    <div class="cust-comp-block">
+      <div class="cust-comp-view-label" style="color:#8bc4f5;">Per epoch &mdash; <span id="cust-comp-stake-pct">—</span> Raiku stake</div>
+      <div class="cust-comp-bar-track">
+        <div class="cust-comp-seg" id="cust-comp-ep-raiku-seg" style="background:var(--lime-soft);opacity:.7;width:0%;"></div>
+        <div class="cust-comp-seg" id="cust-comp-ep-njit-seg" style="background:#4a5568;width:0%;"></div>
+      </div>
+      <div class="cust-comp-legend-row">
+        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:var(--lime-soft);opacity:.7;"></span>Raiku blks: <span id="cust-comp-ep-raiku-l">—</span> L</span>
+        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:#4a5568;"></span>Non-Raiku: <span id="cust-comp-ep-njit-l">—</span> L</span>
+        <span class="cust-comp-total-label"><span id="cust-comp-ep-sol">—</span> SOL</span>
       </div>
     </div>
   </div>
 
-  <!-- B. Network + scenario sentence -->
-  <div class="cust-panel-section fade-in">
-    <div class="cust-panel-title">Network</div>
-    <div class="cust-summary-groups" style="grid-template-columns:1fr;">
-      <div class="cust-summary-group" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-        <div class="cust-summary-metric">
-          <div class="cust-summary-label">Raiku stake</div>
-          <div class="cust-summary-value" id="cust-k-stake-disp">—</div>
-        </div>
-        <div class="cust-summary-metric">
-          <div class="cust-summary-label">Raiku blk / epoch</div>
-          <div class="cust-summary-value" id="cust-k-offerable">—</div>
-        </div>
-        <div class="cust-summary-metric">
-          <div class="cust-summary-label">Non-Raiku blk / epoch</div>
-          <div class="cust-summary-value" id="cust-k-njit-bpe">—</div>
-        </div>
-      </div>
-    </div>
-    <!-- Auto-generated scenario sentence -->
-    <div class="cust-scenario-text" id="cust-scenario-text">Configure the demand and context inputs to generate a scenario summary.</div>
-  </div>
-
-  <!-- C. Block Distribution Visuals -->
+  <!-- 2. BLOCK DISTRIBUTION -->
   <div class="cust-panel-section fade-in">
     <div class="cust-panel-title">Block Distribution</div>
 
-    <!-- Visual A: Epoch Share -->
+    <!-- Epoch Share bar -->
     <div>
-      <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;">Epoch Share</div>
+      <div class="cust-comp-view-label" style="margin-bottom:5px;">Epoch Share</div>
       <div class="cust-epoch-share-bar">
         <div class="cust-epoch-bar-raiku" id="cust-epoch-bar-raiku" style="width:10%;"></div>
         <div class="cust-epoch-bar-other"></div>
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;font-family:var(--font-mono);">
-        <span style="color:var(--lime-soft);">Raiku&nbsp;<span id="cust-epoch-raiku-pct">10.0%</span>&nbsp;&mdash;&nbsp;<span id="cust-epoch-raiku-blks">43,200</span> blk</span>
-        <span style="color:var(--text2);">Non-Raiku&nbsp;<span id="cust-epoch-other-pct">90.0%</span>&nbsp;&mdash;&nbsp;<span id="cust-epoch-other-blks">388,800</span> blk</span>
+        <span style="color:var(--lime-soft);">Raiku <span id="cust-epoch-raiku-pct">10.0%</span> · <span id="cust-epoch-raiku-blks">43,200</span> blk</span>
+        <span style="color:var(--text2);">Non-Raiku <span id="cust-epoch-other-pct">90.0%</span> · <span id="cust-epoch-other-blks">388,800</span> blk</span>
       </div>
     </div>
 
-    <!-- Visual B: Illustrative Leader Cadence -->
+    <!-- 432-cell compressed epoch map -->
     <div style="margin-top:8px;">
-      <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;">Illustrative Leader Cadence</div>
+      <div class="cust-comp-view-label" style="margin-bottom:5px;">Compressed Epoch Map <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;">— 1 cell = 1,000 blocks</span></div>
+      <div class="cust-cell-grid" id="cust-cell-grid"><!-- populated by JS --></div>
+      <div class="cust-cadence-note">432 cells total · Raiku-staked blocks highlighted · compressed representation, not literal block order</div>
+    </div>
+
+    <!-- Illustrative Leader Cadence -->
+    <div style="margin-top:8px;">
+      <div class="cust-comp-view-label" style="margin-bottom:5px;">Illustrative Leader Cadence</div>
       <div class="cust-cadence-grid" id="cust-cadence-grid"><!-- populated by JS --></div>
-      <div class="cust-cadence-note">Each cell = 1 leader window (4 consecutive slots). Pattern assumes uniform distribution across the epoch. Illustrative only — not the actual validator schedule.</div>
+      <div class="cust-cadence-note">Each cell = 1 leader window (4 consecutive slots). Uniform distribution assumed. Illustrative only — not the actual validator schedule.</div>
     </div>
   </div>
 
-  <!-- D. Route Breakdown Table -->
+  <!-- 3. RESULTS MATRIX -->
   <div class="cust-panel-section fade-in">
-    <div class="cust-panel-title">Route Breakdown &mdash; per block</div>
-    <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);">
-      <thead>
-        <tr style="border-bottom:2px solid var(--card-border);">
-          <th style="text-align:left;padding:0 6px 7px 0;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);">Route</th>
-          <th style="text-align:right;padding:0 6px 7px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);">CU / blk</th>
-          <th style="text-align:right;padding:0 6px 7px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);">CU share</th>
-          <th style="text-align:right;padding:0 6px 7px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);">Fee / CU (L)</th>
-          <th style="text-align:right;padding:0 6px 7px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);">Spend (L)</th>
-          <th style="text-align:right;padding:0 0 7px 6px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);">Spend share</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr style="border-bottom:1px solid #181b22;">
-          <td style="padding:8px 6px 8px 0;color:var(--lime-soft);font-weight:600;">AOT</td>
-          <td style="text-align:right;padding:8px 6px;" id="cust-td-aot-cu">—</td>
-          <td style="text-align:right;padding:8px 6px;color:var(--text2);" id="cust-td-aot-cu-pct">—</td>
-          <td style="text-align:right;padding:8px 6px;" id="cust-td-aot-fee">—</td>
-          <td style="text-align:right;padding:8px 6px;" id="cust-td-aot-cost">—</td>
-          <td style="text-align:right;padding:8px 0 8px 6px;color:var(--text2);" id="cust-td-aot-spend-pct">—</td>
-        </tr>
-        <tr style="border-bottom:1px solid #181b22;">
-          <td style="padding:8px 6px 8px 0;color:#8bc4f5;font-weight:600;">Raiku JIT</td>
-          <td style="text-align:right;padding:8px 6px;" id="cust-td-rjit-cu">—</td>
-          <td style="text-align:right;padding:8px 6px;color:var(--text2);" id="cust-td-rjit-cu-pct">—</td>
-          <td style="text-align:right;padding:8px 6px;" id="cust-td-rjit-fee">—</td>
-          <td style="text-align:right;padding:8px 6px;" id="cust-td-rjit-cost">—</td>
-          <td style="text-align:right;padding:8px 0 8px 6px;color:var(--text2);" id="cust-td-rjit-spend-pct">—</td>
-        </tr>
-        <tr style="border-bottom:1px solid #181b22;">
-          <td style="padding:8px 6px 8px 0;color:var(--text-mid);">Other JIT</td>
-          <td style="text-align:right;padding:8px 6px;" id="cust-td-njit-cu">—</td>
-          <td style="text-align:right;padding:8px 6px;color:var(--text2);" id="cust-td-njit-cu-pct">—</td>
-          <td style="text-align:right;padding:8px 6px;" id="cust-td-njit-fee">—</td>
-          <td style="text-align:right;padding:8px 6px;" id="cust-td-njit-cost">—</td>
-          <td style="text-align:right;padding:8px 0 8px 6px;color:var(--text2);" id="cust-td-njit-spend-pct">—</td>
-        </tr>
-        <tr style="background:#0c0e13;">
-          <td style="padding:8px 6px 8px 0;color:var(--text);font-weight:700;">Total</td>
-          <td style="text-align:right;padding:8px 6px;color:var(--text);font-weight:700;" id="cust-td-total-cu">—</td>
-          <td style="text-align:right;padding:8px 6px;color:var(--text2);font-size:9px;" id="cust-td-total-cu-pct">—</td>
-          <td style="text-align:right;padding:8px 6px;"></td>
-          <td style="text-align:right;padding:8px 6px;color:var(--text);font-weight:700;" id="cust-td-total-cost">—</td>
-          <td style="text-align:right;padding:8px 0 8px 6px;"></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="cust-panel-title">Results Matrix</div>
+    <div style="overflow-x:auto;">
+      <table class="cust-mx-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;" rowspan="2">Route</th>
+            <th class="cust-mx-group-h" colspan="3">Per block</th>
+            <th class="cust-mx-group-h" colspan="2">Per epoch</th>
+            <th class="cust-mx-group-h" colspan="2">Per month</th>
+            <th class="cust-mx-group-h" colspan="2">Per year</th>
+          </tr>
+          <tr class="cust-mx-subrow">
+            <th>CU</th><th>Fee / CU</th><th>Spend (L)</th>
+            <th>CU</th><th>Spend (L)</th>
+            <th>CU</th><th>Spend (L)</th>
+            <th>CU</th><th>Spend (L)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cust-mx-route-cell" style="color:var(--lime-soft);">Raiku AOT</td>
+            <td id="mx-aot-blk-cu">—</td><td id="mx-aot-blk-fee">—</td><td id="mx-aot-blk-spend">—</td>
+            <td id="mx-aot-ep-cu">—</td><td id="mx-aot-ep-spend">—</td>
+            <td id="mx-aot-mo-cu">—</td><td id="mx-aot-mo-spend">—</td>
+            <td id="mx-aot-yr-cu">—</td><td id="mx-aot-yr-spend">—</td>
+          </tr>
+          <tr>
+            <td class="cust-mx-route-cell" style="color:#8bc4f5;">Raiku JIT</td>
+            <td id="mx-rjit-blk-cu">—</td><td id="mx-rjit-blk-fee">—</td><td id="mx-rjit-blk-spend">—</td>
+            <td id="mx-rjit-ep-cu">—</td><td id="mx-rjit-ep-spend">—</td>
+            <td id="mx-rjit-mo-cu">—</td><td id="mx-rjit-mo-spend">—</td>
+            <td id="mx-rjit-yr-cu">—</td><td id="mx-rjit-yr-spend">—</td>
+          </tr>
+          <tr>
+            <td class="cust-mx-route-cell" style="color:var(--text-mid);">Other JIT</td>
+            <td id="mx-njit-blk-cu">—</td><td id="mx-njit-blk-fee">—</td><td id="mx-njit-blk-spend">—</td>
+            <td id="mx-njit-ep-cu">—</td><td id="mx-njit-ep-spend">—</td>
+            <td id="mx-njit-mo-cu">—</td><td id="mx-njit-mo-spend">—</td>
+            <td id="mx-njit-yr-cu">—</td><td id="mx-njit-yr-spend">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <p style="color:var(--text2);font-size:9px;margin-top:10px;line-height:1.5;">Values are editable starting points. Category seeding uses median on-chain data where available. No hidden route split logic. This tool does not model or claim Raiku reduces execution cost.</p>
   </div>
+
+  <!-- hidden spans to keep existing JS set() calls silent -->
+  <span style="display:none;" id="cust-k-raiku-spend"></span>
+  <span style="display:none;" id="cust-k-njit-spend"></span>
+  <span style="display:none;" id="cust-k-epoch-sol"></span>
+  <span style="display:none;" id="cust-k-epoch-usd"></span>
+  <span style="display:none;" id="cust-k-stake-disp"></span>
+  <span style="display:none;" id="cust-k-offerable"></span>
+  <span style="display:none;" id="cust-k-njit-bpe"></span>
+  <span style="display:none;" id="cust-scenario-text"></span>
 
 </div><!-- end right -->
 </div><!-- end validator-layout -->
@@ -9619,74 +9656,110 @@ function updateCustomerCalcs() {
         }
     }
 
-    // ── A. Spend cards ──
+    // ── Helper: compact number formatters ──
+    function fmtCU(n) {
+        if(n >= 1e9) return (n/1e9).toFixed(2) + 'B';
+        if(n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+        return Math.round(n).toLocaleString('en-US');
+    }
+    function fmtL(n) {
+        if(n >= 1e9) return (n/1e9).toFixed(3) + 'B';
+        if(n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+        return Math.round(n).toLocaleString('en-US');
+    }
+
+    // ── A. Spend composition bars ──
+    var epochRaikuLamports    = epochRaikuBlocks    * raikuBlockSpend;
+    var epochNonRaikuLamports = epochNonRaikuBlocks * nonRaikuBlockSpend;
+    function setSeg(id, pct) {
+        var el = document.getElementById(id);
+        if(el) el.style.width = pct.toFixed(2) + '%';
+    }
+    if(raikuBlockSpend > 0) {
+        setSeg('cust-comp-aot-seg',  aotSpend  / raikuBlockSpend * 100);
+        setSeg('cust-comp-rjit-seg', rjitSpend / raikuBlockSpend * 100);
+    } else { setSeg('cust-comp-aot-seg', 0); setSeg('cust-comp-rjit-seg', 0); }
+    set('cust-comp-aot-l',       Math.round(aotSpend).toLocaleString('en-US'));
+    set('cust-comp-rjit-l',      Math.round(rjitSpend).toLocaleString('en-US'));
+    set('cust-comp-raiku-total', Math.round(raikuBlockSpend).toLocaleString('en-US'));
+    setSeg('cust-comp-njit-seg', nonRaikuBlockSpend > 0 ? 100 : 0);
+    set('cust-comp-njit-l',     Math.round(nonRaikuBlockSpend).toLocaleString('en-US'));
+    set('cust-comp-njit-total', Math.round(nonRaikuBlockSpend).toLocaleString('en-US'));
+    if(epochTotalLamports > 0) {
+        setSeg('cust-comp-ep-raiku-seg', epochRaikuLamports    / epochTotalLamports * 100);
+        setSeg('cust-comp-ep-njit-seg',  epochNonRaikuLamports / epochTotalLamports * 100);
+    } else { setSeg('cust-comp-ep-raiku-seg', 0); setSeg('cust-comp-ep-njit-seg', 0); }
+    set('cust-comp-stake-pct',  (s.raikuStake * 100).toFixed(1) + '%');
+    set('cust-comp-ep-raiku-l', fmtL(epochRaikuLamports));
+    set('cust-comp-ep-njit-l',  fmtL(epochNonRaikuLamports));
+    set('cust-comp-ep-sol',     epochTotalSol.toFixed(4));
+
+    // ── B. Silent hidden spans (legacy IDs) ──
     set('cust-k-raiku-spend', Math.round(raikuBlockSpend).toLocaleString('en-US'));
     set('cust-k-njit-spend',  Math.round(nonRaikuBlockSpend).toLocaleString('en-US'));
     set('cust-k-epoch-sol',   epochTotalSol.toFixed(4));
     set('cust-k-epoch-usd',   '$' + epochTotalUsd.toLocaleString(undefined, {maximumFractionDigits:0}));
-
-    // ── B. Network ──
-    set('cust-k-stake-disp', (s.raikuStake * 100).toFixed(1) + '%');
-    set('cust-k-offerable',  epochRaikuBlocks.toLocaleString('en-US'));
-    set('cust-k-njit-bpe',   epochNonRaikuBlocks.toLocaleString('en-US'));
+    set('cust-k-stake-disp',  (s.raikuStake * 100).toFixed(1) + '%');
+    set('cust-k-offerable',   epochRaikuBlocks.toLocaleString('en-US'));
+    set('cust-k-njit-bpe',    epochNonRaikuBlocks.toLocaleString('en-US'));
 
     // ── C. Block Distribution Visuals ──
-    // Visual A: Epoch Share bar
     var stakeBarEl = document.getElementById('cust-epoch-bar-raiku');
     if(stakeBarEl) stakeBarEl.style.width = (s.raikuStake * 100).toFixed(2) + '%';
     set('cust-epoch-raiku-pct',  (s.raikuStake * 100).toFixed(1) + '%');
     set('cust-epoch-other-pct',  ((1 - s.raikuStake) * 100).toFixed(1) + '%');
     set('cust-epoch-raiku-blks', epochRaikuBlocks.toLocaleString('en-US'));
     set('cust-epoch-other-blks', epochNonRaikuBlocks.toLocaleString('en-US'));
-    // Visual B: Illustrative Leader Cadence (10 cells, each = 1 leader window = 4 slots)
+    // 432-cell compressed epoch map (1 cell = 1,000 blocks)
+    var cellGridEl = document.getElementById('cust-cell-grid');
+    if(cellGridEl) {
+        var raikuCells = Math.round(s.raikuStake * 432);
+        var cg = '';
+        for(var cc = 0; cc < 432; cc++) {
+            cg += '<div class="cust-cell" style="background:' + (cc < raikuCells ? 'var(--lime-soft)' : '#1a1e2a') + ';"></div>';
+        }
+        cellGridEl.innerHTML = cg;
+    }
+    // Illustrative Leader Cadence (10 cells, each = 1 leader window = 4 slots)
     var cadenceEl = document.getElementById('cust-cadence-grid');
     if(cadenceEl) {
         var raikuW = Math.min(10, Math.max(1, Math.round(s.raikuStake * 10)));
-        var positions = {};
-        for(var wi = 0; wi < raikuW; wi++) positions[Math.floor(wi * 10 / raikuW)] = true;
+        var cadPos = {};
+        for(var wi = 0; wi < raikuW; wi++) cadPos[Math.floor(wi * 10 / raikuW)] = true;
         var ch = '';
         for(var ci = 0; ci < 10; ci++) {
-            var isR = !!positions[ci];
+            var isR = !!cadPos[ci];
             ch += '<div class="cust-cadence-cell" style="background:' + (isR ? 'var(--lime-soft)' : '#1a1e2a;border:1px solid #2a2e3a') + ';" title="' + (isR ? 'Raiku' : 'Non-Raiku') + ' leader window (4 slots)"></div>';
         }
         cadenceEl.innerHTML = ch;
     }
 
-    // ── Auto-generated scenario sentence ──
+    // ── D. Results Matrix ──
+    var EPOCHS_PER_MONTH = 15.22;  // 365.25 / 12 / 2 (1 epoch ≈ 2 days)
+    var EPOCHS_PER_YEAR  = 182.5;  // 365 / 2
+    function setMx(pfx, cu, fee, spend, epochBlks) {
+        set(pfx+'-blk-cu',    Math.round(cu).toLocaleString('en-US'));
+        set(pfx+'-blk-fee',   fee.toFixed(3));
+        set(pfx+'-blk-spend', Math.round(spend).toLocaleString('en-US'));
+        var epCu    = cu    * epochBlks;
+        var epSpend = spend * epochBlks;
+        set(pfx+'-ep-cu',    fmtCU(epCu));
+        set(pfx+'-ep-spend', fmtL(epSpend));
+        set(pfx+'-mo-cu',    fmtCU(epCu    * EPOCHS_PER_MONTH));
+        set(pfx+'-mo-spend', fmtL(epSpend  * EPOCHS_PER_MONTH));
+        set(pfx+'-yr-cu',    fmtCU(epCu    * EPOCHS_PER_YEAR));
+        set(pfx+'-yr-spend', fmtL(epSpend  * EPOCHS_PER_YEAR));
+    }
+    setMx('mx-aot',  s.aotCu,  s.aotFee,  aotSpend,  epochRaikuBlocks);
+    setMx('mx-rjit', s.rjitCu, s.rjitFee, rjitSpend, epochRaikuBlocks);
+    setMx('mx-njit', s.njitCu, s.njitFee, njitSpend, epochNonRaikuBlocks);
+
+    // ── Silent scenario sentence (hidden span) ──
     var raikuCu = s.aotCu + s.rjitCu;
     var sent = '';
-    if(raikuCu > 0) {
-        sent += 'In each Raiku block, the customer uses ' + Math.round(raikuCu).toLocaleString('en-US')
-            + ' CU at ' + Math.round(raikuBlockSpend).toLocaleString('en-US') + ' L / block.';
-    }
-    if(s.njitCu > 0) {
-        sent += (sent ? ' ' : '') + 'In each Non-Raiku block, the customer uses ' + Math.round(s.njitCu).toLocaleString('en-US')
-            + ' CU at ' + Math.round(nonRaikuBlockSpend).toLocaleString('en-US') + ' L / block.';
-    }
-    if((raikuCu > 0 || s.njitCu > 0) && s.raikuStake > 0) {
-        sent += ' At ' + (s.raikuStake * 100).toFixed(1) + '% Raiku stake, estimated epoch total: '
-            + epochTotalSol.toFixed(4) + ' SOL ($'
-            + epochTotalUsd.toLocaleString(undefined, {maximumFractionDigits:0}) + ').';
-    }
-    set('cust-scenario-text', sent || 'Configure the demand and context inputs to generate a scenario summary.');
-
-    // ── D. Route Breakdown Table ──
-    var raikuTotalCu = s.aotCu + s.rjitCu;
-    function setRow(pfx, cu, fee, baseCu, baseSpend) {
-        var cost = cu * fee;
-        set(pfx+'-cu',        Math.round(cu).toLocaleString('en-US'));
-        set(pfx+'-cu-pct',    baseCu    > 0 ? (cu   / baseCu    * 100).toFixed(1) + '%' : '\u2014');
-        set(pfx+'-fee',       fee.toFixed(3));
-        set(pfx+'-cost',      Math.round(cost).toLocaleString('en-US'));
-        set(pfx+'-spend-pct', baseSpend > 0 ? (cost / baseSpend * 100).toFixed(1) + '%' : '\u2014');
-    }
-    // AOT/Raiku JIT: CU share within Raiku block; Other JIT: CU share within Non-Raiku block (60M)
-    setRow('cust-td-aot',  s.aotCu,  s.aotFee,  raikuTotalCu,    raikuBlockSpend);
-    setRow('cust-td-rjit', s.rjitCu, s.rjitFee, raikuTotalCu,    raikuBlockSpend);
-    setRow('cust-td-njit', s.njitCu, s.njitFee, CUST_BLOCK_SIZE, nonRaikuBlockSpend);
-    set('cust-td-total-cu',     '\u2014');
-    set('cust-td-total-cu-pct', '\u2014');
-    set('cust-td-total-cost',   epochTotalSol > 0 ? epochTotalSol.toFixed(4) + ' SOL / epoch' : '\u2014');
+    if(raikuCu > 0) sent += 'Raiku block: ' + Math.round(raikuCu).toLocaleString('en-US') + ' CU at ' + Math.round(raikuBlockSpend).toLocaleString('en-US') + ' L.';
+    if(s.njitCu > 0) sent += (sent?' ':'') + 'Non-Raiku block: ' + Math.round(s.njitCu).toLocaleString('en-US') + ' CU at ' + Math.round(nonRaikuBlockSpend).toLocaleString('en-US') + ' L.';
+    set('cust-scenario-text', sent || 'Configure inputs.');
 
     // Format slider .val spans
     (function(){
