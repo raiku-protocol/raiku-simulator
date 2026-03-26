@@ -825,28 +825,21 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 .vi-raiku-label { font-size:10px; font-family:var(--font-mono); color:var(--text2);
                   letter-spacing:0.3px; white-space:nowrap; }
 
-/* ── Network positioning ── */
-.vi-pos-refs { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
-.vi-pos-ref { background:#060809; border:1px solid #16191f; border-radius:5px; padding:8px 10px; }
-.vi-pos-ref-label { font-size:9px; color:#6e7585; text-transform:uppercase;
-                    letter-spacing:0.5px; margin-bottom:3px; }
-.vi-pos-ref-value { font-size:12px; font-family:var(--font-mono); font-weight:600; color:var(--text); }
-.vi-pos-track { height:6px; background:#0e1117; border-radius:3px; position:relative;
-                margin:10px 0 4px; }
-.vi-pos-fill { height:100%; border-radius:3px;
-               background:linear-gradient(90deg,#2a3848,#C0FF38); pointer-events:none; }
-.vi-pos-thumb { position:absolute; top:-4px; width:14px; height:14px; background:#C0FF38;
-                border-radius:50%; transform:translateX(-50%);
-                box-shadow:0 0 6px rgba(192,255,56,0.4); }
-.vi-pos-axis { display:flex; justify-content:space-between; font-size:9px;
-               color:#4a5060; font-family:var(--font-mono); }
+/* ── Network Positioning: distribution ── */
+.vi-dist-toggle {
+  font-size:10px; font-family:var(--font-mono); color:var(--text2);
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+  border-radius:4px; padding:4px 10px; cursor:pointer; letter-spacing:0.3px;
+}
+.vi-dist-toggle:hover { color:var(--text); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2); }
+.vi-pos-sum-chip { font-size:11px; font-family:var(--font-mono); color:var(--text2); }
+.vi-pos-pct-tag { font-size:10px; font-family:var(--font-mono); color:#5a6272; white-space:nowrap; }
 
 /* ── Responsive ── */
 @media(max-width:1100px) {
   .vi-layout { grid-template-columns:1fr; }
   .vi-side { width:100%; position:static; }
   .vi-kpi-grid { grid-template-columns:repeat(2,1fr); }
-  .vi-pos-refs { grid-template-columns:repeat(2,1fr); }
 }
 </style>
 </head>
@@ -1973,8 +1966,37 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
   <!-- ─── RIGHT: Results ──────────────────────────────────────── -->
   <div class="vi-main">
 
-    <!-- ① Validator Yield (Individual Level) -->
-    <div class="section fade-in fade-in-1" style="padding-bottom:0; margin-bottom:0; position:relative;">
+    <!-- ① Network Positioning -->
+    <div class="section fade-in fade-in-1" style="padding-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:0;">
+        <h2 style="margin-bottom:0;">Network Positioning</h2>
+        <button class="vi-dist-toggle" id="vi-dist-toggle-btn" onclick="viToggleDist()">View distribution ▾</button>
+      </div>
+
+      <!-- Compact summary line -->
+      <div id="vi-pos-summary" style="margin-top:10px; display:flex; flex-wrap:wrap; align-items:center; gap:6px; min-height:18px;">
+        <span class="vi-pos-sum-chip" id="vi-pos-sum-stake">—</span>
+        <span style="color:#2e3445; font-size:10px;">·</span>
+        <span class="vi-pos-sum-chip" id="vi-pos-sum-share">—</span>
+        <span style="color:#2e3445; font-size:10px;">·</span>
+        <span class="vi-pos-pct-tag" id="vi-pos-pct-tag">—</span>
+      </div>
+
+      <!-- Collapsible distribution panel (starts hidden) -->
+      <div id="vi-dist-panel" style="display:none; margin-top:14px;">
+        <canvas id="vi-dist-canvas" height="100"
+                style="width:100%; display:block; cursor:default;"></canvas>
+        <div id="vi-dist-stats" style="margin-top:8px; padding:8px 10px;
+             background:#04060a; border:1px solid #16191f; border-radius:5px;
+             font-size:10px; font-family:var(--font-mono); color:#6e7585; line-height:1.8;"></div>
+        <div class="validator-note" style="margin-top:8px; font-size:10px;">
+          Source: Trillium API, epoch 945 · 762 validators with active stake
+        </div>
+      </div>
+    </div>
+
+    <!-- ② Validator Yield (Individual Level) -->
+    <div class="section fade-in fade-in-2" style="padding-bottom:0; margin-bottom:0; position:relative;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:0;">
         <h2 style="margin-bottom:0;">
           Validator Yield (Individual Level)
@@ -2047,8 +2069,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       </div>
     </div>
 
-    <!-- ② Validator Revenue (Individual Level) — 4-column table matching Protocol Level -->
-    <div class="section fade-in fade-in-2" style="padding-top:10px; padding-bottom:0;">
+    <!-- ③ Validator Revenue (Individual Level) — 4-column table matching Protocol Level -->
+    <div class="section fade-in fade-in-3" style="padding-top:10px; padding-bottom:0;">
       <h2>Validator Revenue (Individual Level)
         <button class="vc-info-btn" onclick="vcOpenExplainer('vi-explainer-annual-rev')">?</button>
       </h2>
@@ -2122,38 +2144,6 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             </tr>
           </tbody>
         </table>
-      </div>
-    </div>
-
-    <!-- ③ Network Positioning -->
-    <div class="section fade-in fade-in-3" style="padding-bottom:14px;">
-      <h2>Network Positioning</h2>
-      <div class="vi-pos-refs">
-        <div class="vi-pos-ref">
-          <div class="vi-pos-ref-label">Your stake</div>
-          <div class="vi-pos-ref-value" id="vi-pos-your-stake">—</div>
-        </div>
-        <div class="vi-pos-ref">
-          <div class="vi-pos-ref-label">50th largest (ep. 945)</div>
-          <div class="vi-pos-ref-value" id="vi-pos-top50">loading…</div>
-        </div>
-        <div class="vi-pos-ref">
-          <div class="vi-pos-ref-label">Largest (ep. 945)</div>
-          <div class="vi-pos-ref-value" id="vi-pos-largest">loading…</div>
-        </div>
-      </div>
-      <div class="vi-pos-track">
-        <div class="vi-pos-fill" id="vi-pos-fill" style="width:0%;"></div>
-        <div class="vi-pos-thumb" id="vi-pos-thumb" style="left:0%;"></div>
-      </div>
-      <div class="vi-pos-axis">
-        <span>0 SOL</span>
-        <span id="vi-pos-axis-mid">—</span>
-        <span id="vi-pos-axis-max">—</span>
-      </div>
-      <div class="validator-note" style="margin-top:10px;">
-        Bar shows position on a log scale relative to the top-50 validators by stake (epoch 945, from loaded benchmark data).
-        Full network percentile distribution pending a future upstream artifact.
       </div>
     </div>
 
@@ -2878,7 +2868,7 @@ function vprToggle(group) {
 }
 
 // ── Validation / QC panel ────────────────────────────────────────────
-window.QCP = { ref: null, bench: null, timeBench: null, sim: {} };
+window.QCP = { ref: null, bench: null, timeBench: null, stakeDist: null, sim: {} };
 
 function qcpFetch() {
     var probe = 960;
@@ -2935,6 +2925,17 @@ function qcpLoadTimeBenchmarks() {
             if (window.QCP.bench && window.QCP.sim && window.QCP.sim.iss != null) qcpRender();
         })
         .catch(function() { /* non-fatal: table still works from bench alone */ });
+}
+
+function qcpLoadStakeDist() {
+    fetch('data/validator_stake_distribution_epoch_945.json')
+        .then(function(r){ return r.ok ? r.json() : Promise.reject('not found'); })
+        .then(function(d){
+            window.QCP.stakeDist = d;
+            // Re-render summary if viUpdate has already run
+            if (typeof window.viUpdate === 'function') window.viUpdate();
+        })
+        .catch(function(){ /* non-fatal — positioning degrades gracefully */ });
 }
 
 function qcpToggle() {
@@ -6073,7 +6074,7 @@ function initHybridControls() {
     });
 }
 
-renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); setCalibrationContext('horizon'); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls(); _populateJitWindowRef(); qcpFetch(); qcpLoadBenchmarks(); qcpLoadTimeBenchmarks();
+renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); setCalibrationContext('horizon'); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls(); _populateJitWindowRef(); qcpFetch(); qcpLoadBenchmarks(); qcpLoadTimeBenchmarks(); qcpLoadStakeDist();
 
 // Calibration source info popover — moved to document.body to escape all stacking contexts
 (function() {
@@ -7902,6 +7903,125 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     if (chev) chev.textContent = expanded ? '▾' : '▴';
   };
 
+  window.viToggleDist = function() {
+    var panel = document.getElementById('vi-dist-panel');
+    var btn   = document.getElementById('vi-dist-toggle-btn');
+    if (!panel) return;
+    var wasHidden = panel.style.display === 'none';
+    panel.style.display = wasHidden ? '' : 'none';
+    if (btn) btn.textContent = wasHidden ? 'Hide distribution ▴' : 'View distribution ▾';
+    if (wasHidden) {
+        var stakeRaw = document.getElementById('vi-stake-raw');
+        viRenderDistribution(stakeRaw ? parseFloat(stakeRaw.value) || 0 : 0);
+    }
+  };
+
+  window.viRenderDistribution = function(userStake) {
+    var canvas = document.getElementById('vi-dist-canvas');
+    if (!canvas) return;
+    var dist = window.QCP && window.QCP.stakeDist;
+    if (!dist || !dist.stakes_sol) {
+        var ctx0 = canvas.getContext('2d');
+        if (ctx0) {
+            canvas.width = canvas.offsetWidth || 460;
+            canvas.height = 100;
+            ctx0.fillStyle = '#4a5060';
+            ctx0.font = '10px monospace';
+            ctx0.textAlign = 'center';
+            ctx0.fillText('Loading distribution\u2026', canvas.width/2, 54);
+        }
+        return;
+    }
+    var W = canvas.offsetWidth || 460;
+    if (W < 10) return; // panel hidden, skip
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(100 * dpr);
+    canvas.style.width  = W + 'px';
+    canvas.style.height = '100px';
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    var stakes = dist.stakes_sol; // sorted ascending
+    var NUM_B  = 20;
+    var LOG_MIN = 3.0;   // log10(1,000)
+    var LOG_MAX = 7.3;   // log10(~20M)
+    var bucketW_log = (LOG_MAX - LOG_MIN) / NUM_B;
+
+    // Build histogram counts
+    var counts = new Array(NUM_B).fill(0);
+    for (var i = 0; i < stakes.length; i++) {
+        if (stakes[i] <= 0) continue;
+        var lv = Math.log10(stakes[i]);
+        var b  = Math.floor((lv - LOG_MIN) / bucketW_log);
+        b = Math.max(0, Math.min(NUM_B - 1, b));
+        counts[b]++;
+    }
+    var maxC = Math.max.apply(null, counts);
+
+    // Layout
+    var PAD_T = 6, PAD_B = 22, PAD_L = 0, PAD_R = 0;
+    var chartW = W - PAD_L - PAD_R;
+    var chartH = 100 - PAD_T - PAD_B;
+    var bW = chartW / NUM_B;
+
+    // User stake log position
+    var uLog = (userStake > 0) ? Math.log10(Math.max(1, userStake)) : -1;
+    var uX   = PAD_L + ((uLog - LOG_MIN) / (LOG_MAX - LOG_MIN)) * chartW;
+
+    // Draw bars
+    for (var b = 0; b < NUM_B; b++) {
+        var bH  = maxC > 0 ? Math.max(2, (counts[b] / maxC) * chartH) : 0;
+        if (counts[b] === 0) bH = 0;
+        var bX  = PAD_L + b * bW;
+        var bY  = PAD_T + chartH - bH;
+        var bLo = LOG_MIN + b * bucketW_log;
+        var bHi = LOG_MIN + (b + 1) * bucketW_log;
+        var inBucket = (uLog >= bLo && uLog < bHi);
+        ctx.fillStyle = inBucket ? 'rgba(192,255,56,0.55)' : '#1e2530';
+        ctx.fillRect(bX + 1, bY, bW - 2, bH);
+    }
+
+    // User position marker (dashed vertical line)
+    if (uLog >= LOG_MIN && uLog <= LOG_MAX) {
+        ctx.strokeStyle = 'rgba(192,255,56,0.9)';
+        ctx.lineWidth   = 1.5;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(uX, PAD_T);
+        ctx.lineTo(uX, PAD_T + chartH);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    // X axis labels
+    var axLabels = [{l:3,t:'1K'},{l:4,t:'10K'},{l:5,t:'100K'},{l:6,t:'1M'},{l:7,t:'10M'}];
+    ctx.fillStyle  = '#3a4050';
+    ctx.font       = '9px monospace';
+    ctx.textAlign  = 'center';
+    for (var ai = 0; ai < axLabels.length; ai++) {
+        var ax = PAD_L + ((axLabels[ai].l - LOG_MIN) / (LOG_MAX - LOG_MIN)) * chartW;
+        ctx.fillText(axLabels[ai].t, ax, PAD_T + chartH + 15);
+    }
+
+    // Stats strip
+    function fmtK(v) {
+        if (v >= 1e6) return (v/1e6).toFixed(1)+'M';
+        if (v >= 1e3) return Math.round(v/1e3)+'K';
+        return Math.round(v)+'';
+    }
+    var d = dist;
+    var statsEl = document.getElementById('vi-dist-stats');
+    if (statsEl) {
+        statsEl.textContent =
+            d.n + ' validators (epoch ' + d.epoch + ')  \u00b7  ' +
+            'Median ' + fmtK(d.p50_sol) + ' SOL  \u00b7  ' +
+            'P25 ' + fmtK(d.p25_sol) + '  \u00b7  ' +
+            'P75 ' + fmtK(d.p75_sol) + '  \u00b7  ' +
+            'Max ' + fmtK(d.max_sol) + ' SOL';
+    }
+  };
+
   window.viUpdate = function() {
     var stakeRawEl = document.getElementById('vi-stake-raw');
     var commRawEl  = document.getElementById('vi-commission-raw');
@@ -8011,26 +8131,26 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
       if (el) el.style.display = raikuOn ? '' : 'none';
     });
 
-    // Network Positioning
-    var bench = window.QCP && window.QCP.bench;
-    var top50 = bench && bench.top_validators_by_stake;
-    if (top50 && top50.length >= 50) {
-      var largest    = top50[0].actual_stake_sol;
-      var boundary50 = top50[49].actual_stake_sol;
-      _set('vi-pos-your-stake', _fmtSol(stake));
-      _set('vi-pos-top50',     _fmtSol(boundary50) + ' (#50)');
-      _set('vi-pos-largest',   _fmtSol(largest));
-      _set('vi-pos-axis-mid',  _fmtSol(Math.round(largest / 2)));
-      _set('vi-pos-axis-max',  _fmtSol(largest));
-      var logMax = Math.log10(largest + 1);
-      var logVal = stake > 0 ? Math.log10(stake + 1) : 0;
-      var pct = Math.max(0, Math.min(100, logVal / logMax * 100));
-      var fillEl  = document.getElementById('vi-pos-fill');
-      var thumbEl = document.getElementById('vi-pos-thumb');
-      if (fillEl)  fillEl.style.width = pct + '%';
-      if (thumbEl) thumbEl.style.left  = pct + '%';
+    // ── Network Positioning: compact summary ──
+    var distData = window.QCP && window.QCP.stakeDist;
+    _set('vi-pos-sum-stake', _fmtSol(stake));
+    _set('vi-pos-sum-share', netShare < 0.001 ? '<0.001%' : netShare.toFixed(4) + '%');
+    if (distData) {
+        var pctTag;
+        if      (stake < distData.p10_sol) pctTag = 'bottom 10% by stake';
+        else if (stake < distData.p25_sol) pctTag = 'P10\u2013P25 range';
+        else if (stake < distData.p50_sol) pctTag = 'P25\u2013P50 range';
+        else if (stake < distData.p75_sol) pctTag = 'P50\u2013P75 range';
+        else if (stake < distData.p90_sol) pctTag = 'P75\u2013P90 range';
+        else                               pctTag = 'top 10% by stake';
+        _set('vi-pos-pct-tag', pctTag + '  \u00b7  Median ' + (function(v){ return v>=1e6?(v/1e6).toFixed(1)+'M SOL':Math.round(v/1000)+'K SOL'; })(distData.p50_sol));
     } else {
-      _set('vi-pos-your-stake', _fmtSol(stake));
+        _set('vi-pos-pct-tag', 'distribution loading\u2026');
+    }
+    // Re-render histogram if panel is currently open
+    var distPanel = document.getElementById('vi-dist-panel');
+    if (distPanel && distPanel.style.display !== 'none') {
+        viRenderDistribution(stake);
     }
   };
 
