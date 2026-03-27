@@ -2631,10 +2631,10 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             <th class="cust-mx-group-h" colspan="2">Per year</th>
           </tr>
           <tr class="cust-mx-subrow">
-            <th>CU</th><th>Fee / CU</th><th>Spend (L)</th>
-            <th>CU</th><th>Spend (L)</th>
-            <th>CU</th><th>Spend (L)</th>
-            <th>CU</th><th>Spend (L)</th>
+            <th>CU</th><th>Fee / CU (L)</th><th>Spend (SOL)</th>
+            <th>CU</th><th>Spend (SOL)</th>
+            <th>CU</th><th>Spend (SOL)</th>
+            <th>CU</th><th>Spend (SOL)</th>
           </tr>
         </thead>
         <tbody>
@@ -9667,6 +9667,12 @@ function updateCustomerCalcs() {
         if(n >= 1e6) return (n/1e6).toFixed(2) + 'M';
         return Math.round(n).toLocaleString('en-US');
     }
+    function fmtSOL(n) {
+        if(n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+        if(n >= 1000) return n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+        if(n >= 1) return n.toFixed(3);
+        return n.toFixed(6);
+    }
 
     // ── A. Spend composition bars ──
     var epochRaikuLamports    = epochRaikuBlocks    * raikuBlockSpend;
@@ -9745,15 +9751,15 @@ function updateCustomerCalcs() {
     function setMx(pfx, cu, fee, spend, epochBlks) {
         set(pfx+'-blk-cu',    Math.round(cu).toLocaleString('en-US'));
         set(pfx+'-blk-fee',   fee.toFixed(3));
-        set(pfx+'-blk-spend', Math.round(spend).toLocaleString('en-US'));
+        set(pfx+'-blk-spend', (spend / 1e9).toFixed(6));
         var epCu    = cu    * epochBlks;
         var epSpend = spend * epochBlks;
         set(pfx+'-ep-cu',    fmtCU(epCu));
-        set(pfx+'-ep-spend', fmtL(epSpend));
+        set(pfx+'-ep-spend', fmtSOL(epSpend / 1e9));
         set(pfx+'-mo-cu',    fmtCU(epCu    * EPOCHS_PER_MONTH));
-        set(pfx+'-mo-spend', fmtL(epSpend  * EPOCHS_PER_MONTH));
+        set(pfx+'-mo-spend', fmtSOL(epSpend * EPOCHS_PER_MONTH / 1e9));
         set(pfx+'-yr-cu',    fmtCU(epCu    * EPOCHS_PER_YEAR));
-        set(pfx+'-yr-spend', fmtL(epSpend  * EPOCHS_PER_YEAR));
+        set(pfx+'-yr-spend', fmtSOL(epSpend * EPOCHS_PER_YEAR / 1e9));
     }
     setMx('mx-aot',  s.aotCu,  s.aotFee,  aotSpend,  epochRaikuBlocks);
     setMx('mx-rjit', s.rjitCu, s.rjitFee, rjitSpend, epochRaikuBlocks);
