@@ -9977,7 +9977,7 @@ function updateCustomerCalcs() {
         return n.toFixed(6);
     }
     function fmtMatrixSol(v) {
-        return v.toLocaleString('en-US', {minimumFractionDigits: 3, maximumFractionDigits: 3});
+        return v.toLocaleString('en-US', {minimumFractionDigits: 4, maximumFractionDigits: 4});
     }
 
     // ── A. Spend composition bars ──
@@ -10145,9 +10145,10 @@ function updateCustomerCalcs() {
     var grandEpSol  = totEpSol  + (njitSpend / 1e9) * epochNonRaikuBlocks;
     var grandMoSol  = grandEpSol * EPOCHS_PER_MONTH;
     var grandYrSol  = grandEpSol * EPOCHS_PER_YEAR;
+    var grandBlkSol = (raikuBlockSpend + nonRaikuBlockSpend) / 1e9;
     set('mx-grand-blk-cu',  '—');
     set('mx-grand-blk-fee', '—');
-    set('mx-grand-blk-spend', '—');
+    setSpend('mx-grand-blk-spend', fmtMatrixSol(grandBlkSol), grandBlkSol * s.solPrice);
     set('mx-grand-ep-cu',   '—');
     setSpend('mx-grand-ep-spend',  fmtMatrixSol(grandEpSol),  grandEpSol  * s.solPrice);
     set('mx-grand-mo-cu',   '—');
