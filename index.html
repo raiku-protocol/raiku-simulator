@@ -2830,9 +2830,6 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
     <!-- Strict spec blocks -->
     <div id="sim-dex-breakdown" style="margin-bottom:12px;"></div>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
-        <button class="vc-info-btn" onclick="switchTab('customer')" style="font-size:9px;padding:2px 8px;">&#8592; Back to Customer Economics</button>
-    </div>
     <div id="sim-benchmark-block" style="margin-bottom:12px;"></div>
 
     <!-- v6: Secondary — Programs in selected category (demoted from primary) -->
@@ -7297,6 +7294,9 @@ function renderBenchmarkBlock(){
             '</div>' +
             distHtml +
             '<div style="font-size:9px;color:var(--text2);margin-top:8px;font-family:var(--font-mono);">' + ((arbProfile && arbProfile.usesTouchedBlocks) ? 'Active-block metrics use touched-block semantics from benchmark rows when available.' : 'Active-block metrics fall back to 30d window averages when touched-block counts are unavailable.') + '</div>' +
+            '<div style="text-align:right;margin-top:10px;">' +
+                '<button class="vc-info-btn" onclick="switchTab(\'customer\')" style="font-size:9px;padding:2px 8px;">&#8592; Customer Economics</button>' +
+            '</div>' +
         '</div>';
     renderArbBotDistributionChart(arbBuilder ? arbBuilder.distribution : null);
 }
