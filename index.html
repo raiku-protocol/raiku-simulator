@@ -2480,9 +2480,9 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
   <div class="fade-in fade-in-4" style="border-top:1px solid var(--card-border);padding-top:10px;margin-top:8px;display:flex;flex-direction:column;gap:6px;">
     <h2 style="margin-bottom:4px;">Customer Demand</h2>
     <div class="control" style="gap:3px;">
-      <label style="display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:10px;">
+      <label style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;">
         <span>Customer category</span>
-        <button class="vc-info-btn" id="cust-src-nav-btn" style="font-size:9px;padding:1px 5px;" onclick="custNavToSource()">View in Block Sim &#8599;</button>
+        <button id="cust-src-nav-btn" onclick="custNavToSource()" style="display:inline-flex;align-items:center;white-space:nowrap;padding:4px 10px;font-size:10px;font-family:var(--font-mono);font-weight:700;color:#0a0c0f;background:#7ec860;border:none;border-radius:4px;cursor:pointer;letter-spacing:0.03em;flex-shrink:0;">View in Block Sim &#8599;</button>
       </label>
       <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
@@ -9744,13 +9744,13 @@ function _custUpdateNavButtons(catId) {
     if(!btn) return;
     if(catId === 'arb_bot') {
         btn.textContent = 'Arb Bot Detail \u2197';
-        btn.style.opacity = '1';
+        btn.style.background = '#7ec860';
     } else if(catId === 'custom' || !catId) {
         btn.textContent = 'View in Block Sim \u2197';
-        btn.style.opacity = '0.4';
+        btn.style.background = '#3a5a28';
     } else {
         btn.textContent = 'Category Explorer \u2197';
-        btn.style.opacity = '1';
+        btn.style.background = '#7ec860';
     }
 }
 
