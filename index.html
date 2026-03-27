@@ -9860,7 +9860,20 @@ function syncCustomerRouteSliders() {
 }
 
 function readCustomerInputs() {
-    function n(id){ var el=document.getElementById(id); return el ? parseFloat(el.value)||0 : 0; }
+    // For sliders managed by initHybridControls, the stepper <input type="text"> is the
+    // authoritative value — slider.value is subject to step-snapping (e.g. step="10000"
+    // silently coerces 1000 → 0). Read from the stepper when available; fall back to slider.
+    function n(id){
+        var el = document.getElementById(id);
+        if(!el) return 0;
+        var row = el.closest ? el.closest('.slider-row') : null;
+        var sr  = row ? row.nextElementSibling : null;
+        if(sr && sr.classList && sr.classList.contains('hybrid-stepper-row')) {
+            var si = sr.querySelector('.stepper-input');
+            if(si && si.value !== '') { var v = parseFloat(si.value.replace(/,/g,'')); return isNaN(v) ? 0 : v; }
+        }
+        return parseFloat(el.value)||0;
+    }
     customerState.aotCu          = n('cust-aot-cu-sl');
     customerState.aotFee         = n('cust-aot-fee-sl');
     customerState.rjitCu         = n('cust-rjit-cu-sl');
@@ -10101,11 +10114,19 @@ function updateCustomerCalcs() {
         if(!el) return;
         el.innerHTML = solVal + ' <span class="mx-usd">(~' + fmtUSD(usd) + ')</span>';
     }
+    // Per-block only: show lamports alongside SOL (SOL rounds to 0.000 for small values)
+    function setBlkSpend(id, spendL) {
+        var el = document.getElementById(id);
+        if(!el) return;
+        var sol = spendL / 1e9;
+        var usd = sol * s.solPrice;
+        var lStr = Math.round(spendL).toLocaleString('en-US');
+        el.innerHTML = fmtMatrixSol(sol) + ' <span class="mx-usd">(' + lStr + ' L · ~' + fmtUSD(usd) + ')</span>';
+    }
     function setMx(pfx, cu, fee, spend, epochBlks) {
         set(pfx+'-blk-cu',  Math.round(cu).toLocaleString('en-US'));
         set(pfx+'-blk-fee', fee.toFixed(3));
-        var blkSol = spend / 1e9;
-        setSpend(pfx+'-blk-spend', fmtMatrixSol(blkSol), blkSol * s.solPrice);
+        setBlkSpend(pfx+'-blk-spend', spend);
         var epCu    = cu    * epochBlks;
         var epSpend = spend * epochBlks;
         var epSol   = epSpend / 1e9;
@@ -10129,7 +10150,7 @@ function updateCustomerCalcs() {
     set('mx-total-blk-cu',  Math.round(totalCu).toLocaleString('en-US'));
     set('mx-total-blk-fee', totalFee.toFixed(3));
     var totBlkSol = totalSpend / 1e9;
-    setSpend('mx-total-blk-spend', fmtMatrixSol(totBlkSol), totBlkSol * s.solPrice);
+    setBlkSpend('mx-total-blk-spend', totalSpend);
     var totEpSol = totalSpend * epochRaikuBlocks / 1e9;
     set('mx-total-ep-cu', fmtCU(totalCu * epochRaikuBlocks));
     setSpend('mx-total-ep-spend', fmtMatrixSol(totEpSol), totEpSol * s.solPrice);
@@ -10148,7 +10169,7 @@ function updateCustomerCalcs() {
     var grandBlkSol = (raikuBlockSpend + nonRaikuBlockSpend) / 1e9;
     set('mx-grand-blk-cu',  '—');
     set('mx-grand-blk-fee', '—');
-    setSpend('mx-grand-blk-spend', fmtMatrixSol(grandBlkSol), grandBlkSol * s.solPrice);
+    setBlkSpend('mx-grand-blk-spend', raikuBlockSpend + nonRaikuBlockSpend);
     set('mx-grand-ep-cu',   '—');
     setSpend('mx-grand-ep-spend',  fmtMatrixSol(grandEpSol),  grandEpSol  * s.solPrice);
     set('mx-grand-mo-cu',   '—');
