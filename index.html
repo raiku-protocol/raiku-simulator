@@ -2472,18 +2472,11 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
   <div class="fade-in fade-in-4" style="border-top:1px solid var(--card-border);padding-top:10px;margin-top:8px;display:flex;flex-direction:column;gap:6px;">
     <h2 style="margin-bottom:4px;">Customer Demand</h2>
     <div class="control" style="gap:3px;">
-      <label style="display:flex;align-items:center;gap:4px;font-size:10px;">
+      <label style="display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:10px;">
         <span>Customer category</span>
+        <button class="vc-info-btn" id="cust-src-nav-btn" style="font-size:9px;padding:1px 5px;" onclick="custNavToSource()">View in Block Sim &#8599;</button>
       </label>
       <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
-      <div style="display:flex;gap:6px;margin-top:5px;">
-        <button class="vc-info-btn" id="cust-nav-cat-btn"
-                style="flex:1;font-size:9px;padding:3px 6px;text-align:center;"
-                onclick="custNavToCatExplorer()">Category Explorer &#8599;</button>
-        <button class="vc-info-btn" id="cust-nav-arb-btn"
-                style="flex:1;font-size:9px;padding:3px 6px;text-align:center;"
-                onclick="custNavToArbBot()">Arb Bot Detail &#8599;</button>
-      </div>
     </div>
     <div class="control" style="gap:3px;margin-top:6px;" id="cust-profile-row">
       <label style="display:flex;align-items:center;gap:4px;font-size:10px;">
@@ -2491,13 +2484,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       </label>
       <select id="cust-profile-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
-    <div style="margin-top:6px;font-size:9px;color:var(--text2);font-family:var(--font-mono);line-height:1.6;padding:5px 7px;background:#1a1c22;border:1px solid #2a2d35;border-radius:4px;" id="cust-default-note">
-      <span style="color:#7c8;font-weight:600;">Conservative default</span><br>
-      The selected profile sets <em>one</em> baseline demand.<br>
-      <span style="color:var(--text);">Non-Raiku block</span> &#8594; Other JIT gets the full baseline CU + fee.<br>
-      <span style="color:var(--text);">Raiku block</span> &#8594; same total CU, split 50&thinsp;/&thinsp;50 between Raiku AOT and Raiku JIT.<br>
-      No extra demand assumed &#8212; only rerouting.<br>
-      <span style="color:#888;">Seeded values are rounded for readability. Adjust with the sliders below.</span>
+    <div style="margin-top:6px;font-size:9px;color:var(--text2);font-family:var(--font-mono);line-height:1.5;padding:5px 7px;background:#1a1c22;border:1px solid #2a2d35;border-radius:4px;" id="cust-default-note">
+      <span style="color:#7c8;font-weight:600;">Conservative default</span> &#8212; profile sets one baseline demand. Non-Raiku block: full baseline &#8594; Other JIT. Raiku block: same total CU split 50&thinsp;/&thinsp;50 between AOT and JIT. No extra demand assumed. <span style="color:#888;">Seeded CU rounded &#8212; adjust freely with sliders.</span>
     </div>
 
     <!-- Raiku Blocks -->
@@ -2807,7 +2795,10 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
 <!-- C. CATEGORY EXPLORER (reference data for fragment selection) -->
 <div class="section fade-in fade-in-2">
-    <h2 style="margin-bottom:8px;">Category Explorer</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <h2 style="margin-bottom:0;">Category Explorer</h2>
+        <button class="vc-info-btn" onclick="switchTab('customer')" style="font-size:9px;padding:2px 8px;">&#8592; Back to Customer Economics</button>
+    </div>
     <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">Fixed canonical order: <strong>Prop AMM, Cranker, Oracle, Depin, Payments, DEX, Lending, Perps, Bridge, NFT, Gaming</strong>. Core scope uses <strong>aot + both</strong>. The <strong>arbitrage-bot</strong> layer appears separately and stays excluded by default unless explicitly toggled on in Block Builder.</div>
 
     <!-- Normal / Peak toggle -->
@@ -2839,6 +2830,9 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
     <!-- Strict spec blocks -->
     <div id="sim-dex-breakdown" style="margin-bottom:12px;"></div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
+        <button class="vc-info-btn" onclick="switchTab('customer')" style="font-size:9px;padding:2px 8px;">&#8592; Back to Customer Economics</button>
+    </div>
     <div id="sim-benchmark-block" style="margin-bottom:12px;"></div>
 
     <!-- v6: Secondary — Programs in selected category (demoted from primary) -->
@@ -9707,35 +9701,39 @@ function populateCustProfileSelect(catId) {
 }
 
 function _custUpdateNavButtons(catId) {
-    var catBtn = document.getElementById('cust-nav-cat-btn');
-    var arbBtn = document.getElementById('cust-nav-arb-btn');
-    if(!catBtn || !arbBtn) return;
+    var btn = document.getElementById('cust-src-nav-btn');
+    if(!btn) return;
     if(catId === 'arb_bot') {
-        arbBtn.style.opacity = '1';
-        catBtn.style.opacity = '0.4';
+        btn.textContent = 'Arb Bot Detail \u2197';
+        btn.style.opacity = '1';
+    } else if(catId === 'custom' || !catId) {
+        btn.textContent = 'View in Block Sim \u2197';
+        btn.style.opacity = '0.4';
     } else {
-        catBtn.style.opacity = '1';
-        arbBtn.style.opacity = catId === 'custom' ? '0.4' : '0.6';
+        btn.textContent = 'Category Explorer \u2197';
+        btn.style.opacity = '1';
     }
 }
 
-function custNavToCatExplorer() {
+function custNavToSource() {
+    var catSel = document.getElementById('cust-cat-select');
+    var catId = catSel ? catSel.value : '';
     switchTab('micro');
     setTimeout(function() {
-        var el = document.getElementById('sim-cat-bar');
-        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-    }, 150);
-}
-
-function custNavToArbBot() {
-    switchTab('micro');
-    setTimeout(function() {
-        if(typeof _showBenchmarkBlock !== 'undefined' && !_showBenchmarkBlock) {
-            _showBenchmarkBlock = true;
-            if(typeof renderBenchmarkBlock === 'function') renderBenchmarkBlock();
+        if(catId === 'arb_bot') {
+            if(typeof _showBenchmarkBlock !== 'undefined' && !_showBenchmarkBlock) {
+                _showBenchmarkBlock = true;
+                if(typeof renderBenchmarkBlock === 'function') renderBenchmarkBlock();
+            }
+            var el = document.getElementById('sim-benchmark-block');
+            if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+        } else {
+            if(catId && typeof selectCategory === 'function') {
+                selectCategory(catId);
+            }
+            var el = document.getElementById('sim-cat-bar');
+            if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
         }
-        var el = document.getElementById('sim-benchmark-block');
-        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
     }, 150);
 }
 
@@ -9805,7 +9803,7 @@ function _custSyncSlider(slId, val) {
     inp.value = decimals === 0 ? Math.round(val).toLocaleString('en-US') : parseFloat(val).toFixed(decimals);
 }
 
-// seedCustomerAOT, seedCustomerJIT, custNavToAOTSource, custNavToJITSource, custNavToSource removed — replaced by seedCustomerFromProfile / custNavToCatExplorer / custNavToArbBot
+// seedCustomerAOT, seedCustomerJIT, custNavToAOTSource, custNavToJITSource removed — replaced by seedCustomerFromProfile / custNavToSource
 
 function syncCustomerRouteSliders() {
     var s = customerState;
