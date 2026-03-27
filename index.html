@@ -301,7 +301,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-mx-table td { padding:5px 4px; font-size:10px; color:var(--text); white-space:nowrap; border-bottom:1px solid #181b22; }
 .cust-mx-table td:not(:first-child) { text-align:right; }
 .cust-mx-route-cell { font-weight:600; padding-right:8px !important; font-size:10px; }
-.cust-mx-group-row td { font-size:8px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text2); font-family:var(--font-mono); padding:8px 4px 3px; border-bottom:1px solid #1e2130; border-top:2px solid #1e2130; }
+.cust-mx-group-row td { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#c0c8d8; font-family:var(--font-mono); padding:8px 4px 3px 8px; border-bottom:1px solid #1e2130; border-top:2px solid #1e2130; border-left:2px solid var(--lime-soft); }
 .cust-mx-group-row--first td { border-top:none; padding-top:4px; }
 .cust-mx-total-row td { font-weight:700; color:var(--text); border-top:1px solid #2a2e3d; border-bottom:2px solid #2a2e3d; font-family:var(--font-mono); font-size:10px; }
 .mx-usd { font-size:9px; color:var(--text2); font-weight:400; }
@@ -2541,87 +2541,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
   <h2 style="font-size:12px;font-weight:600;color:var(--lime-soft);text-transform:uppercase;letter-spacing:2px;font-family:var(--font-mono);margin:0 0 4px 0;">Customer Results</h2>
 
-  <!-- 1. SPEND COMPOSITION — 3 views -->
-  <div class="cust-panel-section fade-in">
-    <div class="cust-panel-title" style="display:flex;align-items:baseline;gap:8px;">
-      Spend Composition
-      <span style="font-size:9px;font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;color:var(--text2);">configured AOT / JIT spend · base fees not separately modeled</span>
-    </div>
-
-    <!-- View A: Per Raiku block -->
-    <div class="cust-comp-block">
-      <div class="cust-comp-view-label" style="color:var(--lime-soft);">Per Raiku block</div>
-      <div class="cust-comp-bar-track">
-        <div class="cust-comp-seg" id="cust-comp-aot-seg" style="background:var(--lime-soft);width:0%;"></div>
-        <div class="cust-comp-seg" id="cust-comp-rjit-seg" style="background:#8bc4f5;width:0%;"></div>
-      </div>
-      <div class="cust-comp-legend-row">
-        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:var(--lime-soft);"></span>AOT: <span id="cust-comp-aot-l">—</span> L</span>
-        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:#8bc4f5;"></span>Raiku JIT: <span id="cust-comp-rjit-l">—</span> L</span>
-        <span class="cust-comp-total-label">Total: <span id="cust-comp-raiku-total">—</span> L</span>
-      </div>
-    </div>
-
-    <!-- View B: Per Non-Raiku block -->
-    <div class="cust-comp-block">
-      <div class="cust-comp-view-label" style="color:var(--text2);">Per Non-Raiku block</div>
-      <div class="cust-comp-bar-track">
-        <div class="cust-comp-seg" id="cust-comp-njit-seg" style="background:#4a5568;width:0%;"></div>
-      </div>
-      <div class="cust-comp-legend-row">
-        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:#4a5568;"></span>Other JIT: <span id="cust-comp-njit-l">—</span> L</span>
-        <span class="cust-comp-total-label">Total: <span id="cust-comp-njit-total">—</span> L</span>
-      </div>
-    </div>
-
-    <!-- View C: Per epoch -->
-    <div class="cust-comp-block">
-      <div class="cust-comp-view-label" style="color:#8bc4f5;">Per epoch &mdash; <span id="cust-comp-stake-pct">—</span> Raiku stake</div>
-      <div class="cust-comp-bar-track">
-        <div class="cust-comp-seg" id="cust-comp-ep-raiku-seg" style="background:var(--lime-soft);opacity:.7;width:0%;"></div>
-        <div class="cust-comp-seg" id="cust-comp-ep-njit-seg" style="background:#4a5568;width:0%;"></div>
-      </div>
-      <div class="cust-comp-legend-row">
-        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:var(--lime-soft);opacity:.7;"></span>Raiku blks: <span id="cust-comp-ep-raiku-l">—</span> L</span>
-        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:#4a5568;"></span>Non-Raiku: <span id="cust-comp-ep-njit-l">—</span> L</span>
-        <span class="cust-comp-total-label"><span id="cust-comp-ep-sol">—</span> SOL</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- 2. BLOCK DISTRIBUTION -->
-  <div class="cust-panel-section fade-in">
-    <div class="cust-panel-title">Block Distribution</div>
-
-    <!-- Epoch Share bar -->
-    <div>
-      <div class="cust-comp-view-label" style="margin-bottom:5px;">Epoch Share</div>
-      <div class="cust-epoch-share-bar">
-        <div class="cust-epoch-bar-raiku" id="cust-epoch-bar-raiku" style="width:10%;"></div>
-        <div class="cust-epoch-bar-other"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;font-family:var(--font-mono);">
-        <span style="color:var(--lime-soft);">Raiku <span id="cust-epoch-raiku-pct">10.0%</span> · <span id="cust-epoch-raiku-blks">43,200</span> blk</span>
-        <span style="color:var(--text2);">Non-Raiku <span id="cust-epoch-other-pct">90.0%</span> · <span id="cust-epoch-other-blks">388,800</span> blk</span>
-      </div>
-    </div>
-
-    <!-- 432-cell compressed epoch map -->
-    <div style="margin-top:8px;">
-      <div class="cust-comp-view-label" style="margin-bottom:5px;">Compressed Epoch Map <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;">— 1 cell = 1,000 blocks</span></div>
-      <div class="cust-cell-grid" id="cust-cell-grid"><!-- populated by JS --></div>
-      <div class="cust-cadence-note">432 cells total · Raiku-staked blocks highlighted · compressed representation, not literal block order</div>
-    </div>
-
-    <!-- Illustrative Leader Cadence — dense 9×100 grid -->
-    <div style="margin-top:8px;">
-      <div class="cust-comp-view-label" style="margin-bottom:5px;">Illustrative Leader Cadence <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;">— ~1 hour · ~9,000 slots</span></div>
-      <div class="cust-cadence-dense" id="cust-cadence-dense"><!-- populated by JS --></div>
-      <div class="cust-cadence-note">9 rows × 100 cells · 4 consecutive highlighted cells = 1 leader window (4 slots) · groups evenly spaced by stake · uniform distribution assumed · illustrative only</div>
-    </div>
-  </div>
-
-  <!-- 3. RESULTS MATRIX -->
+  <!-- 1. RESULTS MATRIX -->
   <div class="cust-panel-section fade-in">
     <div class="cust-panel-title">Results Matrix</div>
     <div style="overflow-x:auto;">
@@ -2685,6 +2605,86 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       </table>
     </div>
     <p style="color:var(--text2);font-size:9px;margin-top:10px;line-height:1.5;">Values are editable starting points. Category seeding uses median on-chain data where available. No hidden route split logic. This tool does not model or claim Raiku reduces execution cost.</p>
+  </div>
+
+  <!-- 2. SPEND COMPOSITION — 3 views -->
+  <div class="cust-panel-section fade-in">
+    <div class="cust-panel-title" style="display:flex;align-items:baseline;gap:8px;">
+      Spend Composition
+      <span style="font-size:9px;font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;color:var(--text2);">configured AOT / JIT spend · base fees not separately modeled</span>
+    </div>
+
+    <!-- View A: Per Raiku block -->
+    <div class="cust-comp-block">
+      <div class="cust-comp-view-label" style="color:var(--lime-soft);">Per Raiku block</div>
+      <div class="cust-comp-bar-track">
+        <div class="cust-comp-seg" id="cust-comp-aot-seg" style="background:var(--lime-soft);width:0%;"></div>
+        <div class="cust-comp-seg" id="cust-comp-rjit-seg" style="background:#8bc4f5;width:0%;"></div>
+      </div>
+      <div class="cust-comp-legend-row">
+        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:var(--lime-soft);"></span>AOT: <span id="cust-comp-aot-l">—</span> L</span>
+        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:#8bc4f5;"></span>Raiku JIT: <span id="cust-comp-rjit-l">—</span> L</span>
+        <span class="cust-comp-total-label">Total: <span id="cust-comp-raiku-total">—</span> L</span>
+      </div>
+    </div>
+
+    <!-- View B: Per Non-Raiku block -->
+    <div class="cust-comp-block">
+      <div class="cust-comp-view-label" style="color:var(--text2);">Per Non-Raiku block</div>
+      <div class="cust-comp-bar-track">
+        <div class="cust-comp-seg" id="cust-comp-njit-seg" style="background:#4a5568;width:0%;"></div>
+      </div>
+      <div class="cust-comp-legend-row">
+        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:#4a5568;"></span>Other JIT: <span id="cust-comp-njit-l">—</span> L</span>
+        <span class="cust-comp-total-label">Total: <span id="cust-comp-njit-total">—</span> L</span>
+      </div>
+    </div>
+
+    <!-- View C: Per epoch -->
+    <div class="cust-comp-block">
+      <div class="cust-comp-view-label" style="color:#8bc4f5;">Per epoch &mdash; <span id="cust-comp-stake-pct">—</span> Raiku stake</div>
+      <div class="cust-comp-bar-track">
+        <div class="cust-comp-seg" id="cust-comp-ep-raiku-seg" style="background:var(--lime-soft);opacity:.7;width:0%;"></div>
+        <div class="cust-comp-seg" id="cust-comp-ep-njit-seg" style="background:#4a5568;width:0%;"></div>
+      </div>
+      <div class="cust-comp-legend-row">
+        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:var(--lime-soft);opacity:.7;"></span>Raiku blks: <span id="cust-comp-ep-raiku-l">—</span> L</span>
+        <span class="cust-comp-leg-item"><span class="cust-comp-leg-dot" style="background:#4a5568;"></span>Non-Raiku: <span id="cust-comp-ep-njit-l">—</span> L</span>
+        <span class="cust-comp-total-label"><span id="cust-comp-ep-sol">—</span> SOL</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. BLOCK DISTRIBUTION -->
+  <div class="cust-panel-section fade-in">
+    <div class="cust-panel-title">Block Distribution</div>
+
+    <!-- Epoch Share bar -->
+    <div>
+      <div class="cust-comp-view-label" style="margin-bottom:5px;">Epoch Share</div>
+      <div class="cust-epoch-share-bar">
+        <div class="cust-epoch-bar-raiku" id="cust-epoch-bar-raiku" style="width:10%;"></div>
+        <div class="cust-epoch-bar-other"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;font-family:var(--font-mono);">
+        <span style="color:var(--lime-soft);">Raiku <span id="cust-epoch-raiku-pct">10.0%</span> · <span id="cust-epoch-raiku-blks">43,200</span> blk</span>
+        <span style="color:var(--text2);">Non-Raiku <span id="cust-epoch-other-pct">90.0%</span> · <span id="cust-epoch-other-blks">388,800</span> blk</span>
+      </div>
+    </div>
+
+    <!-- 432-cell compressed epoch map -->
+    <div style="margin-top:8px;">
+      <div class="cust-comp-view-label" style="margin-bottom:5px;">Compressed Epoch Map <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;">— 1 cell = 1,000 blocks</span></div>
+      <div class="cust-cell-grid" id="cust-cell-grid"><!-- populated by JS --></div>
+      <div class="cust-cadence-note">432 cells total · Raiku-staked blocks highlighted · compressed representation, not literal block order</div>
+    </div>
+
+    <!-- Illustrative Leader Cadence — dense 9×100 grid -->
+    <div style="margin-top:8px;">
+      <div class="cust-comp-view-label" style="margin-bottom:5px;">Illustrative Leader Cadence <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;">— ~1 hour · ~9,000 slots</span></div>
+      <div class="cust-cadence-dense" id="cust-cadence-dense"><!-- populated by JS --></div>
+      <div class="cust-cadence-note">9 rows × 100 cells · 4 consecutive highlighted cells = 1 leader window (4 slots) · groups evenly spaced by stake · uniform distribution assumed · illustrative only</div>
+    </div>
   </div>
 
   <!-- hidden spans to keep existing JS set() calls silent -->
