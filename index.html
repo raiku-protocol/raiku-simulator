@@ -2472,11 +2472,18 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
   <div class="fade-in fade-in-4" style="border-top:1px solid var(--card-border);padding-top:10px;margin-top:8px;display:flex;flex-direction:column;gap:6px;">
     <h2 style="margin-bottom:4px;">Customer Demand</h2>
     <div class="control" style="gap:3px;">
-      <label style="display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:10px;">
+      <label style="display:flex;align-items:center;gap:4px;font-size:10px;">
         <span>Customer category</span>
-        <button class="vc-info-btn" id="cust-src-nav-btn" style="font-size:9px;padding:1px 5px;" onclick="custNavToSource()">Block Simulation &#8599;</button>
       </label>
       <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
+      <div style="display:flex;gap:6px;margin-top:5px;">
+        <button class="vc-info-btn" id="cust-nav-cat-btn"
+                style="flex:1;font-size:9px;padding:3px 6px;text-align:center;"
+                onclick="custNavToCatExplorer()">Category Explorer &#8599;</button>
+        <button class="vc-info-btn" id="cust-nav-arb-btn"
+                style="flex:1;font-size:9px;padding:3px 6px;text-align:center;"
+                onclick="custNavToArbBot()">Arb Bot Detail &#8599;</button>
+      </div>
     </div>
     <div class="control" style="gap:3px;margin-top:6px;" id="cust-profile-row">
       <label style="display:flex;align-items:center;gap:4px;font-size:10px;">
@@ -2484,8 +2491,13 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       </label>
       <select id="cust-profile-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
-    <div style="margin-top:6px;font-size:9px;color:var(--text2);font-family:var(--font-mono);line-height:1.5;padding:5px 7px;background:#1a1c22;border:1px solid #2a2d35;border-radius:4px;" id="cust-default-note">
-      <span style="color:#7c8;font-weight:600;">Conservative default</span> &#8212; the selected profile sets one baseline demand. Non-Raiku block gets the full baseline (Other JIT). Raiku block uses the same total CU, split 50&#8239;/&#8239;50 between Raiku AOT and Raiku JIT. This assumes no extra demand &#8212; only rerouting.
+    <div style="margin-top:6px;font-size:9px;color:var(--text2);font-family:var(--font-mono);line-height:1.6;padding:5px 7px;background:#1a1c22;border:1px solid #2a2d35;border-radius:4px;" id="cust-default-note">
+      <span style="color:#7c8;font-weight:600;">Conservative default</span><br>
+      The selected profile sets <em>one</em> baseline demand.<br>
+      <span style="color:var(--text);">Non-Raiku block</span> &#8594; Other JIT gets the full baseline CU + fee.<br>
+      <span style="color:var(--text);">Raiku block</span> &#8594; same total CU, split 50&thinsp;/&thinsp;50 between Raiku AOT and Raiku JIT.<br>
+      No extra demand assumed &#8212; only rerouting.<br>
+      <span style="color:#888;">Seeded values are rounded for readability. Adjust with the sliders below.</span>
     </div>
 
     <!-- Raiku Blocks -->
@@ -9625,15 +9637,37 @@ function _custGetProfilesForCat(catId) {
         if(!d) return [];
         return [
             { key: 'median', label: 'Median', profile: d.medianProfile },
+            { key: 'p25',    label: 'P25',    profile: d.p25Profile    },
+            { key: 'p75',    label: 'P75',    profile: d.p75Profile    },
+            { key: 'mean',   label: 'Mean',   profile: d.meanProfile   },
             { key: 'small',  label: 'Small',  profile: d.smallProfile  },
             { key: 'medium', label: 'Medium', profile: d.mediumProfile  },
             { key: 'large',  label: 'Large',  profile: d.largeProfile  },
             { key: 'xl',     label: 'XL',     profile: d.xlProfile     }
         ].filter(function(p){ return p.profile && p.profile.cu > 0; });
     }
-    var prof = _custGetProfile(catId);
-    if(!prof || prof.cu <= 0) return [];
-    return [{ key: 'median', label: 'Median', profile: prof }];
+    var catObj = getBuilderCatData(catId, null);
+    var result = [];
+    if(catObj) {
+        if(catObj.medianProfile && catObj.medianProfile.cu > 0)
+            result.push({ key: 'median', label: 'Median', profile: catObj.medianProfile });
+        if(catObj.meanProfile && catObj.meanProfile.cu > 0)
+            result.push({ key: 'mean', label: 'Mean', profile: catObj.meanProfile });
+        if(catObj.p25Profile && catObj.p25Profile.cu > 0)
+            result.push({ key: 'p25', label: 'P25', profile: catObj.p25Profile });
+        if(catObj.p75Profile && catObj.p75Profile.cu > 0)
+            result.push({ key: 'p75', label: 'P75', profile: catObj.p75Profile });
+        if(catObj.programOptions && catObj.programOptions.length) {
+            catObj.programOptions.forEach(function(p) {
+                if(p.cu > 0) result.push({ key: p.key, label: p.label, profile: p });
+            });
+        }
+    }
+    if(!result.length) {
+        var prof = _custGetProfile(catId);
+        if(prof && prof.cu > 0) result.push({ key: 'median', label: 'Median', profile: prof });
+    }
+    return result;
 }
 
 function populateCustProfileSelect(catId) {
@@ -9641,6 +9675,7 @@ function populateCustProfileSelect(catId) {
     var sel = document.getElementById('cust-profile-select');
     if(!sel) return;
     sel.innerHTML = '';
+    _custUpdateNavButtons(catId);
     if(catId === 'custom' || !catId) {
         if(row) row.style.display = 'none';
         return;
@@ -9671,21 +9706,45 @@ function populateCustProfileSelect(catId) {
     });
 }
 
-// Context-aware navigation to Block Simulation source data
-function custNavToSource() {
-    var catSel = document.getElementById('cust-cat-select');
-    var catId = catSel ? catSel.value : '';
+function _custUpdateNavButtons(catId) {
+    var catBtn = document.getElementById('cust-nav-cat-btn');
+    var arbBtn = document.getElementById('cust-nav-arb-btn');
+    if(!catBtn || !arbBtn) return;
+    if(catId === 'arb_bot') {
+        arbBtn.style.opacity = '1';
+        catBtn.style.opacity = '0.4';
+    } else {
+        catBtn.style.opacity = '1';
+        arbBtn.style.opacity = catId === 'custom' ? '0.4' : '0.6';
+    }
+}
+
+function custNavToCatExplorer() {
     switchTab('micro');
     setTimeout(function() {
-        if(catId === 'arb_bot') {
-            if(!_showBenchmarkBlock) { _showBenchmarkBlock = true; renderBenchmarkBlock(); }
-            var el = document.getElementById('sim-benchmark-block');
-            if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-        } else {
-            var el = document.getElementById('sim-cat-bar');
-            if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-        }
+        var el = document.getElementById('sim-cat-bar');
+        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
     }, 150);
+}
+
+function custNavToArbBot() {
+    switchTab('micro');
+    setTimeout(function() {
+        if(typeof _showBenchmarkBlock !== 'undefined' && !_showBenchmarkBlock) {
+            _showBenchmarkBlock = true;
+            if(typeof renderBenchmarkBlock === 'function') renderBenchmarkBlock();
+        }
+        var el = document.getElementById('sim-benchmark-block');
+        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 150);
+}
+
+function _roundCuForDisplay(rawCu) {
+    if(rawCu <= 0) return 0;
+    if(rawCu < 50000)  return Math.round(rawCu / 1000)  * 1000;   // nearest 1K
+    if(rawCu < 100000) return Math.round(rawCu / 5000)  * 5000;   // nearest 5K
+    if(rawCu < 500000) return Math.round(rawCu / 10000) * 10000;  // nearest 10K
+    return                     Math.round(rawCu / 50000) * 50000; // nearest 50K
 }
 
 // Seed all 6 sliders from the selected profile — conservative 50/50 split
@@ -9697,7 +9756,7 @@ function seedCustomerFromProfile(catId, profileKey) {
         if(profiles[i].key === profileKey) { selected = profiles[i]; break; }
     }
     if(!selected || !selected.profile || selected.profile.cu <= 0) return;
-    var cu  = Math.round(selected.profile.cu);
+    var cu  = _roundCuForDisplay(selected.profile.cu);
     var fee = selected.profile.feePerCU > 0 ? selected.profile.feePerCU : 0;
     var halfCu = Math.round(cu * 0.5);
     // Non-Raiku block: full baseline
@@ -9746,7 +9805,7 @@ function _custSyncSlider(slId, val) {
     inp.value = decimals === 0 ? Math.round(val).toLocaleString('en-US') : parseFloat(val).toFixed(decimals);
 }
 
-// seedCustomerAOT, seedCustomerJIT, custNavToAOTSource, custNavToJITSource removed — replaced by seedCustomerFromProfile / custNavToSource
+// seedCustomerAOT, seedCustomerJIT, custNavToAOTSource, custNavToJITSource, custNavToSource removed — replaced by seedCustomerFromProfile / custNavToCatExplorer / custNavToArbBot
 
 function syncCustomerRouteSliders() {
     var s = customerState;
@@ -10104,6 +10163,7 @@ function initCustomerTab() {
 
     // Initialize second selector and state
     populateCustProfileSelect(catSel ? catSel.value : 'custom');
+    _custUpdateNavButtons(catSel ? catSel.value : 'custom');
     readCustomerInputs();
     updateCustomerCalcs();
 }
