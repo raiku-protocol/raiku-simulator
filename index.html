@@ -2471,9 +2471,19 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
   <!-- C. CUSTOMER DEMAND -->
   <div class="fade-in fade-in-4" style="border-top:1px solid var(--card-border);padding-top:10px;margin-top:8px;display:flex;flex-direction:column;gap:6px;">
     <h2 style="margin-bottom:4px;">Customer Demand</h2>
-    <div class="control" style="gap:4px;">
-      <label style="display:flex;align-items:center;gap:5px;">Category<button class="vc-info-btn" onclick="vcOpenExplainer('cust-explainer-cat')">?</button></label>
-      <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
+    <div class="control" style="gap:3px;">
+      <label style="display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:10px;">
+        <span>AOT selection</span>
+        <button class="vc-info-btn" style="font-size:9px;padding:1px 5px;" onclick="switchTab('micro')">View in Block Sim ↗</button>
+      </label>
+      <select id="cust-aot-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
+    </div>
+    <div class="control" style="gap:3px;margin-top:6px;">
+      <label style="display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:10px;">
+        <span>JIT selection</span>
+        <button class="vc-info-btn" style="font-size:9px;padding:1px 5px;" onclick="switchTab('micro')">View Arb Bot source ↗</button>
+      </label>
+      <select id="cust-jit-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
 
     <!-- Raiku Blocks -->
@@ -2506,7 +2516,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           </div>
           <div class="control">
             <label>Fee / CU (L)</label>
-            <div class="slider-row"><input type="range" id="cust-rjit-fee-sl" min="0" max="25" step="0.1" value="0"><span class="val">0</span></div>
+            <div class="slider-row"><input type="range" id="cust-rjit-fee-sl" min="0" max="25" step="0.0001" value="0"><span class="val">0</span></div>
           </div>
         </div>
         <div id="cust-rjit-warn" class="cust-aot-warn">Raiku JIT CU exceeds allocation &mdash; max <span id="cust-rjit-max-cu">&mdash;</span> CU at <span id="cust-rjit-alloc-pct">&mdash;</span>% block share.</div>
@@ -2529,7 +2539,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           </div>
           <div class="control">
             <label>Fee / CU (L)</label>
-            <div class="slider-row"><input type="range" id="cust-njit-fee-sl" min="0" max="25" step="0.1" value="0"><span class="val">0</span></div>
+            <div class="slider-row"><input type="range" id="cust-njit-fee-sl" min="0" max="25" step="0.0001" value="0"><span class="val">0</span></div>
           </div>
         </div>
         <div id="cust-njit-warn" class="cust-aot-warn">Other JIT CU exceeds allocation — max <span id="cust-njit-max-cu">—</span> CU at <span id="cust-njit-alloc-pct">—</span>% block share.</div>
@@ -9574,6 +9584,120 @@ function seedCustomerFromCategory(catId) {
     updateCustomerCalcs();
 }
 
+// ── Dual-selector support (AOT selection + JIT selection) ──
+
+// AOT category order — arb_bot moved to end (less typical AOT customer)
+var CUST_AOT_CAT_ORDER = [
+    { id: 'custom',   label: 'Custom',       isCustom: true },
+    { id: 'prop_amm', label: 'Prop AMM'      },
+    { id: 'cranker',  label: 'Cranker'       },
+    { id: 'oracle',   label: 'Oracle'        },
+    { id: 'payments', label: 'Payments'      },
+    { id: 'dex',      label: 'DEX'           },
+    { id: 'lending',  label: 'Lending'       },
+    { id: 'perps',    label: 'Perps'         },
+    { id: 'bridge',   label: 'Bridge'        },
+    { id: 'nft',      label: 'NFT'           },
+    { id: 'gaming',   label: 'Gaming'        },
+    { id: 'depin',    label: 'Depin'         },
+    { id: 'arb_bot',  label: 'Arbitrage Bot' }
+];
+
+function populateCustAOTSelect() {
+    var sel = document.getElementById('cust-aot-cat-select');
+    if(!sel) return;
+    CUST_AOT_CAT_ORDER.forEach(function(cat) {
+        var prof = _custGetProfile(cat.id);
+        var tag  = _custDataTag(cat.id, prof);
+        var text = cat.label;
+        if(prof && prof.cu > 0) {
+            var cuK = prof.cu >= 1000000 ? (prof.cu/1000000).toFixed(1)+'M' : Math.round(prof.cu/1000)+'K';
+            text += '  \u2014  ' + prof.feePerCU.toFixed(1) + ' L/CU \u00b7 ' + cuK + ' CU/blk';
+        } else if(tag) {
+            text += '  \u2014  ' + tag;
+        }
+        var opt = document.createElement('option');
+        opt.value = cat.id;
+        opt.textContent = text;
+        sel.appendChild(opt);
+    });
+}
+
+function _custGetJITProfile(key) {
+    var data = getArbBotBuilderData();
+    if(!data) return null;
+    var map = { median: data.medianProfile, small: data.smallProfile, medium: data.mediumProfile, large: data.largeProfile, xl: data.xlProfile };
+    return map[key] || null;
+}
+
+function populateCustJITSelect() {
+    var sel = document.getElementById('cust-jit-cat-select');
+    if(!sel) return;
+    var data = getArbBotBuilderData();
+    var presets = [
+        { key: 'custom', label: 'Custom',  profile: null },
+        { key: 'median', label: 'Median',  profile: data ? data.medianProfile : null },
+        { key: 'small',  label: 'Small',   profile: data ? data.smallProfile  : null },
+        { key: 'medium', label: 'Medium',  profile: data ? data.mediumProfile : null },
+        { key: 'large',  label: 'Large',   profile: data ? data.largeProfile  : null },
+        { key: 'xl',     label: 'XL',      profile: data ? data.xlProfile     : null }
+    ];
+    presets.forEach(function(preset) {
+        var opt = document.createElement('option');
+        opt.value = preset.key;
+        var text = preset.label;
+        if(preset.profile && preset.profile.cu > 0) {
+            var cuK = preset.profile.cu >= 1000000 ? (preset.profile.cu/1000000).toFixed(1)+'M' : Math.round(preset.profile.cu/1000)+'K';
+            var fee = preset.profile.feePerCU;
+            var feeStr = fee < 0.01 ? fee.toFixed(4) : fee.toFixed(2);
+            text += '  \u2014  ' + feeStr + ' L/CU \u00b7 ' + cuK + ' CU/blk';
+        }
+        opt.textContent = text;
+        sel.appendChild(opt);
+    });
+}
+
+function seedCustomerAOT(catId) {
+    if(catId !== 'custom') {
+        var prof = _custGetProfile(catId);
+        if(prof && prof.cu > 0) {
+            customerState.aotCu  = Math.round(prof.cu);
+            customerState.aotFee = +(prof.feePerCU > 0 ? prof.feePerCU : 0).toFixed(3);
+        } else {
+            customerState.aotCu = customerState.aotFee = 0;
+        }
+        var cuSl = document.getElementById('cust-aot-cu-sl');
+        var feeSl = document.getElementById('cust-aot-fee-sl');
+        if(cuSl)  { cuSl.value  = customerState.aotCu;  cuSl.dispatchEvent(new Event('input',  { bubbles: true })); }
+        if(feeSl) { feeSl.value = customerState.aotFee; feeSl.dispatchEvent(new Event('input', { bubbles: true })); }
+    }
+    updateCustomerCalcs();
+}
+
+function seedCustomerJIT(presetKey) {
+    if(presetKey !== 'custom') {
+        var prof = _custGetJITProfile(presetKey);
+        if(prof && prof.cu > 0) {
+            var cu  = Math.round(prof.cu);
+            var fee = prof.feePerCU > 0 ? prof.feePerCU : 0;
+            customerState.rjitCu  = cu;  customerState.rjitFee = fee;
+            customerState.njitCu  = cu;  customerState.njitFee = fee;
+        } else {
+            customerState.rjitCu = customerState.rjitFee = 0;
+            customerState.njitCu = customerState.njitFee = 0;
+        }
+        [['cust-rjit-cu-sl', customerState.rjitCu],  ['cust-rjit-fee-sl', customerState.rjitFee],
+         ['cust-njit-cu-sl', customerState.njitCu],  ['cust-njit-fee-sl', customerState.njitFee]
+        ].forEach(function(e) {
+            var sl = document.getElementById(e[0]);
+            if(!sl) return;
+            sl.value = e[1];
+            sl.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+    }
+    updateCustomerCalcs();
+}
+
 function syncCustomerRouteSliders() {
     var s = customerState;
     [['cust-aot-cu-sl', s.aotCu], ['cust-aot-fee-sl', s.aotFee],
@@ -9881,9 +10005,10 @@ function updateCustomerCalcs() {
         fmtSpan('cust-aot-cu-sl',  Math.round(s.aotCu).toLocaleString('en-US'));
         fmtSpan('cust-rjit-cu-sl', Math.round(s.rjitCu).toLocaleString('en-US'));
         fmtSpan('cust-njit-cu-sl', Math.round(s.njitCu).toLocaleString('en-US'));
-        fmtSpan('cust-aot-fee-sl',  s.aotFee.toFixed(3));
-        fmtSpan('cust-rjit-fee-sl', s.rjitFee.toFixed(3));
-        fmtSpan('cust-njit-fee-sl', s.njitFee.toFixed(3));
+        function fmtFeeVal(v){ if(v===0) return '0'; if(v<0.001) return v.toFixed(5); if(v<0.01) return v.toFixed(4); return v.toFixed(3); }
+        fmtSpan('cust-aot-fee-sl',  fmtFeeVal(s.aotFee));
+        fmtSpan('cust-rjit-fee-sl', fmtFeeVal(s.rjitFee));
+        fmtSpan('cust-njit-fee-sl', fmtFeeVal(s.njitFee));
         fmtSpan('cust-ctx-aot-share', (s.aotShare * 100).toFixed(0) + '%');
         fmtSpan('cust-ctx-rjit-alloc', (s.rjitShare * 100).toFixed(0) + '%');
         fmtSpan('cust-ctx-stake', (s.raikuStake * 100).toFixed(1) + '%');
@@ -9892,9 +10017,14 @@ function updateCustomerCalcs() {
 }
 
 function initCustomerTab() {
-    populateCustCategorySelect();
-    var sel = document.getElementById('cust-cat-select');
-    if(sel) sel.addEventListener('change', function(){ seedCustomerFromCategory(this.value); });
+    populateCustAOTSelect();
+    populateCustJITSelect();
+
+    var aotSel = document.getElementById('cust-aot-cat-select');
+    if(aotSel) aotSel.addEventListener('change', function(){ seedCustomerAOT(this.value); });
+
+    var jitSel = document.getElementById('cust-jit-cat-select');
+    if(jitSel) jitSel.addEventListener('change', function(){ seedCustomerJIT(this.value); });
 
     // Demand sliders
     ['cust-aot-cu-sl','cust-aot-fee-sl','cust-rjit-cu-sl','cust-rjit-fee-sl','cust-njit-cu-sl','cust-njit-fee-sl'].forEach(function(id) {
@@ -9902,15 +10032,13 @@ function initCustomerTab() {
         if(sl) sl.addEventListener('input', function(){ readCustomerInputs(); updateCustomerCalcs(); });
     });
 
-    // Context sliders (sol price is now a range slider)
+    // Context sliders
     ['cust-ctx-aot-share','cust-ctx-rjit-alloc','cust-ctx-njit-alloc','cust-ctx-stake','cust-ctx-sol'].forEach(function(id) {
         var sl = document.getElementById(id);
         if(sl) sl.addEventListener('input', function(){ readCustomerInputs(); updateCustomerCalcs(); });
     });
 
-    // Initialize with Custom (blank start)
     readCustomerInputs();
-    updateCustCatInfo('custom');
     updateCustomerCalcs();
 }
 
