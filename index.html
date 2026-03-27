@@ -2821,7 +2821,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 <div class="section fade-in fade-in-2">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <h2 style="margin-bottom:0;">Category Explorer</h2>
-        <button class="vc-info-btn" onclick="switchTab('customer')" style="font-size:9px;padding:2px 8px;">&#8592; Back to Customer Economics</button>
+        <button onclick="switchTab('customer')" style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;font-size:11px;font-family:var(--font-mono);font-weight:600;color:#0a0c0f;background:#7ec860;border:none;border-radius:4px;cursor:pointer;letter-spacing:0.04em;">&#8592; Customer Economics</button>
     </div>
     <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">Fixed canonical order: <strong>Prop AMM, Cranker, Oracle, Depin, Payments, DEX, Lending, Perps, Bridge, NFT, Gaming</strong>. Core scope uses <strong>aot + both</strong>. The <strong>arbitrage-bot</strong> layer appears separately and stays excluded by default unless explicitly toggled on in Block Builder.</div>
 
@@ -7306,7 +7306,10 @@ function renderBenchmarkBlock(){
     }
     el.innerHTML = html +
         '<div style="margin-top:8px;padding:10px 12px;background:#0a0b0c;border:1px solid var(--card-border);border-radius:8px;">' +
-            '<div style="font-size:11px;color:#A78BFA;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Arbitrage Bot Layer</div>' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+                '<div style="font-size:11px;color:#A78BFA;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Arbitrage Bot Layer</div>' +
+                '<button onclick="switchTab(\'customer\')" style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;font-size:11px;font-family:var(--font-mono);font-weight:600;color:#0a0c0f;background:#7ec860;border:none;border-radius:4px;cursor:pointer;letter-spacing:0.04em;">&#8592; Customer Economics</button>' +
+            '</div>' +
             '<div style="font-size:10px;color:var(--text2);margin-bottom:8px;">Shown separately and excluded by default from the core AOT customer story. Non-base means priority fees plus MEV / JIT tips.</div>' +
             '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-family:var(--font-mono);font-size:11px;">' +
                 '<div><span style="color:var(--text2);">Programs</span><br><span style="color:var(--text);font-weight:600;">' + fmtK(b.n) + '</span></div>' +
@@ -7318,9 +7321,6 @@ function renderBenchmarkBlock(){
             '</div>' +
             distHtml +
             '<div style="font-size:9px;color:var(--text2);margin-top:8px;font-family:var(--font-mono);">' + ((arbProfile && arbProfile.usesTouchedBlocks) ? 'Active-block metrics use touched-block semantics from benchmark rows when available.' : 'Active-block metrics fall back to 30d window averages when touched-block counts are unavailable.') + '</div>' +
-            '<div style="text-align:right;margin-top:10px;">' +
-                '<button class="vc-info-btn" onclick="switchTab(\'customer\')" style="font-size:9px;padding:2px 8px;">&#8592; Customer Economics</button>' +
-            '</div>' +
         '</div>';
     renderArbBotDistributionChart(arbBuilder ? arbBuilder.distribution : null);
 }
