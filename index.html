@@ -2627,7 +2627,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             <td id="mx-njit-yr-cu" class="mx-group-start">—</td><td id="mx-njit-yr-spend">—</td>
           </tr>
           <tr class="cust-mx-grand-row">
-            <td class="cust-mx-route-cell" style="font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;">Grand Total</td>
+            <td class="cust-mx-route-cell" style="font-weight:700;color:var(--text);letter-spacing:.06em;">TOTAL — Raiku + Non-Raiku</td>
             <td id="mx-grand-blk-cu">—</td>
             <td id="mx-grand-blk-fee">—</td>
             <td id="mx-grand-blk-spend">—</td>
@@ -10085,18 +10085,18 @@ function updateCustomerCalcs() {
         set(pfx+'-blk-cu',  Math.round(cu).toLocaleString('en-US'));
         set(pfx+'-blk-fee', fee.toFixed(3));
         var blkSol = spend / 1e9;
-        setSpend(pfx+'-blk-spend', blkSol.toFixed(6), blkSol * s.solPrice);
+        setSpend(pfx+'-blk-spend', blkSol.toFixed(3), blkSol * s.solPrice);
         var epCu    = cu    * epochBlks;
         var epSpend = spend * epochBlks;
         var epSol   = epSpend / 1e9;
         set(pfx+'-ep-cu', fmtCU(epCu));
-        setSpend(pfx+'-ep-spend', fmtSOL(epSol), epSol * s.solPrice);
+        setSpend(pfx+'-ep-spend', epSol.toFixed(3), epSol * s.solPrice);
         var moSol = epSol * EPOCHS_PER_MONTH;
         set(pfx+'-mo-cu', fmtCU(epCu * EPOCHS_PER_MONTH));
-        setSpend(pfx+'-mo-spend', fmtSOL(moSol), moSol * s.solPrice);
+        setSpend(pfx+'-mo-spend', moSol.toFixed(3), moSol * s.solPrice);
         var yrSol = epSol * EPOCHS_PER_YEAR;
         set(pfx+'-yr-cu', fmtCU(epCu * EPOCHS_PER_YEAR));
-        setSpend(pfx+'-yr-spend', fmtSOL(yrSol), yrSol * s.solPrice);
+        setSpend(pfx+'-yr-spend', yrSol.toFixed(3), yrSol * s.solPrice);
     }
     setMx('mx-aot',  s.aotCu,  s.aotFee,  aotSpend,  epochRaikuBlocks);
     setMx('mx-rjit', s.rjitCu, s.rjitFee, rjitSpend, epochRaikuBlocks);
@@ -10109,16 +10109,16 @@ function updateCustomerCalcs() {
     set('mx-total-blk-cu',  Math.round(totalCu).toLocaleString('en-US'));
     set('mx-total-blk-fee', totalFee.toFixed(3));
     var totBlkSol = totalSpend / 1e9;
-    setSpend('mx-total-blk-spend', totBlkSol.toFixed(6), totBlkSol * s.solPrice);
+    setSpend('mx-total-blk-spend', totBlkSol.toFixed(3), totBlkSol * s.solPrice);
     var totEpSol = totalSpend * epochRaikuBlocks / 1e9;
     set('mx-total-ep-cu', fmtCU(totalCu * epochRaikuBlocks));
-    setSpend('mx-total-ep-spend', fmtSOL(totEpSol), totEpSol * s.solPrice);
+    setSpend('mx-total-ep-spend', totEpSol.toFixed(3), totEpSol * s.solPrice);
     var totMoSol = totEpSol * EPOCHS_PER_MONTH;
     set('mx-total-mo-cu', fmtCU(totalCu * epochRaikuBlocks * EPOCHS_PER_MONTH));
-    setSpend('mx-total-mo-spend', fmtSOL(totMoSol), totMoSol * s.solPrice);
+    setSpend('mx-total-mo-spend', totMoSol.toFixed(3), totMoSol * s.solPrice);
     var totYrSol = totEpSol * EPOCHS_PER_YEAR;
     set('mx-total-yr-cu', fmtCU(totalCu * epochRaikuBlocks * EPOCHS_PER_YEAR));
-    setSpend('mx-total-yr-spend', fmtSOL(totYrSol), totYrSol * s.solPrice);
+    setSpend('mx-total-yr-spend', totYrSol.toFixed(3), totYrSol * s.solPrice);
 
     // ── Grand Total row (Raiku Block + Non-Raiku Block spend) ──
     // Per-block CU and fee are not addable across block types (different context), show "—"
@@ -10129,11 +10129,11 @@ function updateCustomerCalcs() {
     set('mx-grand-blk-fee', '—');
     set('mx-grand-blk-spend', '—');
     set('mx-grand-ep-cu',   '—');
-    setSpend('mx-grand-ep-spend',  fmtSOL(grandEpSol),  grandEpSol  * s.solPrice);
+    setSpend('mx-grand-ep-spend',  grandEpSol.toFixed(3),  grandEpSol  * s.solPrice);
     set('mx-grand-mo-cu',   '—');
-    setSpend('mx-grand-mo-spend',  fmtSOL(grandMoSol),  grandMoSol  * s.solPrice);
+    setSpend('mx-grand-mo-spend',  grandMoSol.toFixed(3),  grandMoSol  * s.solPrice);
     set('mx-grand-yr-cu',   '—');
-    setSpend('mx-grand-yr-spend',  fmtSOL(grandYrSol),  grandYrSol  * s.solPrice);
+    setSpend('mx-grand-yr-spend',  grandYrSol.toFixed(3),  grandYrSol  * s.solPrice);
 
     // ── Silent scenario sentence (hidden span) ──
     var raikuCu = s.aotCu + s.rjitCu;
