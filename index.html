@@ -286,10 +286,12 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-epoch-share-bar { height:18px; border-radius:3px; overflow:hidden; display:flex; background:#0e1016; }
 .cust-epoch-bar-raiku { background:var(--lime-soft); height:100%; transition:width 0.25s ease; min-width:2px; }
 .cust-epoch-bar-other { background:#1a1e2a; height:100%; flex:1; }
-/* 9,000-cell leader-window cadence grid */
-.cust-cadence-9k { display:grid; grid-template-columns:repeat(100,1fr); gap:1px; }
-.cust-cadence-9k .cs { aspect-ratio:1/1; border-radius:0; }
-.cust-cadence-note { font-size:10px; color:var(--text2); font-family:var(--font-mono); line-height:1.6; margin-top:8px; font-style:normal; }
+/* 400-cell leader-window cadence grid */
+.cust-epoch-share-text { font-size:10px; font-family:var(--font-mono); color:var(--text2); padding:4px 0 8px; }
+.cust-cadence-label { font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-family:var(--font-mono); color:var(--text2); margin-bottom:6px; }
+.cust-cadence-400 { display:grid; grid-template-columns:repeat(40,1fr); gap:2px; }
+.cust-cadence-400 .cs { aspect-ratio:1/1; border-radius:1px; }
+.cust-cadence-note-v2 { font-size:10px; color:var(--text2); font-family:var(--font-mono); line-height:1.6; margin-top:8px; }
 /* Results matrix */
 .cust-mx-table { width:100%; border-collapse:collapse; font-family:var(--font-mono); min-width:540px; }
 .cust-mx-table th { font-size:8px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text2); white-space:nowrap; padding:4px 4px 2px; }
@@ -2670,11 +2672,14 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       </div>
     </div>
 
-    <!-- Illustrative 1h slot cadence — 9,000-cell leader-window grid -->
-    <div class="cust-panel-subsection-label" style="margin-top:12px;">Illustrative 1h slot cadence</div>
-    <div id="cust-cadence-dense" class="cust-cadence-9k"></div>
-    <div class="cust-cadence-note" id="cust-cadence-note-text">
-      1 square = 1 slot (avg 0.4 s) · yellow groups of 4 = one Raiku leader window (4 consecutive slots) · ~9,000 slots ≈ 1 hour · leader windows distributed approximately uniformly by stake · illustrative only — not the actual validator schedule
+    <!-- Epoch share summary text -->
+    <div class="cust-epoch-share-text" id="cust-epoch-share-text">—</div>
+
+    <!-- Illustrative local slot cadence — 400-cell leader-window grid -->
+    <div class="cust-cadence-label">Illustrative local slot cadence</div>
+    <div id="cust-cadence-local" class="cust-cadence-400"></div>
+    <div class="cust-cadence-note-v2">
+      1 square = 1 slot (0.4 s) · yellow groups of 4 = one Raiku leader window (4 consecutive slots) · ~400 slots shown ≈ 2 min 40 s · leader windows distributed approximately uniformly · illustrative only, not the actual validator schedule
     </div>
   </div>
 
@@ -9729,18 +9734,24 @@ function updateCustomerCalcs() {
     set('cust-epoch-other-pct',  ((1 - s.raikuStake) * 100).toFixed(1) + '%');
     set('cust-epoch-raiku-blks', epochRaikuBlocks.toLocaleString('en-US'));
     set('cust-epoch-other-blks', epochNonRaikuBlocks.toLocaleString('en-US'));
-    // 1-hour slot cadence (9,000 slots = 90 rows × 100 cols)
-    var cadEl = document.getElementById('cust-cadence-dense');
+    // Epoch share summary text line
+    set('cust-epoch-share-text',
+        'Raiku ' + (s.raikuStake * 100).toFixed(1) + '% = ' +
+        epochRaikuBlocks.toLocaleString('en-US') + ' blk · Non-Raiku ' +
+        ((1 - s.raikuStake) * 100).toFixed(1) + '% = ' +
+        epochNonRaikuBlocks.toLocaleString('en-US') + ' blk'
+    );
+    // 400-cell leader-window cadence (10 rows × 40 cols)
+    var cadEl = document.getElementById('cust-cadence-local');
     if(cadEl) {
-        var TOTAL_SLOTS = 9000;
+        var TOTAL_SLOTS = 400;
         var WINDOW_SIZE = 4; // Solana: 4 consecutive slots per leader
-        var totalWindows = TOTAL_SLOTS / WINDOW_SIZE; // 2,250 windows
+        var totalWindows = TOTAL_SLOTS / WINDOW_SIZE; // 100 windows
         // Number of Raiku leader windows = stake × total windows
         var raikuWindows = Math.round(s.raikuStake * totalWindows);
         raikuWindows = Math.max(0, Math.min(totalWindows, raikuWindows));
 
-        // Mark which windows are Raiku by distributing them uniformly
-        // Use evenly-spaced placement: window i lands at round(i * totalWindows / raikuWindows)
+        // Step 1: distribute leader windows uniformly
         var windowIsRaiku = new Uint8Array(totalWindows);
         if(raikuWindows > 0) {
             for(var wi = 0; wi < raikuWindows; wi++) {
@@ -9749,7 +9760,7 @@ function updateCustomerCalcs() {
             }
         }
 
-        // Expand windows into slots
+        // Step 2: expand each Raiku window into 4 consecutive slots
         var slotIsRaiku = new Uint8Array(TOTAL_SLOTS);
         for(var w = 0; w < totalWindows; w++) {
             if(windowIsRaiku[w]) {
@@ -9760,10 +9771,10 @@ function updateCustomerCalcs() {
             }
         }
 
-        // Build HTML — use inline style for colors, minimal class for size
-        var html = '';
+        // Step 3: render cells
         var raikuColor = getComputedStyle(document.documentElement).getPropertyValue('--lime-soft').trim() || '#c8f135';
         var darkColor = '#1a1e2a';
+        var html = '';
         for(var si = 0; si < TOTAL_SLOTS; si++) {
             html += '<div class="cs" style="background:' + (slotIsRaiku[si] ? raikuColor : darkColor) + '"></div>';
         }
