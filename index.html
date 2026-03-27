@@ -259,7 +259,8 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-ctx-static { font-size:11px; color:var(--text); font-family:var(--font-mono); font-weight:500; }
 .cust-ctx-derived { font-size:11px; color:var(--text); font-family:var(--font-mono); font-weight:600; }
 .cust-alloc-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; }
-.cust-alloc-grid .cust-ctx-card { padding:5px 6px; }
+.cust-alloc-grid .cust-ctx-card { padding:5px 6px; min-width:0; overflow:hidden; }
+.cust-alloc-grid .slider-row { min-width:0; width:100%; }
 #tab-customer .cust-alloc-grid .control label { font-size:9px; }
 #tab-customer .cust-alloc-grid .stepper-input { width:36px; }
 #tab-customer .cust-alloc-grid .stepper-unit { font-size:9px; }
