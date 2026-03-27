@@ -286,12 +286,10 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-epoch-share-bar { height:18px; border-radius:3px; overflow:hidden; display:flex; background:#0e1016; }
 .cust-epoch-bar-raiku { background:var(--lime-soft); height:100%; transition:width 0.25s ease; min-width:2px; }
 .cust-epoch-bar-other { background:#1a1e2a; height:100%; flex:1; }
-/* 432-cell compressed epoch map */
-.cust-cell-grid { display:grid; grid-template-columns:repeat(36,1fr); gap:2px; }
-.cust-cell { height:6px; border-radius:1px; }
-.cust-cadence-dense { display:grid; grid-template-columns:repeat(100,1fr); gap:1px; row-gap:1px; }
-.cust-cell-dense { height:4px; border-radius:0; }
-.cust-cadence-note { font-size:9px; color:var(--text2); font-family:var(--font-mono); line-height:1.55; margin-top:6px; font-style:italic; }
+/* 9,000-cell leader-window cadence grid */
+.cust-cadence-9k { display:grid; grid-template-columns:repeat(100,1fr); gap:1px; }
+.cust-cadence-9k .cs { aspect-ratio:1/1; border-radius:0; }
+.cust-cadence-note { font-size:10px; color:var(--text2); font-family:var(--font-mono); line-height:1.6; margin-top:8px; font-style:normal; }
 /* Results matrix */
 .cust-mx-table { width:100%; border-collapse:collapse; font-family:var(--font-mono); min-width:540px; }
 .cust-mx-table th { font-size:8px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text2); white-space:nowrap; padding:4px 4px 2px; }
@@ -2672,18 +2670,11 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       </div>
     </div>
 
-    <!-- 432-cell compressed epoch map -->
-    <div style="margin-top:8px;">
-      <div class="cust-comp-view-label" style="margin-bottom:5px;">Compressed Epoch Map <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;">— 1 cell = 1,000 blocks</span></div>
-      <div class="cust-cell-grid" id="cust-cell-grid"><!-- populated by JS --></div>
-      <div class="cust-cadence-note">432 cells total · Raiku-staked blocks highlighted · compressed representation, not literal block order</div>
-    </div>
-
-    <!-- Illustrative Leader Cadence — dense 9×100 grid -->
-    <div style="margin-top:8px;">
-      <div class="cust-comp-view-label" style="margin-bottom:5px;">Illustrative Leader Cadence <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;">— ~1 hour · ~9,000 slots</span></div>
-      <div class="cust-cadence-dense" id="cust-cadence-dense"><!-- populated by JS --></div>
-      <div class="cust-cadence-note">9 rows × 100 cells · 4 consecutive highlighted cells = 1 leader window (4 slots) · groups evenly spaced by stake · uniform distribution assumed · illustrative only</div>
+    <!-- Illustrative 1h slot cadence — 9,000-cell leader-window grid -->
+    <div class="cust-panel-subsection-label" style="margin-top:12px;">Illustrative 1h slot cadence</div>
+    <div id="cust-cadence-dense" class="cust-cadence-9k"></div>
+    <div class="cust-cadence-note" id="cust-cadence-note-text">
+      1 square = 1 slot (avg 0.4 s) · yellow groups of 4 = one Raiku leader window (4 consecutive slots) · ~9,000 slots ≈ 1 hour · leader windows distributed approximately uniformly by stake · illustrative only — not the actual validator schedule
     </div>
   </div>
 
@@ -9738,33 +9729,45 @@ function updateCustomerCalcs() {
     set('cust-epoch-other-pct',  ((1 - s.raikuStake) * 100).toFixed(1) + '%');
     set('cust-epoch-raiku-blks', epochRaikuBlocks.toLocaleString('en-US'));
     set('cust-epoch-other-blks', epochNonRaikuBlocks.toLocaleString('en-US'));
-    // 432-cell compressed epoch map (1 cell = 1,000 blocks)
-    var cellGridEl = document.getElementById('cust-cell-grid');
-    if(cellGridEl) {
-        var raikuCells = Math.round(s.raikuStake * 432);
-        var cg = '';
-        for(var cc = 0; cc < 432; cc++) {
-            cg += '<div class="cust-cell" style="background:' + (cc < raikuCells ? 'var(--lime-soft)' : '#1a1e2a') + ';"></div>';
-        }
-        cellGridEl.innerHTML = cg;
-    }
-    // Illustrative Leader Cadence — dense 9×100 grid, groups of 4 consecutive cells
-    var denseCadEl = document.getElementById('cust-cadence-dense');
-    if(denseCadEl) {
-        var CDEN = 900;
-        var raikuGroups = Math.min(225, Math.max(0, Math.round(s.raikuStake * CDEN / 4)));
-        var dcells = new Uint8Array(CDEN); // 0 = non-Raiku, 1 = Raiku
-        for(var dg = 0; dg < raikuGroups; dg++) {
-            var gstart = Math.round(dg * CDEN / raikuGroups);
-            for(var dk = 0; dk < 4; dk++) {
-                if(gstart + dk < CDEN) dcells[gstart + dk] = 1;
+    // 1-hour slot cadence (9,000 slots = 90 rows × 100 cols)
+    var cadEl = document.getElementById('cust-cadence-dense');
+    if(cadEl) {
+        var TOTAL_SLOTS = 9000;
+        var WINDOW_SIZE = 4; // Solana: 4 consecutive slots per leader
+        var totalWindows = TOTAL_SLOTS / WINDOW_SIZE; // 2,250 windows
+        // Number of Raiku leader windows = stake × total windows
+        var raikuWindows = Math.round(s.raikuStake * totalWindows);
+        raikuWindows = Math.max(0, Math.min(totalWindows, raikuWindows));
+
+        // Mark which windows are Raiku by distributing them uniformly
+        // Use evenly-spaced placement: window i lands at round(i * totalWindows / raikuWindows)
+        var windowIsRaiku = new Uint8Array(totalWindows);
+        if(raikuWindows > 0) {
+            for(var wi = 0; wi < raikuWindows; wi++) {
+                var wpos = Math.round(wi * totalWindows / raikuWindows);
+                if(wpos < totalWindows) windowIsRaiku[wpos] = 1;
             }
         }
-        var dh = '';
-        for(var di = 0; di < CDEN; di++) {
-            dh += '<div class="cust-cell-dense" style="background:' + (dcells[di] ? 'var(--lime-soft)' : '#1a1e2a') + ';"></div>';
+
+        // Expand windows into slots
+        var slotIsRaiku = new Uint8Array(TOTAL_SLOTS);
+        for(var w = 0; w < totalWindows; w++) {
+            if(windowIsRaiku[w]) {
+                var base = w * WINDOW_SIZE;
+                for(var k = 0; k < WINDOW_SIZE; k++) {
+                    slotIsRaiku[base + k] = 1;
+                }
+            }
         }
-        denseCadEl.innerHTML = dh;
+
+        // Build HTML — use inline style for colors, minimal class for size
+        var html = '';
+        var raikuColor = getComputedStyle(document.documentElement).getPropertyValue('--lime-soft').trim() || '#c8f135';
+        var darkColor = '#1a1e2a';
+        for(var si = 0; si < TOTAL_SLOTS; si++) {
+            html += '<div class="cs" style="background:' + (slotIsRaiku[si] ? raikuColor : darkColor) + '"></div>';
+        }
+        cadEl.innerHTML = html;
     }
 
     // ── D. Results Matrix ──
