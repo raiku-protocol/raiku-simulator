@@ -289,8 +289,8 @@ details[open] summary::before { transform:rotate(90deg); }
 /* 432-cell compressed epoch map */
 .cust-cell-grid { display:grid; grid-template-columns:repeat(36,1fr); gap:2px; }
 .cust-cell { height:6px; border-radius:1px; }
-.cust-cadence-grid { display:flex; gap:3px; flex-wrap:nowrap; }
-.cust-cadence-cell { width:18px; height:18px; border-radius:2px; flex-shrink:0; }
+.cust-cadence-dense { display:grid; grid-template-columns:repeat(100,1fr); gap:1px; row-gap:1px; }
+.cust-cell-dense { height:4px; border-radius:0; }
 .cust-cadence-note { font-size:9px; color:var(--text2); font-family:var(--font-mono); line-height:1.55; margin-top:6px; font-style:italic; }
 /* Results matrix */
 .cust-mx-table { width:100%; border-collapse:collapse; font-family:var(--font-mono); min-width:540px; }
@@ -2609,11 +2609,11 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       <div class="cust-cadence-note">432 cells total · Raiku-staked blocks highlighted · compressed representation, not literal block order</div>
     </div>
 
-    <!-- Illustrative Leader Cadence -->
+    <!-- Illustrative Leader Cadence — dense 9×100 grid -->
     <div style="margin-top:8px;">
-      <div class="cust-comp-view-label" style="margin-bottom:5px;">Illustrative Leader Cadence</div>
-      <div class="cust-cadence-grid" id="cust-cadence-grid"><!-- populated by JS --></div>
-      <div class="cust-cadence-note">Each cell = 1 leader window (4 consecutive slots). Uniform distribution assumed. Illustrative only — not the actual validator schedule.</div>
+      <div class="cust-comp-view-label" style="margin-bottom:5px;">Illustrative Leader Cadence <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;">— ~1 hour · ~9,000 slots</span></div>
+      <div class="cust-cadence-dense" id="cust-cadence-dense"><!-- populated by JS --></div>
+      <div class="cust-cadence-note">9 rows × 100 cells · 4 consecutive highlighted cells = 1 leader window (4 slots) · groups evenly spaced by stake · uniform distribution assumed · illustrative only</div>
     </div>
   </div>
 
@@ -9720,18 +9720,23 @@ function updateCustomerCalcs() {
         }
         cellGridEl.innerHTML = cg;
     }
-    // Illustrative Leader Cadence (10 cells, each = 1 leader window = 4 slots)
-    var cadenceEl = document.getElementById('cust-cadence-grid');
-    if(cadenceEl) {
-        var raikuW = Math.min(10, Math.max(1, Math.round(s.raikuStake * 10)));
-        var cadPos = {};
-        for(var wi = 0; wi < raikuW; wi++) cadPos[Math.floor(wi * 10 / raikuW)] = true;
-        var ch = '';
-        for(var ci = 0; ci < 10; ci++) {
-            var isR = !!cadPos[ci];
-            ch += '<div class="cust-cadence-cell" style="background:' + (isR ? 'var(--lime-soft)' : '#1a1e2a;border:1px solid #2a2e3a') + ';" title="' + (isR ? 'Raiku' : 'Non-Raiku') + ' leader window (4 slots)"></div>';
+    // Illustrative Leader Cadence — dense 9×100 grid, groups of 4 consecutive cells
+    var denseCadEl = document.getElementById('cust-cadence-dense');
+    if(denseCadEl) {
+        var CDEN = 900;
+        var raikuGroups = Math.min(225, Math.max(0, Math.round(s.raikuStake * CDEN / 4)));
+        var dcells = new Uint8Array(CDEN); // 0 = non-Raiku, 1 = Raiku
+        for(var dg = 0; dg < raikuGroups; dg++) {
+            var gstart = Math.round(dg * CDEN / raikuGroups);
+            for(var dk = 0; dk < 4; dk++) {
+                if(gstart + dk < CDEN) dcells[gstart + dk] = 1;
+            }
         }
-        cadenceEl.innerHTML = ch;
+        var dh = '';
+        for(var di = 0; di < CDEN; di++) {
+            dh += '<div class="cust-cell-dense" style="background:' + (dcells[di] ? 'var(--lime-soft)' : '#1a1e2a') + ';"></div>';
+        }
+        denseCadEl.innerHTML = dh;
     }
 
     // ── D. Results Matrix ──
