@@ -2474,14 +2474,15 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <div class="control" style="gap:3px;">
       <label style="display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:10px;">
         <span>AOT selection</span>
-        <button class="vc-info-btn" style="font-size:9px;padding:1px 5px;" onclick="switchTab('micro')">View in Block Sim ↗</button>
+        <button class="vc-info-btn" style="font-size:9px;padding:1px 5px;" onclick="custNavToAOTSource()">Category Explorer ↗</button>
       </label>
       <select id="cust-aot-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
+      <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);padding:1px 2px 0;">Seeds to median fee/CU &amp; CU/block for the selected category</div>
     </div>
     <div class="control" style="gap:3px;margin-top:6px;">
       <label style="display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:10px;">
         <span>JIT selection</span>
-        <button class="vc-info-btn" style="font-size:9px;padding:1px 5px;" onclick="switchTab('micro')">View Arb Bot source ↗</button>
+        <button class="vc-info-btn" style="font-size:9px;padding:1px 5px;" onclick="custNavToJITSource()">Arb Bot source ↗</button>
       </label>
       <select id="cust-jit-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
@@ -9635,12 +9636,12 @@ function populateCustJITSelect() {
     if(!sel) return;
     var data = getArbBotBuilderData();
     var presets = [
-        { key: 'custom', label: 'Custom',  profile: null },
-        { key: 'median', label: 'Median',  profile: data ? data.medianProfile : null },
-        { key: 'small',  label: 'Small',   profile: data ? data.smallProfile  : null },
-        { key: 'medium', label: 'Medium',  profile: data ? data.mediumProfile : null },
-        { key: 'large',  label: 'Large',   profile: data ? data.largeProfile  : null },
-        { key: 'xl',     label: 'XL',      profile: data ? data.xlProfile     : null }
+        { key: 'custom', label: 'Custom',          profile: null },
+        { key: 'median', label: 'Arb Bot Median',  profile: data ? data.medianProfile : null },
+        { key: 'small',  label: 'Arb Bot Small',   profile: data ? data.smallProfile  : null },
+        { key: 'medium', label: 'Arb Bot Medium',  profile: data ? data.mediumProfile : null },
+        { key: 'large',  label: 'Arb Bot Large',   profile: data ? data.largeProfile  : null },
+        { key: 'xl',     label: 'Arb Bot XL',      profile: data ? data.xlProfile     : null }
     ];
     presets.forEach(function(preset) {
         var opt = document.createElement('option');
@@ -9662,14 +9663,15 @@ function seedCustomerAOT(catId) {
         var prof = _custGetProfile(catId);
         if(prof && prof.cu > 0) {
             customerState.aotCu  = Math.round(prof.cu);
-            customerState.aotFee = +(prof.feePerCU > 0 ? prof.feePerCU : 0).toFixed(3);
+            customerState.aotFee = prof.feePerCU > 0 ? prof.feePerCU : 0;
         } else {
             customerState.aotCu = customerState.aotFee = 0;
         }
+        // Set slider positions only — no dispatch to avoid readCustomerInputs overwriting state
         var cuSl = document.getElementById('cust-aot-cu-sl');
         var feeSl = document.getElementById('cust-aot-fee-sl');
-        if(cuSl)  { cuSl.value  = customerState.aotCu;  cuSl.dispatchEvent(new Event('input',  { bubbles: true })); }
-        if(feeSl) { feeSl.value = customerState.aotFee; feeSl.dispatchEvent(new Event('input', { bubbles: true })); }
+        if(cuSl)  cuSl.value  = customerState.aotCu;
+        if(feeSl) feeSl.value = customerState.aotFee;
     }
     updateCustomerCalcs();
 }
@@ -9686,16 +9688,29 @@ function seedCustomerJIT(presetKey) {
             customerState.rjitCu = customerState.rjitFee = 0;
             customerState.njitCu = customerState.njitFee = 0;
         }
-        [['cust-rjit-cu-sl', customerState.rjitCu],  ['cust-rjit-fee-sl', customerState.rjitFee],
-         ['cust-njit-cu-sl', customerState.njitCu],  ['cust-njit-fee-sl', customerState.njitFee]
-        ].forEach(function(e) {
-            var sl = document.getElementById(e[0]);
-            if(!sl) return;
-            sl.value = e[1];
-            sl.dispatchEvent(new Event('input', { bubbles: true }));
-        });
+        // Set slider positions only — no dispatch to avoid readCustomerInputs overwriting state
+        [['cust-rjit-cu-sl', customerState.rjitCu], ['cust-rjit-fee-sl', customerState.rjitFee],
+         ['cust-njit-cu-sl', customerState.njitCu], ['cust-njit-fee-sl', customerState.njitFee]
+        ].forEach(function(e) { var sl = document.getElementById(e[0]); if(sl) sl.value = e[1]; });
     }
     updateCustomerCalcs();
+}
+
+function custNavToAOTSource() {
+    switchTab('micro');
+    setTimeout(function() {
+        var el = document.getElementById('sim-cat-bar');
+        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 150);
+}
+
+function custNavToJITSource() {
+    switchTab('micro');
+    setTimeout(function() {
+        if(!_showBenchmarkBlock) { _showBenchmarkBlock = true; renderBenchmarkBlock(); }
+        var el = document.getElementById('sim-benchmark-block');
+        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 150);
 }
 
 function syncCustomerRouteSliders() {
