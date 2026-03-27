@@ -9658,6 +9658,27 @@ function populateCustJITSelect() {
     });
 }
 
+// Sync a range slider AND its hybrid-stepper numeric input together.
+// initHybridControls() hides the legacy .val span and makes the stepper input the
+// authoritative display. Programmatic slider.value assignments do NOT fire 'input',
+// so the stepper stays stale. This helper keeps both in lockstep without dispatching
+// an input event (which would trigger readCustomerInputs and overwrite customerState).
+function _custSyncSlider(slId, val) {
+    var sl = document.getElementById(slId);
+    if(!sl) return;
+    sl.value = val;
+    // Update the stepper numeric input that initHybridControls() injected after the slider-row
+    var sliderRow = sl.closest('.slider-row');
+    if(!sliderRow) return;
+    var stepperRow = sliderRow.nextElementSibling;
+    if(!stepperRow || !stepperRow.classList.contains('hybrid-stepper-row')) return;
+    var inp = stepperRow.querySelector('.stepper-input');
+    if(!inp) return;
+    var meta = typeof SLIDER_META !== 'undefined' ? SLIDER_META[slId] : null;
+    var decimals = meta ? meta.decimals : 0;
+    inp.value = decimals === 0 ? Math.round(val).toLocaleString('en-US') : parseFloat(val).toFixed(decimals);
+}
+
 function seedCustomerAOT(catId) {
     if(catId !== 'custom') {
         var prof = _custGetProfile(catId);
@@ -9667,11 +9688,9 @@ function seedCustomerAOT(catId) {
         } else {
             customerState.aotCu = customerState.aotFee = 0;
         }
-        // Set slider positions only — no dispatch to avoid readCustomerInputs overwriting state
-        var cuSl = document.getElementById('cust-aot-cu-sl');
-        var feeSl = document.getElementById('cust-aot-fee-sl');
-        if(cuSl)  cuSl.value  = customerState.aotCu;
-        if(feeSl) feeSl.value = customerState.aotFee;
+        // Set slider + stepper display — no dispatch to avoid readCustomerInputs overwriting state
+        _custSyncSlider('cust-aot-cu-sl',  customerState.aotCu);
+        _custSyncSlider('cust-aot-fee-sl', customerState.aotFee);
     }
     updateCustomerCalcs();
 }
@@ -9688,10 +9707,10 @@ function seedCustomerJIT(presetKey) {
             customerState.rjitCu = customerState.rjitFee = 0;
             customerState.njitCu = customerState.njitFee = 0;
         }
-        // Set slider positions only — no dispatch to avoid readCustomerInputs overwriting state
+        // Set slider + stepper display — no dispatch to avoid readCustomerInputs overwriting state
         [['cust-rjit-cu-sl', customerState.rjitCu], ['cust-rjit-fee-sl', customerState.rjitFee],
          ['cust-njit-cu-sl', customerState.njitCu], ['cust-njit-fee-sl', customerState.njitFee]
-        ].forEach(function(e) { var sl = document.getElementById(e[0]); if(sl) sl.value = e[1]; });
+        ].forEach(function(e) { _custSyncSlider(e[0], e[1]); });
     }
     updateCustomerCalcs();
 }
