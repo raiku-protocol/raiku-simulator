@@ -2473,18 +2473,19 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <h2 style="margin-bottom:4px;">Customer Demand</h2>
     <div class="control" style="gap:3px;">
       <label style="display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:10px;">
-        <span>AOT selection</span>
-        <button class="vc-info-btn" style="font-size:9px;padding:1px 5px;" onclick="custNavToAOTSource()">Category Explorer ↗</button>
+        <span>Customer category</span>
+        <button class="vc-info-btn" id="cust-src-nav-btn" style="font-size:9px;padding:1px 5px;" onclick="custNavToSource()">Block Simulation &#8599;</button>
       </label>
-      <select id="cust-aot-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
-      <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);padding:1px 2px 0;">Seeds to median fee/CU &amp; CU/block for the selected category</div>
+      <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
-    <div class="control" style="gap:3px;margin-top:6px;">
-      <label style="display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:10px;">
-        <span>JIT selection</span>
-        <button class="vc-info-btn" style="font-size:9px;padding:1px 5px;" onclick="custNavToJITSource()">Arb Bot source ↗</button>
+    <div class="control" style="gap:3px;margin-top:6px;" id="cust-profile-row">
+      <label style="display:flex;align-items:center;gap:4px;font-size:10px;">
+        <span>Customer profile</span>
       </label>
-      <select id="cust-jit-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
+      <select id="cust-profile-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
+    </div>
+    <div style="margin-top:6px;font-size:9px;color:var(--text2);font-family:var(--font-mono);line-height:1.5;padding:5px 7px;background:#1a1c22;border:1px solid #2a2d35;border-radius:4px;" id="cust-default-note">
+      <span style="color:#7c8;font-weight:600;">Conservative default</span> &#8212; the selected profile sets one baseline demand. Non-Raiku block gets the full baseline (Other JIT). Raiku block uses the same total CU, split 50&#8239;/&#8239;50 between Raiku AOT and Raiku JIT. This assumes no extra demand &#8212; only rerouting.
     </div>
 
     <!-- Raiku Blocks -->
@@ -9585,11 +9586,12 @@ function seedCustomerFromCategory(catId) {
     updateCustomerCalcs();
 }
 
-// ── Dual-selector support (AOT selection + JIT selection) ──
+// ── Single 2-step selector: category → profile ──
 
-// AOT category order — arb_bot moved to end (less typical AOT customer)
-var CUST_AOT_CAT_ORDER = [
+// Category list — reuses IDs from CUST_CAT_ORDER (Custom first, arb_bot in natural position)
+var CUST_CAT_ITEMS = [
     { id: 'custom',   label: 'Custom',       isCustom: true },
+    { id: 'arb_bot',  label: 'Arbitrage Bot' },
     { id: 'prop_amm', label: 'Prop AMM'      },
     { id: 'cranker',  label: 'Cranker'       },
     { id: 'oracle',   label: 'Oracle'        },
@@ -9600,28 +9602,120 @@ var CUST_AOT_CAT_ORDER = [
     { id: 'bridge',   label: 'Bridge'        },
     { id: 'nft',      label: 'NFT'           },
     { id: 'gaming',   label: 'Gaming'        },
-    { id: 'depin',    label: 'Depin'         },
-    { id: 'arb_bot',  label: 'Arbitrage Bot' }
+    { id: 'depin',    label: 'Depin'         }
 ];
 
-function populateCustAOTSelect() {
-    var sel = document.getElementById('cust-aot-cat-select');
+function populateCustCatSelect() {
+    var sel = document.getElementById('cust-cat-select');
     if(!sel) return;
-    CUST_AOT_CAT_ORDER.forEach(function(cat) {
-        var prof = _custGetProfile(cat.id);
-        var tag  = _custDataTag(cat.id, prof);
-        var text = cat.label;
-        if(prof && prof.cu > 0) {
-            var cuK = prof.cu >= 1000000 ? (prof.cu/1000000).toFixed(1)+'M' : Math.round(prof.cu/1000)+'K';
-            text += '  \u2014  ' + prof.feePerCU.toFixed(1) + ' L/CU \u00b7 ' + cuK + ' CU/blk';
-        } else if(tag) {
-            text += '  \u2014  ' + tag;
-        }
+    sel.innerHTML = '';
+    CUST_CAT_ITEMS.forEach(function(item) {
         var opt = document.createElement('option');
-        opt.value = cat.id;
+        opt.value = item.id;
+        opt.textContent = item.label;
+        sel.appendChild(opt);
+    });
+}
+
+// Returns array of {key, label, profile} for the second selector
+function _custGetProfilesForCat(catId) {
+    if(catId === 'custom' || !catId) return [];
+    if(catId === 'arb_bot') {
+        var d = getArbBotBuilderData();
+        if(!d) return [];
+        return [
+            { key: 'median', label: 'Median', profile: d.medianProfile },
+            { key: 'small',  label: 'Small',  profile: d.smallProfile  },
+            { key: 'medium', label: 'Medium', profile: d.mediumProfile  },
+            { key: 'large',  label: 'Large',  profile: d.largeProfile  },
+            { key: 'xl',     label: 'XL',     profile: d.xlProfile     }
+        ].filter(function(p){ return p.profile && p.profile.cu > 0; });
+    }
+    var prof = _custGetProfile(catId);
+    if(!prof || prof.cu <= 0) return [];
+    return [{ key: 'median', label: 'Median', profile: prof }];
+}
+
+function populateCustProfileSelect(catId) {
+    var row = document.getElementById('cust-profile-row');
+    var sel = document.getElementById('cust-profile-select');
+    if(!sel) return;
+    sel.innerHTML = '';
+    if(catId === 'custom' || !catId) {
+        if(row) row.style.display = 'none';
+        return;
+    }
+    if(row) row.style.display = '';
+    var profiles = _custGetProfilesForCat(catId);
+    if(profiles.length === 0) {
+        var opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'No profile data';
+        sel.appendChild(opt);
+        sel.disabled = true;
+        return;
+    }
+    sel.disabled = false;
+    profiles.forEach(function(p) {
+        var opt = document.createElement('option');
+        opt.value = p.key;
+        var text = p.label;
+        if(p.profile && p.profile.cu > 0) {
+            var cuK = p.profile.cu >= 1000000 ? (p.profile.cu/1000000).toFixed(1)+'M' : Math.round(p.profile.cu/1000)+'K';
+            var fee = p.profile.feePerCU;
+            var feeStr = fee < 0.01 ? fee.toFixed(4) : fee.toFixed(2);
+            text += '  \u2014  ' + feeStr + ' L/CU \u00b7 ' + cuK + ' CU/blk';
+        }
         opt.textContent = text;
         sel.appendChild(opt);
     });
+}
+
+// Context-aware navigation to Block Simulation source data
+function custNavToSource() {
+    var catSel = document.getElementById('cust-cat-select');
+    var catId = catSel ? catSel.value : '';
+    switchTab('micro');
+    setTimeout(function() {
+        if(catId === 'arb_bot') {
+            if(!_showBenchmarkBlock) { _showBenchmarkBlock = true; renderBenchmarkBlock(); }
+            var el = document.getElementById('sim-benchmark-block');
+            if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+        } else {
+            var el = document.getElementById('sim-cat-bar');
+            if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+    }, 150);
+}
+
+// Seed all 6 sliders from the selected profile — conservative 50/50 split
+function seedCustomerFromProfile(catId, profileKey) {
+    if(catId === 'custom' || !catId || !profileKey) return;
+    var profiles = _custGetProfilesForCat(catId);
+    var selected = null;
+    for(var i = 0; i < profiles.length; i++) {
+        if(profiles[i].key === profileKey) { selected = profiles[i]; break; }
+    }
+    if(!selected || !selected.profile || selected.profile.cu <= 0) return;
+    var cu  = Math.round(selected.profile.cu);
+    var fee = selected.profile.feePerCU > 0 ? selected.profile.feePerCU : 0;
+    var halfCu = Math.round(cu * 0.5);
+    // Non-Raiku block: full baseline
+    customerState.njitCu  = cu;
+    customerState.njitFee = fee;
+    // Raiku block: same total CU, split 50/50
+    customerState.aotCu   = halfCu;
+    customerState.aotFee  = fee;
+    customerState.rjitCu  = halfCu;
+    customerState.rjitFee = fee;
+    // Sync all 6 sliders
+    _custSyncSlider('cust-aot-cu-sl',   customerState.aotCu);
+    _custSyncSlider('cust-aot-fee-sl',  customerState.aotFee);
+    _custSyncSlider('cust-rjit-cu-sl',  customerState.rjitCu);
+    _custSyncSlider('cust-rjit-fee-sl', customerState.rjitFee);
+    _custSyncSlider('cust-njit-cu-sl',  customerState.njitCu);
+    _custSyncSlider('cust-njit-fee-sl', customerState.njitFee);
+    updateCustomerCalcs();
 }
 
 function _custGetJITProfile(key) {
@@ -9629,33 +9723,6 @@ function _custGetJITProfile(key) {
     if(!data) return null;
     var map = { median: data.medianProfile, small: data.smallProfile, medium: data.mediumProfile, large: data.largeProfile, xl: data.xlProfile };
     return map[key] || null;
-}
-
-function populateCustJITSelect() {
-    var sel = document.getElementById('cust-jit-cat-select');
-    if(!sel) return;
-    var data = getArbBotBuilderData();
-    var presets = [
-        { key: 'custom', label: 'Custom',          profile: null },
-        { key: 'median', label: 'Arb Bot Median',  profile: data ? data.medianProfile : null },
-        { key: 'small',  label: 'Arb Bot Small',   profile: data ? data.smallProfile  : null },
-        { key: 'medium', label: 'Arb Bot Medium',  profile: data ? data.mediumProfile : null },
-        { key: 'large',  label: 'Arb Bot Large',   profile: data ? data.largeProfile  : null },
-        { key: 'xl',     label: 'Arb Bot XL',      profile: data ? data.xlProfile     : null }
-    ];
-    presets.forEach(function(preset) {
-        var opt = document.createElement('option');
-        opt.value = preset.key;
-        var text = preset.label;
-        if(preset.profile && preset.profile.cu > 0) {
-            var cuK = preset.profile.cu >= 1000000 ? (preset.profile.cu/1000000).toFixed(1)+'M' : Math.round(preset.profile.cu/1000)+'K';
-            var fee = preset.profile.feePerCU;
-            var feeStr = fee < 0.01 ? fee.toFixed(4) : fee.toFixed(2);
-            text += '  \u2014  ' + feeStr + ' L/CU \u00b7 ' + cuK + ' CU/blk';
-        }
-        opt.textContent = text;
-        sel.appendChild(opt);
-    });
 }
 
 // Sync a range slider AND its hybrid-stepper numeric input together.
@@ -9679,58 +9746,7 @@ function _custSyncSlider(slId, val) {
     inp.value = decimals === 0 ? Math.round(val).toLocaleString('en-US') : parseFloat(val).toFixed(decimals);
 }
 
-function seedCustomerAOT(catId) {
-    if(catId !== 'custom') {
-        var prof = _custGetProfile(catId);
-        if(prof && prof.cu > 0) {
-            customerState.aotCu  = Math.round(prof.cu);
-            customerState.aotFee = prof.feePerCU > 0 ? prof.feePerCU : 0;
-        } else {
-            customerState.aotCu = customerState.aotFee = 0;
-        }
-        // Set slider + stepper display — no dispatch to avoid readCustomerInputs overwriting state
-        _custSyncSlider('cust-aot-cu-sl',  customerState.aotCu);
-        _custSyncSlider('cust-aot-fee-sl', customerState.aotFee);
-    }
-    updateCustomerCalcs();
-}
-
-function seedCustomerJIT(presetKey) {
-    if(presetKey !== 'custom') {
-        var prof = _custGetJITProfile(presetKey);
-        if(prof && prof.cu > 0) {
-            var cu  = Math.round(prof.cu);
-            var fee = prof.feePerCU > 0 ? prof.feePerCU : 0;
-            customerState.rjitCu  = cu;  customerState.rjitFee = fee;
-            customerState.njitCu  = cu;  customerState.njitFee = fee;
-        } else {
-            customerState.rjitCu = customerState.rjitFee = 0;
-            customerState.njitCu = customerState.njitFee = 0;
-        }
-        // Set slider + stepper display — no dispatch to avoid readCustomerInputs overwriting state
-        [['cust-rjit-cu-sl', customerState.rjitCu], ['cust-rjit-fee-sl', customerState.rjitFee],
-         ['cust-njit-cu-sl', customerState.njitCu], ['cust-njit-fee-sl', customerState.njitFee]
-        ].forEach(function(e) { _custSyncSlider(e[0], e[1]); });
-    }
-    updateCustomerCalcs();
-}
-
-function custNavToAOTSource() {
-    switchTab('micro');
-    setTimeout(function() {
-        var el = document.getElementById('sim-cat-bar');
-        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-    }, 150);
-}
-
-function custNavToJITSource() {
-    switchTab('micro');
-    setTimeout(function() {
-        if(!_showBenchmarkBlock) { _showBenchmarkBlock = true; renderBenchmarkBlock(); }
-        var el = document.getElementById('sim-benchmark-block');
-        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-    }, 150);
-}
+// seedCustomerAOT, seedCustomerJIT, custNavToAOTSource, custNavToJITSource removed — replaced by seedCustomerFromProfile / custNavToSource
 
 function syncCustomerRouteSliders() {
     var s = customerState;
@@ -10051,14 +10067,28 @@ function updateCustomerCalcs() {
 }
 
 function initCustomerTab() {
-    populateCustAOTSelect();
-    populateCustJITSelect();
+    populateCustCatSelect();
 
-    var aotSel = document.getElementById('cust-aot-cat-select');
-    if(aotSel) aotSel.addEventListener('change', function(){ seedCustomerAOT(this.value); });
+    var catSel = document.getElementById('cust-cat-select');
+    if(catSel) {
+        catSel.addEventListener('change', function() {
+            var catId = this.value;
+            populateCustProfileSelect(catId);
+            var profSel = document.getElementById('cust-profile-select');
+            if(profSel && profSel.value && catId !== 'custom') {
+                seedCustomerFromProfile(catId, profSel.value);
+            }
+        });
+    }
 
-    var jitSel = document.getElementById('cust-jit-cat-select');
-    if(jitSel) jitSel.addEventListener('change', function(){ seedCustomerJIT(this.value); });
+    var profSel = document.getElementById('cust-profile-select');
+    if(profSel) {
+        profSel.addEventListener('change', function() {
+            var catSel2 = document.getElementById('cust-cat-select');
+            var catId = catSel2 ? catSel2.value : '';
+            seedCustomerFromProfile(catId, this.value);
+        });
+    }
 
     // Demand sliders
     ['cust-aot-cu-sl','cust-aot-fee-sl','cust-rjit-cu-sl','cust-rjit-fee-sl','cust-njit-cu-sl','cust-njit-fee-sl'].forEach(function(id) {
@@ -10072,6 +10102,8 @@ function initCustomerTab() {
         if(sl) sl.addEventListener('input', function(){ readCustomerInputs(); updateCustomerCalcs(); });
     });
 
+    // Initialize second selector and state
+    populateCustProfileSelect(catSel ? catSel.value : 'custom');
     readCustomerInputs();
     updateCustomerCalcs();
 }
