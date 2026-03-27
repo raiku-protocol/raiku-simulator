@@ -292,7 +292,7 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-cadence-400 { display:grid; grid-template-columns:repeat(40,1fr); gap:2px; }
 .cust-cadence-400 .cs { aspect-ratio:1/1; border-radius:1px; }
 .cust-cadence-note-v2 { font-size:10px; color:var(--text2); font-family:var(--font-mono); line-height:1.6; margin-top:8px; }
-.cust-cadence-metrics { margin-top:10px; display:flex; flex-direction:column; gap:3px; }
+.cust-cadence-metrics { margin-top:0; margin-bottom:8px; display:flex; flex-direction:column; gap:3px; }
 .cust-cadence-metric-primary { font-size:11px; font-family:var(--font-mono); color:var(--text); font-weight:600; }
 .cust-cadence-metric-primary span { color:var(--lime-soft); }
 .cust-cadence-metric-secondary { font-size:10px; font-family:var(--font-mono); color:var(--text2); }
@@ -2681,11 +2681,6 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <div class="cust-epoch-share-text" id="cust-epoch-share-text">—</div>
 
     <!-- Illustrative local slot cadence — 400-cell leader-window grid -->
-    <div class="cust-cadence-label">Illustrative local slot cadence</div>
-    <div id="cust-cadence-local" class="cust-cadence-400"></div>
-    <div class="cust-cadence-note-v2">
-      1 square = 1 slot (0.4 s) · yellow groups of 4 = one Raiku leader window (4 consecutive slots) · ~400 slots shown ≈ 2 min 40 s · leader windows distributed approximately uniformly · illustrative only, not the actual validator schedule
-    </div>
     <div class="cust-cadence-metrics">
       <div class="cust-cadence-metric-primary">
         Avg gap between Raiku windows: <span id="cust-cad-gap-slots">—</span> slots · <span id="cust-cad-gap-sec">—</span> s
@@ -2693,7 +2688,11 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
       <div class="cust-cadence-metric-secondary">
         Start-to-start cadence: <span id="cust-cad-s2s-slots">—</span> slots · <span id="cust-cad-s2s-sec">—</span> s
       </div>
-      <div class="cust-cadence-metric-note">Illustrative average assuming uniform leader-window distribution · not the actual validator schedule</div>
+    </div>
+    <div class="cust-cadence-label">Illustrative local slot cadence</div>
+    <div id="cust-cadence-local" class="cust-cadence-400"></div>
+    <div class="cust-cadence-note-v2">
+      1 square = 1 slot (0.4 s) · yellow groups of 4 = one Raiku leader window (4 consecutive slots) · ~400 slots shown ≈ 2 min 40 s · leader windows distributed approximately uniformly · illustrative only, not the actual validator schedule
     </div>
   </div>
 
