@@ -299,16 +299,24 @@ details[open] summary::before { transform:rotate(90deg); }
 .cust-cadence-metric-note { font-size:9px; font-family:var(--font-mono); color:var(--text2); opacity:0.7; margin-top:2px; font-style:italic; }
 /* Results matrix */
 .cust-mx-table { width:100%; border-collapse:collapse; font-family:var(--font-mono); min-width:540px; }
-.cust-mx-table th { font-size:8px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text2); white-space:nowrap; padding:4px 4px 2px; }
-.cust-mx-table .cust-mx-subrow th { font-weight:600; text-align:right; padding:2px 4px 5px; border-bottom:2px solid var(--card-border); }
+.cust-mx-table th { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#b0b8c8; white-space:nowrap; padding:5px 4px 3px; background:#1a1c24; }
+.cust-mx-table .cust-mx-subrow th { font-size:9px; font-weight:600; text-align:right; padding:3px 4px 6px; border-bottom:2px solid #2e3240; color:#888; background:#1a1c24; }
 .cust-mx-table .cust-mx-subrow th:first-child { text-align:left; }
-.cust-mx-group-h { text-align:center !important; border-left:1px solid #1e2130; border-bottom:1px solid #1e2130; }
+.cust-mx-group-h { text-align:center !important; border-left:2px solid #2e3240; border-bottom:1px solid #2e3240; }
 .cust-mx-table td { padding:5px 4px; font-size:10px; color:var(--text); white-space:nowrap; border-bottom:1px solid #181b22; }
 .cust-mx-table td:not(:first-child) { text-align:right; }
+/* Vertical separator: first cell of each time-horizon group */
+.cust-mx-table td.mx-group-start, .cust-mx-table th.mx-group-start { border-left:2px solid #2e3240; }
 .cust-mx-route-cell { font-weight:600; padding-right:8px !important; font-size:10px; }
-.cust-mx-group-row td { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#c0c8d8; font-family:var(--font-mono); padding:8px 4px 3px 8px; border-bottom:1px solid #1e2130; border-top:2px solid #1e2130; border-left:2px solid var(--lime-soft); }
+/* RAIKU BLOCK group row — lime accent */
+.cust-mx-group-row td { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#7ec860; font-family:var(--font-mono); padding:8px 4px 3px 8px; border-bottom:1px solid #1e2130; border-top:2px solid #1e2130; border-left:3px solid #7ec860; background:rgba(120,200,80,0.05); }
 .cust-mx-group-row--first td { border-top:none; padding-top:4px; }
-.cust-mx-total-row td { font-weight:700; color:var(--text); border-top:1px solid #2a2e3d; border-bottom:2px solid #2a2e3d; font-family:var(--font-mono); font-size:10px; }
+/* NON-RAIKU BLOCK group row — blue accent */
+.cust-mx-group-row--nonraiku td { color:#7090c0; border-left:3px solid #5080b0; background:rgba(80,128,200,0.05); }
+/* Raiku Block Total row */
+.cust-mx-total-row td { font-weight:600; color:var(--text); border-top:1px solid #2a2e3d; border-bottom:2px solid #2a2e3d; font-family:var(--font-mono); font-size:10px; background:#1e2818; }
+/* Grand Total row */
+.cust-mx-grand-row td { font-weight:700; color:var(--text); border-top:2px solid #3a4050; border-bottom:2px solid #3a4050; font-family:var(--font-mono); font-size:10px; background:#1a2030; }
 .mx-usd { font-size:9px; color:var(--text2); font-weight:400; }
 .sidebar .section-label { font-size:10px; margin-top:12px; padding-bottom:2px; border-bottom:1px solid #1e2028; margin-bottom:2px; }
 .sidebar .section-label:first-child { margin-top:0; }
@@ -2560,22 +2568,22 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
   <!-- 1. RESULTS MATRIX -->
   <div class="cust-panel-section fade-in">
-    <div class="cust-panel-title">Results Matrix</div>
+    <div class="cust-panel-title" style="font-size:12px;font-weight:700;color:var(--text);letter-spacing:0.08em;padding-bottom:8px;border-bottom:1px solid #2a2d35;margin-bottom:10px;">Results Matrix</div>
     <div style="overflow-x:auto;">
       <table class="cust-mx-table">
         <thead>
           <tr>
-            <th style="text-align:left;" rowspan="2">Route</th>
+            <th style="text-align:left;background:#1a1c24;" rowspan="2">Route</th>
             <th class="cust-mx-group-h" colspan="3">Per block</th>
-            <th class="cust-mx-group-h" colspan="2">Per epoch</th>
-            <th class="cust-mx-group-h" colspan="2">Per month</th>
-            <th class="cust-mx-group-h" colspan="2">Per year</th>
+            <th class="cust-mx-group-h mx-group-start" colspan="2">Per epoch</th>
+            <th class="cust-mx-group-h mx-group-start" colspan="2">Per month</th>
+            <th class="cust-mx-group-h mx-group-start" colspan="2">Per year</th>
           </tr>
           <tr class="cust-mx-subrow">
             <th>CU</th><th>Fee / CU (L)</th><th>Spend (SOL)</th>
-            <th>CU</th><th>Spend (SOL)</th>
-            <th>CU</th><th>Spend (SOL)</th>
-            <th>CU</th><th>Spend (SOL)</th>
+            <th class="mx-group-start">CU</th><th>Spend (SOL)</th>
+            <th class="mx-group-start">CU</th><th>Spend (SOL)</th>
+            <th class="mx-group-start">CU</th><th>Spend (SOL)</th>
           </tr>
         </thead>
         <tbody>
@@ -2585,43 +2593,59 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <tr>
             <td class="cust-mx-route-cell" style="color:var(--lime-soft);">Raiku AOT</td>
             <td id="mx-aot-blk-cu">—</td><td id="mx-aot-blk-fee">—</td><td id="mx-aot-blk-spend">—</td>
-            <td id="mx-aot-ep-cu">—</td><td id="mx-aot-ep-spend">—</td>
-            <td id="mx-aot-mo-cu">—</td><td id="mx-aot-mo-spend">—</td>
-            <td id="mx-aot-yr-cu">—</td><td id="mx-aot-yr-spend">—</td>
+            <td id="mx-aot-ep-cu" class="mx-group-start">—</td><td id="mx-aot-ep-spend">—</td>
+            <td id="mx-aot-mo-cu" class="mx-group-start">—</td><td id="mx-aot-mo-spend">—</td>
+            <td id="mx-aot-yr-cu" class="mx-group-start">—</td><td id="mx-aot-yr-spend">—</td>
           </tr>
           <tr>
             <td class="cust-mx-route-cell" style="color:#8bc4f5;">Raiku JIT</td>
             <td id="mx-rjit-blk-cu">—</td><td id="mx-rjit-blk-fee">—</td><td id="mx-rjit-blk-spend">—</td>
-            <td id="mx-rjit-ep-cu">—</td><td id="mx-rjit-ep-spend">—</td>
-            <td id="mx-rjit-mo-cu">—</td><td id="mx-rjit-mo-spend">—</td>
-            <td id="mx-rjit-yr-cu">—</td><td id="mx-rjit-yr-spend">—</td>
+            <td id="mx-rjit-ep-cu" class="mx-group-start">—</td><td id="mx-rjit-ep-spend">—</td>
+            <td id="mx-rjit-mo-cu" class="mx-group-start">—</td><td id="mx-rjit-mo-spend">—</td>
+            <td id="mx-rjit-yr-cu" class="mx-group-start">—</td><td id="mx-rjit-yr-spend">—</td>
           </tr>
           <tr class="cust-mx-total-row">
-            <td class="cust-mx-route-cell">Total</td>
+            <td class="cust-mx-route-cell">Raiku Block Total</td>
             <td id="mx-total-blk-cu">—</td>
             <td id="mx-total-blk-fee">—</td>
             <td id="mx-total-blk-spend">—</td>
-            <td id="mx-total-ep-cu">—</td>
+            <td id="mx-total-ep-cu" class="mx-group-start">—</td>
             <td id="mx-total-ep-spend">—</td>
-            <td id="mx-total-mo-cu">—</td>
+            <td id="mx-total-mo-cu" class="mx-group-start">—</td>
             <td id="mx-total-mo-spend">—</td>
-            <td id="mx-total-yr-cu">—</td>
+            <td id="mx-total-yr-cu" class="mx-group-start">—</td>
             <td id="mx-total-yr-spend">—</td>
           </tr>
-          <tr class="cust-mx-group-row">
+          <tr class="cust-mx-group-row cust-mx-group-row--nonraiku">
             <td colspan="10" class="cust-mx-group-label">NON-RAIKU BLOCK</td>
           </tr>
           <tr>
-            <td class="cust-mx-route-cell" style="color:var(--text-mid);">Other JIT</td>
+            <td class="cust-mx-route-cell" style="color:#7090c0;">Other JIT</td>
             <td id="mx-njit-blk-cu">—</td><td id="mx-njit-blk-fee">—</td><td id="mx-njit-blk-spend">—</td>
-            <td id="mx-njit-ep-cu">—</td><td id="mx-njit-ep-spend">—</td>
-            <td id="mx-njit-mo-cu">—</td><td id="mx-njit-mo-spend">—</td>
-            <td id="mx-njit-yr-cu">—</td><td id="mx-njit-yr-spend">—</td>
+            <td id="mx-njit-ep-cu" class="mx-group-start">—</td><td id="mx-njit-ep-spend">—</td>
+            <td id="mx-njit-mo-cu" class="mx-group-start">—</td><td id="mx-njit-mo-spend">—</td>
+            <td id="mx-njit-yr-cu" class="mx-group-start">—</td><td id="mx-njit-yr-spend">—</td>
+          </tr>
+          <tr class="cust-mx-grand-row">
+            <td class="cust-mx-route-cell">Grand Total</td>
+            <td id="mx-grand-blk-cu">—</td>
+            <td id="mx-grand-blk-fee">—</td>
+            <td id="mx-grand-blk-spend">—</td>
+            <td id="mx-grand-ep-cu" class="mx-group-start">—</td>
+            <td id="mx-grand-ep-spend">—</td>
+            <td id="mx-grand-mo-cu" class="mx-group-start">—</td>
+            <td id="mx-grand-mo-spend">—</td>
+            <td id="mx-grand-yr-cu" class="mx-group-start">—</td>
+            <td id="mx-grand-yr-spend">—</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <p style="color:var(--text2);font-size:9px;margin-top:10px;line-height:1.5;">Values are editable starting points. Category seeding uses median on-chain data where available. No hidden route split logic. This tool does not model or claim Raiku reduces execution cost.</p>
+    <div style="font-size:9px;color:#888;font-family:var(--font-mono);margin-top:10px;line-height:1.6;padding:6px 8px;background:#161820;border-radius:4px;border:1px solid #2a2d35;">
+      Scenario tool based on editable benchmark assumptions. Results are estimates, not guarantees.
+      Spend figures show fee spend only (priority fees + MEV/JIT tips where applicable).
+      Base fees and execution cost savings are not modeled here.
+    </div>
   </div>
 
   <!-- 2. SPEND COMPOSITION — 3 views -->
@@ -10095,6 +10119,21 @@ function updateCustomerCalcs() {
     var totYrSol = totEpSol * EPOCHS_PER_YEAR;
     set('mx-total-yr-cu', fmtCU(totalCu * epochRaikuBlocks * EPOCHS_PER_YEAR));
     setSpend('mx-total-yr-spend', fmtSOL(totYrSol), totYrSol * s.solPrice);
+
+    // ── Grand Total row (Raiku Block + Non-Raiku Block spend) ──
+    // Per-block CU and fee are not addable across block types (different context), show "—"
+    var grandEpSol  = totEpSol  + (njitSpend / 1e9) * epochNonRaikuBlocks;
+    var grandMoSol  = grandEpSol * EPOCHS_PER_MONTH;
+    var grandYrSol  = grandEpSol * EPOCHS_PER_YEAR;
+    set('mx-grand-blk-cu',  '—');
+    set('mx-grand-blk-fee', '—');
+    set('mx-grand-blk-spend', '—');
+    set('mx-grand-ep-cu',   '—');
+    setSpend('mx-grand-ep-spend',  fmtSOL(grandEpSol),  grandEpSol  * s.solPrice);
+    set('mx-grand-mo-cu',   '—');
+    setSpend('mx-grand-mo-spend',  fmtSOL(grandMoSol),  grandMoSol  * s.solPrice);
+    set('mx-grand-yr-cu',   '—');
+    setSpend('mx-grand-yr-spend',  fmtSOL(grandYrSol),  grandYrSol  * s.solPrice);
 
     // ── Silent scenario sentence (hidden span) ──
     var raikuCu = s.aotCu + s.rjitCu;
