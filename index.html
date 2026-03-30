@@ -2488,7 +2488,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <span>Customer category</span>
         <button id="cust-src-nav-btn" onclick="custNavToSource()" style="display:inline-flex;align-items:center;white-space:nowrap;padding:4px 10px;font-size:10px;font-family:var(--font-mono);font-weight:700;color:#0a0c0f;background:#7ec860;border:none;border-radius:4px;cursor:pointer;letter-spacing:0.03em;flex-shrink:0;">View in Block Sim &#8599;</button>
       </label>
-      <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid #333;border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
+      <div id="cust-cat-prompt" style="font-size:10px;font-family:var(--font-mono);color:var(--lime);padding:5px 7px;background:rgba(192,255,56,0.07);border:1px solid rgba(192,255,56,0.28);border-radius:4px;margin-bottom:4px;">&#8679;&nbsp; Select a customer category &mdash; inputs below will populate</div>
+      <select id="cust-cat-select" style="background:#141516;color:var(--text);border:1px solid var(--lime);border-radius:4px;padding:5px 8px;font-size:10px;width:100%;cursor:pointer;font-family:var(--font-mono);"></select>
     </div>
     <div class="control" style="gap:3px;margin-top:6px;" id="cust-profile-row">
       <label style="display:flex;align-items:center;gap:4px;font-size:10px;">
@@ -9627,6 +9628,8 @@ function updateCustCatInfo(catId) {
 }
 
 function seedCustomerFromCategory(catId) {
+    var _p=document.getElementById('cust-cat-prompt'); if(_p) _p.style.display='none';
+    var _s=document.getElementById('cust-cat-select'); if(_s) _s.style.borderColor='#333';
     updateCustCatInfo(catId);
     if(catId !== 'custom') {
         var prof = _custGetProfile(catId);
