@@ -168,6 +168,56 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
     <div class="callout">
       <strong>Why it matters for validators:</strong> Validators running RAIKU earn additional MEV revenue on top of standard Solana issuance and network fees — without forgoing any existing income stream.
     </div>
+
+    <!-- Revenue Waterfall Diagram -->
+    <div style="margin:20px 0 4px;">
+      <svg viewBox="0 0 700 225" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;" aria-label="Revenue waterfall diagram">
+        <text x="10" y="13" font-family="'JetBrains Mono',monospace" font-size="9" fill="#71787F" letter-spacing="1">REVENUE WATERFALL</text>
+
+        <!-- Gross Revenue -->
+        <rect x="250" y="22" width="200" height="48" rx="6" fill="#0d0f12" stroke="#C0FF38" stroke-width="1.5"/>
+        <text x="350" y="42" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#C0FF38" font-weight="700">Gross Revenue</text>
+        <text x="350" y="60" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="#71787F">AOT + JIT · 100%</text>
+
+        <!-- Branch to level 2 -->
+        <line x1="350" y1="70" x2="350" y2="88" stroke="#2a2f38" stroke-width="1.5"/>
+        <line x1="190" y1="88" x2="510" y2="88" stroke="#2a2f38" stroke-width="1.5"/>
+        <line x1="190" y1="88" x2="190" y2="100" stroke="#2a2f38" stroke-width="1.5"/>
+        <line x1="510" y1="88" x2="510" y2="100" stroke="#2a2f38" stroke-width="1.5"/>
+
+        <!-- Validator Base -->
+        <rect x="80" y="100" width="220" height="48" rx="6" fill="#0d0f12" stroke="#A0C878" stroke-width="1.5"/>
+        <text x="190" y="120" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#A0C878" font-weight="700">Validator Base</text>
+        <text x="190" y="138" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="#71787F">95–99% of gross</text>
+
+        <!-- Protocol Pool -->
+        <rect x="390" y="100" width="240" height="48" rx="6" fill="#0d0f12" stroke="#2a2f38" stroke-width="1.5"/>
+        <text x="510" y="120" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#F6F8FA" font-weight="700">Protocol Pool</text>
+        <text x="510" y="138" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="#71787F">1–5% of gross</text>
+
+        <!-- Branch to level 3 -->
+        <line x1="510" y1="148" x2="510" y2="165" stroke="#2a2f38" stroke-width="1.5"/>
+        <line x1="379" y1="165" x2="627" y2="165" stroke="#2a2f38" stroke-width="1.5"/>
+        <line x1="379" y1="165" x2="379" y2="177" stroke="#2a2f38" stroke-width="1.5"/>
+        <line x1="503" y1="165" x2="503" y2="177" stroke="#2a2f38" stroke-width="1.5"/>
+        <line x1="627" y1="165" x2="627" y2="177" stroke="#2a2f38" stroke-width="1.5"/>
+
+        <!-- Cust. Rebate -->
+        <rect x="323" y="177" width="112" height="36" rx="5" fill="#0d0f12" stroke="#2a2f38" stroke-width="1"/>
+        <text x="379" y="193" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#6B9EBC" font-weight="700">Cust. Rebate</text>
+        <text x="379" y="207" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#71787F">AOT + JIT</text>
+
+        <!-- Validator Bonus -->
+        <rect x="447" y="177" width="112" height="36" rx="5" fill="#0d0f12" stroke="#2a2f38" stroke-width="1"/>
+        <text x="503" y="193" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#5B8DEF" font-weight="700">Val. Bonus</text>
+        <text x="503" y="207" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#71787F">AOT only</text>
+
+        <!-- Treasury -->
+        <rect x="571" y="177" width="112" height="36" rx="5" fill="#0d0f12" stroke="#2a2f38" stroke-width="1"/>
+        <text x="627" y="193" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#8E77C7" font-weight="700">Treasury</text>
+        <text x="627" y="207" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#71787F">residual</text>
+      </svg>
+    </div>
   </div>
 
   <hr>
@@ -299,6 +349,44 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
         <li><strong>Revenue table</strong> — per block / epoch / month / year; SOL and USD.</li>
         <li><strong>Validation panel</strong> — simulated values cross-checked against Trillium epoch benchmarks (latest epoch, 12M all, 24M elevated+extreme). Green cells indicate the reference most relevant for the active scenario.</li>
       </ul>
+    </div>
+
+    <!-- 6-Segment Yield Bar Diagram -->
+    <div style="margin:16px 0 4px;">
+      <svg viewBox="0 0 600 128" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:600px;display:block;" aria-label="6-segment validator yield decomposition bar">
+        <defs>
+          <clipPath id="yield-bar-clip">
+            <rect x="10" y="24" width="580" height="24" rx="4"/>
+          </clipPath>
+        </defs>
+        <text x="10" y="13" font-family="'JetBrains Mono',monospace" font-size="9" fill="#71787F" letter-spacing="1">VALIDATOR YIELD DECOMPOSITION — ILLUSTRATIVE (BASE CASE)</text>
+
+        <!-- Segments (1px gap between each, clipped to rounded bar) -->
+        <rect x="10"  y="24" width="360" height="24" fill="#A0C878" clip-path="url(#yield-bar-clip)"/>
+        <rect x="371" y="24" width="74"  height="24" fill="#6B9EBC" clip-path="url(#yield-bar-clip)"/>
+        <rect x="446" y="24" width="45"  height="24" fill="#7BBBAF" clip-path="url(#yield-bar-clip)"/>
+        <rect x="492" y="24" width="22"  height="24" fill="#4178DE" clip-path="url(#yield-bar-clip)"/>
+        <rect x="515" y="24" width="28"  height="24" fill="#5B8DEF" clip-path="url(#yield-bar-clip)"/>
+        <rect x="544" y="24" width="46"  height="24" fill="#8E77C7" clip-path="url(#yield-bar-clip)"/>
+
+        <!-- Legend row 1 -->
+        <rect x="10"  y="61" width="10" height="10" rx="2" fill="#A0C878"/>
+        <text x="25"  y="71" font-family="'JetBrains Mono',monospace" font-size="10" fill="#A0A3A9">Issuance</text>
+        <rect x="210" y="61" width="10" height="10" rx="2" fill="#6B9EBC"/>
+        <text x="225" y="71" font-family="'JetBrains Mono',monospace" font-size="10" fill="#A0A3A9">Network Block Fees</text>
+        <rect x="410" y="61" width="10" height="10" rx="2" fill="#7BBBAF"/>
+        <text x="425" y="71" font-family="'JetBrains Mono',monospace" font-size="10" fill="#A0A3A9">Raiku AOT</text>
+
+        <!-- Legend row 2 -->
+        <rect x="10"  y="83" width="10" height="10" rx="2" fill="#4178DE"/>
+        <text x="25"  y="93" font-family="'JetBrains Mono',monospace" font-size="10" fill="#A0A3A9">Validator Bonus</text>
+        <rect x="210" y="83" width="10" height="10" rx="2" fill="#5B8DEF"/>
+        <text x="225" y="93" font-family="'JetBrains Mono',monospace" font-size="10" fill="#A0A3A9">Raiku JIT</text>
+        <rect x="410" y="83" width="10" height="10" rx="2" fill="#8E77C7"/>
+        <text x="425" y="93" font-family="'JetBrains Mono',monospace" font-size="10" fill="#A0A3A9">Other JIT</text>
+
+        <text x="10" y="118" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#71787F" font-style="italic">Proportions are illustrative. Issuance typically dominates (~62%); Raiku components scale with stake and market share.</text>
+      </svg>
     </div>
 
     <h2>4b — Individual Level</h2>
