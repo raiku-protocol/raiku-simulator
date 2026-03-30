@@ -2074,10 +2074,10 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <div class="validator-context-value" id="vi-stake">152,908 SOL</div>
           <input type="hidden" id="vi-stake-raw" value="152908">
         </div>
-        <!-- Network Share: derived, editable (updates stake) -->
+        <!-- Network Stake %: derived, editable (updates stake) -->
         <div class="validator-context-item">
           <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
-            Network Share
+            Network Stake %
             <button class="vi-param-reset" onclick="viResetStake()" title="Reset stake to P50 median">↺</button>
           </div>
           <div class="validator-context-value" id="vi-share">0.0363%</div>
@@ -2207,13 +2207,13 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
           <div class="vi-pos-fill" id="vi-pos-fill" style="width:0%;"></div>
           <div class="vi-pos-thumb" id="vi-pos-thumb" style="left:0%;"></div>
         </div>
-        <div style="display:flex; justify-content:space-between; font-size:9px;
+        <div style="position:relative; height:13px; font-size:9px; overflow:visible;
                     color:#8a93a8; font-family:var(--font-mono); font-weight:600; margin-top:3px;">
-          <span>#762 (smallest)</span>
-          <span id="vi-rank-axis-500">#500</span>
-          <span id="vi-rank-axis-250">#250</span>
-          <span id="vi-rank-axis-100">#100</span>
-          <span>#1 (largest)</span>
+          <span style="position:absolute; left:0; white-space:nowrap;">#762 (smallest)</span>
+          <span id="vi-rank-axis-500" style="position:absolute; transform:translateX(-50%); white-space:nowrap;">#500</span>
+          <span id="vi-rank-axis-250" style="position:absolute; transform:translateX(-50%); white-space:nowrap;">#250</span>
+          <span id="vi-rank-axis-100" style="position:absolute; transform:translateX(-50%); white-space:nowrap;">#100</span>
+          <span style="position:absolute; right:0; white-space:nowrap;">#1 (largest)</span>
         </div>
         <div id="vi-rank-position" style="margin-top:6px; padding:8px 10px; background:#04060a;
              border:1px solid #16191f; border-radius:5px;
@@ -2311,9 +2311,9 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             <div style="font-size:10px; color:var(--text-mid); margin-top:2px;" id="vi-kpi-epoch-sol">— SOL/epoch</div>
           </div>
           <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:5px; padding:7px 10px;">
-            <div style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Network Share</div>
+            <div style="font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:3px;">Network Stake %</div>
             <div style="font-size:13px; font-family:var(--font-mono); font-weight:700; color:var(--text);" id="vi-kpi-share">—</div>
-            <div style="font-size:10px; color:var(--text-mid); margin-top:2px;">of total stake</div>
+            <div style="font-size:10px; color:var(--text-mid); margin-top:2px;">of total staked SOL</div>
           </div>
         </div>
       </div>
@@ -8820,10 +8820,14 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     if (fillEl)  fillEl.style.width = pct + '%';
     if (thumbEl) thumbEl.style.left  = pct + '%';
 
-    // Axis label positions (approximate, based on linear rank scale)
-    _set('vi-rank-axis-500', '#500');
-    _set('vi-rank-axis-250', '#250');
-    _set('vi-rank-axis-100', '#100');
+    // Axis label positions: computed from linear rank scale so labels align with thumb
+    var _rankPct = function(r) { return n > 1 ? (n - r) / (n - 1) * 100 : 0; };
+    var _ax500 = document.getElementById('vi-rank-axis-500');
+    var _ax250 = document.getElementById('vi-rank-axis-250');
+    var _ax100 = document.getElementById('vi-rank-axis-100');
+    if (_ax500) _ax500.style.left = _rankPct(500).toFixed(1) + '%';
+    if (_ax250) _ax250.style.left = _rankPct(250).toFixed(1) + '%';
+    if (_ax100) _ax100.style.left = _rankPct(100).toFixed(1) + '%';
 
     var rankEl = document.getElementById('vi-rank-position');
     if (rankEl) {
@@ -8854,8 +8858,17 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     _set('vi-sol-price-display', '$' + Math.round(solPrice));
     var stakeUsd = stake * solPrice;
     _set('vi-stake-usd', _fmtUsd(stakeUsd));
-    _set('vi-stake-summary', stake.toLocaleString('en-US',{maximumFractionDigits:0}) + ' SOL · ' + _fmtUsd(stakeUsd));
     var netShare = total > 0 ? (stake / total * 100) : 0;
+    (function() {
+        var el = document.getElementById('vi-stake-summary');
+        if (!el) return;
+        var totalFmt = total >= 1e6 ? (total / 1e6).toFixed(1) + 'M SOL' : Math.round(total / 1000) + 'K SOL';
+        var shareFmt = netShare < 0.001 ? '<0.001%' : netShare.toFixed(4) + '%';
+        el.innerHTML = stake.toLocaleString('en-US', {maximumFractionDigits:0}) + ' SOL = '
+            + shareFmt + ' of ' + totalFmt
+            + ' \u00b7 <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener" style="color:inherit;opacity:0.7;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.12);">Solana Compass</a>'
+            + ' <span style="opacity:0.5;">(snapshot, Mar\u00a02026)</span>';
+    }());
     var shareRawEl = document.getElementById('vi-share-raw');
     if (shareRawEl) shareRawEl.value = netShare;
     var shareDiv = document.getElementById('vi-share');
@@ -9415,7 +9428,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     </div>
     <div class="vc-explainer-section">
       <div class="vc-explainer-section-title">FORMULA</div>
-      <div class="vc-explainer-note">Network Share = Your Stake ÷ Total Network Staked × 100</div>
+      <div class="vc-explainer-note">Network Stake % = Your Stake ÷ Total Network Staked × 100</div>
     </div>
     <div class="vc-explainer-section">
       <div class="vc-explainer-note">Reference: total active stake ~421M SOL (Solana Compass, Mar 2026). Changing stake automatically updates the Network Share field and vice versa.</div>
