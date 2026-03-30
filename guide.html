@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAIKU Revenue Simulator — User Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --lime: #C0FF38;
+    --bg: #000204;
+    --card: #0d0f12;
+    --card-border: #1e2126;
+    --text: #F6F8FA;
+    --text2: #71787F;
+    --text-mid: #A0A3A9;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --radius: 8px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--font-display); background:var(--bg); color:var(--text); line-height:1.6; font-size:14px; }
+a { color:var(--lime); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+/* Layout */
+.page { max-width:900px; margin:0 auto; padding:32px 24px 64px; }
+
+/* Top nav */
+.topnav { display:flex; align-items:center; justify-content:space-between; margin-bottom:40px; padding-bottom:16px; border-bottom:1px solid var(--card-border); }
+.topnav-back { font-family:var(--font-mono); font-size:11px; color:var(--text2); letter-spacing:0.5px; display:flex; align-items:center; gap:6px; transition:color .2s; }
+.topnav-back:hover { color:var(--lime); text-decoration:none; }
+.topnav-meta { font-family:var(--font-mono); font-size:10px; color:var(--text2); letter-spacing:0.5px; }
+
+/* Title block */
+.hero { margin-bottom:48px; }
+.hero-label { font-family:var(--font-mono); font-size:10px; color:var(--lime); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:10px; }
+.hero h1 { font-size:28px; font-weight:700; color:var(--text); letter-spacing:-0.3px; line-height:1.25; margin-bottom:12px; }
+.hero p { color:var(--text-mid); font-size:14px; max-width:680px; line-height:1.7; }
+
+/* Section */
+.section { margin-bottom:48px; }
+.section-title { font-family:var(--font-mono); font-size:10px; color:var(--lime); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--card-border); }
+.section h2 { font-size:18px; font-weight:600; color:var(--text); margin-bottom:10px; margin-top:20px; }
+.section h2:first-of-type { margin-top:0; }
+.section h3 { font-size:13px; font-weight:600; color:var(--text); margin-bottom:8px; margin-top:18px; letter-spacing:0.1px; }
+.section p { color:var(--text-mid); margin-bottom:10px; }
+.section p + p { margin-top:4px; }
+
+/* Cards */
+.card { background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); padding:16px 18px; margin-bottom:12px; }
+.card-title { font-size:11px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; font-family:var(--font-mono); }
+.card p { font-size:13px; color:var(--text-mid); margin-bottom:0; }
+
+/* Scenario grid */
+.scenario-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:16px 0; }
+.sc-card { background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); padding:12px 14px; }
+.sc-name { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
+.sc-name.con { color:#8a93a8; }
+.sc-name.base { color:var(--lime); }
+.sc-name.opt { color:#6B9EBC; }
+.sc-name.bull { color:#E8855A; }
+.sc-row { display:flex; justify-content:space-between; align-items:baseline; font-size:11px; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+.sc-row:last-child { border-bottom:none; }
+.sc-key { color:var(--text2); font-family:var(--font-mono); font-size:9.5px; }
+.sc-val { color:var(--text); font-family:var(--font-mono); font-weight:600; font-size:10.5px; }
+.sc-note { font-size:10.5px; color:var(--text2); font-style:italic; margin-top:8px; }
+
+/* Input/output blocks */
+.io-block { margin:12px 0; }
+.io-label { font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:1px; font-weight:700; padding:4px 8px; border-radius:3px; display:inline-block; margin-bottom:8px; }
+.io-label.input { background:rgba(107,158,188,0.12); color:#6B9EBC; }
+.io-label.output { background:rgba(192,255,56,0.08); color:var(--lime); }
+.io-list { list-style:none; }
+.io-list li { font-size:13px; color:var(--text-mid); padding:3px 0 3px 14px; position:relative; }
+.io-list li::before { content:"·"; position:absolute; left:2px; color:var(--text2); }
+.io-list li strong { color:var(--text); font-weight:600; }
+.io-list li code { font-family:var(--font-mono); font-size:11px; color:#6B9EBC; background:rgba(107,158,188,0.08); padding:1px 4px; border-radius:3px; }
+
+/* Formula block */
+.formula { background:#040608; border:1px solid var(--card-border); border-left:2px solid var(--lime); border-radius:var(--radius); padding:12px 16px; margin:12px 0; font-family:var(--font-mono); font-size:12px; color:#a8b4c0; line-height:1.8; }
+.formula span.hl { color:var(--lime); }
+
+/* Table */
+.data-table { width:100%; border-collapse:collapse; margin:14px 0; font-size:12px; }
+.data-table th { font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:0.8px; color:var(--text2); text-align:left; padding:6px 10px; border-bottom:1px solid var(--card-border); font-weight:600; }
+.data-table td { padding:7px 10px; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--text-mid); vertical-align:top; }
+.data-table td strong { color:var(--text); font-weight:600; }
+.data-table tr:last-child td { border-bottom:none; }
+.data-table td:first-child { color:var(--text); font-weight:500; }
+
+/* Glossary */
+.glossary { margin:12px 0; }
+.glossary dt { font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--lime); margin-top:12px; margin-bottom:3px; }
+.glossary dd { color:var(--text-mid); font-size:13px; padding-left:16px; }
+
+/* Tab overview row */
+.tab-overview { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin:16px 0; }
+.tab-card { background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius); padding:14px 16px; }
+.tab-num { font-family:var(--font-mono); font-size:9px; color:var(--text2); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+.tab-name { font-size:13px; font-weight:700; color:var(--text); margin-bottom:6px; }
+.tab-desc { font-size:12px; color:var(--text2); line-height:1.5; }
+
+/* Callout */
+.callout { background:rgba(192,255,56,0.04); border:1px solid rgba(192,255,56,0.15); border-radius:var(--radius); padding:12px 16px; margin:14px 0; font-size:13px; color:var(--text-mid); }
+.callout strong { color:var(--lime); }
+
+/* Tag chip */
+.tag { display:inline-block; font-family:var(--font-mono); font-size:10px; padding:2px 7px; border-radius:3px; margin-right:4px; font-weight:600; }
+.tag.aot { background:rgba(123,187,175,0.12); color:#7BBBAF; }
+.tag.jit { background:rgba(91,141,239,0.12); color:#5B8DEF; }
+
+/* Separator */
+hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
+
+@media (max-width:640px) {
+    .scenario-grid { grid-template-columns:repeat(2,1fr); }
+    .tab-overview { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Top nav -->
+  <div class="topnav">
+    <a href="index.html" class="topnav-back">← Back to Simulator</a>
+    <span class="topnav-meta">v6 · Mar 2026</span>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-label">RAIKU Protocol</div>
+    <h1>Revenue Simulator<br>User Guide</h1>
+    <p>
+      This tool models the revenue economics of RAIKU, a Solana blockspace marketplace protocol.
+      It lets you explore protocol-level treasury projections, validator yield uplift, and customer blockspace costs
+      across four market scenarios — all driven by on-chain data from Trillium, Jito, and Dune Analytics.
+    </p>
+  </div>
+
+  <!-- ═══ SECTION 1 — What is RAIKU ═══ -->
+  <div class="section">
+    <div class="section-title">01 — What is RAIKU?</div>
+    <p>
+      RAIKU is a Solana blockspace marketplace that sells guaranteed transaction inclusion via two auction types:
+    </p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:14px 0;">
+      <div class="card">
+        <div class="card-title"><span class="tag aot">AOT</span> Ahead-of-Time</div>
+        <p>Sealed-bid auction for reserved compute unit (CU) windows, executed before the block is built.
+           Customers bid a fee per CU and are guaranteed inclusion in a Raiku-controlled slot.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="tag jit">JIT</span> Just-in-Time</div>
+        <p>Real-time tip-based ordering at block construction time — similar to Jito bundles.
+           Customers submit bids at the last second; the highest bidder gets priority ordering.</p>
+      </div>
+    </div>
+    <p>
+      <strong style="color:var(--text);">Revenue split:</strong>
+      95–99% of gross revenue flows to validators (governance range).
+      The remaining 1–5% is the protocol take, redistributed as:
+      customer rebates, validator bonuses (AOT only), growth &amp; buyback, and residual treasury.
+    </p>
+    <div class="callout">
+      <strong>Why it matters for validators:</strong> Validators running RAIKU earn additional MEV revenue on top of standard Solana issuance and network fees — without forgoing any existing income stream.
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ═══ SECTION 2 — Scenarios ═══ -->
+  <div class="section">
+    <div class="section-title">02 — The Four Scenarios</div>
+    <p>
+      All tabs share the same four scenario presets. Switching scenario resets all adjustable inputs to the values below.
+      Protocol take rates (AOT 5%, JIT 5%) are identical across all scenarios — only market participation assumptions differ.
+    </p>
+
+    <div class="scenario-grid">
+      <div class="sc-card">
+        <div class="sc-name con">Conservative</div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$80</span></div>
+        <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">5%</span></div>
+        <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">2%</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">1.00 lam</span></div>
+        <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">6M SOL/yr</span></div>
+        <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">4%</span></div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-name base">Base Case</div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$100</span></div>
+        <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">10%</span></div>
+        <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">8%</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">1.50 lam</span></div>
+        <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">813K SOL/yr</span></div>
+        <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">8%</span></div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-name opt">Optimistic</div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$150</span></div>
+        <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">15%</span></div>
+        <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">12%</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">2.00 lam</span></div>
+        <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">1.76M SOL/yr</span></div>
+        <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">12%</span></div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-name bull">Bull Case</div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$250</span></div>
+        <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">25%</span></div>
+        <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">15%</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">3.50 lam</span></div>
+        <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">5M SOL/yr</span></div>
+        <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">20%</span></div>
+      </div>
+    </div>
+    <p class="sc-note">
+      JIT Market figures derive from Jito Foundation MEV reward data (epochs 836–935).
+      Conservative uses a 6-month window; Base uses 12 months; Optimistic uses 24 months; Bull is a manual stress assumption.
+    </p>
+  </div>
+
+  <hr>
+
+  <!-- ═══ SECTION 3 — Tab 1: Revenue Model ═══ -->
+  <div class="section">
+    <div class="section-title">03 — Tab 1: Revenue Model</div>
+    <p>Top-down protocol-level revenue model. Estimates annual gross revenue, the protocol treasury, and validator pools for a given set of market assumptions.</p>
+
+    <h3>Inputs (left sidebar)</h3>
+    <div class="io-block">
+      <span class="io-label input">Inputs</span>
+      <ul class="io-list">
+        <li><strong>SOL Price</strong> — $10–$400. Converts all SOL-denominated outputs to USD.</li>
+        <li><strong>AOT / JIT Take Rate</strong> — % of gross revenue retained by the protocol (0–10% each).</li>
+        <li><strong>Customer Rebate</strong> — % of gross returned to customers from the protocol pool.</li>
+        <li><strong>Validator Bonus</strong> — % of gross redistributed to validators from the protocol pool (AOT only).</li>
+        <li><strong>Raiku Stake %</strong> — Share of total Solana stake controlled by validators running RAIKU. Determines slot allocation.</li>
+        <li><strong>Block Share (CU %)</strong> — % of each Raiku block's 60M CU reserved for AOT auctions.</li>
+        <li><strong>Avg Auction Fee/CU</strong> — Average winning bid per compute unit in lamports (see §07 for calibration).</li>
+        <li><strong>Total JIT Market</strong> — Total annual SOL volume of JIT tips on Solana (scenario-driven; sourced from Jito Foundation API).</li>
+        <li><strong>Raiku JIT Share %</strong> — RAIKU's capture of the JIT market.</li>
+      </ul>
+    </div>
+
+    <h3>Revenue formulas</h3>
+    <div class="formula">
+      <span class="hl">AOT Gross</span> = Raiku Stake% × Total Staked SOL<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× Block Share% × 60,000,000 CU/block<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× Fee/CU (lam) × Blocks/year ÷ 1,000,000,000
+    </div>
+    <div class="formula">
+      <span class="hl">JIT Gross</span> = Total JIT Market (SOL/yr) × Raiku JIT Share%
+    </div>
+
+    <h3>Outputs</h3>
+    <div class="io-block">
+      <span class="io-label output">Outputs</span>
+      <ul class="io-list">
+        <li><strong>Revenue overview</strong> — AOT Revenue, JIT Revenue, Total Gross Revenue; annual / monthly / per-block.</li>
+        <li><strong>Waterfall</strong> — Validator Base, Validator Bonus, AOT Rebate, JIT Rebate, Growth &amp; Buyback, Treasury.</li>
+        <li><strong>Revenue Flow diagram</strong> — Sankey showing how gross revenue distributes to each destination.</li>
+        <li><strong>Sensitivity matrix</strong> — AOT Protocol Treasury across Stake % × Fee/CU grid.</li>
+        <li><strong>Scenario comparison</strong> — 4 side-by-side cards for Conservative / Base / Optimistic / Bull.</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ═══ SECTION 4 — Tab 2: Validator Revenue ═══ -->
+  <div class="section">
+    <div class="section-title">04 — Tab 2: Validator Revenue</div>
+    <p>Two independent sub-sections covering validator economics at two levels of abstraction.</p>
+
+    <h2>4a — Protocol Level</h2>
+    <p>
+      Protocol-level view: what a validator running RAIKU earns, expressed as total APY and its six revenue components.
+      All inputs are mirrored from Tab 1 — this section does not have its own sliders.
+    </p>
+    <div class="io-block">
+      <span class="io-label input">Setup</span>
+      <ul class="io-list">
+        <li><strong>Scenario selector</strong> — 4 buttons (Conservative / Base Case / Optimistic / Bull Case). Resets all Tab 1 inputs.</li>
+        <li>Read-only context: SOL Price, Raiku Stake %, Block Share %, Avg Fee/CU, Raiku Validator Stake (SOL).</li>
+      </ul>
+    </div>
+    <div class="io-block">
+      <span class="io-label output">Outputs</span>
+      <ul class="io-list">
+        <li><strong>Total Validator APY</strong> + <strong>Raiku Uplift badge</strong> — incremental APY added by running RAIKU vs. not running it.</li>
+        <li><strong>6-segment yield bar</strong> — visual decomposition of total APY into:
+          <code>Issuance</code> · <code>Network Block Fees</code> · <code>Raiku AOT</code> · <code>Validator Bonus</code> · <code>Raiku JIT</code> · <code>Other JIT</code>
+        </li>
+        <li><strong>Revenue table</strong> — per block / epoch / month / year; SOL and USD.</li>
+        <li><strong>Validation panel</strong> — simulated values cross-checked against Trillium epoch benchmarks (latest epoch, 12M all, 24M elevated+extreme). Green cells indicate the reference most relevant for the active scenario.</li>
+      </ul>
+    </div>
+
+    <h2>4b — Individual Level</h2>
+    <p>
+      Per-validator view: revenue for a specific validator with a given stake size. Independent of Tab 1's protocol-level stake assumption.
+    </p>
+    <div class="io-block">
+      <span class="io-label input">Setup</span>
+      <ul class="io-list">
+        <li><strong>Delegated Stake</strong> — editable (default P50 median = 152,908 SOL); ↺ resets to median.</li>
+        <li><strong>Network Stake %</strong> — derived from Delegated Stake ÷ total staked SOL (~426M; source: Solana Compass).</li>
+        <li><strong>SOL Price</strong> — local to this section; independent from Tab 1.</li>
+        <li><strong>Issuance APY / Network Fees APY</strong> — initialised from active scenario; user-adjustable; ↺ resets.</li>
+      </ul>
+    </div>
+    <div class="io-block">
+      <span class="io-label output">Outputs</span>
+      <ul class="io-list">
+        <li><strong>Network Positioning</strong> — histogram of all 762 active validators (Trillium epoch 945) with the user's stake highlighted; rank bar with P25/P50/P75/P90 reference points; approximate rank (#X of 762).</li>
+        <li><strong>Annual Revenue KPIs</strong> — total annual revenue in USD and SOL; per-epoch equivalent.</li>
+        <li><strong>6-component yield decomposition</strong> — same structure as Protocol Level.</li>
+        <li><strong>Revenue table</strong> — per block / epoch / month / year for this specific validator.</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ═══ SECTION 5 — Tab 3: Customer Economics ═══ -->
+  <div class="section">
+    <div class="section-title">05 — Tab 3: Customer Economics</div>
+    <p>
+      Analyses the cost breakdown for a customer (PropAMM, market maker, arb bot, protocol cranker, etc.)
+      purchasing blockspace via Raiku AOT, Raiku JIT, or Other JIT (Jito / non-Raiku ordering).
+    </p>
+    <div class="io-block">
+      <span class="io-label input">Setup</span>
+      <ul class="io-list">
+        <li><strong>Customer category &amp; profile</strong> — dropdown populated from embedded program database (Dune 30-day data, top 500 programs).</li>
+        <li><strong>CU/block and Fee/CU</strong> — per route (Raiku AOT, Raiku JIT, Other JIT).</li>
+        <li><strong>Raiku Stake %</strong> and block allocation caps per route.</li>
+      </ul>
+    </div>
+    <div class="io-block">
+      <span class="io-label output">Outputs</span>
+      <ul class="io-list">
+        <li><strong>Spend matrix</strong> — per route: CU volume, Fee/CU, total spend (SOL) × per block / epoch / month / year.</li>
+        <li><strong>Block distribution</strong> — Raiku blocks vs. Non-Raiku blocks per epoch.</li>
+        <li><strong>Spend composition bar</strong> — AOT vs JIT vs Other JIT share of total cost.</li>
+      </ul>
+    </div>
+    <div class="callout">
+      The <strong>→ Block Simulation</strong> button at the bottom of this tab opens Tab 4 with the selected customer profile pre-loaded for a deeper per-block auction analysis.
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ═══ SECTION 6 — Tab 4: Block Simulation ═══ -->
+  <div class="section">
+    <div class="section-title">06 — Tab 4: Block Simulation</div>
+    <p>
+      Micro-level simulation of a single Raiku block. Models how competing customer bids aggregate into a 60M CU block
+      and which customers win space at what effective fee/CU.
+    </p>
+    <div class="io-block">
+      <span class="io-label input">Setup</span>
+      <ul class="io-list">
+        <li><strong>Scenario selector</strong> — initialises customer demand and fee assumptions.</li>
+        <li><strong>Per-customer category</strong> — CU demand and bid (lam/CU) per archetype.</li>
+      </ul>
+    </div>
+    <div class="io-block">
+      <span class="io-label output">Outputs</span>
+      <ul class="io-list">
+        <li><strong>Bid histogram</strong> — frequency distribution of bids by fee/CU.</li>
+        <li><strong>Block fill %</strong> — how much of the 60M CU capacity is allocated in this simulation.</li>
+        <li><strong>Blended fee/CU</strong> — CU-weighted average winning bid for the block.</li>
+        <li><strong>Per-customer breakdown</strong> — which archetypes win space and at what cost.</li>
+      </ul>
+    </div>
+    <p style="font-size:12px; color:var(--text2); font-style:italic;">
+      Note: Block Simulation is a realism check. Its results do not feed back into Tabs 1–2.
+    </p>
+  </div>
+
+  <hr>
+
+  <!-- ═══ SECTION 7 — Data Sources ═══ -->
+  <div class="section">
+    <div class="section-title">07 — Data Sources &amp; Methodology</div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Source</th>
+          <th>Data</th>
+          <th>Coverage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Trillium API</strong></td>
+          <td>MEV tips, priority fees, issuance rewards, validator count, active stake, SOL price — per epoch and per validator</td>
+          <td>Epochs 552–945 (Dec 2023–present)</td>
+        </tr>
+        <tr>
+          <td><strong>Jito Foundation API</strong></td>
+          <td>Total network JIT tips (MEV) per epoch. Cross-checked against Trillium: ratio = 1.000×</td>
+          <td>Epochs 390–934</td>
+        </tr>
+        <tr>
+          <td><strong>Solana Compass</strong></td>
+          <td>Total staked SOL (~426M SOL, snapshot Mar 2026); staking ratio; inflation rate</td>
+          <td>Snapshot reference</td>
+        </tr>
+        <tr>
+          <td><strong>Dune Analytics</strong></td>
+          <td>Per-program fee/CU (30-day aggregate); daily priority fees (91-day); top 500 programs</td>
+          <td>30-day rolling window</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>How Fee/CU is calibrated</h3>
+    <p>
+      Fee/CU (lamports per compute unit) measures the price actors pay to get their transactions included quickly.
+      It combines <strong style="color:var(--text);">priority fees</strong> (paid directly to the validator) and
+      <strong style="color:var(--text);">MEV/JIT tips</strong> (paid via Jito-style ordering).
+      Together, these represent the real willingness-to-pay for blockspace priority.
+    </p>
+    <p>
+      Two data sources are combined:
+    </p>
+    <ul class="io-list" style="margin:8px 0;">
+      <li><strong>30-day Dune data</strong> — program-level fee/CU for the top 500 programs. Arb bots are excluded from AOT calibration (they are JIT-only by nature).</li>
+      <li><strong>12–24 month Trillium epoch data</strong> — epoch-level non-base fee/CU (priority + MEV), classified by market regime.</li>
+    </ul>
+
+    <h3>Market conditions (regimes)</h3>
+    <p>Epochs are tagged based on rolling 30-epoch fee volatility:</p>
+    <table class="data-table" style="margin-top:8px;">
+      <thead>
+        <tr><th>Regime</th><th>Description</th><th>Used in scenarios</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Normal</strong></td><td>Typical fee environment, low volatility</td><td>Conservative, Base Case</td></tr>
+        <tr><td><strong>Elevated</strong></td><td>Higher-than-usual fees; moderate congestion</td><td>Optimistic (24M window)</td></tr>
+        <tr><td><strong>Extreme</strong></td><td>Memecoin surges, high MEV periods, peak congestion</td><td>Bull Case (top-of-range)</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:10px;">
+      Scenario fee/CU defaults:
+      Conservative <strong style="color:var(--text);">1.00 lam</strong> (Normal p25) ·
+      Base <strong style="color:var(--text);">1.50 lam</strong> (Normal median) ·
+      Optimistic <strong style="color:var(--text);">2.00 lam</strong> (Normal p75) ·
+      Bull <strong style="color:var(--text);">3.50 lam</strong> (Extreme mean)
+    </p>
+  </div>
+
+  <hr>
+
+  <!-- ═══ SECTION 8 — Glossary ═══ -->
+  <div class="section">
+    <div class="section-title">08 — Key Concepts</div>
+    <dl class="glossary">
+      <dt>AOT — Ahead-of-Time</dt>
+      <dd>Sealed-bid auction for reserved compute unit windows, executed before a block is built. Customers are guaranteed inclusion in Raiku-controlled slots.</dd>
+
+      <dt>JIT — Just-in-Time</dt>
+      <dd>Real-time tip-based ordering at block construction time, similar to Jito bundles. Highest bidder gets priority ordering.</dd>
+
+      <dt>CU — Compute Unit</dt>
+      <dd>Solana's unit of computational work. Maximum 60,000,000 CU per block. Validators reserve a percentage of each block's CU for Raiku AOT auctions.</dd>
+
+      <dt>Fee/CU (lam/CU)</dt>
+      <dd>Price per compute unit in lamports. 1 SOL = 1,000,000,000 lamports. The Fee/CU slider is the single most impactful input in the AOT revenue formula.</dd>
+
+      <dt>Protocol Take Rate</dt>
+      <dd>Percentage of gross revenue retained by the RAIKU protocol (governance range 0–5%). AOT and JIT have separate take rates.</dd>
+
+      <dt>Validator Bonus</dt>
+      <dd>A portion of the AOT protocol take redistributed back to validators running RAIKU as an adoption incentive.</dd>
+
+      <dt>Customer Rebate</dt>
+      <dd>A portion of the protocol take returned to customers, funded from the protocol pool. Reduces net cost for high-volume AOT/JIT users.</dd>
+
+      <dt>Epoch</dt>
+      <dd>Solana time unit ≈ 2–3 days (~432,000 slots). Approximately 182 epochs per year. All epoch-level metrics in the simulator are annualised using this rate.</dd>
+
+      <dt>Network Stake %</dt>
+      <dd>Your validator's delegated stake divided by total staked SOL (~426M SOL as of Mar 2026). Determines your share of slot leadership and revenue.</dd>
+
+      <dt>Raiku Uplift</dt>
+      <dd>The incremental APY gained by a validator running RAIKU, over and above standard Solana issuance + network fees.</dd>
+    </dl>
+  </div>
+
+  <!-- Footer -->
+  <div style="margin-top:48px; padding-top:20px; border-top:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+    <span style="font-family:var(--font-mono); font-size:10px; color:var(--text2);">
+      RAIKU Revenue Simulator v6 · Mar 2026 · Internal use only
+    </span>
+    <a href="index.html" style="font-family:var(--font-mono); font-size:10px; color:var(--text2);">← Back to Simulator</a>
+  </div>
+
+</div>
+</body>
+</html>
