@@ -367,9 +367,9 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
 
     <h2>4a — Protocol Level</h2>
     <p>
-      Protocol-level view: what a validator running RAIKU earns, expressed as total APY decomposed into six components:
-      Issuance · Network Block Fees · Raiku AOT · Validator Bonus · Raiku JIT · Other JIT.
-      All inputs are mirrored from <a href="#s3">Tab 1 — Revenue Model</a>; this section has no independent sliders.
+      Aggregate yield composition for the Raiku validator set: how much of total staking APY comes from each source,
+      broken down into six components — Issuance · Network Block Fees · Raiku AOT · Validator Bonus · Raiku JIT · Other JIT.
+      All inputs mirror <a href="#s3">Tab 1 — Revenue Model</a>; this sub-section has no independent sliders.
     </p>
     <div class="io-block">
       <span class="io-label input">Setup</span>
@@ -458,7 +458,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
   <div id="s5" class="section">
     <div class="section-title">05 — Tab 3: Customer Economics</div>
     <p>
-      Analyses the cost breakdown for a customer (PropAMM, quant trading desk, arb bot, protocol cranker, etc.)
+      Analyses the cost breakdown for a customer — Arbitrage Bot, Prop AMM, Cranker, Oracle, DEX, Lending, Perps, Payments, Bridge, NFT, Gaming, or DePIN —
       purchasing blockspace via Raiku AOT, Raiku JIT, or Other JIT (non-Raiku ordering services).
     </p>
     <div class="io-block">
@@ -477,9 +477,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
         <li><strong>Spend composition bar</strong> — AOT vs JIT vs Other JIT share of total cost.</li>
       </ul>
     </div>
-    <div class="callout">
-      Some customer profiles include a <strong>View in Block Simulation</strong> link that opens <a href="#s6">Tab 4 — Block Simulation</a> with the selected profile pre-loaded for a deeper per-block auction analysis.
-    </div>
+    <p style="font-size:12px;color:var(--text2);font-style:italic;margin-top:6px;">Note: some customer profiles include a “View in Block Simulation” link that opens <a href="#s6">Tab 4</a> with the selected profile pre-loaded.</p>
   </div>
 
   <hr>
