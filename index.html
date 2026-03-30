@@ -3325,7 +3325,7 @@ const SC = {
 };
 let _selectedScenario = 'base';
 let _vcOverrides = {nf: false, iss: false};  // true = user has manually edited the cell; scenario buttons reset these
-const STAKE_FALLBACK_SOL = 421562663; // Solana Compass snapshot, Mar 2026
+const STAKE_FALLBACK_SOL = 426299856; // Solana Compass snapshot, Mar 2026
 let _solanaStakeState = {
     sol: STAKE_FALLBACK_SOL,
     sourceHtml: 'Source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener noreferrer">Solana Compass Staked Supply</a>',
@@ -3335,7 +3335,7 @@ let _solanaStakeState = {
 // Source: Solana RPC getInflationRate epoch 945 → 3.9395%; schedule: 8% initial, −15%/yr, 1.5% terminal
 const SOLANA_INFLATION_RATE          = 0.0394;  // Solana protocol inflation (all new SOL goes to validators; foundation rate = 0)
 // Staking ratio = active stake / total SOL supply (NOT vs circulating supply)
-// Source: Solana Compass tokenomics (Mar 2026) → 421,562,663.7 staked = 67.7% of total supply
+// Source: Solana Compass tokenomics (Mar 2026) → 426,299,856.3 staked (ratio updated; staking % TBC with current total supply)
 const ACTIVE_STAKING_RATIO_DEFAULT   = 0.677;   // Default: March 2026 ≈ 67.7%
 // Commission reference — NOT used in issuance formula (Tab 2 shows validator-level gross, not delegator net)
 const AVG_VALIDATOR_COMMISSION_REF   = 0.07;    // Network-avg commission, reference only; source: Trillium validator data
@@ -9431,7 +9431,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
       <div class="vc-explainer-note">Network Stake % = Your Stake ÷ Total Network Staked × 100</div>
     </div>
     <div class="vc-explainer-section">
-      <div class="vc-explainer-note">Reference: total active stake ~421M SOL (Solana Compass, Mar 2026). Changing stake automatically updates the Network Share field and vice versa.</div>
+      <div class="vc-explainer-note">Reference: total active stake ~426M SOL (Solana Compass, Mar 2026). Changing stake automatically updates the Network Stake % field and vice versa.</div>
     </div>
   </div>
 </div>
