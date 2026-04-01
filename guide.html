@@ -430,7 +430,11 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
 
     <h2>4b — Individual Level</h2>
     <p>
-      Per-validator view: revenue for a specific validator with a given stake size. Independent of Tab 1 — Revenue Model's protocol-level Raiku stake assumption.
+      Per-validator view: revenue for a specific validator with a given stake size.
+    </p>
+    <p>
+      This section is local for validator-specific inputs such as Delegated Stake, Network Stake %, SOL Price, and manual overrides on Issuance APY / Network Fees APY.
+      Raiku-related yield and revenue, however, inherit the current live Protocol Level economics. As a result, changes to Protocol Level settings such as take rate and other live revenue drivers update Individual Level outputs immediately.
     </p>
     <div class="io-block">
       <span class="io-label input">Setup</span>
@@ -438,16 +442,17 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
         <li><strong>Delegated Stake</strong> — editable (default P50 median = 152,908 SOL); ↺ resets to median.</li>
         <li><strong>Network Stake %</strong> — derived from Delegated Stake ÷ total staked SOL (~426M SOL; source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener">Solana Compass</a>, snapshot Mar 2026).</li>
         <li><strong>SOL Price</strong> — local to this section; independent from Tab 1 — Revenue Model.</li>
-        <li><strong>Issuance APY / Network Fees APY</strong> — initialised from active scenario; user-adjustable; ↺ resets.</li>
+        <li><strong>Issuance APY / Network Fees APY</strong> — initialised from the active Individual Level scenario; user-adjustable; ↺ resets.</li>
       </ul>
     </div>
     <div class="io-block">
       <span class="io-label output">Outputs</span>
       <ul class="io-list">
-        <li><strong>Network Positioning</strong> — histogram of all 762 active validators (Trillium epoch 945) with the user's stake highlighted; rank bar with P25/P50/P75/P90 reference points; approximate rank (#X of 762).</li>
+        <li><strong>Network Positioning</strong> — histogram of all 762 active validators (Trillium epoch 945) with the user's stake highlighted; rank bar with P25 / P50 / P75 / P90 reference points; approximate rank (#X of 762).</li>
         <li><strong>Annual Revenue KPIs</strong> — total annual revenue in USD and SOL; per-epoch equivalent.</li>
-        <li><strong>6-component yield decomposition</strong> — same structure as Protocol Level.</li>
+        <li><strong>6-component yield decomposition</strong> — same structure as Protocol Level, with Raiku-related components reflecting current live Protocol Level economics.</li>
         <li><strong>Revenue table</strong> — per block / epoch / month / year for this specific validator.</li>
+        <li><strong>Zero-stake guardrail</strong> — if Delegated Stake or implied Network Stake % is zero, Individual Level yield and revenue are zeroed / safely suppressed and a warning is shown: <em>"You need non-zero delegated stake / network share to earn validator revenue."</em></li>
       </ul>
     </div>
   </div>

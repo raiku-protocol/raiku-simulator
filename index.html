@@ -2139,6 +2139,11 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <div id="vi-stake-summary" style="font-size:10px; color:#5a6272; margin-top:3px; line-height:1.5; font-family:var(--font-mono);">—</div>
       </div>
 
+      <!-- Zero-stake warning: shown only when delegated stake / network share is 0 -->
+      <div id="vi-zero-stake-warning" style="display:none; margin-top:8px; padding:7px 10px; background:rgba(255,100,80,0.07); border:1px solid rgba(255,100,80,0.25); border-radius:5px; font-size:10px; color:#f08070; font-family:var(--font-mono); line-height:1.5;">
+        You need non-zero delegated stake / network share to earn validator revenue.
+      </div>
+
       <!-- Spacer -->
       <div style="flex:1; min-height:12px;"></div>
 
@@ -8538,18 +8543,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     if (typeof getScenarioParams !== 'function' || typeof calc !== 'function') return;
     var sp = getScenarioParams(n);
     if (!sp) return;
-    var r        = calc(sp);
-    var totalSol = _getTotalStake();
-    var connectedSol = totalSol * (sp.s || 0);
-    // Raiku APRs: per SOL staked in Raiku-connected validators (same for all validators in scenario)
-    if (connectedSol > 0) {
-      _viState.aotApr   = (r.aotValidatorBase  || 0) / connectedSol;
-      _viState.bonusApr = ((r.aotValBonus || 0) + (r.jitValBonus || 0)) / connectedSol;
-      _viState.jitApr   = (r.jitValidatorBase  || 0) / connectedSol;
-      _viState.ojitApr  = (r.otherJitRev       || 0) / connectedSol;
-    } else {
-      _viState.aotApr = _viState.bonusApr = _viState.jitApr = _viState.ojitApr = 0;
-    }
+    // Raiku APRs are now derived from live protocol economics in viUpdate() on every call.
     // Read issApy from Protocol Level's sl-iss-apy slider to guarantee exact float64 parity
     var slIssEl = document.getElementById('sl-iss-apy');
     var issApyFinal = (slIssEl && parseFloat(slIssEl.value)) ? parseFloat(slIssEl.value) / 100 : (sp.issApy || 0);
@@ -8848,6 +8842,25 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var raikuEl    = document.getElementById('vi-raiku-on');
     if (!stakeRawEl || !commRawEl || !raikuEl) return;
 
+    // ── Live Raiku APR recompute: always use current Protocol Level economics ──
+    // This runs on every viUpdate() call, so changes to any Protocol Level slider
+    // (take rate, stake %, block share, fee/CU, JIT market …) propagate immediately
+    // without requiring the user to re-click an Individual Level scenario button.
+    if (typeof gp === 'function' && typeof calc === 'function') {
+      var _lp = gp();
+      var _lr = calc(_lp);
+      var _ts = _getTotalStake();
+      var _cs = _ts * (_lp.s || 0);
+      if (_cs > 0) {
+        _viState.aotApr   = (_lr.aotValidatorBase  || 0) / _cs;
+        _viState.bonusApr = ((_lr.aotValBonus  || 0) + (_lr.jitValBonus || 0)) / _cs;
+        _viState.jitApr   = (_lr.jitValidatorBase  || 0) / _cs;
+        _viState.ojitApr  = (_lr.otherJitRev       || 0) / _cs;
+      } else {
+        _viState.aotApr = _viState.bonusApr = _viState.jitApr = _viState.ojitApr = 0;
+      }
+    }
+
     var stake   = parseFloat(stakeRawEl.value) || 0;
     var commPct = parseFloat(commRawEl.value)  || 0;
     var raikuOn = raikuEl.checked;
@@ -8888,6 +8901,45 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     _set('vi-slots-epoch', _fmtSlots(432000 * shareFrac));
     _set('vi-slots-month', _fmtSlots(SY / 12  * shareFrac));
     _set('vi-slots-year',  _fmtSlots(SY       * shareFrac));
+
+    // ── Zero-stake guard ─────────────────────────────────────────────────────────
+    // When delegated stake is 0 (or cleared) all yield and revenue outputs are 0.
+    // Stake display above (vi-stake, vi-stake-usd, vi-stake-summary, slots) already
+    // updated correctly; just zero the rate + revenue sections and show a warning.
+    var _warnEl = document.getElementById('vi-zero-stake-warning');
+    if (stake <= 0) {
+      if (_warnEl) _warnEl.style.display = '';
+      var _badge = document.getElementById('vi-raiku-badge');
+      if (_badge) _badge.style.opacity = '0.3';
+      _set('vi-total-apy-display', fmtValidatorRate(0));
+      _set('vi-raiku-apy-uplift',  '+' + fmtValidatorRate(0));
+      _set('vi-total-apr',         fmtValidatorRate(0));
+      ['vi-yield-iss-seg','vi-yield-blk-seg','vi-yield-aot-seg',
+       'vi-yield-bonus-seg','vi-yield-jit-seg','vi-yield-ojit-seg'].forEach(function(id) {
+        var el = document.getElementById(id); if (el) el.style.width = '0%';
+      });
+      ['iss','blk','aot','jit','bonus','ojit'].forEach(function(k) {
+        _set('vi-decomp-' + k + '-apy', fmtValidatorRate(0) + ' APY');
+        _set('vi-decomp-' + k + '-apr', fmtValidatorRate(0) + ' APR');
+      });
+      _set('vi-kpi-annual',     '—');
+      _set('vi-kpi-annual-sol', '—');
+      _set('vi-kpi-epoch',      '—');
+      _set('vi-kpi-epoch-sol',  '—');
+      _set('vi-kpi-share',      '0.0000%');
+      var _dash = '<span class="vpr-sol">—</span>';
+      ['vi-iss','vi-blk','vi-br','vi-aot','vi-jit','vi-bonus','vi-ojit','vi-mev','vi-total'].forEach(function(pfx) {
+        _setHtml(pfx + '-block', _dash);
+        _setHtml(pfx + '-epoch', _dash);
+        _setHtml(pfx + '-month', _dash);
+        _setHtml(pfx + '-year',  _dash);
+      });
+      ['vi-raiku-group-row','vi-aot-row','vi-jit-row','vi-bonus-row','vi-ojit-row'].forEach(function(id) {
+        var el = document.getElementById(id); if (el) el.style.display = raikuOn ? '' : 'none';
+      });
+      return;
+    }
+    if (_warnEl) _warnEl.style.display = 'none';
 
     // ── APR derivation from own state — zero Protocol Level DOM reads ────────────
     var _toApr = function(apy) { return typeof apyToApr === 'function' ? apyToApr(apy, N) : apy; };
