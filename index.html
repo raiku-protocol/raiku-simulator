@@ -8493,7 +8493,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
       function(v){ if (typeof window.viSetBlkApy === 'function') window.viSetBlkApy(v/100); });
 }());
 
-// ── Individual Level: self-contained state + calculations (no Protocol Level live reads) ───
+// ── Individual Level: self-contained state + calculations ───────────────────────────────────
 (function(){
   // ── Own state: Raiku APRs + scenario-scoped APYs, initialized once per scenario change ──
   var _viState = {
@@ -8505,6 +8505,9 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     ojitApr:  0,    // Other JIT (non-Raiku bypass) — from scenario calc
     scenario: 'base'
   };
+  // blk: true = user has manually edited Network Fees APY; live sync from sl-nfapr is skipped.
+  // Reset to false when a scenario button is clicked or ↺ is used.
+  var _viOverrides = { blk: false };
 
   function _fmtUsd(v) {
     var a = Math.abs(v);
@@ -8535,7 +8538,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
   // ── Public setters for Issuance APY and Network Fees APY (called from first-IIFE makeEditable) ──
   window.viSetIssApy = function(apy) { _viState.issApy = apy; window.viUpdate(); };
-  window.viSetBlkApy = function(apy) { _viState.blkApy = apy; window.viUpdate(); };
+  window.viSetBlkApy = function(apy) { _viState.blkApy = apy; _viOverrides.blk = true; window.viUpdate(); };
 
   // ── Apply scenario: initialize _viState from scenario params + update own inputs ──
   // SOL Price and Delegated Stake / Network Share are NOT touched.
@@ -8548,17 +8551,21 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var slIssEl = document.getElementById('sl-iss-apy');
     var issApyFinal = (slIssEl && parseFloat(slIssEl.value)) ? parseFloat(slIssEl.value) / 100 : (sp.issApy || 0);
     _viState.issApy  = issApyFinal;
-    _viState.blkApy  = sp.nfApy  || 0;
+    // Network Fees APY: sync from live sl-nfapr (same source as Protocol Level), not frozen scenario
+    var slNfEl = document.getElementById('sl-nfapr');
+    var blkApyFinal = (slNfEl && parseFloat(slNfEl.value) > 0) ? parseFloat(slNfEl.value) / 100 : (sp.nfApy || 0);
+    _viState.blkApy  = blkApyFinal;
+    _viOverrides.blk = false;
     _viState.scenario = n;
     // Update own Issuance APY and Network Fees APY raw inputs + display divs
     var issRaw = document.getElementById('vi-iss-apy-raw');
     if (issRaw) issRaw.value = (issApyFinal * 100).toFixed(4);
     var blkRaw = document.getElementById('vi-blk-apy-raw');
-    if (blkRaw) blkRaw.value = ((sp.nfApy  || 0) * 100).toFixed(4);
+    if (blkRaw) blkRaw.value = (blkApyFinal * 100).toFixed(4);
     var issDiv = document.getElementById('vi-iss-apy');
     if (issDiv && !issDiv.querySelector('input')) issDiv.textContent = fmtValidatorRate(issApyFinal);
     var blkDiv = document.getElementById('vi-blk-apy');
-    if (blkDiv && !blkDiv.querySelector('input')) blkDiv.textContent = fmtValidatorRate(sp.nfApy  || 0);
+    if (blkDiv && !blkDiv.querySelector('input')) blkDiv.textContent = fmtValidatorRate(blkApyFinal);
     // Highlight only vi-btn-* buttons — isolated from Protocol Level .scenario-btn sweep
     ['con','base','opt','bull'].forEach(function(k) {
       var btn = document.getElementById('vi-btn-' + k);
@@ -8594,13 +8601,16 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     window.viUpdate();
   };
   window.viResetBlkApy = function() {
+    // ↺ resets to the live Protocol Level value (sl-nfapr), not the frozen scenario preset
+    var slNf = document.getElementById('sl-nfapr');
     var sp = typeof getScenarioParams === 'function' ? getScenarioParams(_viState.scenario || 'base') : null;
-    if (!sp) return;
-    _viState.blkApy = sp.nfApy || 0;
+    var liveVal = (slNf && parseFloat(slNf.value) > 0) ? parseFloat(slNf.value) / 100 : ((sp && sp.nfApy) || 0);
+    _viState.blkApy = liveVal;
+    _viOverrides.blk = false;
     var raw = document.getElementById('vi-blk-apy-raw');
-    if (raw) raw.value = (_viState.blkApy * 100).toFixed(4);
+    if (raw) raw.value = (liveVal * 100).toFixed(4);
     var div = document.getElementById('vi-blk-apy');
-    if (div && !div.querySelector('input')) div.textContent = typeof fmtValidatorRate === 'function' ? fmtValidatorRate(_viState.blkApy) : (_viState.blkApy * 100).toFixed(3) + '%';
+    if (div && !div.querySelector('input')) div.textContent = typeof fmtValidatorRate === 'function' ? fmtValidatorRate(liveVal) : (liveVal * 100).toFixed(3) + '%';
     window.viUpdate();
   };
 
@@ -8858,6 +8868,21 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         _viState.ojitApr  = (_lr.otherJitRev       || 0) / _cs;
       } else {
         _viState.aotApr = _viState.bonusApr = _viState.jitApr = _viState.ojitApr = 0;
+      }
+    }
+
+    // ── Live Network Fees APY sync: follow sl-nfapr unless user has manually overridden ──
+    if (!_viOverrides.blk) {
+      var _slNf = document.getElementById('sl-nfapr');
+      if (_slNf) {
+        var _liveBlkApy = parseFloat(_slNf.value) / 100;
+        if (!isNaN(_liveBlkApy) && _liveBlkApy > 0) {
+          _viState.blkApy = _liveBlkApy;
+          var _blkRaw = document.getElementById('vi-blk-apy-raw');
+          if (_blkRaw) _blkRaw.value = (_liveBlkApy * 100).toFixed(4);
+          var _blkDiv = document.getElementById('vi-blk-apy');
+          if (_blkDiv && !_blkDiv.querySelector('input')) _blkDiv.textContent = fmtValidatorRate(_liveBlkApy);
+        }
       }
     }
 

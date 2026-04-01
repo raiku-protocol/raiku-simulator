@@ -442,7 +442,8 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
         <li><strong>Delegated Stake</strong> — editable (default P50 median = 152,908 SOL); ↺ resets to median.</li>
         <li><strong>Network Stake %</strong> — derived from Delegated Stake ÷ total staked SOL (~426M SOL; source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener">Solana Compass</a>, snapshot Mar 2026).</li>
         <li><strong>SOL Price</strong> — local to this section; independent from Tab 1 — Revenue Model.</li>
-        <li><strong>Issuance APY / Network Fees APY</strong> — initialised from the active Individual Level scenario; user-adjustable; ↺ resets.</li>
+        <li><strong>Issuance APY</strong> — initialised from the active Protocol Level scenario; user-adjustable; ↺ resets to Protocol Level value.</li>
+        <li><strong>Network Fees APY</strong> — syncs live from Protocol Level (same <em>NETWORK_FEES_APR_REF × (1 − Block Share)</em> formula) by default, so both sections always agree. Editing it locally applies only to Individual Level outputs; ↺ resets to the live Protocol Level value.</li>
       </ul>
     </div>
     <div class="io-block">
