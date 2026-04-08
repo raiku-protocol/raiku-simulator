@@ -2009,10 +2009,15 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
                 <span style="font-size:11px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.7px; font-family:var(--font-mono);">Validation / Cross-checking</span>
             </div>
             <div id="qcp-body" style="display:none; padding:0 20px 6px;">
-                <div style="padding:8px 0 10px; font-size:11px; color:var(--text-mid); line-height:1.9;">
-                    <div><span style="color:var(--text2);font-weight:600;">Primary source:</span> <a href="https://trillium.so" target="_blank" style="color:var(--text-mid);text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2);">Trillium API</a> — live fetch, latest indexed epoch (auto-detected; typically 1&ndash;2 behind chain tip) &amp; 12-month benchmark history</div>
-                    <div><span style="color:var(--text2);font-weight:600;">Reference dashboard:</span> <a href="https://trillium-dashboard.trillium.so/" target="_blank" style="color:var(--text-mid);text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2);">Trillium Dashboard</a></div>
-                    <div><span style="color:var(--text2);font-weight:600;">Cross-check:</span> <span style="color:var(--text-mid);">ValidBlocks</span> <span style="color:#4a5060;font-size:10px;">(link TBD)</span></div>
+                <div style="padding:8px 0 10px; font-size:11px; color:var(--text-mid); line-height:1.8; display:grid; grid-template-columns:max-content 1fr; gap:1px 10px; align-items:baseline;">
+                    <span style="color:var(--text2);font-weight:600;white-space:nowrap;">Simulator column</span>
+                    <span>Live &mdash; recalculated from current Protocol Level settings on every change</span>
+                    <span style="color:var(--text2);font-weight:600;white-space:nowrap;">Latest epoch column</span>
+                    <span>Epoch-945 cross-section (static benchmark file); column header shows live latest indexed epoch from <a href="https://trillium.so" target="_blank" style="color:var(--text-mid);text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2);">Trillium API</a>, typically 1&ndash;2 behind chain tip</span>
+                    <span style="color:var(--text2);font-weight:600;white-space:nowrap;">12M &amp; 24M columns</span>
+                    <span>Static snapshot &mdash; <span id="qcp-bench-meta" style="color:var(--text-mid);">loading&hellip;</span> &mdash; updated by re-running the Python pipeline</span>
+                    <span style="color:var(--text2);font-weight:600;white-space:nowrap;">References</span>
+                    <span><a href="https://trillium-dashboard.trillium.so/" target="_blank" style="color:var(--text-mid);text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2);">Trillium Dashboard</a> &nbsp;&middot;&nbsp; <a href="https://dashboards.validblocks.com/" target="_blank" style="color:var(--text-mid);text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2);">ValidBlocks</a></span>
                 </div>
                 <div style="background:#0a0c0f; border:1px solid #1a1e27; border-radius:8px; overflow-x:auto; padding:0;">
                     <table class="qcp-table">
@@ -3544,6 +3549,13 @@ function qcpLoadTimeBenchmarks() {
         .then(function(r) { return r.ok ? r.json() : Promise.reject('not found'); })
         .then(function(d) {
             window.QCP.timeBench = d;
+            // Populate benchmark metadata line in validation panel description
+            var metaEl = document.getElementById('qcp-bench-meta');
+            if (metaEl && d.meta) {
+                var gen = d.meta.generated_at || '?';
+                var rng = d.meta.epoch_range   || '?';
+                metaEl.textContent = 'generated ' + gen + ' \u00b7 epochs ' + rng;
+            }
             if (window.QCP.bench && window.QCP.sim && window.QCP.sim.iss != null) qcpRender();
         })
         .catch(function() { /* non-fatal: table still works from bench alone */ });
