@@ -8597,7 +8597,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   };
   window.viResetSolPrice = function() {
     var el = document.getElementById('vi-sol-price-raw');
-    if (el) el.value = 100;
+    var sp = typeof getScenarioParams === 'function' ? getScenarioParams(_viState.scenario || 'base') : null;
+    if (el) el.value = (sp && sp.p) ? sp.p : 100;
     window.viUpdate();
   };
   window.viResetCommission = function() {
