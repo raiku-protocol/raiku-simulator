@@ -2056,10 +2056,10 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
       <!-- Scenario selection: 2×2 grid, mirrors Protocol Level -->
       <div class="vi-btns-2x2">
-        <button class="vi-scenario-btn" id="vi-btn-con"  onclick="viApplyScenario('con')">Conservative</button>
-        <button class="vi-scenario-btn active" id="vi-btn-base" onclick="viApplyScenario('base')">Base Case</button>
-        <button class="vi-scenario-btn" id="vi-btn-opt"  onclick="viApplyScenario('opt')">Optimistic</button>
-        <button class="vi-scenario-btn" id="vi-btn-bull" onclick="viApplyScenario('bull')">Bull Case</button>
+        <button class="vi-scenario-btn" id="vi-btn-con"  onclick="applyScenario('con')">Conservative</button>
+        <button class="vi-scenario-btn active" id="vi-btn-base" onclick="applyScenario('base')">Base Case</button>
+        <button class="vi-scenario-btn" id="vi-btn-opt"  onclick="applyScenario('opt')">Optimistic</button>
+        <button class="vi-scenario-btn" id="vi-btn-bull" onclick="applyScenario('bull')">Bull Case</button>
       </div>
 
       <!-- divider -->
@@ -4223,6 +4223,8 @@ function applyScenario(n){
     if (typeof syncAllNumericInputs === 'function') syncAllNumericInputs();
     updateJitHistoryChart(n);
     updateJitDatasetViewer(n);
+    // Cascade to Individual Level — keeps all 3 scenario selectors in sync
+    if (typeof window.viApplyScenario === 'function') window.viApplyScenario(n, true);
 }
 
 ['sl-comm-aot','sl-comm-jit','sl-rebate-aot','sl-rebate-jit','sl-val-bonus','sl-val-bonus-jit','sl-gb-aot','sl-gb-jit','sl-jit-market','sl-jit','sl-stake','sl-blk','sl-fcu','sl-price'].forEach(id=>{
@@ -8553,16 +8555,20 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var slIssEl = document.getElementById('sl-iss-apy');
     var issApyFinal = (slIssEl && parseFloat(slIssEl.value)) ? parseFloat(slIssEl.value) / 100 : (sp.issApy || 0);
     _viState.issApy  = issApyFinal;
-    // Network Fees APY: on init (page load / full reset) use live Protocol Level value;
-    // on explicit scenario button click, use scenario preset so each button shows a distinct value.
+    // Network Fees APY + SOL Price: on scenario selection (init=true, called from applyScenario)
+    // read live Protocol Level values — they've just been set by applyScenario. On standalone
+    // viApplyScenario call without init, use scenario presets.
     var blkApyFinal;
     if (init) {
       var slNfEl = document.getElementById('sl-nfapr');
       blkApyFinal = (slNfEl && parseFloat(slNfEl.value) > 0) ? parseFloat(slNfEl.value) / 100 : (sp.nfApy || 0);
-      _viOverrides.blk = false;  // live sync enabled after init
+      _viOverrides.blk = false;
+      // Sync SOL price from scenario (sp.p was just applied to sl-price by applyScenario)
+      var viPriceRaw = document.getElementById('vi-sol-price-raw');
+      if (viPriceRaw && sp.p) viPriceRaw.value = sp.p;
     } else {
-      blkApyFinal = sp.nfApy || 0;  // scenario preset — differs across Con/Base/Opt/Bull
-      _viOverrides.blk = true;       // suspend live sync; ↺ re-enables it
+      blkApyFinal = sp.nfApy || 0;
+      _viOverrides.blk = true;
     }
     _viState.blkApy  = blkApyFinal;
     _viState.scenario = n;
