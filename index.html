@@ -8542,7 +8542,9 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
   // ── Apply scenario: initialize _viState from scenario params + update own inputs ──
   // SOL Price and Delegated Stake / Network Share are NOT touched.
-  window.viApplyScenario = function(n) {
+  // init=true: called on page load or full reset — blk override stays false so live sync runs.
+  // init=false (default): user clicked a scenario button — use scenario preset and set override.
+  window.viApplyScenario = function(n, init) {
     if (typeof getScenarioParams !== 'function' || typeof calc !== 'function') return;
     var sp = getScenarioParams(n);
     if (!sp) return;
@@ -8551,11 +8553,18 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     var slIssEl = document.getElementById('sl-iss-apy');
     var issApyFinal = (slIssEl && parseFloat(slIssEl.value)) ? parseFloat(slIssEl.value) / 100 : (sp.issApy || 0);
     _viState.issApy  = issApyFinal;
-    // Network Fees APY: sync from live sl-nfapr (same source as Protocol Level), not frozen scenario
-    var slNfEl = document.getElementById('sl-nfapr');
-    var blkApyFinal = (slNfEl && parseFloat(slNfEl.value) > 0) ? parseFloat(slNfEl.value) / 100 : (sp.nfApy || 0);
+    // Network Fees APY: on init (page load / full reset) use live Protocol Level value;
+    // on explicit scenario button click, use scenario preset so each button shows a distinct value.
+    var blkApyFinal;
+    if (init) {
+      var slNfEl = document.getElementById('sl-nfapr');
+      blkApyFinal = (slNfEl && parseFloat(slNfEl.value) > 0) ? parseFloat(slNfEl.value) / 100 : (sp.nfApy || 0);
+      _viOverrides.blk = false;  // live sync enabled after init
+    } else {
+      blkApyFinal = sp.nfApy || 0;  // scenario preset — differs across Con/Base/Opt/Bull
+      _viOverrides.blk = true;       // suspend live sync; ↺ re-enables it
+    }
     _viState.blkApy  = blkApyFinal;
-    _viOverrides.blk = false;
     _viState.scenario = n;
     // Update own Issuance APY and Network Fees APY raw inputs + display divs
     var issRaw = document.getElementById('vi-iss-apy-raw');
@@ -8616,7 +8625,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
   // ── Global reset (full scenario re-apply) — kept for internal use ─────────
   window.viResetToDefaults = function() {
-    window.viApplyScenario(_viState.scenario || 'base');
+    window.viApplyScenario(_viState.scenario || 'base', true);  // treat as init: re-enable live sync
   };
 
   // SOL Price is now local to Individual Level (vi-sol-price-raw). viSyncPrice is a no-op.
@@ -9100,7 +9109,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   document.addEventListener('DOMContentLoaded', function() {
     // Initialize Individual Level: apply Base Case scenario defaults, then render
     setTimeout(function() {
-      window.viApplyScenario('base');
+      window.viApplyScenario('base', true);  // init=true: live sync enabled, no override
       // Panel is open by default — render histogram immediately after data loads
       var stakeRaw = document.getElementById('vi-stake-raw');
       window.viRenderDistribution(stakeRaw ? parseFloat(stakeRaw.value) || 0 : 0);
