@@ -1026,9 +1026,9 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 <div class="controls-section fade-in fade-in-1">
     <h2>Scenario Presets</h2>
     <div class="scenario-btns">
-        <button class="scenario-btn" id="btn-con" onclick="applyScenario('con')">Conservative</button>
-        <button class="scenario-btn active" id="btn-base" onclick="applyScenario('base')">Base Case</button>
-        <button class="scenario-btn" id="btn-opt" onclick="applyScenario('opt')">Optimistic</button>
+        <button class="scenario-btn active" id="btn-con" onclick="applyScenario('con')">Current Market</button>
+        <button class="scenario-btn" id="btn-base" onclick="applyScenario('base')">Last 12 Months</button>
+        <button class="scenario-btn" id="btn-opt" onclick="applyScenario('opt')">Last 24 Months + Congestion</button>
         <button class="scenario-btn" id="btn-bull" onclick="applyScenario('bull')">Bull Case</button>
     </div>
     <div class="scenario-desc" id="scenario-desc"></div>
@@ -1413,19 +1413,19 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <h2>Scenario Comparison</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
         <div class="scenario-card" id="sc-card-con" data-scenario="con">
-            <h3>Conservative</h3>
+            <h3>Current Market</h3>
             <div class="sc-val" id="sc-con-v">&mdash;</div>
             <div class="sc-detail" id="sc-con-d"></div>
             <div class="sc-monthly" id="sc-con-m"></div>
         </div>
         <div class="scenario-card" id="sc-card-base" data-scenario="base">
-            <h3>Base Case</h3>
+            <h3>Last 12 Months</h3>
             <div class="sc-val" id="sc-base-v">&mdash;</div>
             <div class="sc-detail" id="sc-base-d"></div>
             <div class="sc-monthly" id="sc-base-m"></div>
         </div>
         <div class="scenario-card" id="sc-card-opt" data-scenario="opt">
-            <h3>Optimistic</h3>
+            <h3>Last 24 Months + Congestion</h3>
             <div class="sc-val" id="sc-opt-v">&mdash;</div>
             <div class="sc-detail" id="sc-opt-d"></div>
             <div class="sc-monthly" id="sc-opt-m"></div>
@@ -1487,9 +1487,9 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <div style="background:#111213;border-radius:6px;padding:14px 16px;margin-bottom:12px;border-left:3px solid #5B8DEF;">
             <div style="font-size:10px;font-weight:600;color:#5B8DEF;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Scenario mapping &mdash; preset &rarr; window &rarr; market size</div>
             <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:11px;font-family:var(--font-mono);margin-bottom:14px;">
-                <span style="color:#D4E8A0;white-space:nowrap;">Conservative</span><span style="color:var(--text);">6-month window, annualized</span>
-                <span style="color:#BDD970;white-space:nowrap;">Base Case</span><span style="color:var(--text);">12-month window, annualized &mdash; data-driven default</span>
-                <span style="color:#F0C040;white-space:nowrap;">Optimistic</span><span style="color:var(--text);">24-month window, annualized &mdash; includes higher-activity periods</span>
+                <span style="color:#D4E8A0;white-space:nowrap;">Current Market</span><span style="color:var(--text);">6-month window, annualized</span>
+                <span style="color:#BDD970;white-space:nowrap;">Last 12 Months</span><span style="color:var(--text);">12-month window, annualized</span>
+                <span style="color:#F0C040;white-space:nowrap;">Last 24 Months + Congestion</span><span style="color:var(--text);">24-month window, annualized &mdash; includes higher-activity periods</span>
                 <span style="color:#F5A623;white-space:nowrap;">Bull Case</span><span style="color:var(--text);">5,000,000 SOL/yr &mdash; manual, not derived from historical windows</span>
             </div>
             <div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Window detail &mdash; anchored to <span id="jw-tbl-date">&mdash;</span></div>
@@ -1509,7 +1509,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
                     </thead>
                     <tbody>
                         <tr style="border-bottom:1px solid #1e1f20;">
-                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">6 months<br><span style="font-size:9px;color:#D4E8A0;">Conservative</span></td>
+                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">6 months<br><span style="font-size:9px;color:#D4E8A0;">Current Market</span></td>
                             <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-6m-range">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-6m-ep">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-6m-sol">&mdash;</td>
@@ -1519,7 +1519,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
                             <td style="padding:7px 8px;text-align:right;color:var(--text);font-weight:500;" id="jw-tbl-6m-ann">&mdash;</td>
                         </tr>
                         <tr style="border-bottom:1px solid #1e1f20;">
-                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">12 months<br><span style="font-size:9px;color:#BDD970;">Base Case</span></td>
+                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">12 months<br><span style="font-size:9px;color:#BDD970;">Last 12 Months</span></td>
                             <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-12m-range">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-12m-ep">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-12m-sol">&mdash;</td>
@@ -1529,7 +1529,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
                             <td style="padding:7px 8px;text-align:right;color:var(--text);font-weight:500;" id="jw-tbl-12m-ann">&mdash;</td>
                         </tr>
                         <tr>
-                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">24 months<br><span style="font-size:9px;color:#F0C040;">Optimistic</span></td>
+                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">24 months<br><span style="font-size:9px;color:#F0C040;">Last 24 Months + Congestion</span></td>
                             <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-24m-range">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-24m-ep">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-24m-sol">&mdash;</td>
@@ -1607,7 +1607,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
         <!-- Header line: active preset + source badge + framework label -->
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <span style="font-size:12px;font-weight:600;color:var(--text);" id="aot-active-preset">Base Case</span>
+            <span style="font-size:12px;font-weight:600;color:var(--text);" id="aot-active-preset">Current Market</span>
             <span id="aot-active-source-badge" style="display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:0.3px;padding:3px 8px;border-radius:3px;background:#0d3b3b;color:#4dd0e1;">30d AOT scope</span>
             <span style="flex:1;"></span>
             <span style="font-size:10px;color:var(--text2);font-style:italic;" id="aot-fcu-badge">data-driven framework</span>
@@ -1636,28 +1636,28 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;">Scenario Assumptions (Fee/CU)</div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
                 <div class="scenario-card aot-scenario-card" id="aot-sc-card-con">
-                    <h3>Conservative</h3>
+                    <h3>Current Market</h3>
                     <div class="sc-val" id="aot-sc-con-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-con-sentence">&mdash;</p>
                     <div class="aot-sc-rule" id="aot-sc-con-rule"></div>
                     <button type="button" class="aot-sc-open" data-aot-scenario="con">Show calculation</button>
                 </div>
                 <div class="scenario-card aot-scenario-card" id="aot-sc-card-base">
-                    <h3>Base</h3>
+                    <h3>Last 12 Months</h3>
                     <div class="sc-val" id="aot-sc-base-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-base-sentence">&mdash;</p>
                     <div class="aot-sc-rule" id="aot-sc-base-rule"></div>
                     <button type="button" class="aot-sc-open" data-aot-scenario="base">Show calculation</button>
                 </div>
                 <div class="scenario-card aot-scenario-card" id="aot-sc-card-opt">
-                    <h3>Optimistic</h3>
+                    <h3>Last 24 Months + Congestion</h3>
                     <div class="sc-val" id="aot-sc-opt-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-opt-sentence">&mdash;</p>
                     <div class="aot-sc-rule" id="aot-sc-opt-rule"></div>
                     <button type="button" class="aot-sc-open" data-aot-scenario="opt">Show calculation</button>
                 </div>
                 <div class="scenario-card aot-scenario-card" id="aot-sc-card-bull">
-                    <h3>Bull</h3>
+                    <h3>Bull Case</h3>
                     <div class="sc-val" id="aot-sc-bull-f">&mdash;</div>
                     <p class="aot-sc-sentence" id="aot-sc-bull-sentence">&mdash;</p>
                     <div class="aot-sc-rule" id="aot-sc-bull-rule"></div>
@@ -1747,9 +1747,9 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <div>
             <h2>Validator Setup (Protocol Level)</h2>
             <div class="validator-btns-2x2" style="margin-top:10px;">
-                <button class="scenario-btn" id="validator-btn-con" onclick="applyScenario('con')">Conservative</button>
-                <button class="scenario-btn active" id="validator-btn-base" onclick="applyScenario('base')">Base Case</button>
-                <button class="scenario-btn" id="validator-btn-opt" onclick="applyScenario('opt')">Optimistic</button>
+                <button class="scenario-btn active" id="validator-btn-con" onclick="applyScenario('con')">Current Market</button>
+                <button class="scenario-btn" id="validator-btn-base" onclick="applyScenario('base')">Last 12 Months</button>
+                <button class="scenario-btn" id="validator-btn-opt" onclick="applyScenario('opt')">Last 24 Months + Congestion</button>
                 <button class="scenario-btn" id="validator-btn-bull" onclick="applyScenario('bull')">Bull Case</button>
             </div>
         </div>
@@ -1811,19 +1811,19 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <span id="validator-context-jit-market" style="display:none;"></span>
     <span id="validator-context-ojit" style="display:none;"></span>
     <!-- Base Network Yield inputs — hidden in this layout; controls appear in component expand rows (Patch 3) -->
-    <input type="range" id="sl-staking-ratio" min="50" max="85" step="0.1" value="67.7" style="display:none;" oninput="update()">
-    <input type="range" id="sl-nfapr" min="0" max="2" step="0.001" value="0.497" style="display:none;" oninput="update()"><!-- stores NF APY%; derive-first block in update() sets it to aprToApy(REF×residual,n) unless _vcOverrides.nf -->
-    <input type="range" id="sl-iss-apy" min="0" max="20" step="0.001" value="5.99" style="display:none;" oninput="update()"><!-- stores issuance APY%; derive-first block sets it to aprToApy(INFLATION/stakingRatio,n) unless _vcOverrides.iss -->
+    <input type="range" id="sl-staking-ratio" min="50" max="85" step="0.1" value="70" style="display:none;" oninput="update()">
+    <input type="range" id="sl-nfapr" min="0" max="2" step="0.001" value="0.460" style="display:none;" oninput="update()"><!-- stores NF APY%; derive-first block in update() sets it to APY based on NETWORK_FEES_BENCHMARK_APY × residual, unless _vcOverrides.nf -->
+    <input type="range" id="sl-iss-apy" min="0" max="20" step="0.001" value="5.787" style="display:none;" oninput="update()"><!-- stores issuance APY%; derive-first block sets it to aprToApy(INFLATION/stakingRatio,n) unless _vcOverrides.iss -->
     <span id="validator-staked-value" style="display:none;"></span>
     <span id="validator-staked-source" style="display:none;"></span>
     <span id="validator-inflation-rate" style="display:none;"></span>
-    <span id="validator-staking-ratio-display" style="display:none;">66%</span>
+    <span id="validator-staking-ratio-display" style="display:none;">70%</span>
     <span id="validator-base-apr" style="display:none;"></span>
     <span id="validator-base-apr-sub" style="display:none;"></span>
     <span id="validator-base-apy" style="display:none;"></span>
     <span id="validator-priority-apr" style="display:none;"></span>
     <span id="validator-priority-apy" style="display:none;"></span>
-    <span id="validator-scenario-name" style="display:none;">Base Case</span>
+    <span id="validator-scenario-name" style="display:none;">Current Market</span>
 </div>
 <div class="validator-main">
     <div class="section fade-in fade-in-1" style="padding-bottom:0; margin-bottom:0; position:relative; align-self:start;">
@@ -2056,9 +2056,9 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
 
       <!-- Scenario selection: 2×2 grid, mirrors Protocol Level -->
       <div class="vi-btns-2x2">
-        <button class="vi-scenario-btn" id="vi-btn-con"  onclick="applyScenario('con')">Conservative</button>
-        <button class="vi-scenario-btn active" id="vi-btn-base" onclick="applyScenario('base')">Base Case</button>
-        <button class="vi-scenario-btn" id="vi-btn-opt"  onclick="applyScenario('opt')">Optimistic</button>
+        <button class="vi-scenario-btn active" id="vi-btn-con"  onclick="applyScenario('con')">Current Market</button>
+        <button class="vi-scenario-btn" id="vi-btn-base" onclick="applyScenario('base')">Last 12 Months</button>
+        <button class="vi-scenario-btn" id="vi-btn-opt"  onclick="applyScenario('opt')">Last 24 Months + Congestion</button>
         <button class="vi-scenario-btn" id="vi-btn-bull" onclick="applyScenario('bull')">Bull Case</button>
       </div>
 
@@ -2117,8 +2117,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             Issuance APY
             <button class="vi-param-reset" onclick="viResetIssApy()" title="Reset to active scenario default">↺</button>
           </div>
-          <div class="validator-context-value" id="vi-iss-apy">5.995%</div>
-          <input type="hidden" id="vi-iss-apy-raw" value="5.995">
+          <div class="validator-context-value" id="vi-iss-apy">5.787%</div>
+          <input type="hidden" id="vi-iss-apy-raw" value="5.787">
         </div>
         <div class="validator-context-item">
           <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
@@ -3323,16 +3323,16 @@ const SLIDER_META = {
 };
 
 const SC = {
-    con:  {ca:5,cj:5,j:4,s:5,b:2,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:_jit6m,
-           desc:"Conservative — low but practical non-base assumption from active fee-paying application programs, with a hard floor at 0.10 lam/CU."},
+    con:  {ca:5,cj:5,j:6.4,s:8,b:8,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:_jit6m,
+           desc:"Current market conditions. AOT fee/CU calibrated from 30d program-level data (AOT scope). JIT market anchored to the last 6 months. Raiku stake 8%, block share 8%, SOL price $80."},
     base: {ca:5,cj:5,j:8,s:10,b:8,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.10,vb:1.0,jm:_jit12m,
-           desc:"Base — raw observed CU-weighted non-base fees across included application categories, without outlier clipping."},
+           desc:"Moderate adoption scenario. AOT fee/CU calibrated from long-horizon data (24-month epoch distribution, normal regime). JIT market anchored to the last 12 months. Raiku stake 10%, block share 8%, SOL price $100."},
     opt:  {ca:5,cj:5,j:12,s:15,b:12,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:_jit24m,
-           desc:"Optimistic — strong upside case using CU-weighted total fee/CU, displayed at 1.50 lam/CU."},
+           desc:"Higher adoption scenario. AOT fee/CU calibrated from long-horizon data, elevated above current 30d levels. JIT market anchored to the last 24 months including congestion periods. Raiku stake 15%, block share 12%, SOL price $150."},
     bull: {ca:5,cj:5,j:20,s:25,b:15,f:+_fBull.toFixed(2),p:250,ra:0.25,rj:0.10,vb:0.5,jm:5_000_000,
-           desc:"Bull — high-payer stress case using active-payer P75 non-base fee/CU, displayed at 2.00 lam/CU."},
+           desc:"Upside scenario. AOT fee/CU anchored to long-horizon upper tail (P90 normal regime). JIT market uses the bull sizing assumption (5M SOL/yr). Raiku stake 25%, block share 15%, SOL price $250."},
 };
-let _selectedScenario = 'base';
+let _selectedScenario = 'con';
 let _vcOverrides = {nf: false, iss: false};  // true = user has manually edited the cell; scenario buttons reset these
 const STAKE_FALLBACK_SOL = 426299856; // Solana Compass snapshot, Mar 2026
 let _solanaStakeState = {
@@ -3344,16 +3344,18 @@ let _solanaStakeState = {
 // Source: Solana RPC getInflationRate epoch 945 → 3.9395%; schedule: 8% initial, −15%/yr, 1.5% terminal
 const SOLANA_INFLATION_RATE          = 0.0394;  // Solana protocol inflation (all new SOL goes to validators; foundation rate = 0)
 // Staking ratio = active stake / total SOL supply (NOT vs circulating supply)
-// Source: Solana Compass tokenomics (Mar 2026) → 426,299,856.3 staked (ratio updated; staking % TBC with current total supply)
-const ACTIVE_STAKING_RATIO_DEFAULT   = 0.677;   // Default: March 2026 ≈ 67.7%
+// Source: Solana Compass tokenomics → 426,299,856.3 staked; model default updated to ~70% reflecting current conditions
+const ACTIVE_STAKING_RATIO_DEFAULT   = 0.700;   // Default: ≈ 70% (current network staking ratio)
 // Commission reference — NOT used in issuance formula (Tab 2 shows validator-level gross, not delegator net)
 const AVG_VALIDATOR_COMMISSION_REF   = 0.07;    // Network-avg commission, reference only; source: Trillium validator data
-const NETWORK_FEES_APR_REF           = 0.0054;  // Marinade Block Rewards APR benchmark (base + priority fees, full-network); March 2026 data; used to derive NF APY default
-// Network Fees APY (base + priority, scenario-adjusted) — stored in sl-nfapr as %; derived by update() as aprToApy(NETWORK_FEES_APR_REF × residual, n) unless _vcOverrides.nf
+// Network Fees APY benchmark — model assumption for base + priority fees yield (full-network, before block-share adjustment)
+// 0.50% APY is the model assumption; the derive-first block converts it to APR, applies residual block share, and converts back to APY
+const NETWORK_FEES_BENCHMARK_APY     = 0.005;   // 0.50% APY model assumption (base + priority fees, full-network)
+// Network Fees APY (base + priority, scenario-adjusted) — stored in sl-nfapr as %; derived by update() unless _vcOverrides.nf
 // Parity reference — NOT used as model input
 const RATED_DELEGATOR_APY_REFERENCE  = 0.0448;  // Rated Network 30d Delegator APY; includes commission; parity check only
 const APY_COMPOUNDING_PERIODS = EPOCHS_PER_YEAR; // epoch-based compounding (≈ 182 epochs/yr)
-const SCENARIO_LABELS = { con:'Conservative', base:'Base Case', opt:'Optimistic', bull:'Bull Case' };
+const SCENARIO_LABELS = { con:'Current Market', base:'Last 12 Months', opt:'Last 24 Months + Congestion', bull:'Bull Case' };
 
 function fmt(v,t){
     const a=Math.abs(v);
@@ -3413,11 +3415,12 @@ function vcOpenExplainer(id) {
         var slNf = document.getElementById('sl-nfapr');
         var bShare = slB ? (+(slB.value) / 100) : 0.08;
         var residual = Math.max(0, 1 - bShare);
-        var refAPR = NETWORK_FEES_APR_REF * residual;
+        var benchmarkApr2 = apyToApr(NETWORK_FEES_BENCHMARK_APY, APY_COMPOUNDING_PERIODS);
+        var refAPR = benchmarkApr2 * residual;
         var nfApy = slNf ? +slNf.value/100 : aprToApy(refAPR, APY_COMPOUNDING_PERIODS);
         var nfApr = apyToApr(nfApy, APY_COMPOUNDING_PERIODS);
         _e = document.getElementById('vc-blk-exp-ref-adj');   if(_e) _e.textContent = fmtValidatorRate(refAPR);
-        _e = document.getElementById('vc-blk-exp-nfapr');     if(_e) _e.textContent = fmtValidatorRate(NETWORK_FEES_APR_REF);
+        _e = document.getElementById('vc-blk-exp-nfapr');     if(_e) _e.textContent = fmtValidatorRate(NETWORK_FEES_BENCHMARK_APY);
         _e = document.getElementById('vc-blk-exp-nfapr-inp'); if(_e) _e.textContent = fmtValidatorRate(nfApy);
         _e = document.getElementById('vc-blk-exp-bshare');    if(_e) _e.textContent = (bShare * 100).toFixed(0) + '%';
         _e = document.getElementById('vc-blk-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(nfApr);
@@ -4103,7 +4106,7 @@ function getScenarioParams(key){
     return {
         ca:s.ca, cj:s.cj, ra:s.ra, rj:s.rj, vb:s.vb,
         jm:s.jm, j:s.j/100, s:s.s/100, b:s.b/100, f:s.f, p:s.p,
-        nfApy: aprToApy(NETWORK_FEES_APR_REF * residual, APY_COMPOUNDING_PERIODS),
+        nfApy: aprToApy(apyToApr(NETWORK_FEES_BENCHMARK_APY, APY_COMPOUNDING_PERIODS) * residual, APY_COMPOUNDING_PERIODS),
         issApy: aprToApy(SOLANA_INFLATION_RATE / ACTIVE_STAKING_RATIO_DEFAULT, APY_COMPOUNDING_PERIODS)
     };
 }
@@ -4198,6 +4201,8 @@ async function loadCurrentTotalSolanaStaked(){
 
 function applyScenario(n){
     _selectedScenario = n;
+    // Auto-select calibration context: Current Market uses 30d data; others use long-horizon
+    setCalibrationContext(n === 'con' ? '30d' : 'horizon');
     const s=SC[n];
     document.getElementById('sl-comm-aot').value=s.ca;
     document.getElementById('sl-comm-jit').value=s.cj;
@@ -4224,7 +4229,7 @@ function applyScenario(n){
     document.querySelectorAll('.scenario-card').forEach(c=>c.classList.remove('active'));
     const sc=document.getElementById('sc-card-'+n); if(sc) sc.classList.add('active');
     // Update AOT headline preset name (C2)
-    const presetNames = { con: 'Conservative', base: 'Base Case', opt: 'Optimistic', bull: 'Bull Case' };
+    const presetNames = { con: 'Current Market', base: 'Last 12 Months', opt: 'Last 24 Months + Congestion', bull: 'Bull Case' };
     const presetEl = document.getElementById('aot-active-preset');
     if (presetEl) presetEl.textContent = presetNames[n] || n;
     update();
@@ -4309,8 +4314,8 @@ function setCalibrationContext(ctx) {
     updateAotScenarioCards();
     // Update bottom source copy (C10)
     _updateAotSourceCopy();
-    // Re-apply current scenario to propagate new fee/CU through model
-    if (_selectedScenario) applyScenario(_selectedScenario);
+    // Propagate new fee/CU through model without resetting all preset sliders
+    if (_selectedScenario) update();
 }
 
 // Source-aware bottom copy (C10)
@@ -5049,7 +5054,7 @@ function initJitHistoryChart(){
     const o2={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#888',font:{size:10}},display:true},tooltip:{callbacks:{title:function(ctx){const i=ctx[0].dataIndex;return 'Epoch '+jitAll[i][0]+' \u2014 '+jitAll[i][2];}}}},scales:{x:{ticks:{color:'#555',font:{size:9},maxTicksLimit:18,maxRotation:0,callback:function(val,idx){const lbl=this.getLabelForValue(val);const ep=epochNums[val]!=null?epochNums[val]:'';return [lbl,'ep '+ep];}},grid:{color:'#1a1a1a'}},y:{ticks:{color:'#555',font:{size:9}},grid:{color:'#1a1a1a'},title:{display:true,color:'#A0A3A9',font:{size:10},text:'SOL / epoch'}}}};
     cJH=new Chart(document.getElementById('chart-jit-history'),{type:'line',data:{labels:dateLabels,datasets:[
         {label:'All epochs',data:jitAll.map(r=>r[1]),borderColor:'rgba(255,255,255,0.25)',borderWidth:1,pointRadius:0,fill:false},
-        {label:'Window (12m \u2014 Base Case)',data:jitAll.map(r=>r[2]>=_initCutoff?r[1]:null),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(189,217,112,0.10)'}
+        {label:'Window (12m \u2014 Last 12 Months)',data:jitAll.map(r=>r[2]>=_initCutoff?r[1]:null),borderColor:'#BDD970',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(189,217,112,0.10)'}
     ]},options:o2});
 }
 
@@ -5060,7 +5065,7 @@ const _jitChartColors = {
     opt:  { border: '#F0C040', bg: 'rgba(240,192,64,0.10)' },
 };
 const _jitWindowMonths = { con: 6, base: 12, opt: 24 };
-const _jitWindowLabels = { con: '6m \u2014 Conservative', base: '12m \u2014 Base Case', opt: '24m \u2014 Optimistic' };
+const _jitWindowLabels = { con: '6m \u2014 Current Market', base: '12m \u2014 Last 12 Months', opt: '24m \u2014 Last 24 Months + Congestion' };
 
 function updateJitHistoryChart(presetKey) {
     if (!cJH) return;
@@ -5809,7 +5814,7 @@ function _build30dScenarioExplain() {
     const activeCount = _scenarioActivePayers.length;
     return {
         con: {
-            title: 'Conservative', value: _fCon.toFixed(2) + ' lam/CU',
+            title: 'Current Market', value: _fCon.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents a low but still credible willingness-to-pay environment among currently active application programs.',
             scope: includedCategoriesText + ' Included programs for scenario construction: n = ' + includedCount + '. For this scenario, we additionally use active payers only: n = ' + activeCount + '. ' + activePayerDefinition + ' ' + representativeText,
             metric: 'Metric used: non-base fee/CU, where non-base means priority fees plus MEV / JIT fees. Rule applied: take P25 among active payers, then apply a hard floor of 0.10 lam/CU.',
@@ -5818,7 +5823,7 @@ function _build30dScenarioExplain() {
             context: 'Case 1: P30 active payer non-base fee/CU* \u2192 ' + _scenarioP30Active.toFixed(4) + ' lam/CU.\n' + activePayerAsterisk
         },
         base: {
-            title: 'Base', value: _fBase.toFixed(2) + ' lam/CU',
+            title: 'Last 12 Months', value: _fBase.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents the new default market-observed state for current application demand.',
             scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
             metric: 'Metric used: raw CU-weighted non-base fee/CU across the included application categories. Rule applied: no outlier clipping is used in this scenario.',
@@ -5827,7 +5832,7 @@ function _build30dScenarioExplain() {
             context: 'Case 1: Raw CU-weighted non-base fee/CU on included programs (n = ' + includedCount + ') \u2192 ' + _fBaseRaw.toFixed(4) + ' lam/CU.\nCase 2: Active payers only* (n = ' + activeCount + ') \u2192 ' + _scenarioActiveAgg.weightedNonBase.toFixed(4) + ' lam/CU.\n' + activePayerAsterisk
         },
         opt: {
-            title: 'Optimistic', value: _fOpt.toFixed(2) + ' lam/CU',
+            title: 'Last 24 Months + Congestion', value: _fOpt.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents a strong upside case where applications absorb the full observed all-in fee burden.',
             scope: includedCategoriesText + ' Included programs for this scenario: n = ' + includedCount + '. ' + representativeText,
             metric: 'Metric used: CU-weighted total fee/CU across the included application categories. Rule applied: total fee/CU includes base fees plus priority and MEV / JIT components.',
@@ -5836,7 +5841,7 @@ function _build30dScenarioExplain() {
             context: 'Case 1: P75 of the included reference set (n = ' + includedCount + ') \u2192 ' + _scenarioP75Included.toFixed(4) + ' lam/CU.'
         },
         bull: {
-            title: 'Bull', value: _fBull.toFixed(2) + ' lam/CU',
+            title: 'Bull Case', value: _fBull.toFixed(2) + ' lam/CU',
             plain: 'This scenario represents the most aggressive case, anchored to the upper tail of observed willingness to pay among active fee-paying programs.',
             scope: includedCategoriesText + ' Included programs for scenario construction: n = ' + includedCount + '. For this scenario, we additionally use active payers only: n = ' + activeCount + '. ' + activePayerDefinition + ' ' + representativeText,
             metric: 'Metric used: non-base fee/CU among active payers. Rule applied: use the P75 active payer non-base fee/CU as the bull anchor.',
@@ -5862,7 +5867,7 @@ function _buildHorizonScenarioExplain() {
     const f = _feeDefaultsHorizon;
     return {
         con: {
-            title: 'Conservative', value: f.con.toFixed(2) + ' lam/CU',
+            title: 'Current Market', value: f.con.toFixed(2) + ' lam/CU',
             plain: 'Anchored to the lower quartile of normal-regime epochs over the 24-month window.',
             scope: scopeText, metric: metricText + ' Rule: Normal regime P25.',
             calculation: 'Normal regime P25 non-base fee/CU = ' + (s.normal?.p25?.toFixed(3) || '?') + ' lam/CU \u2192 product value rounded to ' + f.con.toFixed(2) + ' lam/CU.',
@@ -5870,7 +5875,7 @@ function _buildHorizonScenarioExplain() {
             context: 'Case 1 \u2014 Normal regime P25 = ' + (s.normal?.p25?.toFixed(3) || '?') + ' lam/CU (n=' + nN + ' epochs, 24mo).\nCase 2 \u2014 All epochs P25 = ' + (s.all_epochs?.p25?.toFixed(3) || '?') + ' lam/CU (n=' + nAll + ' epochs, 24mo). Cross-check confirms the product value of ' + f.con.toFixed(1) + ' is directionally consistent.'
         },
         base: {
-            title: 'Base', value: f.base.toFixed(2) + ' lam/CU',
+            title: 'Last 12 Months', value: f.base.toFixed(2) + ' lam/CU',
             plain: 'Anchored to the median fee environment during normal-regime epochs over the 24-month window.',
             scope: scopeText, metric: metricText + ' Rule: Normal regime median.',
             calculation: 'Normal regime median non-base fee/CU = ' + (s.normal?.median?.toFixed(3) || '?') + ' lam/CU \u2192 product value rounded to ' + f.base.toFixed(2) + ' lam/CU.',
@@ -5878,7 +5883,7 @@ function _buildHorizonScenarioExplain() {
             context: 'Case 1 \u2014 Normal regime median = ' + (s.normal?.median?.toFixed(3) || '?') + ' lam/CU (n=' + nN + ' epochs, 24mo).\nCase 2 \u2014 All epochs median = ' + (s.all_epochs?.median?.toFixed(3) || '?') + ' lam/CU (n=' + nAll + ' epochs, 24mo). Cross-check confirms the product value of ' + f.base.toFixed(1) + ' is directionally consistent.'
         },
         opt: {
-            title: 'Optimistic', value: f.opt.toFixed(2) + ' lam/CU',
+            title: 'Last 24 Months + Congestion', value: f.opt.toFixed(2) + ' lam/CU',
             plain: 'Anchored to the upper quartile of normal-regime epochs over the 24-month window.',
             scope: scopeText, metric: metricText + ' Rule: Normal regime P75.',
             calculation: 'Normal regime P75 non-base fee/CU = ' + (s.normal?.p75?.toFixed(3) || '?') + ' lam/CU \u2192 product value rounded to ' + f.opt.toFixed(2) + ' lam/CU.',
@@ -5886,7 +5891,7 @@ function _buildHorizonScenarioExplain() {
             context: 'Case 1 \u2014 Normal regime P75 = ' + (s.normal?.p75?.toFixed(3) || '?') + ' lam/CU (n=' + nN + ' epochs, 24mo).\nCase 2 \u2014 All epochs P75 = ' + (s.all_epochs?.p75?.toFixed(3) || '?') + ' lam/CU (n=' + nAll + ' epochs, 24mo). Cross-check confirms the product value of ' + f.opt.toFixed(1) + ' is directionally consistent.'
         },
         bull: {
-            title: 'Bull', value: f.bull.toFixed(2) + ' lam/CU',
+            title: 'Bull Case', value: f.bull.toFixed(2) + ' lam/CU',
             plain: 'Anchored to the 90th percentile of normal-regime epochs over the 24-month window.',
             scope: scopeText, metric: metricText + ' Rule: Normal regime P90.',
             calculation: 'Normal regime P90 non-base fee/CU = ' + (s.normal?.p90?.toFixed(3) || '?') + ' lam/CU \u2192 product value rounded to ' + f.bull.toFixed(2) + ' lam/CU.',
@@ -6046,7 +6051,7 @@ function update(){
         var bShare = slBlk ? +(slBlk.value)/100 : 0.08;
         var sr     = slSr  ? +(slSr.value)/100  : ACTIVE_STAKING_RATIO_DEFAULT;
         var n = APY_COMPOUNDING_PERIODS;
-        if (!_vcOverrides.nf  && slNf)  slNf.value  = (aprToApy(NETWORK_FEES_APR_REF * Math.max(0, 1 - bShare), n) * 100).toFixed(4);
+        if (!_vcOverrides.nf  && slNf)  slNf.value  = (aprToApy(apyToApr(NETWORK_FEES_BENCHMARK_APY, n) * Math.max(0, 1 - bShare), n) * 100).toFixed(4);
         if (!_vcOverrides.iss && slIss) slIss.value = (aprToApy(SOLANA_INFLATION_RATE / sr, n) * 100).toFixed(4);
         // Sync sl-jit to derived value: Raiku JIT Market Share = 80% × Raiku Stake %
         var slStk = document.getElementById('sl-stake');
@@ -6259,9 +6264,10 @@ function update(){
     // ── Network Fees explainer live values ────────────────────────────────
     (function() {
         var _e;
-        var refAdj = NETWORK_FEES_APR_REF * residualBlockShare;
+        var benchmarkApr = apyToApr(NETWORK_FEES_BENCHMARK_APY, APY_COMPOUNDING_PERIODS);
+        var refAdj = benchmarkApr * residualBlockShare;
         _e = document.getElementById('vc-blk-exp-ref-adj');   if(_e) _e.textContent = fmtValidatorRate(refAdj);
-        _e = document.getElementById('vc-blk-exp-nfapr');     if(_e) _e.textContent = fmtValidatorRate(NETWORK_FEES_APR_REF);  // Marinade benchmark (static)
+        _e = document.getElementById('vc-blk-exp-nfapr');     if(_e) _e.textContent = fmtValidatorRate(NETWORK_FEES_BENCHMARK_APY);  // model benchmark APY (static)
         _e = document.getElementById('vc-blk-exp-nfapr-inp'); if(_e) _e.textContent = fmtValidatorRate(p.nfApy);  // active NF APY
         _e = document.getElementById('vc-blk-exp-bshare');    if(_e) _e.textContent = (p.b * 100).toFixed(0) + '%';
         _e = document.getElementById('vc-blk-exp-apr');       if(_e) _e.textContent = fmtValidatorRate(priorityFeesApr);
@@ -6706,7 +6712,7 @@ function initHybridControls() {
     });
 }
 
-renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); setCalibrationContext('horizon'); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('base'); loadCurrentTotalSolanaStaked(); initHybridControls(); _populateJitWindowRef(); qcpFetch(); qcpLoadBenchmarks(); qcpLoadTimeBenchmarks(); qcpLoadStakeDist();
+renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('con'); loadCurrentTotalSolanaStaked(); initHybridControls(); _populateJitWindowRef(); qcpFetch(); qcpLoadBenchmarks(); qcpLoadTimeBenchmarks(); qcpLoadStakeDist();
 
 // Calibration source info popover — moved to document.body to escape all stacking contexts
 (function() {
@@ -8513,7 +8519,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     jitApr:   0,    // Raiku JIT — from scenario calc
     bonusApr: 0,    // Raiku Validator Bonus — from scenario calc
     ojitApr:  0,    // Other JIT (non-Raiku bypass) — from scenario calc
-    scenario: 'base'
+    scenario: 'con'
   };
   // blk: true = user has manually edited Network Fees APY; live sync from sl-nfapr is skipped.
   // Reset to false when a scenario button is clicked or ↺ is used.
@@ -8605,7 +8611,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   };
   window.viResetSolPrice = function() {
     var el = document.getElementById('vi-sol-price-raw');
-    var sp = typeof getScenarioParams === 'function' ? getScenarioParams(_viState.scenario || 'base') : null;
+    var sp = typeof getScenarioParams === 'function' ? getScenarioParams(_viState.scenario || 'con') : null;
     if (el) el.value = (sp && sp.p) ? sp.p : 100;
     window.viUpdate();
   };
@@ -8615,7 +8621,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     window.viUpdate();
   };
   window.viResetIssApy = function() {
-    var sp = typeof getScenarioParams === 'function' ? getScenarioParams(_viState.scenario || 'base') : null;
+    var sp = typeof getScenarioParams === 'function' ? getScenarioParams(_viState.scenario || 'con') : null;
     if (!sp) return;
     _viState.issApy = sp.issApy || 0;
     var raw = document.getElementById('vi-iss-apy-raw');
@@ -8627,7 +8633,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   window.viResetBlkApy = function() {
     // ↺ resets to the live Protocol Level value (sl-nfapr), not the frozen scenario preset
     var slNf = document.getElementById('sl-nfapr');
-    var sp = typeof getScenarioParams === 'function' ? getScenarioParams(_viState.scenario || 'base') : null;
+    var sp = typeof getScenarioParams === 'function' ? getScenarioParams(_viState.scenario || 'con') : null;
     var liveVal = (slNf && parseFloat(slNf.value) > 0) ? parseFloat(slNf.value) / 100 : ((sp && sp.nfApy) || 0);
     _viState.blkApy = liveVal;
     _viOverrides.blk = false;
@@ -8640,7 +8646,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
   // ── Global reset (full scenario re-apply) — kept for internal use ─────────
   window.viResetToDefaults = function() {
-    window.viApplyScenario(_viState.scenario || 'base', true);  // treat as init: re-enable live sync
+    window.viApplyScenario(_viState.scenario || 'con', true);  // treat as init: re-enable live sync
   };
 
   // SOL Price is now local to Individual Level (vi-sol-price-raw). viSyncPrice is a no-op.
@@ -9122,9 +9128,9 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
   };
 
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Individual Level: apply Base Case scenario defaults, then render
+    // Initialize Individual Level: apply Current Market scenario defaults, then render
     setTimeout(function() {
-      window.viApplyScenario('base', true);  // init=true: live sync enabled, no override
+      window.viApplyScenario('con', true);  // init=true: live sync enabled, no override
       // Panel is open by default — render histogram immediately after data loads
       var stakeRaw = document.getElementById('vi-stake-raw');
       window.viRenderDistribution(stakeRaw ? parseFloat(stakeRaw.value) || 0 : 0);
@@ -9182,12 +9188,12 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Staking ratio</div>
-            <div class="vc-explainer-note">The staking ratio is the share of total SOL supply that is actively staked (currently <span id="vc-iss-exp-staking3" style="color:var(--text); font-family:var(--font-mono);">—</span> — source: Solana Compass, Mar 2026). It is the denominator in the APR formula: the higher the share of supply staked, the lower the per-unit issuance yield. A rising staking ratio compresses APR for the same inflation level. <a class="vc-explainer-source-inline" href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener">↗ Solana Compass</a></div>
+            <div class="vc-explainer-note">The staking ratio is the share of total SOL supply that is actively staked (currently <span id="vc-iss-exp-staking3" style="color:var(--text); font-family:var(--font-mono);">—</span> — source: Solana Compass). It is the denominator in the APR formula: the higher the share of supply staked, the lower the per-unit issuance yield. A rising staking ratio compresses APR for the same inflation level. <a class="vc-explainer-source-inline" href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener">↗ Solana Compass</a></div>
         </div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Cross-check vs. Marinade</div>
-            <div class="vc-explainer-note">At default inputs (3.94% inflation, 67.7% staking ratio) this model yields <strong style="color:var(--text);">5.82% issuance APR</strong>. <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade Network Stats</a> shows ~5.93% APR (March 2026). Delta: 0.11pp. Likely sources of difference: Marinade may use a slightly lower staking ratio or a different inflation capture point. The methodology is consistent — both figures are derived from the same underlying formula.</div>
+            <div class="vc-explainer-note">At default inputs (3.94% inflation, 70% staking ratio) this model yields <strong style="color:var(--text);">5.63% issuance APR → ~5.79% APY</strong> (epoch-compounded). <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade Network Stats</a> shows ~5.93% APR as a recent reference. Delta vs Marinade is partly explained by the staking ratio assumption — Marinade may use a slightly lower ratio. The methodology is consistent — both figures are derived from the same underlying formula.</div>
         </div>
 
         <div class="vc-explainer-section">
@@ -9208,15 +9214,15 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">What it includes</div>
-            <div class="vc-explainer-note"><strong style="color:var(--text);">Base fees</strong> (signature fees, ~5,000 lamports/signature) and <strong style="color:var(--text);">priority fees</strong> (compute unit price bids set by tx senders). Together these are the fee revenues validators earn from ordinary block production. The full-network APR benchmark is sourced from Marinade Network Stats and reflects prevailing on-chain conditions, including background MEV activity already embedded in observed fee data — no separate MEV adjustment is needed. The only required adjustment is removing the Raiku AOT reserved block share, which is counted separately in the AOT component.</div>
+            <div class="vc-explainer-note"><strong style="color:var(--text);">Base fees</strong> (signature fees, ~5,000 lamports/signature) and <strong style="color:var(--text);">priority fees</strong> (compute unit price bids set by tx senders). Together these are the fee revenues validators earn from ordinary block production. The model uses a 0.50% APY benchmark for the full-network base + priority yield. The only required adjustment is removing the Raiku AOT reserved block share, which is counted separately in the AOT component.</div>
         </div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Live formula</div>
             <div class="vc-explainer-formula">
-                <div><span class="vc-ef-dim">Reference derivation:</span> <span class="vc-ef-val" id="vc-blk-exp-nfapr">—</span> &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-ref-adj">—</span> APR &rarr; epoch-compounded</div>
+                <div><span class="vc-ef-dim">Benchmark APY &rarr; APR &rarr; residual adjustment:</span> <span class="vc-ef-val" id="vc-blk-exp-nfapr">—</span> APY &rarr; APR &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-ref-adj">—</span> APR &rarr; epoch-compounded back to APY</div>
                 <div style="margin-top:4px;"><span class="vc-ef-dim">Active input (used in calculations):</span> <span class="vc-ef-val" id="vc-blk-exp-apy">—</span> APY &nbsp;&middot;&nbsp; <span class="vc-ef-val" id="vc-blk-exp-apr">—</span> APR</div>
-                <div style="margin-top:6px; font-size:10px; opacity:0.55;">Edit "Network Fees APY" cell to override; scenario buttons reset to reference value.</div>
+                <div style="margin-top:6px; font-size:10px; opacity:0.55;">Edit "Network Fees APY" cell to override; scenario buttons reset to model benchmark.</div>
             </div>
         </div>
 
@@ -9224,13 +9230,11 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             <div class="vc-explainer-section-title">Live inputs</div>
             <div class="vc-explainer-inputs">
                 <div class="vc-explainer-input-row">
-                    <span class="vc-explainer-input-key">Marinade benchmark (base + priority APR, full-network)
-                        <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade</a>
-                    </span>
-                    <span class="vc-explainer-input-val">0.54%</span>
+                    <span class="vc-explainer-input-key">Model benchmark (base + priority fees APY, full-network)</span>
+                    <span class="vc-explainer-input-val">0.50%</span>
                 </div>
                 <div class="vc-explainer-input-row">
-                    <span class="vc-explainer-input-key">Network Fees APY (active input — edit cell to override)</span>
+                    <span class="vc-explainer-input-key">Network Fees APY (active — after block-share adjustment)</span>
                     <span class="vc-explainer-input-val" id="vc-blk-exp-nfapr-inp">—</span>
                 </div>
                 <div class="vc-explainer-input-row">
@@ -9252,7 +9256,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Reference</div>
             <div class="vc-explainer-sources">
-                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (full-network benchmark ≈ 0.54%; Network Fees APY defaults to this benchmark adjusted by residual block share)</a>
+                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats (external reference for cross-check; model uses 0.50% APY assumption, not sourced directly from Marinade)</a>
             </div>
         </div>
     </div>
@@ -9569,10 +9573,10 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     </div>
     <div class="vc-explainer-section">
       <div class="vc-explainer-section-title">FORMULA</div>
-      <div class="vc-explainer-note">Total APY = Issuance APY × Commission + Network Fees APY + Raiku APY (if enabled)</div>
+      <div class="vc-explainer-note">Total APY = Issuance APY + Network Fees APY + Raiku APY (if enabled)</div>
     </div>
     <div class="vc-explainer-section">
-      <div class="vc-explainer-note">APY components are inherited from the Protocol Level Validator Yield decomposition above. Commission scales only the Issuance component — block fees and Raiku MEV are not reduced by commission.</div>
+      <div class="vc-explainer-note">APY components are inherited from the Protocol Level Validator Yield decomposition above. All components are shown gross — no commission deduction is applied in this version.</div>
     </div>
     <div class="vc-explainer-section">
       <div class="vc-explainer-note">Toggle "+ Raiku" to compare yield with and without Raiku participation.</div>
