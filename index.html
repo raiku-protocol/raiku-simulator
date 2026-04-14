@@ -4202,36 +4202,31 @@ async function loadCurrentTotalSolanaStaked(){
     update();
 }
 
-// ── SOL Price Hydration (CoinGecko Demo API — read-only key, no billing) ──
-// Demo key is safe to include client-side: read-only, no billing exposure.
-var _CG_KEY = 'CG-PNBAmwe5CKTpwZHFSHg4RJw7';
-var _CG_QS  = '&x_cg_demo_api_key=' + _CG_KEY;
-var _solPriceState = { loaded: false, failed: false, spot: null, avg12m: null, avg24m: null, pts12m: 0, pts24m: 0 };
+// ── SOL Price Hydration (Binance public API — no key, CORS-friendly) ──────
+// Binance SOLUSDT endpoints are public and allow browser requests natively.
+var _solPriceState = { loaded: false, failed: false, spot: null, avg12m: null, avg24m: null, pts12m: 0, pts24m: 0, src: '' };
 
 async function initSolPrices() {
     try {
-        // 1. Spot price
-        var spotRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd' + _CG_QS);
+        // 1. Spot price — Binance ticker
+        var spotRes = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT');
         if (!spotRes.ok) throw new Error('spot-' + spotRes.status);
         var spotJson = await spotRes.json();
-        var spot = spotJson && spotJson.solana && spotJson.solana.usd;
-        if (!spot) throw new Error('no-spot');
+        var spot = parseFloat(spotJson.price);
+        if (!spot || isNaN(spot)) throw new Error('no-spot');
 
-        // 2. 730-day price history (daily for ≤365d, weekly for 366-730d on Demo tier)
-        var histRes = await fetch('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=730' + _CG_QS);
+        // 2. 730 daily candles — [openTime, open, high, low, close, volume, ...]
+        var histRes = await fetch('https://api.binance.com/api/v3/klines?symbol=SOLUSDT&interval=1d&limit=730');
         if (!histRes.ok) throw new Error('hist-' + histRes.status);
-        var histJson = await histRes.json();
-        var prices = histJson.prices; // [[timestamp_ms, price], ...]
-        if (!prices || prices.length < 10) throw new Error('no-history');
+        var klines = await histRes.json();
+        if (!klines || klines.length < 30) throw new Error('no-history');
 
-        var now = Date.now();
-        var ms12m = 365 * 24 * 3600 * 1000;
-        var prices12m = prices.filter(function(r) { return (now - r[0]) <= ms12m; });
-        var prices24m = prices;
-        var avg12m = prices12m.length > 0 ? prices12m.reduce(function(s,r){return s+r[1];},0) / prices12m.length : spot;
-        var avg24m = prices24m.length > 0 ? prices24m.reduce(function(s,r){return s+r[1];},0) / prices24m.length : spot;
+        var closes = klines.map(function(k) { return parseFloat(k[4]); }); // close price
+        var last365 = closes.slice(-365);
+        var avg12m = last365.reduce(function(s,v){return s+v;},0) / last365.length;
+        var avg24m = closes.reduce(function(s,v){return s+v;},0) / closes.length;
 
-        _solPriceState = { loaded: true, failed: false, spot: spot, avg12m: avg12m, avg24m: avg24m, pts12m: prices12m.length, pts24m: prices24m.length };
+        _solPriceState = { loaded: true, failed: false, spot: spot, avg12m: avg12m, avg24m: avg24m, pts12m: last365.length, pts24m: closes.length, src: 'Binance' };
 
         // Update SC presets — clamp to slider range [10, 400], round to step-5
         function _pClamp(v) { return Math.max(10, Math.min(400, Math.round(v / 5) * 5)); }
@@ -4248,7 +4243,7 @@ async function initSolPrices() {
         var expEl = document.getElementById('vc-explainer-price');
         if (expEl && expEl.classList.contains('open')) _vcPopulatePriceExplainer();
     } catch(e) {
-        _solPriceState = { loaded: false, failed: true, spot: null, avg12m: null, avg24m: null, pts12m: 0, pts24m: 0 };
+        _solPriceState = { loaded: false, failed: true, spot: null, avg12m: null, avg24m: null, pts12m: 0, pts24m: 0, src: '' };
         // SC stays at initial hardcoded values (80/100/150/250) — no update needed
     }
 }
@@ -4256,8 +4251,8 @@ async function initSolPrices() {
 function _vcPopulatePriceExplainer() {
     var st = _solPriceState;
     var na = st.failed ? 'unavailable (API error)' : 'loading\u2026';
-    var statusTxt = st.failed ? '\u26a0 CoinGecko unreachable \u2014 stale fallback values in use'
-                  : st.loaded ? '\u2713 Live CoinGecko data loaded'
+    var statusTxt = st.failed ? '\u26a0 Price source unreachable \u2014 stale fallback values in use'
+                  : st.loaded ? '\u2713 Live Binance data loaded'
                   : 'Fetching\u2026';
     var _e;
     _e = document.getElementById('vc-price-exp-status');   if(_e) { _e.textContent = statusTxt; _e.style.color = st.failed ? '#F5A623' : st.loaded ? '#C0FF38' : 'var(--text2)'; }
@@ -9746,7 +9741,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
     <div class="vc-explainer-card">
         <button class="vc-explainer-close" onclick="vcCloseExplainer('vc-explainer-price')">×</button>
         <div class="vc-explainer-title">SOL Price (USD)</div>
-        <div class="vc-explainer-subtitle">Source and methodology for each scenario preset — live from CoinGecko public API</div>
+        <div class="vc-explainer-subtitle">Source and methodology for each scenario preset — live from Binance public API</div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Data status</div>
@@ -9759,7 +9754,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
                 <div class="vc-explainer-input-row">
                     <span class="vc-explainer-input-key" style="flex-direction:column;align-items:flex-start;gap:2px;">
                         <span style="color:var(--text);">Current Market</span>
-                        <span style="font-size:10px;">CoinGecko spot &mdash; latest SOL/USD</span>
+                        <span style="font-size:10px;">Binance SOLUSDT spot &mdash; latest close</span>
                     </span>
                     <span class="vc-explainer-input-val" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
                         <span id="vc-price-exp-con-src" style="color:var(--text2);font-size:11px;">&mdash;</span>
@@ -9769,7 +9764,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
                 <div class="vc-explainer-input-row">
                     <span class="vc-explainer-input-key" style="flex-direction:column;align-items:flex-start;gap:2px;">
                         <span style="color:var(--text);">Last 12 Months</span>
-                        <span style="font-size:10px;">CoinGecko 365-day daily average</span>
+                        <span style="font-size:10px;">Binance SOLUSDT &mdash; 365-day daily close average</span>
                     </span>
                     <span class="vc-explainer-input-val" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
                         <span id="vc-price-exp-base-src" style="color:var(--text2);font-size:11px;">&mdash;</span>
@@ -9779,7 +9774,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
                 <div class="vc-explainer-input-row">
                     <span class="vc-explainer-input-key" style="flex-direction:column;align-items:flex-start;gap:2px;">
                         <span style="color:var(--text);">Last 24 Months + Congestion</span>
-                        <span style="font-size:10px;">CoinGecko 730-day average (weekly granularity)</span>
+                        <span style="font-size:10px;">Binance SOLUSDT &mdash; 730-day daily close average</span>
                     </span>
                     <span class="vc-explainer-input-val" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
                         <span id="vc-price-exp-opt-src" style="color:var(--text2);font-size:11px;">&mdash;</span>
@@ -9798,13 +9793,13 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Notes</div>
-            <div class="vc-explainer-note">Raw source values are rounded to the nearest $5 for use in the slider. If CoinGecko is unreachable at load time the simulator falls back to stale values ($80 / $100 / $150) until the next page load. Bull Case ($250) is a manual hypothesis &mdash; not derived from any live source.</div>
+            <div class="vc-explainer-note">Raw source values are rounded to the nearest $5 for use in the slider. If Binance is unreachable at load time the simulator falls back to stale values ($80 / $100 / $150) until the next page load. Bull Case ($250) is a manual hypothesis &mdash; not derived from any live source.</div>
         </div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Reference</div>
             <div class="vc-explainer-sources">
-                <a class="vc-explainer-source-link" href="https://www.coingecko.com/en/coins/solana" target="_blank" rel="noopener">CoinGecko &mdash; Solana (SOL) price</a>
+                <a class="vc-explainer-source-link" href="https://www.binance.com/en/trade/SOL_USDT" target="_blank" rel="noopener">Binance &mdash; SOLUSDT market data</a>
             </div>
         </div>
     </div>
