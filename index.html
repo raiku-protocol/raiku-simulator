@@ -1769,7 +1769,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             </div>
             <div class="validator-context-item">
                 <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">Network Fees APY <button class="vc-info-btn" onclick="vcOpenExplainer('vc-explainer-blk')">?</button></div>
-                <div class="validator-context-value" id="validator-context-nfapr">0.44%</div>
+                <div class="validator-context-value" id="validator-context-nfapr">0.37%</div>
             </div>
         </div>
         <!-- Derived: Raiku Validator Stake -->
@@ -1812,7 +1812,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <span id="validator-context-ojit" style="display:none;"></span>
     <!-- Base Network Yield inputs — hidden in this layout; controls appear in component expand rows (Patch 3) -->
     <input type="range" id="sl-staking-ratio" min="50" max="85" step="0.1" value="68" style="display:none;" oninput="update()">
-    <input type="range" id="sl-nfapr" min="0" max="2" step="0.001" value="0.442" style="display:none;" oninput="update()"><!-- stores NF APY%; derive-first block sets it to aprToApy(BENCHMARK_APR × residual, n) unless _vcOverrides.nf -->
+    <input type="range" id="sl-nfapr" min="0" max="2" step="0.001" value="0.368" style="display:none;" oninput="update()"><!-- stores NF APY%; derive-first block sets it to aprToApy(BENCHMARK_APR × residual, n) unless _vcOverrides.nf -->
     <input type="range" id="sl-iss-apy" min="0" max="20" step="0.001" value="5.737" style="display:none;" oninput="update()"><!-- stores issuance gross APY% = INFLATION/RATIO directly; derive-first sets it unless _vcOverrides.iss -->
     <span id="validator-staked-value" style="display:none;"></span>
     <span id="validator-staked-source" style="display:none;"></span>
@@ -3350,7 +3350,7 @@ const ACTIVE_STAKING_RATIO_DEFAULT   = 0.680;   // Default: ≈ 68% (current net
 const AVG_VALIDATOR_COMMISSION_REF   = 0.07;    // Network-avg commission, reference only; source: Trillium validator data
 // Network Fees APR benchmark — Marinade Block Rewards APR benchmark (base + priority fees, full-network)
 // Treated as APR. Residual block share applied in APR space, then compounded to APY for display.
-const NETWORK_FEES_BENCHMARK_APR     = 0.0048;  // 0.48% APR benchmark (Marinade Block Rewards, full-network reference, Apr 2026)
+const NETWORK_FEES_BENCHMARK_APR     = 0.004;   // 0.40% APR — conservative model assumption; cross-check: Marinade Block Rewards shows ~0.48% APR (variable, Apr 2026)
 // Network Fees APY (base + priority, scenario-adjusted) — stored in sl-nfapr as %; derived by update() unless _vcOverrides.nf
 // Parity reference — NOT used as model input
 const RATED_DELEGATOR_APY_REFERENCE  = 0.0448;  // Rated Network 30d Delegator APY; includes commission; parity check only
@@ -4117,7 +4117,7 @@ function renderValidatorYieldScenarioComparison(baseApr, baseApy, priorityApr, p
     const rows = ['con','base','opt','bull'].map(function(key){
         const p = (key === _selectedScenario && liveP) ? liveP : getScenarioParams(key);
         const r = calc(p);
-        const cardPriorityApr = apyToApr(p.nfApy || 0.0048, APY_COMPOUNDING_PERIODS);
+        const cardPriorityApr = apyToApr(p.nfApy || 0.004, APY_COMPOUNDING_PERIODS);
         const basePlusPriorityApy = aprToApy(baseApr + cardPriorityApr, APY_COMPOUNDING_PERIODS);
         const connectedStakeSol = totalStakedSol * p.s;
         const aotApr   = connectedStakeSol > 0 ? r.aotValidatorBase / connectedStakeSol : 0;
@@ -9224,15 +9224,20 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">What it includes</div>
-            <div class="vc-explainer-note"><strong style="color:var(--text);">Base fees</strong> (signature fees, ~5,000 lamports/signature) and <strong style="color:var(--text);">priority fees</strong> (compute unit price bids set by tx senders). Together these are the fee revenues validators earn from ordinary block production. The model uses a <strong style="color:var(--text);">0.48% APR benchmark</strong> read from Marinade's Block Rewards reference (full-network, base + priority, Apr 2026). This benchmark is treated as an APR. The residual block-share adjustment is applied in APR space, then the result is compounded to APY for display. The only required adjustment is removing the Raiku AOT reserved block share, which is counted separately in the AOT component.</div>
+            <div class="vc-explainer-note"><strong style="color:var(--text);">Base fees</strong> (signature fees, ~5,000 lamports/signature) and <strong style="color:var(--text);">priority fees</strong> (compute unit price bids set by tx senders) — the fee revenues validators earn from ordinary block production.</div>
+        </div>
+
+        <div class="vc-explainer-section">
+            <div class="vc-explainer-section-title">Model assumption</div>
+            <div class="vc-explainer-note">Unlike issuance, there is no single authoritative source for this yield: it fluctuates with network conditions and varies across dashboards. Cross-checking several references — including Marinade's Block Rewards indicator — shows an observed range of approximately <strong style="color:var(--text);">0.40%–0.50% APR</strong> under current network conditions (Marinade currently reads ~0.48% APR). This model uses a <strong style="color:var(--text);">conservative assumption of 0.40% APR</strong>. The Raiku AOT block share is then removed to avoid double-counting with the AOT revenue component. The adjusted APR is compounded to APY using the standard 182-epoch Solana formula.</div>
         </div>
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Live formula</div>
             <div class="vc-explainer-formula">
-                <div><span class="vc-ef-val" id="vc-blk-exp-nfapr">—</span> APR (Marinade benchmark) &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-ref-adj">—</span> APR &rarr; epoch-compounded &rarr; APY</div>
+                <div><span class="vc-ef-val" id="vc-blk-exp-nfapr">—</span> APR (conservative assumption) &times; (1 &minus; <span class="vc-ef-val" id="vc-blk-exp-bshare">—</span>) = <span class="vc-ef-val" id="vc-blk-exp-ref-adj">—</span> APR &rarr; epoch-compounded (182 epochs/yr) &rarr; APY</div>
                 <div style="margin-top:4px;"><span class="vc-ef-dim">Active input (used in calculations):</span> <span class="vc-ef-val" id="vc-blk-exp-apy">—</span> APY &nbsp;&middot;&nbsp; <span class="vc-ef-val" id="vc-blk-exp-apr">—</span> APR</div>
-                <div style="margin-top:6px; font-size:10px; opacity:0.55;">Edit "Network Fees APY" cell to override; scenario buttons reset to benchmark.</div>
+                <div style="margin-top:6px; font-size:10px; opacity:0.55;">Edit "Network Fees APY" cell to override; scenario buttons reset to model assumption.</div>
             </div>
         </div>
 
@@ -9240,10 +9245,14 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             <div class="vc-explainer-section-title">Live inputs</div>
             <div class="vc-explainer-inputs">
                 <div class="vc-explainer-input-row">
-                    <span class="vc-explainer-input-key">Marinade benchmark (base + priority fees APR, full-network)
+                    <span class="vc-explainer-input-key">Conservative APR assumption (model input)</span>
+                    <span class="vc-explainer-input-val" id="vc-blk-exp-benchmark-static">0.40% APR</span>
+                </div>
+                <div class="vc-explainer-input-row">
+                    <span class="vc-explainer-input-key">Cross-check: Marinade Block Rewards (variable)
                         <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade</a>
                     </span>
-                    <span class="vc-explainer-input-val" id="vc-blk-exp-benchmark-static">0.48% APR</span>
+                    <span class="vc-explainer-input-val">~0.48% APR</span>
                 </div>
                 <div class="vc-explainer-input-row">
                     <span class="vc-explainer-input-key">Network Fees APY (active — after block-share adjustment)</span>
@@ -9268,7 +9277,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Reference</div>
             <div class="vc-explainer-sources">
-                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (full-network benchmark ≈ 0.48% APR as of Apr 2026; treated as APR, applied before compounding)</a>
+                <a class="vc-explainer-source-link" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">Marinade — Network Stats — Block Rewards APR (cross-check reference; currently ~0.48% APR, variable; observed range ~0.40%–0.50%)</a>
             </div>
         </div>
     </div>
