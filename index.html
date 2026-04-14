@@ -4202,20 +4202,23 @@ async function loadCurrentTotalSolanaStaked(){
     update();
 }
 
-// ── SOL Price Hydration (CoinGecko public API — no key required) ──────────
+// ── SOL Price Hydration (CoinGecko Demo API — read-only key, no billing) ──
+// Demo key is safe to include client-side: read-only, no billing exposure.
+var _CG_KEY = 'CG-PNBAmwe5CKTpwZHFSHg4RJw7';
+var _CG_QS  = '&x_cg_demo_api_key=' + _CG_KEY;
 var _solPriceState = { loaded: false, failed: false, spot: null, avg12m: null, avg24m: null, pts12m: 0, pts24m: 0 };
 
 async function initSolPrices() {
     try {
         // 1. Spot price
-        var spotRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
+        var spotRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd' + _CG_QS);
         if (!spotRes.ok) throw new Error('spot-' + spotRes.status);
         var spotJson = await spotRes.json();
         var spot = spotJson && spotJson.solana && spotJson.solana.usd;
         if (!spot) throw new Error('no-spot');
 
-        // 2. 730-day price history (daily for ≤365d, weekly for 366-730d on free tier)
-        var histRes = await fetch('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=730');
+        // 2. 730-day price history (daily for ≤365d, weekly for 366-730d on Demo tier)
+        var histRes = await fetch('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=730' + _CG_QS);
         if (!histRes.ok) throw new Error('hist-' + histRes.status);
         var histJson = await histRes.json();
         var prices = histJson.prices; // [[timestamp_ms, price], ...]
