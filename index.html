@@ -1478,7 +1478,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
                     The total JIT market includes two distinct flows on covered stake:
                     <br>&bull; <strong style="color:var(--text);">Raiku JIT</strong> — tips routed through Raiku's ordering protocol. Subject to protocol take rate, customer rebate, and treasury split.
                     <br>&bull; <strong style="color:#6B9EBC;">Other non-Raiku JIT</strong> — tips from competing ordering services (e.g. direct Jito bundles) that bypass Raiku protocol take entirely and flow straight to validators.
-                    <br><br>Other non-Raiku JIT is <strong>automatically derived</strong> as <code>max(Raiku Stake % &minus; Raiku JIT Market Share, 0)</code>. The logic: Raiku's covered stake creates a JIT opportunity ceiling; the portion not captured by Raiku's protocol flows to validators via other ordering services. It is included in validator-side revenue but excluded from Raiku gross and protocol treasury. No double-counting is possible by construction.
+                    <br><br>Other non-Raiku JIT is <strong>automatically derived</strong> as <code>max(Raiku Stake % &minus; Raiku JIT Market Share, 0)</code>. The logic: Raiku can only route JIT tips from validators it has stake on &mdash; so Raiku Stake % is a hard ceiling on JIT capture. Any portion of that covered stake not routed through Raiku's protocol flows directly to validators via competing ordering services (e.g. native Jito bundles). It is included in validator-side revenue but excluded from Raiku gross and protocol treasury. No double-counting is possible by construction.
                 </div>
             </div>
         </div>
@@ -4358,7 +4358,7 @@ function gp(){return{
     gba:(function(){ var ca=+document.getElementById('sl-comm-aot').value, ra=+document.getElementById('sl-rebate-aot').value, vb=+document.getElementById('sl-val-bonus').value; return Math.min(+document.getElementById('sl-gb-aot').value, Math.max(0, ca-ra-vb)); })(),
     gbj:(function(){ var cj=+document.getElementById('sl-comm-jit').value, rj=+document.getElementById('sl-rebate-jit').value, jvb=+(document.getElementById('sl-val-bonus-jit')||{value:0}).value; return Math.min(+document.getElementById('sl-gb-jit').value, Math.max(0, cj-rj-jvb)); })(),
     jm:+document.getElementById('sl-jit-market').value, // JIT total market (SOL/yr)
-    j:+document.getElementById('sl-stake').value/100*0.8, // derived: Raiku JIT Market Share = 80% × Raiku Stake %
+    j: _vcOverrides.jit ? +document.getElementById('sl-jit').value/100 : +document.getElementById('sl-stake').value/100*0.8, // user override or derived (80% × Raiku Stake %)
     s:+document.getElementById('sl-stake').value/100,
     b:+document.getElementById('sl-blk').value/100,
     f:+document.getElementById('sl-fcu').value,
@@ -6435,7 +6435,7 @@ function update(){
         var jitPct = p.j * 100;
         var stakePct = p.s * 100;
         if (stakePct > 0 && jitPct > stakePct) {
-            jitCoherenceMsg.textContent = '\u26a0 Raiku JIT share (' + jitPct.toFixed(1) + '%) exceeds Raiku stake (' + stakePct.toFixed(1) + '%). May be inconsistent with validator coverage.';
+            jitCoherenceMsg.textContent = '\u26a0 Raiku JIT Market Share (' + jitPct.toFixed(1) + '%) exceeds Raiku Stake (' + stakePct.toFixed(1) + '%). This is above validator coverage \u2014 may be inconsistent.';
             jitCoherenceMsg.style.display = 'block';
         } else {
             jitCoherenceMsg.style.display = 'none';
@@ -6550,6 +6550,7 @@ function update(){
     if(typeof updateSimAssumptions==='function') updateSimAssumptions();
     if(typeof renderBlockBuilder==='function') renderBlockBuilder();
     if (typeof window.viUpdate === 'function') window.viUpdate();
+    if (typeof syncAllNumericInputs === 'function') syncAllNumericInputs();
 }
 
 // ── Hybrid controls: numeric input + stepper buttons ─────────────────────
