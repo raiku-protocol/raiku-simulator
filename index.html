@@ -9202,7 +9202,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Cross-check vs. Marinade</div>
-            <div class="vc-explainer-note">At default inputs (3.90% inflation, 68% staking ratio) this model yields <strong style="color:var(--text);">~5.74% gross APY</strong> (treated directly as APY). <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade Network Stats</a> shows ~5.93% APR as an external reference. The gap reflects two effects: Marinade reports APR while this model outputs APY directly, and dashboards may use a slightly different staking ratio. Both are within the expected range for the current inflation schedule.</div>
+            <div class="vc-explainer-note">At default inputs (3.90% inflation, 68% staking ratio) this model yields <strong style="color:var(--text);">~5.74% gross APY</strong>. <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade Network Stats</a> shows ~5.93% as an external reference. Both figures are computed from the same type of formula (inflation ÷ staking ratio), so the entire gap comes from the assumed staking ratio. Marinade's figure is consistent with a staking ratio closer to 65–66%: 3.90% ÷ 65.8% ≈ 5.93%. Different dashboards measure total staked SOL differently — some exclude foundation or inactive stake — which produces these small differences in the denominator.</div>
         </div>
 
         <div class="vc-explainer-section">
