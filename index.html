@@ -9164,8 +9164,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         </div>
 
         <div class="vc-explainer-section">
-            <div class="vc-explainer-section-title">Why APY and not APR?</div>
-            <div class="vc-explainer-note">The formula <em>Inflation Rate ÷ Staking Ratio</em> gives the annualised staking yield per unit of stake. In practice, Solana rewards are distributed each epoch (~2.4 days) and are immediately eligible for re-staking, so the annual yield already accrues with implicit compounding. The strict approach would interpret this output as an APR and then compound it over 182 epochs to get an APY — but the difference at current inflation levels is less than 0.1%. This model therefore uses the formula output directly as a gross APY, consistent with how most Solana staking dashboards present the staking rate.</div>
+            <div class="vc-explainer-section-title">Why the result is already a gross APY</div>
+            <div class="vc-explainer-note">The Solana protocol creates new SOL tokens each epoch and distributes them proportionally to stakers. The formula <em>Inflation Rate ÷ Staking Ratio</em> gives the total new SOL a validator receives per year as a share of their stake — for example, 5.74% means they receive 5.74 new SOL per 100 SOL staked over a full year. This is the actual monetary return delivered by the protocol: a gross APY by construction. There is no APR-to-APY conversion step because the new tokens are created from nothing by the protocol — they do not come from reinvesting earned income. The conventional APR/APY distinction only arises when a periodic interest rate is applied to a growing balance. Here, the annual yield is given directly by the inflation schedule.</div>
         </div>
 
         <div class="vc-explainer-section">
