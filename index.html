@@ -1813,7 +1813,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
     <!-- Base Network Yield inputs — hidden in this layout; controls appear in component expand rows (Patch 3) -->
     <input type="range" id="sl-staking-ratio" min="50" max="85" step="0.1" value="68" style="display:none;" oninput="update()">
     <input type="range" id="sl-nfapr" min="0" max="2" step="0.001" value="0.461" style="display:none;" oninput="update()"><!-- stores NF APY%; derive-first block sets it to aprToApy(BENCHMARK_APR × residual, n) unless _vcOverrides.nf -->
-    <input type="range" id="sl-iss-apy" min="0" max="20" step="0.001" value="5.794" style="display:none;" oninput="update()"><!-- stores issuance gross APY% = INFLATION/RATIO directly; derive-first sets it unless _vcOverrides.iss -->
+    <input type="range" id="sl-iss-apy" min="0" max="20" step="0.001" value="5.737" style="display:none;" oninput="update()"><!-- stores issuance gross APY% = INFLATION/RATIO directly; derive-first sets it unless _vcOverrides.iss -->
     <span id="validator-staked-value" style="display:none;"></span>
     <span id="validator-staked-source" style="display:none;"></span>
     <span id="validator-inflation-rate" style="display:none;"></span>
@@ -2117,8 +2117,8 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
             Issuance APY
             <button class="vi-param-reset" onclick="viResetIssApy()" title="Reset to active scenario default">↺</button>
           </div>
-          <div class="validator-context-value" id="vi-iss-apy">5.794%</div>
-          <input type="hidden" id="vi-iss-apy-raw" value="5.794">
+          <div class="validator-context-value" id="vi-iss-apy">5.737%</div>
+          <input type="hidden" id="vi-iss-apy-raw" value="5.737">
         </div>
         <div class="validator-context-item">
           <div class="validator-context-label" style="display:flex; align-items:center; gap:3px;">
@@ -3342,7 +3342,7 @@ let _solanaStakeState = {
 };
 // Issuance methodology — validator-level gross (before commission split with delegators)
 // Source: Solana RPC getInflationRate epoch 945 → 3.9395%; schedule: 8% initial, −15%/yr, 1.5% terminal
-const SOLANA_INFLATION_RATE          = 0.0394;  // Solana protocol inflation (all new SOL goes to validators; foundation rate = 0)
+const SOLANA_INFLATION_RATE          = 0.03901; // Solana protocol inflation — current rate per Solana Compass Tokenomics (Apr 2026); foundation rate = 0
 // Staking ratio = active stake / total SOL supply (NOT vs circulating supply)
 // Source: Solana Compass tokenomics → 426,299,856.3 staked; current reference ≈ 68% (Apr 2026)
 const ACTIVE_STAKING_RATIO_DEFAULT   = 0.680;   // Default: ≈ 68% (current network staking ratio, Solana Compass)
@@ -4364,7 +4364,7 @@ function gp(){return{
     f:+document.getElementById('sl-fcu').value,
     p:+document.getElementById('sl-price').value,
     nfApy:+document.getElementById('sl-nfapr').value/100,  // Network Fees APY as decimal (final scenario-adjusted; stored in sl-nfapr)
-    issApy:(function(){ var el=document.getElementById('sl-iss-apy'); return el ? +el.value/100 : 0.0599; })(),  // Issuance APY as decimal
+    issApy:(function(){ var el=document.getElementById('sl-iss-apy'); return el ? +el.value/100 : 0.05737; })(),  // Issuance APY as decimal
 };}
 
 function computeJitStats(windowEpochs) {
@@ -9164,8 +9164,8 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
         </div>
 
         <div class="vc-explainer-section">
-            <div class="vc-explainer-section-title">Modeling choice</div>
-            <div class="vc-explainer-note">One could also consider that this calculation already implicitly includes the fact that rewards are continuously re-staked each epoch, so the result can reasonably be treated directly as a gross APY rather than as an APR. We therefore use it as the primary model input. The difference versus a strict APR-to-APY treatment via epoch compounding is only around 0.1%.</div>
+            <div class="vc-explainer-section-title">Why APY and not APR?</div>
+            <div class="vc-explainer-note">The formula <em>Inflation Rate ÷ Staking Ratio</em> gives the annualised staking yield per unit of stake. In practice, Solana rewards are distributed each epoch (~2.4 days) and are immediately eligible for re-staking, so the annual yield already accrues with implicit compounding. The strict approach would interpret this output as an APR and then compound it over 182 epochs to get an APY — but the difference at current inflation levels is less than 0.1%. This model therefore uses the formula output directly as a gross APY, consistent with how most Solana staking dashboards present the staking rate.</div>
         </div>
 
         <div class="vc-explainer-section">
@@ -9173,7 +9173,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
             <div class="vc-explainer-inputs">
                 <div class="vc-explainer-input-row">
                     <span class="vc-explainer-input-key">Inflation rate (current)
-                        <a class="vc-explainer-source-inline" href="https://solanacompass.com/statistics" target="_blank" rel="noopener">↗ Solana Compass</a>
+                        <a class="vc-explainer-source-inline" href="https://solanacompass.com/tokenomics" target="_blank" rel="noopener">↗ Solana Compass Tokenomics</a>
                     </span>
                     <span class="vc-explainer-input-val" id="vc-iss-exp-inflation2">—</span>
                 </div>
@@ -9202,7 +9202,7 @@ if (aotMethodDetails && jitMethodDetails && aotMethodDetails.parentNode === jitM
 
         <div class="vc-explainer-section">
             <div class="vc-explainer-section-title">Cross-check vs. Marinade</div>
-            <div class="vc-explainer-note">At default inputs (3.94% inflation, 68% staking ratio) this model yields <strong style="color:var(--text);">~5.79% gross APY</strong> (treated directly as APY). <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade Network Stats</a> shows ~5.93% APR as a recent reference point. The delta is partly explained by the staking ratio assumption — a small difference in the ratio used produces a meaningful difference in the output at these levels.</div>
+            <div class="vc-explainer-note">At default inputs (3.90% inflation, 68% staking ratio) this model yields <strong style="color:var(--text);">~5.74% gross APY</strong> (treated directly as APY). <a class="vc-explainer-source-inline" href="https://app.marinade.finance/network/" target="_blank" rel="noopener">↗ Marinade Network Stats</a> shows ~5.93% APR as an external reference. The gap reflects two effects: Marinade reports APR while this model outputs APY directly, and dashboards may use a slightly different staking ratio. Both are within the expected range for the current inflation schedule.</div>
         </div>
 
         <div class="vc-explainer-section">
