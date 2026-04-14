@@ -3637,9 +3637,12 @@ function qcpRender() {
         var maps;
         if (mt === 'mev') {
             maps = {
-                'latest_epoch': { 'con': [], 'base': [], 'opt': [], 'bull': [] },
+                'latest_epoch': {
+                    'con':  [p75, m50Med], // Current Market → latest epoch P75 + Top 50 MEV
+                    'base': [], 'opt': [], 'bull': []
+                },
                 'last_12m_all': {
-                    'con':  [netMed],
+                    'con':  [],            // 12m median not the right ref for Current Market
                     'base': [p75, m50Med],
                     'opt':  [],
                     'bull': []
@@ -3785,6 +3788,17 @@ function qcpRender() {
             return '<span class="qcp-sc">Above 12M range</span>';
         }
         if (sc === 'con') {
+            // MEV + Current Market: compare against epoch 945 snapshot (P75 + Top 50 MEV)
+            if (metricKey === 'mev') {
+                var ep = bench && bench.mev;
+                if (!ep) return '<span class="qcp-sn">\u2014</span>';
+                var ep945p75   = ep.percentiles && ep.percentiles.p75;
+                var ep945top50 = ep.cohorts && ep.cohorts.top_50_by_mev && ep.cohorts.top_50_by_mev.median;
+                if (ep945p75 == null) return '<span class="qcp-sn">\u2014</span>';
+                if (sv <= ep945p75) return '<span class="qcp-sa">Within latest epoch P75</span>';
+                if (ep945top50 != null && sv <= ep945top50 * 1.1) return '<span class="qcp-sc">Near latest top 50 MEV</span>';
+                return '<span class="qcp-sc">Above latest epoch P75</span>';
+            }
             if (!m12) return '<span class="qcp-sn">\u2014</span>';
             var net = m12.network;
             if (net.p25 == null) return '<span class="qcp-sn">\u2014</span>';
