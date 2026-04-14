@@ -1487,7 +1487,7 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
         <div style="background:#111213;border-radius:6px;padding:14px 16px;margin-bottom:12px;border-left:3px solid #5B8DEF;">
             <div style="font-size:10px;font-weight:600;color:#5B8DEF;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Scenario mapping &mdash; preset &rarr; window &rarr; market size</div>
             <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:11px;font-family:var(--font-mono);margin-bottom:14px;">
-                <span style="color:#D4E8A0;white-space:nowrap;">Current Market</span><span style="color:var(--text);">6-month window, annualized</span>
+                <span style="color:#D4E8A0;white-space:nowrap;">Current Market</span><span style="color:var(--text);" id="jit-con-window-label">last 15 epochs (~30 days), annualized</span>
                 <span style="color:#BDD970;white-space:nowrap;">Last 12 Months</span><span style="color:var(--text);">12-month window, annualized</span>
                 <span style="color:#F0C040;white-space:nowrap;">Last 24 Months + Congestion</span><span style="color:var(--text);">24-month window, annualized &mdash; includes higher-activity periods</span>
                 <span style="color:#F5A623;white-space:nowrap;">Bull Case</span><span style="color:var(--text);">5,000,000 SOL/yr &mdash; manual, not derived from historical windows</span>
@@ -1508,8 +1508,18 @@ input.validator-context-value[type=number] { -moz-appearance:textfield; }
                         </tr>
                     </thead>
                     <tbody>
+                        <tr style="border-bottom:1px solid #1e1f20;background:rgba(212,232,160,0.04);">
+                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">~30 days<br><span style="font-size:9px;color:#D4E8A0;">Current Market</span></td>
+                            <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-rec-range">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-rec-ep">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-rec-sol">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text2);" id="jw-tbl-rec-avg">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text2);" id="jw-tbl-rec-fcu">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text2);" id="jw-tbl-rec-days">&mdash;</td>
+                            <td style="padding:7px 8px;text-align:right;color:var(--text);font-weight:500;" id="jw-tbl-rec-ann">&mdash;</td>
+                        </tr>
                         <tr style="border-bottom:1px solid #1e1f20;">
-                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">6 months<br><span style="font-size:9px;color:#D4E8A0;">Current Market</span></td>
+                            <td style="padding:7px 8px;color:var(--text);white-space:nowrap;">6 months<br><span style="font-size:9px;color:var(--text2);">reference</span></td>
                             <td style="padding:7px 8px;color:var(--text2);white-space:nowrap;" id="jw-tbl-6m-range">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-6m-ep">&mdash;</td>
                             <td style="padding:7px 8px;text-align:right;color:var(--text);" id="jw-tbl-6m-sol">&mdash;</td>
@@ -3007,6 +3017,9 @@ const _jit24mStats = computeJitWindowByDate(_isoMonthsBack(_jitLastDate, 24));
 const _jit6m  = Math.round(_jit6mStats.annualized  / 1000) * 1000;
 const _jit12m = Math.round(_jit12mStats.annualized / 1000) * 1000;
 const _jit24m = Math.round(_jit24mStats.annualized / 1000) * 1000;
+// Recent window — last 15 epochs from embedded data (used for Current Market; updated live if Jito API succeeds)
+const _jitRecentStats = computeJitStats(15);
+const _jitRecent = Math.round(_jitRecentStats.annualized / 1000) * 1000;
 const _EMPTY_AOT_ARTIFACT = {
     schema_version: 'aot_programs.v1',
     source_file: 'upstream:missing',
@@ -3323,8 +3336,8 @@ const SLIDER_META = {
 };
 
 const SC = {
-    con:  {ca:5,cj:5,j:6.4,s:8,b:8,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:_jit6m,
-           desc:"Current market conditions. AOT fee/CU calibrated from 30d program-level data (AOT scope). JIT market anchored to the last 6 months. Raiku stake 8%, block share 8%, SOL price $80."},
+    con:  {ca:5,cj:5,j:6.4,s:8,b:8,f:+_fCon.toFixed(2),p:80,ra:0.50,rj:0.25,vb:1.5,jm:_jitRecent,
+           desc:"Current market conditions. AOT fee/CU calibrated from 30d program-level data (AOT scope). JIT market anchored to the last 15 epochs (~30 days). Raiku stake 8%, block share 8%, SOL price $80."},
     base: {ca:5,cj:5,j:8,s:10,b:8,f:+_fBase.toFixed(2),p:100,ra:0.25,rj:0.10,vb:1.0,jm:_jit12m,
            desc:"Moderate adoption scenario. AOT fee/CU calibrated from long-horizon data (24-month epoch distribution, normal regime). JIT market anchored to the last 12 months. Raiku stake 10%, block share 8%, SOL price $100."},
     opt:  {ca:5,cj:5,j:12,s:15,b:12,f:+_fOpt.toFixed(2),p:150,ra:0.25,rj:0.10,vb:0.5,jm:_jit24m,
@@ -4262,6 +4275,67 @@ async function initSolPrices() {
     }
 }
 
+// Live JIT market hydration — fetches last 15 epochs from Jito Foundation API
+// Falls back to embedded D_JITO last-15-epoch window if CORS or network fails.
+async function initJitLiveData() {
+    var JITO_URL = 'https://kobe.mainnet.jito.network/api/v1/mev_rewards';
+    var N_EPOCHS = 15;
+    try {
+        // Step 1: GET latest epoch (no body needed)
+        var latestRes = await fetch(JITO_URL);
+        if (!latestRes.ok) throw new Error('latest-' + latestRes.status);
+        var latest = await latestRes.json();
+        var currentEpoch = latest.epoch;
+        if (!currentEpoch) throw new Error('no-epoch');
+
+        // Step 2: Fetch last N epochs in parallel via POST
+        var epochNums = Array.from({length: N_EPOCHS}, function(_, i) { return currentEpoch - i; });
+        var promises = epochNums.map(function(ep) {
+            return fetch(JITO_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({epoch: ep})
+            }).then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
+        });
+        var results = await Promise.all(promises);
+
+        // Step 3: Filter valid results and compute annualized
+        var valid = results.filter(function(r) { return r && r.epoch && r.total_network_mev_lamports > 0; });
+        if (valid.length < 5) throw new Error('insufficient-data-' + valid.length);
+
+        var totalSol  = valid.reduce(function(s, r) { return s + r.total_network_mev_lamports / 1e9; }, 0);
+        var totalDays = valid.length * 1.97; // ~1.97 days/epoch
+        var annualized = (totalSol / totalDays) * 365.25;
+
+        // Sort by epoch to get date range string (use epoch numbers as proxy)
+        var sortedEpochs = valid.map(function(r) { return r.epoch; }).sort(function(a,b){return a-b;});
+        window._jitLiveStats = {
+            annualized: annualized,
+            totalSol:   totalSol,
+            totalDays:  totalDays,
+            epochs:     valid.length,
+            firstDate:  'Ep.' + sortedEpochs[0],
+            lastDate:   'Ep.' + sortedEpochs[sortedEpochs.length - 1],
+        };
+
+        // Step 4: Update SC.con.jm and re-apply if current scenario is con
+        var liveRounded = Math.round(annualized / 1000) * 1000;
+        SC.con.jm = liveRounded;
+        if (typeof _selectedScenario !== 'undefined' && _selectedScenario === 'con') {
+            applyScenario('con');
+        }
+
+        // Step 5: Update label and methodology table
+        var lbl = document.getElementById('jit-con-window-label');
+        if (lbl) lbl.textContent = 'last ' + valid.length + ' epochs (live, annualized)';
+        _populateJitWindowRef();
+
+    } catch(e) {
+        // CORS or network failure — keep embedded _jitRecent, nothing to update
+        window._jitLiveStats = null;
+    }
+}
+
 function _vcPopulatePriceExplainer() {
     var st = _solPriceState;
     var na = st.failed ? 'unavailable (API error)' : 'loading\u2026';
@@ -4494,6 +4568,19 @@ function _populateJitWindowRef() {
                            .filter(v => v > 0);
         return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
     };
+    // Recent row — last 15 epochs (or updated by live fetch)
+    (function() {
+        var s   = window._jitLiveStats || _jitRecentStats;
+        var ann = window._jitLiveStats ? Math.round(s.annualized / 1000) * 1000 : _jitRecent;
+        set('jw-tbl-rec-range', fmtR(s));
+        set('jw-tbl-rec-ep',   s.epochs);
+        set('jw-tbl-rec-sol',  fmtS(s.totalSol));
+        set('jw-tbl-rec-avg',  fmtN(Math.round(s.totalSol / s.epochs)) + ' SOL');
+        set('jw-tbl-rec-days', Math.round(s.totalDays));
+        set('jw-tbl-rec-ann',  fmtA(ann));
+        var fcu = avgFcu(s.firstDate);
+        set('jw-tbl-rec-fcu', fcu != null ? fcu.toFixed(3) + ' lam/CU' : '\u2014');
+    })();
     [
         { sfx: '6m',  s: _jit6mStats,  ann: _jit6m,  mo: 6  },
         { sfx: '12m', s: _jit12mStats, ann: _jit12m, mo: 12 },
@@ -6797,7 +6884,7 @@ function initHybridControls() {
     });
 }
 
-renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('con'); loadCurrentTotalSolanaStaked(); initSolPrices(); initHybridControls(); _populateJitWindowRef(); qcpFetch(); qcpLoadBenchmarks(); qcpLoadTimeBenchmarks(); qcpLoadStakeDist();
+renderMacroContextPanel(); initEpochFeeChart(); initCharts(); initJitHistoryChart(); initJitDatasetViewer(); initAotFcuSection(); _updateAotSourceCopy(); initFilters(); renderTable(); applyScenario('con'); loadCurrentTotalSolanaStaked(); initSolPrices(); initJitLiveData(); initHybridControls(); _populateJitWindowRef(); qcpFetch(); qcpLoadBenchmarks(); qcpLoadTimeBenchmarks(); qcpLoadStakeDist();
 
 // Calibration source info popover — moved to document.body to escape all stacking contexts
 (function() {
