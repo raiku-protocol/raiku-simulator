@@ -3236,12 +3236,12 @@ const _scenarioPopulationLabel = 'Population: core only (aot + both), is_aot_rel
 
 const _fConRaw = Number(_scenarioActiveAgg.p25NonBase || 0);
 const _fCon = +Math.max(0.10, _fConRaw).toFixed(2);
-const _fBaseRaw = Number(_scenarioAgg.weightedNonBase || 0);
-const _fBase = +_fBaseRaw.toFixed(2);
+const _fBaseRaw = Number(_scenarioAgg.weightedNonBase || 0); // computed but overridden below
+const _fBase = 1.50; // Normal regime median (12-24m Trillium calibration, fixed for Last 12 Months scenario)
 const _fOptRaw = Number(_scenarioAgg.weightedTotal || 0);
-const _fOpt = 1.50;
+const _fOpt = 2.00; // Elevated regime (Normal p75, fixed for Last 24 Months + Congestion)
 const _fBullRaw = Number(_scenarioP75Active || 0);
-const _fBull = 2.00;
+const _fBull = 3.50; // Extreme regime (upper tail, fixed for Bull Case)
 // 30d AOT calibration stats — computed once from the active 30d program dataset.
 // Top-level (non-base fee/CU): active payers (fpc_nb > 0) for percentiles.
 // Sub-metrics: all programs with cu > 0 for percentiles; CU-weighted means from _scenarioAgg.

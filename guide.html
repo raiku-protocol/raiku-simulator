@@ -271,28 +271,28 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
     <div class="scenario-grid">
       <div class="sc-card con">
         <div class="sc-name con">Current Market</div>
-        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$80 (live*)</span></div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">spot (live*)</span></div>
         <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">8%</span></div>
         <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">8%</span></div>
-        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">30d scope†</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">0.10 lam (floor†)</span></div>
         <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">~30d ann.†</span></div>
         <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">6.4%</span></div>
       </div>
       <div class="sc-card base">
         <div class="sc-name base">Last 12 Months</div>
-        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$100 (live*)</span></div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">12m avg (live*)</span></div>
         <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">10%</span></div>
         <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">8%</span></div>
-        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">macro†</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">1.50 lam</span></div>
         <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">12m ann.†</span></div>
         <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">8%</span></div>
       </div>
       <div class="sc-card opt">
         <div class="sc-name opt">Last 24 Months + Congestion</div>
-        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$150 (live*)</span></div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">24m avg (live*)</span></div>
         <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">15%</span></div>
         <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">12%</span></div>
-        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">1.50 lam</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">2.00 lam</span></div>
         <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">24m ann.†</span></div>
         <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">12%</span></div>
       </div>
@@ -301,15 +301,15 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
         <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$250</span></div>
         <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">25%</span></div>
         <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">15%</span></div>
-        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">2.00 lam</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">3.50 lam</span></div>
         <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">5M SOL/yr</span></div>
         <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">20%</span></div>
       </div>
     </div>
     <p class="sc-note">
-      * SOL Price is live-fetched from Binance on page load (spot / 12m avg / 24m avg); fallback values shown. Bull Case SOL ($250) and JIT Market (5M SOL/yr) are fixed stress assumptions.
-      † JIT Market is annualized from the corresponding window via the Jito Foundation API (last 15 epochs for Current Market; 12-month and 24-month windows for the other two).
-      Fee/CU for Current Market is the 30-day AOT program scope p25 (floor 0.10 lam, calibrated from Dune data); Last 12 Months uses 12–24m Trillium weighted non-base; Last 24 Months + Congestion and Bull Case are fixed.
+      * SOL Price is live-fetched from Binance on page load: spot price for Current Market, 12-month average for Last 12 Months, 24-month average for Last 24 Months + Congestion. Bull Case is fixed at $250.
+      † JIT Market is annualized from the Jito Foundation API: last 15 epochs (~30 days) for Current Market; 12-month and 24-month windows for the other two. Bull Case (5M SOL/yr) is a fixed stress assumption.
+      Fee/CU for Current Market is the 30-day AOT program scope p25 (floor 0.10 lam, data-driven from Dune). Last 12 Months, Last 24 Months + Congestion, and Bull Case use fixed calibrated values (Normal / Elevated / Extreme regimes).
     </p>
   </div>
 
@@ -566,8 +566,8 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
       Two data sources are combined:
     </p>
     <ul class="io-list" style="margin:8px 0;">
-      <li><strong>30-day Dune data</strong> — program-level fee/CU for the top 500 programs. Arb bots are excluded from AOT calibration (they are JIT-only by nature). Used by <em>Current Market</em> (p25 of AOT-scope programs, floor 0.10 lam).</li>
-      <li><strong>12–24 month Trillium epoch data</strong> — epoch-level non-base fee/CU (priority + MEV), classified by market regime. Used by <em>Last 12 Months</em> (weighted non-base) and as reference for the longer-horizon scenarios.</li>
+      <li><strong>30-day Dune data</strong> — program-level fee/CU for the top 500 programs. Arb bots are excluded from AOT calibration (they are JIT-only by nature). Used by <em>Current Market</em> (p25 of AOT-scope active payers, floor 0.10 lam).</li>
+      <li><strong>12–24 month Trillium epoch calibration</strong> — epoch-level non-base fee/CU classified by market regime, used to set fixed defaults: <em>Last 12 Months</em> 1.50 lam (Normal median), <em>Last 24 Months + Congestion</em> 2.00 lam (Elevated), <em>Bull Case</em> 3.50 lam (Extreme upper tail).</li>
     </ul>
 
     <h3>Market conditions (regimes)</h3>
@@ -584,10 +584,10 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
     </table>
     <p style="margin-top:10px;">
       Scenario fee/CU defaults:
-      Current Market <strong style="color:var(--text);">≥0.10 lam</strong> (30d AOT scope, p25, data-driven) ·
-      Last 12 Months <strong style="color:var(--text);">data-driven</strong> (12–24m Trillium weighted non-base) ·
-      Last 24 Months + Congestion <strong style="color:var(--text);">1.50 lam</strong> (fixed) ·
-      Bull Case <strong style="color:var(--text);">2.00 lam</strong> (fixed)
+      Current Market <strong style="color:var(--text);">0.10 lam</strong> (30d AOT scope p25, floor — data-driven) ·
+      Last 12 Months <strong style="color:var(--text);">1.50 lam</strong> (Normal regime median, fixed) ·
+      Last 24 Months + Congestion <strong style="color:var(--text);">2.00 lam</strong> (Elevated regime, fixed) ·
+      Bull Case <strong style="color:var(--text);">3.50 lam</strong> (Extreme regime upper tail, fixed)
     </p>
   </div>
 
