@@ -271,7 +271,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
     <div class="scenario-grid">
       <div class="sc-card con">
         <div class="sc-name con">Current Market</div>
-        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">spot (live*)</span></div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val" id="guide-sol-con">…</span></div>
         <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">8%</span></div>
         <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">8%</span></div>
         <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">0.10 lam (floor†)</span></div>
@@ -280,7 +280,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
       </div>
       <div class="sc-card base">
         <div class="sc-name base">Last 12 Months</div>
-        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">12m avg (live*)</span></div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val" id="guide-sol-base">…</span></div>
         <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">10%</span></div>
         <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">8%</span></div>
         <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">1.50 lam</span></div>
@@ -289,7 +289,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
       </div>
       <div class="sc-card opt">
         <div class="sc-name opt">Last 24 Months + Congestion</div>
-        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">24m avg (live*)</span></div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val" id="guide-sol-opt">…</span></div>
         <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">15%</span></div>
         <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">12%</span></div>
         <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">2.00 lam</span></div>
@@ -307,7 +307,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
       </div>
     </div>
     <p class="sc-note">
-      * SOL Price is live-fetched from Binance on page load: spot price for Current Market, 12-month average for Last 12 Months, 24-month average for Last 24 Months + Congestion. Bull Case is fixed at $250.
+      * SOL Price is live-fetched from Binance (SOLUSDT) on page load: spot for Current Market, 365-day average for Last 12 Months, 730-day average for Last 24 Months + Congestion. Bull Case is fixed at $250.
       † JIT Market is annualized from the Jito Foundation API: last 15 epochs (~30 days) for Current Market; 12-month and 24-month windows for the other two. Bull Case (5M SOL/yr) is a fixed stress assumption.
       Fee/CU for Current Market is the 30-day AOT program scope p25 (floor 0.10 lam, data-driven from Dune). Last 12 Months, Last 24 Months + Congestion, and Bull Case use fixed calibrated values (Normal / Elevated / Extreme regimes).
     </p>
@@ -660,6 +660,28 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
     });
   }, { rootMargin: '-10% 0px -80% 0px' });
   sections.forEach(function(s) { obs.observe(s); });
+}());
+
+// Live SOL prices from Binance — same logic as simulator
+(async function() {
+  var fmt = function(v) { return '$' + Math.round(v); };
+  var set = function(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
+  set('guide-sol-con', '…'); set('guide-sol-base', '…'); set('guide-sol-opt', '…');
+  try {
+    var spotRes = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT');
+    if (!spotRes.ok) throw new Error('spot');
+    var spot = parseFloat((await spotRes.json()).price);
+    var histRes = await fetch('https://api.binance.com/api/v3/klines?symbol=SOLUSDT&interval=1d&limit=730');
+    if (!histRes.ok) throw new Error('hist');
+    var closes = (await histRes.json()).map(function(k){ return parseFloat(k[4]); });
+    var avg12m = closes.slice(-365).reduce(function(s,v){return s+v;},0) / Math.min(closes.length, 365);
+    var avg24m = closes.reduce(function(s,v){return s+v;},0) / closes.length;
+    set('guide-sol-con',  fmt(spot));
+    set('guide-sol-base', fmt(avg12m));
+    set('guide-sol-opt',  fmt(avg24m));
+  } catch(e) {
+    set('guide-sol-con', 'spot*'); set('guide-sol-base', '12m avg*'); set('guide-sol-opt', '24m avg*');
+  }
 }());
 </script>
 </body>
