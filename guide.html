@@ -146,7 +146,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
   <!-- Top nav -->
   <div class="topnav">
     <a href="index.html" class="topnav-back">← Back to Simulator</a>
-    <span class="topnav-meta">guide v1 · Mar 2026</span>
+    <span class="topnav-meta">guide v1.2 · Apr 2026</span>
   </div>
 
   <div class="layout">
@@ -270,30 +270,30 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
 
     <div class="scenario-grid">
       <div class="sc-card con">
-        <div class="sc-name con">Conservative</div>
-        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$80</span></div>
-        <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">5%</span></div>
-        <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">2%</span></div>
-        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">1.00 lam</span></div>
-        <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">6M SOL/yr</span></div>
-        <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">4%</span></div>
+        <div class="sc-name con">Current Market</div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$80 (live*)</span></div>
+        <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">8%</span></div>
+        <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">8%</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">30d scope†</span></div>
+        <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">~30d ann.†</span></div>
+        <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">6.4%</span></div>
       </div>
       <div class="sc-card base">
-        <div class="sc-name base">Base Case</div>
-        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$100</span></div>
+        <div class="sc-name base">Last 12 Months</div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$100 (live*)</span></div>
         <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">10%</span></div>
         <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">8%</span></div>
-        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">1.50 lam</span></div>
-        <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">813K SOL/yr</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">macro†</span></div>
+        <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">12m ann.†</span></div>
         <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">8%</span></div>
       </div>
       <div class="sc-card opt">
-        <div class="sc-name opt">Optimistic</div>
-        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$150</span></div>
+        <div class="sc-name opt">Last 24 Months + Congestion</div>
+        <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$150 (live*)</span></div>
         <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">15%</span></div>
         <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">12%</span></div>
-        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">2.00 lam</span></div>
-        <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">1.76M SOL/yr</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">1.50 lam</span></div>
+        <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">24m ann.†</span></div>
         <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">12%</span></div>
       </div>
       <div class="sc-card bull">
@@ -301,14 +301,15 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
         <div class="sc-row"><span class="sc-key">SOL Price</span><span class="sc-val">$250</span></div>
         <div class="sc-row"><span class="sc-key">Raiku Stake</span><span class="sc-val">25%</span></div>
         <div class="sc-row"><span class="sc-key">Block Share</span><span class="sc-val">15%</span></div>
-        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">3.50 lam</span></div>
+        <div class="sc-row"><span class="sc-key">Fee/CU</span><span class="sc-val">2.00 lam</span></div>
         <div class="sc-row"><span class="sc-key">JIT Market</span><span class="sc-val">5M SOL/yr</span></div>
         <div class="sc-row"><span class="sc-key">Raiku JIT Share</span><span class="sc-val">20%</span></div>
       </div>
     </div>
     <p class="sc-note">
-      JIT Market figures derive from <a href="https://jito.network" target="_blank" rel="noopener">Jito Foundation</a> MEV reward data (epochs 836–935).
-      Conservative uses a 6-month window; Base uses 12 months; Optimistic uses 24 months; Bull is a manual stress assumption.
+      * SOL Price is live-fetched from Binance on page load (spot / 12m avg / 24m avg); fallback values shown. Bull Case SOL ($250) and JIT Market (5M SOL/yr) are fixed stress assumptions.
+      † JIT Market is annualized from the corresponding window via the Jito Foundation API (last 15 epochs for Current Market; 12-month and 24-month windows for the other two).
+      Fee/CU for Current Market is the 30-day AOT program scope p25 (floor 0.10 lam, calibrated from Dune data); Last 12 Months uses 12–24m Trillium weighted non-base; Last 24 Months + Congestion and Bull Case are fixed.
     </p>
   </div>
 
@@ -353,7 +354,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
         <li><strong>Waterfall</strong> — Validator Base, Validator Bonus, AOT Rebate, JIT Rebate, Growth &amp; Buyback, Treasury.</li>
         <li><strong>Revenue Flow diagram</strong> — Sankey showing how gross revenue distributes to each destination.</li>
         <li><strong>Sensitivity matrix</strong> — AOT Protocol Treasury across Stake % × Fee/CU grid.</li>
-        <li><strong>Scenario comparison</strong> — 4 side-by-side cards for Conservative / Base / Optimistic / Bull.</li>
+        <li><strong>Scenario comparison</strong> — 4 side-by-side cards for Current Market / Last 12 Months / Last 24 Months + Congestion / Bull Case.</li>
       </ul>
     </div>
   </div>
@@ -374,7 +375,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
     <div class="io-block">
       <span class="io-label input">Setup</span>
       <ul class="io-list">
-        <li><strong>Scenario selector</strong> — 4 buttons (Conservative / Base Case / Optimistic / Bull Case). Resets all Tab 1 — Revenue Model inputs.</li>
+        <li><strong>Scenario selector</strong> — 4 buttons (Current Market / Last 12 Months / Last 24 Months + Congestion / Bull Case). Resets all Tab 1 — Revenue Model inputs.</li>
         <li>Read-only context: SOL Price, Raiku Stake %, Block Share %, Avg Fee/CU, Raiku Validator Stake (SOL).</li>
       </ul>
     </div>
@@ -440,10 +441,10 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
       <span class="io-label input">Setup</span>
       <ul class="io-list">
         <li><strong>Delegated Stake</strong> — editable (default P50 median = 152,908 SOL); ↺ resets to median.</li>
-        <li><strong>Network Stake %</strong> — derived from Delegated Stake ÷ total staked SOL (~426M SOL; source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener">Solana Compass</a>, snapshot Mar 2026).</li>
+        <li><strong>Network Stake %</strong> — derived from Delegated Stake ÷ total staked SOL (~426M SOL; source: <a href="https://solanacompass.com/tokenomics#staked" target="_blank" rel="noopener">Solana Compass</a>, snapshot Apr 2026).</li>
         <li><strong>SOL Price</strong> — local to this section; independent from Tab 1 — Revenue Model.</li>
-        <li><strong>Issuance APY</strong> — initialised from the active Protocol Level scenario; user-adjustable; ↺ resets to Protocol Level value.</li>
-        <li><strong>Network Fees APY</strong> — syncs live from Protocol Level (same <em>NETWORK_FEES_APR_REF × (1 − Block Share)</em> formula) by default, so both sections always agree. Editing it locally applies only to Individual Level outputs; ↺ resets to the live Protocol Level value.</li>
+        <li><strong>Issuance APY</strong> — initialised from the active Protocol Level scenario; user-adjustable; ↺ resets to Protocol Level value. Computed as <em>inflation_rate ÷ staking_ratio</em> (gross APY; currently ≈ 3.90% ÷ 68% ≈ 5.74%). APY is the primary displayed quantity; APR is secondary.</li>
+        <li><strong>Network Fees APY</strong> — syncs live from Protocol Level (same <em>NETWORK_FEES_BENCHMARK_APR × (1 − Block Share)</em> formula, converted to APY) by default, so both sections always agree. Editing it locally applies only to Individual Level outputs; ↺ resets to the live Protocol Level value.</li>
       </ul>
     </div>
     <div class="io-block">
@@ -543,7 +544,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
         </tr>
         <tr>
           <td><a href="https://solanacompass.com" target="_blank" rel="noopener"><strong>Solana Compass</strong></a></td>
-          <td>Total staked SOL (~426M SOL, snapshot Mar 2026); staking ratio; inflation rate</td>
+          <td>Total staked SOL (~426M SOL, snapshot Apr 2026); staking ratio; inflation rate</td>
           <td>Snapshot reference</td>
         </tr>
         <tr>
@@ -565,28 +566,28 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
       Two data sources are combined:
     </p>
     <ul class="io-list" style="margin:8px 0;">
-      <li><strong>30-day Dune data</strong> — program-level fee/CU for the top 500 programs. Arb bots are excluded from AOT calibration (they are JIT-only by nature).</li>
-      <li><strong>12–24 month Trillium epoch data</strong> — epoch-level non-base fee/CU (priority + MEV), classified by market regime.</li>
+      <li><strong>30-day Dune data</strong> — program-level fee/CU for the top 500 programs. Arb bots are excluded from AOT calibration (they are JIT-only by nature). Used by <em>Current Market</em> (p25 of AOT-scope programs, floor 0.10 lam).</li>
+      <li><strong>12–24 month Trillium epoch data</strong> — epoch-level non-base fee/CU (priority + MEV), classified by market regime. Used by <em>Last 12 Months</em> (weighted non-base) and as reference for the longer-horizon scenarios.</li>
     </ul>
 
     <h3>Market conditions (regimes)</h3>
-    <p>Epochs are tagged based on rolling 30-epoch fee volatility:</p>
+    <p>Epochs are tagged based on rolling 30-epoch fee volatility. Note: <strong style="color:var(--text);">Current Market</strong> uses the 30-day program-level AOT scope from Dune (not epoch-level regime classification); the regime table applies to the longer-horizon scenarios.</p>
     <table class="data-table" style="margin-top:8px;">
       <thead>
         <tr><th>Regime</th><th>Description</th><th>Used in scenarios</th></tr>
       </thead>
       <tbody>
-        <tr><td><strong>Normal</strong></td><td>Typical fee environment, low volatility</td><td>Conservative, Base Case</td></tr>
-        <tr><td><strong>Elevated</strong></td><td>Higher-than-usual fees; moderate congestion</td><td>Optimistic (24M window)</td></tr>
-        <tr><td><strong>Extreme</strong></td><td>Memecoin surges, high MEV periods, peak congestion</td><td>Bull Case (top-of-range)</td></tr>
+        <tr><td><strong>Normal</strong></td><td>Typical fee environment, low volatility</td><td>Last 12 Months</td></tr>
+        <tr><td><strong>Elevated</strong></td><td>Higher-than-usual fees; moderate congestion</td><td>Last 24 Months + Congestion</td></tr>
+        <tr><td><strong>Extreme</strong></td><td>Memecoin surges, high MEV periods, peak congestion</td><td>Bull Case (upper tail)</td></tr>
       </tbody>
     </table>
     <p style="margin-top:10px;">
       Scenario fee/CU defaults:
-      Conservative <strong style="color:var(--text);">1.00 lam</strong> (Normal p25) ·
-      Base <strong style="color:var(--text);">1.50 lam</strong> (Normal median) ·
-      Optimistic <strong style="color:var(--text);">2.00 lam</strong> (Normal p75) ·
-      Bull <strong style="color:var(--text);">3.50 lam</strong> (Extreme mean)
+      Current Market <strong style="color:var(--text);">≥0.10 lam</strong> (30d AOT scope, p25, data-driven) ·
+      Last 12 Months <strong style="color:var(--text);">data-driven</strong> (12–24m Trillium weighted non-base) ·
+      Last 24 Months + Congestion <strong style="color:var(--text);">1.50 lam</strong> (fixed) ·
+      Bull Case <strong style="color:var(--text);">2.00 lam</strong> (fixed)
     </p>
   </div>
 
@@ -624,7 +625,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
       <dd>Solana time unit ≈ 2–3 days (~432,000 slots). Approximately 182 epochs per year. All epoch-level metrics in the simulator are annualised using this rate.</dd>
 
       <dt>Network Stake %</dt>
-      <dd>Your validator's delegated stake divided by total staked SOL (~426M SOL as of Mar 2026). Determines your share of slot leadership and revenue.</dd>
+      <dd>Your validator's delegated stake divided by total staked SOL (~426M SOL as of Apr 2026). Determines your share of slot leadership and revenue.</dd>
 
       <dt>Raiku Uplift</dt>
       <dd>The incremental APY gained by a validator running RAIKU, over and above standard Solana issuance + network fees.</dd>
@@ -634,7 +635,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
   <!-- Footer -->
   <div style="margin-top:48px; padding-top:20px; border-top:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
     <span style="font-family:var(--font-mono); font-size:10px; color:var(--text2);">
-      RAIKU Revenue Simulator · Guide v1 · Mar 2026 · Internal use only
+      RAIKU Revenue Simulator · Guide v1.2 · Apr 2026 · Internal use only
     </span>
     <a href="index.html" style="font-family:var(--font-mono); font-size:10px; color:var(--text2);">← Back to Simulator</a>
   </div>
