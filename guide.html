@@ -664,7 +664,7 @@ hr { border:none; border-top:1px solid var(--card-border); margin:40px 0; }
 
 // Live SOL prices from Binance — same logic as simulator
 (async function() {
-  var fmt = function(v) { return '$' + Math.round(v); };
+  var fmt = function(v) { return '$' + Math.max(10, Math.min(400, Math.round(v / 5) * 5)); };
   var set = function(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
   set('guide-sol-con', '…'); set('guide-sol-base', '…'); set('guide-sol-opt', '…');
   try {
